@@ -12,29 +12,22 @@
   <meta name="msapplication-TileColor" content="#000000">
   <meta name="theme-color" content="#000000">
   
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     body { margin: 0; padding: 0; background-color: #000; color: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; overflow: hidden; }
-    #image-container { 
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-      z-index: 1; cursor: pointer;
-    }
-    .image-layer {
-      position: absolute; top: 0; left: 0;
-      width: 100%; height: 100%;
-      object-fit: contain;
-      opacity: 0;
-      transition: opacity 0.2s ease-in-out;
-    }
-    .image-layer.is-active {
-      opacity: 1;
-    }
-    .ui-layer { 
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-      z-index: 2; pointer-events: none; 
-    }
+    #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; cursor: pointer; }
+    .ui-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
     .ui-layer > * { pointer-events: auto; }
+    #loading-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: #000; z-index: 10;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 1.2rem; transition: opacity 0.5s ease;
+      opacity: 0; pointer-events: none;
+    }
+    #loading-overlay.is-active { opacity: 1; pointer-events: auto; }
     #prompt-text {
         position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
         z-index: 3; font-size: 1.5rem; font-weight: 200; letter-spacing: 0.2em;
@@ -45,27 +38,11 @@
     #prompt-text.is-visible { opacity: 1; }
     @keyframes subtle-pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 0.4; } }
     .text-shadow { text-shadow: 0 0 8px rgba(0,0,0,0.7); }
-
-    /* ★追加: CSSグリッチエフェクト */
-    .glitch-effect {
-      animation: glitch 0.3s linear;
-    }
-    @keyframes glitch {
-      0% { transform: translate(0); opacity: 1; }
-      25% { transform: translate(10px, -5px); }
-      50% { transform: translate(-10px, 5px); opacity: 0.8; }
-      75% { transform: translate(5px, 10px); }
-      100% { transform: translate(0); opacity: 1; }
-    }
   </style>
 </head>
 <body>
-
-  <div id="image-container" onclick="changeImage()">
-    <img id="img1" class="image-layer" src="" alt="Generative Art Layer 1">
-    <img id="img2" class="image-layer" src="" alt="Generative Art Layer 2">
-  </div>
-  
+  <div id="loading-overlay"><p>Loading Machine...</p></div>
+  <div id="canvas-container"></div>
   <div id="prompt-text">CLICK / TAP</div>
 
   <div class="ui-layer flex flex-col justify-between p-4">
@@ -77,85 +54,210 @@
     </footer>
   </div>
 
-  <script>
-    const imageCount = 394;
-    const filePrefix = "photos/photo";
-    const fileSuffix = ".webp";
-    const numberPadding = 3;
-    const imageFileNames = [];
-    for (let i = 1; i <= imageCount; i++) {
-      imageFileNames.push(`${filePrefix}${i.toString().padStart(numberPadding, '0')}${fileSuffix}`);
+  <script id="vertex-shader" type="x-shader/x-vertex">
+    precision mediump float;
+    attribute vec3 aPosition;
+    attribute vec2 aTexCoord;
+    varying vec2 vTexCoord;
+    void main() {
+      vTexCoord = aTexCoord;
+      gl_Position = vec4(aPosition, 1.0);
+    }
+  </script>
+
+  <script id="fragment-shader" type="x-shader/x-fragment">
+    precision mediump float;
+    varying vec2 vTexCoord;
+    uniform sampler2D fromTex;
+    uniform sampler2D toTex;
+    uniform float progress;
+    uniform float time;
+    uniform vec2 resolution;
+
+    float random(vec2 st) {
+        return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
     }
 
-    const img1 = document.getElementById('img1');
-    const img2 = document.getElementById('img2');
-    const promptText = document.getElementById('prompt-text');
-    
-    let currentImageIndex = -1;
-    let nextImageIndex = -1;
-    let isImg1Active = true;
-    let isChanging = false;
-    let promptTimer = null;
-
-    // 次の画像を裏側で読み込む関数
-    function preloadNextImage() {
-        if (imageFileNames.length < 2) return;
-        let newIndex = Math.floor(Math.random() * imageFileNames.length);
-        while (newIndex === currentImageIndex) {
-            newIndex = Math.floor(Math.random() * imageFileNames.length);
-        }
-        nextImageIndex = newIndex;
+    void main() {
+        float t = progress;
         
-        // Imageオブジェクトを使ってバックグラウンドで読み込む
-        const preloader = new Image();
-        preloader.src = imageFileNames[nextImageIndex];
+        float effectStrength = sin(t * 3.1415);
+
+        // --- 1. モザイク (ブロック) エフェクト ---
+        float blockSize = mix(0.005, 0.1, effectStrength * 1.2);
+        vec2 mosaicCoord = floor(vTexCoord / blockSize) * blockSize;
+        
+        // --- 2. ノイズ ---
+        float noise = (random(vec2(vTexCoord.y * 20.0, time)) - 0.5) * 0.1 * effectStrength;
+
+        // --- 3. グリッチ (色ずれ & 歪み) ---
+        float glitchAmount = effectStrength * 0.05;
+        vec2 offsetR = vec2((random(vec2(vTexCoord.y, time * 0.1)) - 0.5) * 2.0, 0.0) * glitchAmount;
+        vec2 offsetG = vec2((random(vec2(vTexCoord.y, time * 0.2)) - 0.5) * 2.0, 0.0) * glitchAmount * 0.5;
+        
+        vec2 fromCoord = mosaicCoord + offsetR + noise;
+        vec2 toCoord = vTexCoord + offsetG + noise;
+        
+        // テクスチャ座標が0.0-1.0の範囲を超えるのを防ぐ
+        fromCoord = clamp(fromCoord, 0.0, 1.0);
+        toCoord = clamp(toCoord, 0.0, 1.0);
+
+        vec4 fromColor = texture2D(fromTex, fromCoord);
+        vec4 toColor = texture2D(toTex, toCoord);
+        
+        gl_FragColor = mix(fromColor, toColor, t);
     }
+  </script>
 
-    function changeImage() {
-      if (isChanging || nextImageIndex === -1) return;
-      isChanging = true;
-      promptText.classList.remove('is-visible');
-      clearTimeout(promptTimer);
+  <script>
+    const sketch = (p) => {
+      const imageCount = 394;
+      const filePrefix = "photos/photo";
+      const fileSuffix = ".webp";
+      const numberPadding = 3;
 
-      const activeImg = isImg1Active ? img1 : img2;
-      const inactiveImg = isImg1Active ? img2 : img1;
-
-      // 読み込み済みの次の画像をセット
-      inactiveImg.src = imageFileNames[nextImageIndex];
-      currentImageIndex = nextImageIndex;
+      let imageFileNames = [];
+      let allImages = {};
+      let currentImageKey = null;
+      let nextImageKey = null;
+      let theShader;
       
-      // グリッチエフェクトを開始
-      activeImg.classList.add('glitch-effect');
-      inactiveImg.classList.add('glitch-effect');
+      let animationState = 'idle';
+      let progress = 0.0;
+      const transitionDuration = 90;
+      
+      let promptTimer = null;
+      const promptText = document.getElementById('prompt-text');
 
-      // 0.1秒後（グリッチの途中）に画像を入れ替える
-      setTimeout(() => {
-          activeImg.classList.remove('is-active');
-          inactiveImg.classList.add('is-active');
-      }, 150);
+      for (let i = 1; i <= imageCount; i++) {
+        imageFileNames.push(`${filePrefix}${i.toString().padStart(numberPadding, '0')}${fileSuffix}`);
+      }
+      
+      p.preload = () => {
+          const vertexShader = document.getElementById('vertex-shader').textContent;
+          const fragmentShader = document.getElementById('fragment-shader').textContent;
+          theShader = p.createShader(vertexShader, fragmentShader);
+      };
 
-      // アニメーション完了後にクラスを削除し、次の画像を事前読み込み
-      setTimeout(() => {
-        activeImg.classList.remove('glitch-effect');
-        inactiveImg.classList.remove('glitch-effect');
-        isImg1Active = !isImg1Active;
-        isChanging = false;
-        preloadNextImage(); // 次の画像を準備
-        promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 3000);
-      }, 300);
-    }
+      p.setup = () => {
+        const canvasContainer = document.getElementById('canvas-container');
+        p.createCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight, p.WEBGL).parent(canvasContainer);
+        p.noStroke();
+        
+        const initialIndex = p.floor(p.random(imageFileNames.length));
+        loadImageDynamically(imageFileNames[initialIndex], (img) => {
+          currentImageKey = img.filePath;
+          const loadingOverlay = document.getElementById('loading-overlay');
+          loadingOverlay.style.opacity = '0';
+          setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
+          promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 3000);
+        });
+      };
 
-    // 最初の画像読み込み
-    document.addEventListener("DOMContentLoaded", () => {
-        let initialIndex = Math.floor(Math.random() * imageFileNames.length);
-        currentImageIndex = initialIndex;
-        img1.src = imageFileNames[initialIndex];
-        img1.classList.add('is-active');
-        img1.onload = () => {
-            preloadNextImage(); // 最初の画像が表示されたら、すぐに次の画像を裏で読み込み始める
-            promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 3000);
-        };
-    });
+      p.draw = () => {
+        if (!currentImageKey || !allImages[currentImageKey]) {
+          p.background(0);
+          return;
+        }
+        
+        p.shader(theShader);
+
+        const currentImage = allImages[currentImageKey];
+        const nextImage = allImages[nextImageKey];
+
+        if (animationState === 'transitioning' && currentImage && nextImage) {
+            progress += 1.0 / transitionDuration;
+            if (progress >= 1.0) {
+                progress = 0.0;
+                animationState = 'idle';
+                currentImageKey = nextImageKey;
+                nextImageKey = null;
+                preloadNextImage();
+                promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 3000);
+            }
+        } else {
+          progress = 0.0; // アニメーション中でなければ進捗をリセット
+        }
+        
+        theShader.setUniform('fromTex', currentImage);
+        if (nextImage) {
+          theShader.setUniform('toTex', nextImage);
+        } else {
+          theShader.setUniform('toTex', currentImage); // 次の画像がない場合は現在の画像を送る
+        }
+        theShader.setUniform('progress', progress);
+        theShader.setUniform('time', p.frameCount * 0.01);
+        theShader.setUniform('resolution', [p.width, p.height]);
+        
+        p.rect(-p.width/2, -p.height/2, p.width, p.height);
+      };
+      
+      function preloadNextImage() {
+        if (imageFileNames.length < 2) return;
+        let newIndex = p.floor(p.random(imageFileNames.length));
+        while (imageFileNames[newIndex] === currentImageKey) {
+            newIndex = p.floor(p.random(imageFileNames.length));
+        }
+        const nextFilePath = imageFileNames[newIndex];
+        // まだ読み込まれていなければ、裏で読み込んでおく
+        if (!allImages[nextFilePath]) {
+            p.loadImage(nextFilePath, (img) => {
+                img.filePath = nextFilePath;
+                allImages[nextFilePath] = img;
+            });
+        }
+      }
+
+      function loadImageDynamically(filePath, callback) {
+        if (allImages[filePath]) {
+            callback(allImages[filePath]);
+            return;
+        }
+        const loadingOverlay = document.getElementById('loading-overlay');
+        loadingOverlay.classList.add('is-active');
+        p.loadImage(filePath, 
+          (img) => {
+            img.filePath = filePath;
+            allImages[filePath] = img;
+            callback(img);
+            if(loadingOverlay.classList.contains('is-active')) loadingOverlay.classList.remove('is-active');
+          },
+          () => {
+            console.warn(`Failed to load: ${filePath}. Retrying.`);
+            const newIndex = p.floor(p.random(imageFileNames.length));
+            loadImageDynamically(imageFileNames[newIndex], callback);
+          }
+        );
+      }
+      
+      const handleInteraction = () => {
+        if (p.getAudioContext().state !== 'running') { p.getAudioContext().resume(); }
+
+        if (animationState === 'idle' && imageFileNames.length > 1) {
+          promptText.classList.remove('is-visible');
+          clearTimeout(promptTimer);
+          
+          let newIndex = p.floor(p.random(imageFileNames.length));
+          while (imageFileNames[newIndex] === currentImageKey) { 
+            newIndex = p.floor(p.random(imageFileNames.length));
+          }
+          
+          loadImageDynamically(imageFileNames[newIndex], (img) => {
+            nextImageKey = img.filePath;
+            animationState = 'transitioning';
+          });
+        }
+      };
+      p.mousePressed = handleInteraction;
+      p.touchStarted = handleInteraction;
+
+      p.windowResized = () => {
+        const canvasContainer = document.getElementById('canvas-container');
+        p.resizeCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
+      };
+    };
+
+    new p5(sketch);
   </script>
 
 </body>
