@@ -29,8 +29,19 @@
 </head>
 <body>
   <div id="root"></div>
+
+  <!-- ★変更点：新しい統一フッターを追加（黒バージョン） -->
+  <footer class="fixed bottom-4 left-0 right-0 text-center">
+    <div class="flex flex-col items-center">
+      <img src="logo/gj_logo_black.png" alt="GENERATIVE JUNKIE Logo" class="w-36 mb-2">
+      <p class="text-black" style="font-size: 10px; font-family: Verdana, sans-serif;">©︎GENERATIVE JUNKIE</p>
+    </div>
+  </footer>
   
   <script>
+    // ...（JavaScript部分は変更なし）...
+    // ★変更点：コントロールパネル内の古いフッターを削除
+    
     // グローバル変数
     let audioContext, analyser, source, buffer;
     let startTime = 0, pauseTime = 0;
@@ -499,6 +510,7 @@
       controlPanel.id = 'control-panel';
       controlPanel.className = 'absolute bottom-0 left-0 right-0 p-3 z-20';
       controlPanel.style.display = 'none';
+      // ★変更点：innerHTMLから古いフッター部分を削除
       controlPanel.innerHTML = `
         <div class="max-w-4xl mx-auto backdrop-blur-xl bg-black/60 rounded-xl p-3 border border-white/20">
           <div class="mb-2">
@@ -530,9 +542,6 @@
               </label>
             </div>
           </div>
-        </div>
-        <div class="text-center mt-2">
-          <p class="text-white/40 text-xs font-light">©︎GENERATIVE JUNKIE</p>
         </div>
       `;
       root.appendChild(controlPanel);

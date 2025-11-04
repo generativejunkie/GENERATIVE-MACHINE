@@ -26,14 +26,13 @@
     <button onclick="changeBackground()">GENERATIVE MACHINE</button>
   </div>
 
-  <div class="footer-area">
-    <a href="https://generativejunkie.stores.jp/" target="_blank">
-      <img class="logo-footer" src="logo/gj_logo_white.png">
-    </a>
-    <footer>
-      © GENERATIVE JUNKIE
-    </footer>
-  </div>
+  <!-- ★変更点：フッターを新しい統一デザインに置き換え -->
+  <footer class="fixed bottom-4 left-0 right-0 text-center" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <img src="logo/gj_logo_white.png" alt="GENERATIVE JUNKIE Logo" style="width: 9rem; margin-bottom: 0.5rem;">
+      <p style="color: white; font-size: 10px; font-family: Verdana, sans-serif;">©︎GENERATIVE JUNKIE</p>
+    </div>
+  </footer>
 
   <script src="script.js"></script>
   <button id="sound-toggle">SOUND ON</button>

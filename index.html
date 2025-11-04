@@ -6,6 +6,7 @@
   <title>GENERATIVE JUNKIE</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    /* ...（スタイル部分は変更なし）... */
     body {
       background-color: #000000;
       color: #f3f4f6;
@@ -72,6 +73,7 @@
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4">
 
+  <!-- ...（ヘッダーとメインコンテンツは変更なし）... -->
   <header class="text-center mb-12">
     <h1 class="text-4xl md:text-5xl font-extrabold tracking-widest text-white">GENERATIVE JUNKIE</h1>
     <div class="flex items-center justify-center gap-4 mt-2">
@@ -130,12 +132,16 @@
       </p>
     </a>
   </main>
-
+  
+  <!-- ★変更点：フッターにロゴを追加 -->
   <footer class="fixed bottom-4 left-0 right-0 text-center">
-    <p class="text-white" style="font-size: 10px; font-family: Verdana, sans-serif;">©︎GENERATIVE JUNKIE</p>
+    <div class="flex flex-col items-center">
+      <img src="logo/gj_logo_white.png" alt="GENERATIVE JUNKIE Logo" class="w-36 mb-2">
+      <p class="text-white" style="font-size: 10px; font-family: Verdana, sans-serif;">©︎GENERATIVE JUNKIE</p>
+    </div>
   </footer>
 
-  <!-- --- ▼ AboutモーダルのHTML（テキスト修正済み）▼ --- -->
+  <!-- ...（モーダルとスクリプトは変更なし）... -->
   <div id="about-modal" class="modal-overlay">
     <div class="modal-content">
       <div id="close-modal-btn" class="modal-close">
