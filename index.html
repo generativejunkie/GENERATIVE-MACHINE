@@ -32,10 +32,14 @@
       transition: all 0.3s ease;
       text-decoration: none;
     }
-    .card:hover {
+    .card:not(.is-disabled):hover {
       border-color: #60a5fa;
       transform: translateY(-5px);
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+    }
+    .card.is-disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
     }
     .modal-overlay {
       position: fixed;
@@ -85,7 +89,6 @@
     .modal-close:hover {
       color: #f3f4f6;
     }
-    
     .cursor {
       display: inline-block;
       width: 2px;
@@ -115,7 +118,7 @@
     </div>
   </header>
 
-  <main class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
+  <main class="grid grid-cols-1 md:grid-cols-4 gap-8 w-full max-w-7xl">
     
     <a href="machine1.html" class="card rounded-xl p-8 block">
       <div class="flex items-center mb-4">
@@ -146,6 +149,21 @@
         A sound visualizer that transforms your audio into generative art
       </p>
     </a>
+
+    <div class="card rounded-xl p-8 block is-disabled">
+      <div class="flex items-center mb-4">
+        <div class="p-2 bg-yellow-500/20 rounded-full mr-4">
+            <svg class="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-white">MATERIALIZE MACHINE</h2>
+          <p class="text-gray-400 font-light">Digital to Physical</p>
+        </div>
+      </div>
+      <p class="text-gray-300 text-sm">
+        Coming Soon...
+      </p>
+    </div>
 
     <a href="https://generativejunkie.stores.jp/" target="_blank" rel="noopener noreferrer" class="card rounded-xl p-8 block">
       <div class="flex items-center mb-4">
@@ -226,8 +244,7 @@
       const textElement = document.getElementById('typed-text');
       const cursorElement = document.querySelector('.cursor');
       
-      // ★変更点: textPart1 を修正
-      const textPart1 = "An Experimental Generative Art Brand";
+      const textPart1 = "An Experimental Generative Art Brand GENERATIVE JUNKIE";
       const textPart2 = "Always Super High!";
       const typeSpeed = 80;
       const eraseSpeed = 40;
