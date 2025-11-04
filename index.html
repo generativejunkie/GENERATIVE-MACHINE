@@ -83,15 +83,30 @@
     .modal-close:hover {
       color: #f3f4f6;
     }
+    
+    /* --- ▼▼▼ タイピングアニメーション用のスタイルを追加 ▼▼▼ --- */
+    .typing-cursor {
+      display: inline-block; /* ボーダーを表示するため */
+      white-space: nowrap; /* テキストが折り返さないように */
+      overflow: hidden; /* アニメーション中にテキストがはみ出ないように */
+      border-right: 2px solid rgba(255, 255, 255, 0.75); /* カーソルのスタイル */
+      animation: blink 0.7s step-end infinite;
+    }
+    @keyframes blink {
+      from, to { border-color: transparent }
+      50% { border-color: rgba(255, 255, 255, 0.75); }
+    }
+    /* --- ▲▲▲ ここまで ▲▲▲ --- */
+
   </style>
 </head>
-<!-- ★変更点：レイアウトを元の上下中央揃えに戻します -->
 <body class="flex flex-col items-center justify-center min-h-screen p-4">
 
   <header class="text-center mb-12">
     <h1 class="text-4xl md:text-5xl font-extrabold tracking-widest text-white">GENERATIVE MACHINE</h1>
     <div class="flex items-center justify-center gap-4 mt-2">
-      <p class="text-gray-400">An Experimental Generative Art Brand</p>
+      <!-- ★変更点: idとclassを追加し、テキストを空に -->
+      <p id="typing-subtitle" class="text-gray-400 typing-cursor"></p>
       <button id="open-modal-btn" class="text-blue-400 hover:text-blue-300 transition-colors text-sm font-semibold">About</button>
     </div>
   </header>
@@ -208,6 +223,29 @@
         modal.classList.remove('is-visible');
       }
     });
+
+    // --- ▼▼▼ タイピングアニメーション用のスクリプトを追加 ▼▼▼ ---
+    document.addEventListener('DOMContentLoaded', function() {
+      const subtitleElement = document.getElementById('typing-subtitle');
+      const fullText = "An Experimental Generative Art Brand";
+      let charIndex = 0;
+      
+      function typeChar() {
+        if (charIndex < fullText.length) {
+          subtitleElement.textContent += fullText.charAt(charIndex);
+          charIndex++;
+          setTimeout(typeChar, 100); // 100ミリ秒ごとに次の文字をタイプ
+        } else {
+          // タイプ完了後もカーソルを点滅させるため、クラスをそのままにする
+          subtitleElement.style.borderRight = '2px solid rgba(255, 255, 255, 0.75)';
+        }
+      }
+      
+      // アニメーション開始
+      typeChar();
+    });
+    // --- ▲▲▲ ここまで ▲▲▲ ---
+
   </script>
 
 </body>
