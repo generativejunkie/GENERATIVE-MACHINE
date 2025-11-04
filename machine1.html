@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>IMAGE MACHINE</title>
   
+  <!-- ★変更点: ファビコンのパスを修正 -->
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -94,9 +95,7 @@
           promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 3000);
         });
         
-        const userStartAudio = () => { if (p.getAudioContext().state !== 'running') { p.getAudioContext().resume(); } };
-        canvasContainer.addEventListener('touchstart', userStartAudio, { once: true });
-        canvasContainer.addEventListener('mousedown', userStartAudio, { once: true });
+        // ★変更点: 不要なAudioContextの呼び出しを削除
       };
 
       p.draw = () => {
@@ -229,7 +228,7 @@
       }
       
       const handleInteraction = () => {
-        if (p.getAudioContext().state !== 'running') { p.getAudioContext().resume(); }
+        // ★変更点: AudioContextの呼び出しを削除
         if (animationState === 'display' && !nextImageKey && imageFileNames.length > 1) {
           promptText.classList.remove('is-visible');
           clearTimeout(promptTimer);
