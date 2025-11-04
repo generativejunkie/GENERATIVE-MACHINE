@@ -84,16 +84,25 @@
       color: #f3f4f6;
     }
     
+    /* --- ▼▼▼ タイピングカーソルのスタイルを全面変更 ▼▼▼ --- */
     .typing-cursor {
+      position: relative; /* ::after の位置基準のため */
+    }
+    .typing-cursor::after {
+      content: '';
       display: inline-block;
-      overflow: hidden;
-      border-right: 2px solid rgba(255, 255, 255, 0.75);
+      width: 2px;
+      height: 0.9em; /* 文字の高さ(em)に合わせて調整 */
+      background-color: rgba(255, 255, 255, 0.75);
+      margin-left: 4px; /* 文字とカーソルの間に少し余白 */
       animation: blink 0.7s step-end infinite;
     }
     @keyframes blink {
-      from, to { border-color: transparent }
-      50% { border-color: rgba(255, 255, 255, 0.75); }
+      from, to { background-color: transparent; }
+      50% { background-color: rgba(255, 255, 255, 0.75); }
     }
+    /* --- ▲▲▲ ここまで ▲▲▲ --- */
+
   </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4">
@@ -174,35 +183,40 @@
     document.addEventListener('DOMContentLoaded', function() {
       const subtitleElement = document.getElementById('typing-subtitle');
       
-      // --- 設定項目 ---
       const textPart1 = "An Experimental Generative Art Brand GENERATIVE JUNKIE";
-      // ★変更点: テキストを修正
       const textPart2 = "Always Super High!";
       const typeSpeed = 80;
       const eraseSpeed = 40;
       const pauseAfterType1 = 2000;
       const pauseAfterType2 = 3000;
       const pauseBeforeNext = 500;
-      // --- 設定ここまで ---
       
       let textIndex = 0;
       const texts = [textPart1, textPart2];
 
       function typeText(text, charIndex, callback) {
+        // ★変更点: タイピング中はカーソルを非表示にする
+        subtitleElement.classList.remove('typing-cursor'); 
         if (charIndex < text.length) {
           subtitleElement.textContent += text.charAt(charIndex);
           setTimeout(() => typeText(text, charIndex + 1, callback), typeSpeed);
         } else {
+          // ★変更点: タイピング完了後にカーソルを再表示
+          subtitleElement.classList.add('typing-cursor');
           if (callback) callback();
         }
       }
 
       function eraseText(callback) {
+        // ★変更点: 消去中はカーソルを非表示にする
+        subtitleElement.classList.remove('typing-cursor');
         let currentText = subtitleElement.textContent;
         if (currentText.length > 0) {
           subtitleElement.textContent = currentText.slice(0, -1);
           setTimeout(() => eraseText(callback), eraseSpeed);
         } else {
+          // ★変更点: 消去完了後にカーソルを再表示
+          subtitleElement.classList.add('typing-cursor');
           if (callback) callback();
         }
       }
