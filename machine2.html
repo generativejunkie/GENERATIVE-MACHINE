@@ -15,32 +15,20 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-    body, html {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      position: fixed;
-    }
-    #root {
-      width: 100%;
-      height: 100%;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body, html { width: 100%; height: 100%; overflow: hidden; position: fixed; }
+    #root { width: 100%; height: 100%; }
+    .text-shadow { text-shadow: 0 0 5px rgba(255,255,255,0.5); }
   </style>
 </head>
 <body>
   <div id="root"></div>
 
-  <div class="fixed top-0 left-0 p-4 z-50">
-    <a href="/" class="text-black text-lg hover:opacity-75 transition-opacity">← Back</a>
+  <div class="fixed top-4 left-4 z-50">
+      <a href="/" class="text-black text-lg hover:opacity-75 transition-opacity text-shadow">← Back</a>
   </div>
   <footer class="relative mt-12 mb-4 text-center md:fixed md:bottom-4 md:left-0 md:right-0 md:mt-0 md:mb-0">
-    <p class="text-black" style="font-size: 10px; font-family: Verdana, sans-serif;">©︎GENERATIVE JUNKIE</p>
+    <p class="text-black text-shadow" style="font-size: 10px; font-family: Verdana, sans-serif;">©︎GENERATIVE JUNKIE</p>
   </footer>
   
   <script>
@@ -399,9 +387,11 @@
     }
 
     function updateTimeDisplay() {
-      document.getElementById('current-time').textContent = formatTime(currentTime);
-      document.getElementById('duration-time').textContent = formatTime(duration);
-      document.getElementById('progress-bar').style.width = `${(currentTime / duration) * 100}%`;
+      if(document.getElementById('current-time')) {
+        document.getElementById('current-time').textContent = formatTime(currentTime);
+        document.getElementById('duration-time').textContent = formatTime(duration);
+        document.getElementById('progress-bar').style.width = `${(currentTime / duration) * 100}%`;
+      }
       ['low', 'mid', 'high'].forEach(freq => {
         const bars = document.querySelectorAll(`.freq-${freq}`);
         bars.forEach((bar, i) => {
