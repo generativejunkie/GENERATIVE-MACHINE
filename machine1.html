@@ -12,8 +12,7 @@
   <meta name="msapplication-TileColor" content="#000000">
   <meta name="theme-color" content="#000000">
   
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-  <script src="https://cdn/tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     body { margin: 0; padding: 0; background-color: #000; color: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; overflow: hidden; }
@@ -25,17 +24,15 @@
       position: absolute; top: 0; left: 0;
       width: 100%; height: 100%;
       object-fit: contain;
-      transition: opacity 0.3s ease-in-out;
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
     }
-    #canvas-container { 
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-      z-index: 5; /* 画像より手前、UIより後ろ */
-      pointer-events: none; /* 普段はクリックできないように */
-      display: none; /* 普段は非表示 */
+    .image-layer.is-active {
+      opacity: 1;
     }
     .ui-layer { 
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-      z-index: 10; pointer-events: none; 
+      z-index: 2; pointer-events: none; 
     }
     .ui-layer > * { pointer-events: auto; }
     #prompt-text {
@@ -48,16 +45,27 @@
     #prompt-text.is-visible { opacity: 1; }
     @keyframes subtle-pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 0.4; } }
     .text-shadow { text-shadow: 0 0 8px rgba(0,0,0,0.7); }
+
+    /* ★追加: CSSグリッチエフェクト */
+    .glitch-effect {
+      animation: glitch 0.3s linear;
+    }
+    @keyframes glitch {
+      0% { transform: translate(0); opacity: 1; }
+      25% { transform: translate(10px, -5px); }
+      50% { transform: translate(-10px, 5px); opacity: 0.8; }
+      75% { transform: translate(5px, 10px); }
+      100% { transform: translate(0); opacity: 1; }
+    }
   </style>
 </head>
 <body>
 
   <div id="image-container" onclick="changeImage()">
     <img id="img1" class="image-layer" src="" alt="Generative Art Layer 1">
-    <img id="img2" class="image-layer" src="" alt="Generative Art Layer 2" style="opacity: 0;">
+    <img id="img2" class="image-layer" src="" alt="Generative Art Layer 2">
   </div>
   
-  <div id="canvas-container"></div>
   <div id="prompt-text">CLICK / TAP</div>
 
   <div class="ui-layer flex flex-col justify-between p-4">
@@ -84,128 +92,70 @@
     const promptText = document.getElementById('prompt-text');
     
     let currentImageIndex = -1;
+    let nextImageIndex = -1;
     let isImg1Active = true;
     let isChanging = false;
     let promptTimer = null;
-    let p5Instance = null; // p5.jsのインスタンスを保持
 
-    function changeImage() {
-      if (isChanging || imageFileNames.length < 2) return;
-      isChanging = true;
-
-      promptText.classList.remove('is-visible');
-      clearTimeout(promptTimer);
-      
-      let newIndex = Math.floor(Math.random() * imageFileNames.length);
-      while (newIndex === currentImageIndex) {
-        newIndex = Math.floor(Math.random() * imageFileNames.length);
-      }
-      
-      const currentImgSrc = imageFileNames[currentImageIndex];
-      const nextImgSrc = imageFileNames[newIndex];
-      currentImageIndex = newIndex;
-
-      // p5.jsに画像を渡してトランジションを開始
-      p5Instance.startTransition(currentImgSrc, nextImgSrc);
+    // 次の画像を裏側で読み込む関数
+    function preloadNextImage() {
+        if (imageFileNames.length < 2) return;
+        let newIndex = Math.floor(Math.random() * imageFileNames.length);
+        while (newIndex === currentImageIndex) {
+            newIndex = Math.floor(Math.random() * imageFileNames.length);
+        }
+        nextImageIndex = newIndex;
+        
+        // Imageオブジェクトを使ってバックグラウンドで読み込む
+        const preloader = new Image();
+        preloader.src = imageFileNames[nextImageIndex];
     }
 
+    function changeImage() {
+      if (isChanging || nextImageIndex === -1) return;
+      isChanging = true;
+      promptText.classList.remove('is-visible');
+      clearTimeout(promptTimer);
+
+      const activeImg = isImg1Active ? img1 : img2;
+      const inactiveImg = isImg1Active ? img2 : img1;
+
+      // 読み込み済みの次の画像をセット
+      inactiveImg.src = imageFileNames[nextImageIndex];
+      currentImageIndex = nextImageIndex;
+      
+      // グリッチエフェクトを開始
+      activeImg.classList.add('glitch-effect');
+      inactiveImg.classList.add('glitch-effect');
+
+      // 0.1秒後（グリッチの途中）に画像を入れ替える
+      setTimeout(() => {
+          activeImg.classList.remove('is-active');
+          inactiveImg.classList.add('is-active');
+      }, 150);
+
+      // アニメーション完了後にクラスを削除し、次の画像を事前読み込み
+      setTimeout(() => {
+        activeImg.classList.remove('glitch-effect');
+        inactiveImg.classList.remove('glitch-effect');
+        isImg1Active = !isImg1Active;
+        isChanging = false;
+        preloadNextImage(); // 次の画像を準備
+        promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 3000);
+      }, 300);
+    }
+
+    // 最初の画像読み込み
     document.addEventListener("DOMContentLoaded", () => {
         let initialIndex = Math.floor(Math.random() * imageFileNames.length);
         currentImageIndex = initialIndex;
         img1.src = imageFileNames[initialIndex];
+        img1.classList.add('is-active');
         img1.onload = () => {
+            preloadNextImage(); // 最初の画像が表示されたら、すぐに次の画像を裏で読み込み始める
             promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 3000);
         };
     });
-
-    // --- p5.js スクリプト ---
-    const sketch = (p) => {
-      let animationState = 'idle';
-      let animationFrame = 0;
-      let transitionType = 'blocks';
-      const chaosDuration = 15;
-      const transitionDuration = 40;
-      let fromImg, toImg;
-
-      p.setup = () => {
-        const canvasContainer = document.getElementById('canvas-container');
-        p.createCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight).parent(canvasContainer);
-        p.background(0);
-        p.noLoop(); // 普段は描画を停止しておく
-      };
-
-      p.draw = () => {
-        if (animationState === 'idle') return;
-
-        switch (animationState) {
-          case 'decay':
-            runTransition(fromImg, animationFrame / transitionDuration, true);
-            animationFrame++;
-            if (animationFrame > transitionDuration) { animationFrame = 0; animationState = 'chaos'; }
-            break;
-          case 'chaos':
-            drawGlitch(toImg);
-            animationFrame++;
-            if (animationFrame > chaosDuration) {
-              animationFrame = 0; animationState = 'rebuild';
-            }
-            break;
-          case 'rebuild':
-            runTransition(toImg, animationFrame / transitionDuration, false);
-            animationFrame++;
-            if (animationFrame > transitionDuration) {
-              animationState = 'idle';
-              p.noLoop(); // アニメーション完了で描画停止
-              transitionFinished(); // メインスクリプトに完了を通知
-            }
-            break;
-        }
-      };
-      
-      p.startTransition = (fromImgSrc, toImgSrc) => {
-        document.getElementById('canvas-container').style.display = 'block';
-        
-        // 画像を2枚とも読み込む
-        p.loadImage(fromImgSrc, (img1) => {
-          fromImg = img1;
-          p.loadImage(toImgSrc, (img2) => {
-            toImg = img2;
-            
-            // エフェクトをランダムに選択
-            transitionType = p.random(['blocks', 'slide']);
-            animationFrame = 0;
-            animationState = 'decay';
-            p.loop(); // 描画ループを開始
-          });
-        });
-      };
-
-      function runTransition(img, progress, isDecay) { /* ... (以前のコードと同じ) ... */ }
-      function drawBlocks(img, progress, isDecay) { /* ... (以前のコードと同じ) ... */ }
-      function drawSlide(img, progress, isDecay) { /* ... (以前のコードと同じ) ... */ }
-      function drawGlitch(nextImg) { /* ... (以前のコードと同じ) ... */ }
-      
-      p.windowResized = () => { p.resizeCanvas(window.innerWidth, window.innerHeight); };
-    };
-    
-    // グローバルスコープでp5インスタンスを初期化
-    p5Instance = new p5(sketch);
-    
-    // p5.jsから呼び出される完了通知
-    function transitionFinished() {
-        document.getElementById('canvas-container').style.display = 'none';
-        
-        const activeImg = isImg1Active ? img1 : img2;
-        const inactiveImg = isImg1Active ? img2 : img1;
-
-        inactiveImg.src = imageFileNames[currentImageIndex];
-        activeImg.style.opacity = 0;
-        inactiveImg.style.opacity = 1;
-        isImg1Active = !isImg1Active;
-        
-        isChanging = false;
-        promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 3000);
-    }
   </script>
 
 </body>
