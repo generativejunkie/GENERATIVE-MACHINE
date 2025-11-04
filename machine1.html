@@ -25,41 +25,24 @@
       background-color: #000; z-index: 10;
       display: flex; align-items: center; justify-content: center;
       color: white; font-size: 1.2rem; transition: opacity 0.5s ease;
-      opacity: 0; pointer-events: none;
     }
-    #loading-overlay.is-active { opacity: 1; pointer-events: auto; }
-    /* ★追加: クリック促進テキストのスタイル */
     #prompt-text {
-        position: fixed;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 3;
-        font-size: 1.5rem;
-        font-weight: 200;
-        letter-spacing: 0.2em;
-        color: rgba(255, 255, 255, 0.7);
-        opacity: 0;
-        transition: opacity 1s ease-in-out;
-        animation: subtle-pulse 2s infinite;
-        pointer-events: none; /* テキスト自体はクリックできないように */
+        position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+        z-index: 3; font-size: 1.5rem; font-weight: 200; letter-spacing: 0.2em;
+        color: rgba(255, 255, 255, 0.7); opacity: 0;
+        transition: opacity 1s ease-in-out; animation: subtle-pulse 2s infinite;
+        pointer-events: none;
     }
-    #prompt-text.is-visible {
-        opacity: 1;
-    }
-    @keyframes subtle-pulse {
-        0%, 100% { opacity: 0.7; }
-        50% { opacity: 0.4; }
-    }
+    #prompt-text.is-visible { opacity: 1; }
+    @keyframes subtle-pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 0.4; } }
   </style>
 </head>
 <body>
 
-  <div id="loading-overlay"><p>Loading...</p></div>
+  <div id="loading-overlay"><p>Loading Machine...</p></div>
 
   <div id="canvas-container"></div>
 
-  <!-- ★追加: クリック促進テキスト -->
   <div id="prompt-text">CLICK / TAP</div>
 
   <div class="ui-layer flex flex-col justify-between p-4">
@@ -82,9 +65,9 @@
       let currentImage = null;
       let nextImage = null;
       
-      let animationState = 'loading';
+      let animationState = 'display';
       let animationFrame = 0;
-      let transitionType = 'blocks'; // 'blocks' or 'slide'
+      let transitionType = 'blocks';
       const chaosDuration = 20;
       const transitionDuration = 60;
       
@@ -94,30 +77,47 @@
       for (let i = 1; i <= imageCount; i++) {
         imageFileNames.push(`${filePrefix}${i.toString().padStart(numberPadding, '0')}${fileSuffix}`);
       }
+      
+      p.preload = () => {
+          const initialIndex = p.floor(p.random(imageFileNames.length));
+          currentImage = p.loadImage(imageFileNames[initialIndex], 
+            (img) => { img.filePath = imageFileNames[initialIndex]; },
+            () => { console.error("最初の画像の読み込みに失敗しました。"); }
+          );
+      };
 
       p.setup = () => {
         const canvasContainer = document.getElementById('canvas-container');
         p.createCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight).parent(canvasContainer);
         p.background(0);
         
-        // iOS対応: ユーザー操作を有効にする
-        const userStartAudio = () => {
-            if (p.getAudioContext().state !== 'running') {
-                p.getAudioContext().resume();
-            }
-        };
+        const loadingOverlay = document.getElementById('loading-overlay');
+        loadingOverlay.style.opacity = '0';
+        setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
+
+        if (currentImage && currentImage.width > 0) {
+            animationState = 'display';
+            promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 3000);
+        } else {
+            animationState = 'error';
+        }
+        
+        const userStartAudio = () => { if (p.getAudioContext().state !== 'running') { p.getAudioContext().resume(); } };
         canvasContainer.addEventListener('touchstart', userStartAudio, { once: true });
         canvasContainer.addEventListener('mousedown', userStartAudio, { once: true });
-        
-        loadImageDynamically(p.floor(p.random(imageFileNames.length)), (img) => {
-          currentImage = img;
-          animationState = 'display';
-          // 最初の画像表示後、数秒でプロンプトを表示
-          promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 3000);
-        });
       };
 
       p.draw = () => {
+        if (animationState === 'error') {
+            p.background(0);
+            p.fill(255, 0, 0);
+            p.textAlign(p.CENTER);
+            p.textSize(16);
+            p.text("Error: Failed to load the initial image.\nPlease check the file paths in the code.", p.width / 2, p.height / 2);
+            p.noLoop();
+            return;
+        }
+        
         if (!currentImage) { p.background(0); return; }
 
         switch (animationState) {
@@ -143,7 +143,6 @@
             animationFrame++;
             if (animationFrame > transitionDuration) {
               animationFrame = 0; animationState = 'display';
-              // アニメーション完了後、再度プロンプト表示タイマーを設定
               promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 5000);
             }
             break;
@@ -154,10 +153,20 @@
         }
       };
 
-      function loadImageDynamically(index, callback) { /* ... (変更なし) ... */ }
-      function drawImageFullscreen(img) { /* ... (変更なし) ... */ }
+      function loadImageDynamically(index, callback) {
+        p.loadImage(imageFileNames[index], 
+          (img) => {
+            img.filePath = imageFileNames[index];
+            callback(img);
+          },
+          () => {
+            console.warn(`画像の読み込みに失敗 or 欠番: ${imageFileNames[index]}. 別の画像を試します。`);
+            const newIndex = p.floor(p.random(imageFileNames.length));
+            loadImageDynamically(newIndex, callback);
+          }
+        );
+      }
       
-      // --- ▼▼▼ エフェクト関数を改良 ▼▼▼ ---
       function drawBlocks(img, progress, isDecay) {
         p.background(0);
         const blockSize = p.map(p.constrain(progress, 0, 1), 0, 1, isDecay ? 5 : 100, isDecay ? 100 : 5);
@@ -165,7 +174,8 @@
           for (let x = 0; x < p.width; x += blockSize) {
             if (p.random() < 0.8) {
               let c = img.get(x, y);
-              p.fill(c); p.noStroke();
+              p.fill(c);
+              p.noStroke();
               p.rect(x, y, blockSize, blockSize);
             }
           }
@@ -198,33 +208,45 @@
           p.noStroke(); p.rect(x, y, w, h);
         }
       }
-      // --- ▲▲▲ エフェクト関数ここまで ▲▲▲ ---
-
-      // マウスプレスとタッチスタートの両方に対応
+      
+      function drawImageFullscreen(img) {
+          p.imageMode(p.CENTER);
+          const canvasRatio = p.width / p.height;
+          const imageRatio = img.width / img.height;
+          if (canvasRatio > imageRatio) {
+              p.image(img, p.width / 2, p.height / 2, p.width, p.width / imageRatio);
+          } else {
+              p.image(img, p.width / 2, p.height / 2, p.height * imageRatio, p.height);
+          }
+      }
+      
       const handleInteraction = () => {
         if (animationState === 'display' && !nextImage && imageFileNames.length > 1) {
-          // プロンプトを非表示にし、タイマーをクリア
           promptText.classList.remove('is-visible');
           clearTimeout(promptTimer);
-
-          transitionType = p.random() > 0.5 ? 'blocks' : 'slide'; // エフェクトをランダムに選択
-
+          transitionType = p.random() > 0.5 ? 'blocks' : 'slide';
           const currentIndex = imageFileNames.indexOf(currentImage.filePath);
           let newIndex = p.floor(p.random(imageFileNames.length));
           while (newIndex === currentIndex) { newIndex = p.floor(p.random(imageFileNames.length)); }
+          
+          const loadingOverlay = document.getElementById('loading-overlay');
+          loadingOverlay.classList.add('is-active'); // 次の画像の読み込み中にローディング表示
           
           loadImageDynamically(newIndex, (img) => {
             nextImage = img;
             animationFrame = 0;
             animationState = 'decay';
+            loadingOverlay.classList.remove('is-active'); // 読み込み完了で非表示
           });
         }
       };
       p.mousePressed = handleInteraction;
       p.touchStarted = handleInteraction;
 
-
-      p.windowResized = () => { /* ... (変更なし) ... */ };
+      p.windowResized = () => {
+        const canvasContainer = document.getElementById('canvas-container');
+        p.resizeCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
+      };
     };
 
     new p5(sketch);
