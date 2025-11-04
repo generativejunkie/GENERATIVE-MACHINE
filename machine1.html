@@ -12,20 +12,25 @@
   <meta name="msapplication-TileColor" content="#000000">
   <meta name="theme-color" content="#000000">
   
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     body { margin: 0; padding: 0; background-color: #000; color: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; overflow: hidden; }
-    #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; cursor: pointer; }
-    .ui-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
-    .ui-layer > * { pointer-events: auto; }
-    #loading-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background-color: #000; z-index: 10;
-      display: flex; align-items: center; justify-content: center;
-      color: white; font-size: 1.2rem; transition: opacity 0.5s ease;
+    #image-container { 
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      z-index: 1; cursor: pointer;
     }
+    .image-layer {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: contain; /* 画像を画面内に完全に収める */
+      transition: opacity 0.8s ease-in-out; /* フェードの速度 */
+    }
+    .ui-layer { 
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      z-index: 2; pointer-events: none; 
+    }
+    .ui-layer > * { pointer-events: auto; }
     #prompt-text {
         position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
         z-index: 3; font-size: 1.5rem; font-weight: 200; letter-spacing: 0.2em;
@@ -40,8 +45,11 @@
 </head>
 <body>
 
-  <div id="loading-overlay"><p>Loading Machine...</p></div>
-  <div id="canvas-container"></div>
+  <div id="image-container" onclick="changeImage()">
+    <img id="img1" class="image-layer" src="" alt="Generative Art Layer 1">
+    <img id="img2" class="image-layer" src="" alt="Generative Art Layer 2" style="opacity: 0;">
+  </div>
+  
   <div id="prompt-text">CLICK / TAP</div>
 
   <div class="ui-layer flex flex-col justify-between p-4">
@@ -54,210 +62,71 @@
   </div>
 
   <script>
-    const sketch = (p) => {
-      const imageCount = 394;
-      const filePrefix = "photos/photo";
-      const fileSuffix = ".webp";
-      const numberPadding = 3;
+    const imageCount = 394;
+    const filePrefix = "photos/photo";
+    const fileSuffix = ".webp";
+    const numberPadding = 3;
 
-      let imageFileNames = [];
-      let allImages = {};
-      let currentImageKey = null;
-      let nextImageKey = null;
-      
-      let animationState = 'loading';
-      let animationFrame = 0;
-      let transitionType = 'blocks';
-      const chaosDuration = 15;
-      const transitionDuration = 40;
-      
-      let promptTimer = null;
-      const promptText = document.getElementById('prompt-text');
-      let effectParams = {};
+    const imageFileNames = [];
+    for (let i = 1; i <= imageCount; i++) {
+      imageFileNames.push(`${filePrefix}${i.toString().padStart(numberPadding, '0')}${fileSuffix}`);
+    }
 
-      for (let i = 1; i <= imageCount; i++) {
-        imageFileNames.push(`${filePrefix}${i.toString().padStart(numberPadding, '0')}${fileSuffix}`);
+    const img1 = document.getElementById('img1');
+    const img2 = document.getElementById('img2');
+    const promptText = document.getElementById('prompt-text');
+    
+    let currentImageIndex = -1;
+    let isImg1Active = true;
+    let isChanging = false; // アニメーション中の多重クリックを防ぐフラグ
+    let promptTimer = null;
+
+    function changeImage() {
+      if (isChanging || imageFileNames.length < 2) return;
+      isChanging = true;
+
+      promptText.classList.remove('is-visible');
+      clearTimeout(promptTimer);
+      
+      let newIndex = Math.floor(Math.random() * imageFileNames.length);
+      while (newIndex === currentImageIndex) {
+        newIndex = Math.floor(Math.random() * imageFileNames.length);
       }
+      currentImageIndex = newIndex;
+
+      const activeImg = isImg1Active ? img1 : img2;
+      const inactiveImg = isImg1Active ? img2 : img1;
+
+      inactiveImg.src = imageFileNames[currentImageIndex];
       
-      p.setup = () => {
-        const canvasContainer = document.getElementById('canvas-container');
-        p.createCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight).parent(canvasContainer);
-        p.background(0);
+      inactiveImg.onload = () => {
+        activeImg.style.opacity = 0;
+        inactiveImg.style.opacity = 1;
+        isImg1Active = !isImg1Active;
         
-        const initialIndex = p.floor(p.random(imageFileNames.length));
-        loadImageDynamically(imageFileNames[initialIndex], (img) => {
-          currentImageKey = img.filePath;
-          animationState = 'display';
-          const loadingOverlay = document.getElementById('loading-overlay');
-          loadingOverlay.style.opacity = '0';
-          setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
+        // アニメーション完了後にフラグを戻す
+        setTimeout(() => {
+          isChanging = false;
           promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 3000);
-        });
-        
-        const userStartAudio = () => { if (p.getAudioContext().state !== 'running') { p.getAudioContext().resume(); } };
-        canvasContainer.addEventListener('touchstart', userStartAudio, { once: true });
-        canvasContainer.addEventListener('mousedown', userStartAudio, { once: true });
+        }, 800); // CSSのtransitionの時間に合わせる
       };
-
-      p.draw = () => {
-        if (!currentImageKey || !allImages[currentImageKey]) { p.background(0); return; }
-
-        const currentImage = allImages[currentImageKey];
-        const nextImage = allImages[nextImageKey];
-
-        switch (animationState) {
-          case 'decay':
-            runTransition(currentImage, animationFrame / transitionDuration, true);
-            animationFrame++;
-            if (animationFrame > transitionDuration) { animationFrame = 0; animationState = 'chaos'; }
-            break;
-            
-          case 'chaos':
-            drawGlitch(nextImage);
-            animationFrame++;
-            if (animationFrame > chaosDuration) {
-              animationFrame = 0; animationState = 'rebuild';
-              currentImageKey = nextImageKey; nextImageKey = null;
-            }
-            break;
-
-          case 'rebuild':
-            runTransition(allImages[currentImageKey], animationFrame / transitionDuration, false);
-            animationFrame++;
-            if (animationFrame > transitionDuration) {
-              animationFrame = 0; animationState = 'display';
-              promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 5000);
-            }
-            break;
-            
-          default:
-            drawImageFullscreen(currentImage);
-            break;
-        }
+      // 読み込み失敗時のフォールバック
+      inactiveImg.onerror = () => {
+        console.warn(`Failed to load: ${imageFileNames[currentImageIndex]}. Retrying.`);
+        isChanging = false;
+        changeImage(); // 別の画像を試す
       };
+    }
 
-      function loadImageDynamically(filePath, callback) {
-        if (allImages[filePath]) {
-            callback(allImages[filePath]);
-            return;
-        }
-        const loadingOverlay = document.getElementById('loading-overlay');
-        if (loadingOverlay) loadingOverlay.classList.add('is-active');
-
-        p.loadImage(filePath, 
-          (img) => {
-            img.filePath = filePath;
-            allImages[filePath] = img;
-            callback(img);
-            if(loadingOverlay) loadingOverlay.classList.remove('is-active');
-          },
-          () => {
-            console.warn(`Failed to load: ${filePath}. Retrying.`);
-            const newIndex = p.floor(p.random(imageFileNames.length));
-            loadImageDynamically(imageFileNames[newIndex], callback);
-          }
-        );
-      }
-      
-      function runTransition(img, progress, isDecay) {
-        switch(transitionType) {
-          case 'blocks':
-            drawBlocks(img, progress, isDecay);
-            break;
-          case 'slide':
-            drawSlide(img, progress, isDecay);
-            break;
-        }
-      }
-
-      function drawBlocks(img, progress, isDecay) {
-        p.background(0);
-        const blockSize = isDecay ? p.map(progress, 0, 1, 5, 100) : p.map(progress, 0, 1, 100, 5);
-        for (let y = 0; y < p.height; y += blockSize) {
-          for (let x = 0; x < p.width; x += blockSize) {
-            let probability = isDecay ? progress : (1.0 - progress);
-            if (p.random() < probability) {
-              let c = img.get(x, y);
-              p.fill(c);
-              p.noStroke();
-              p.rect(x, y, blockSize, blockSize);
-            }
-          }
-        }
-      }
-
-      function drawSlide(img, progress, isDecay) {
-        p.background(0);
-        const sliceCount = 80;
-        const sliceHeight = p.height / sliceCount;
-        for (let i = 0; i < sliceCount; i++) {
-          let y = i * sliceHeight;
-          let currentProgress = isDecay ? progress : 1.0 - progress;
-          let slideAmount = p.map(currentProgress, 0, 1, 0, p.width) * p.noise(i * 0.1, p.frameCount * 0.01);
-          let sx = 0;
-          let dx = p.random(-slideAmount, slideAmount);
-          p.copy(img, sx, y, img.width, sliceHeight, dx, y, p.width, sliceHeight);
-        }
-      }
-
-      function drawGlitch(nextImg) {
-        if (!nextImg) {
-          p.background(0);
-          return;
-        }
-        drawImageFullscreen(nextImg);
-        for (let i = 0; i < 20; i++) {
-            let x = p.random(p.width);
-            let y = p.random(p.height);
-            let w = p.random(p.width * 0.1, p.width * 0.8);
-            let h = p.random(1, p.height * 0.05);
-            let grabX = p.random(p.width);
-            let grabY = p.random(p.height);
-            p.copy(nextImg, grabX, grabY, w, h, x, y, w, h);
-        }
-      }
-      
-      function drawImageFullscreen(img) {
-          p.imageMode(p.CENTER);
-          const canvasRatio = p.width / p.height;
-          const imageRatio = img.width / img.height;
-          if (canvasRatio > imageRatio) {
-              p.image(img, p.width / 2, p.height / 2, p.width, p.width / imageRatio);
-          } else {
-              p.image(img, p.width / 2, p.height / 2, p.height * imageRatio, p.height);
-          }
-      }
-      
-      const handleInteraction = () => {
-        if (p.getAudioContext().state !== 'running') { p.getAudioContext().resume(); }
-        if (animationState === 'display' && !nextImageKey && imageFileNames.length > 1) {
-          promptText.classList.remove('is-visible');
-          clearTimeout(promptTimer);
-          
-          transitionType = p.random(['blocks', 'slide']);
-          
-          let newIndex = p.floor(p.random(imageFileNames.length));
-          while (imageFileNames[newIndex] === currentImageKey) { 
-            newIndex = p.floor(p.random(imageFileNames.length));
-          }
-          
-          loadImageDynamically(imageFileNames[newIndex], (img) => {
-            nextImageKey = img.filePath;
-            animationFrame = 0;
-            animationState = 'decay';
-          });
-        }
-      };
-      p.mousePressed = handleInteraction;
-      p.touchStarted = handleInteraction;
-
-      p.windowResized = () => {
-        const canvasContainer = document.getElementById('canvas-container');
-        p.resizeCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
-      };
-    };
-
-    new p5(sketch);
+    // 最初の画像読み込み
+    document.addEventListener("DOMContentLoaded", () => {
+        let initialIndex = Math.floor(Math.random() * imageFileNames.length);
+        currentImageIndex = initialIndex;
+        img1.src = imageFileNames[initialIndex];
+        img1.onload = () => {
+            promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 3000);
+        };
+    });
   </script>
 
 </body>
