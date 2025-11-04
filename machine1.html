@@ -4,14 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IMAGE MACHINE</title>
+  
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
   <meta name="msapplication-TileColor" content="#000000">
   <meta name="theme-color" content="#000000">
+  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
     body { margin: 0; padding: 0; background-color: #000; color: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; overflow: hidden; }
     #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; cursor: pointer; }
@@ -48,14 +51,14 @@
 
   <script>
     const sketch = (p) => {
-      // --- ▼▼▼ ここを編集してください ▼▼▼ ---
-      // ステップ2でコピーした、カンマ区切りのファイル名リストを以下の "" の中に貼り付けます
-      const fileListString = "photo001.webp,photo002.webp,photo003.webp,photo004.webp,photo005.webp"; // ← 例：ここに貼り付け
+      // --- ▼▼▼ 設定項目 ▼▼▼ ---
+      const imageCount = 394; // あなたの画像の総数
+      const filePrefix = "photos/photo";
+      const fileSuffix = ".webp";
+      const numberPadding = 3; // 001, 002 のように3桁でゼロ埋め
+      // --- ▲▲▲ 設定ここまで ▲▲▲ ---
 
-      // 上の文字列を配列に変換し、各ファイル名の前に "photos/" を付けます
-      const imageFileNames = fileListString.split(',').map(name => `photos/${name.trim()}`);
-      // --- ▲▲▲ 編集ここまで ▲▲▲ ---
-
+      let imageFileNames = [];
       let currentImage = null;
       let nextImage = null;
       
@@ -64,11 +67,18 @@
       const chaosDuration = 30;
       const transitionDuration = 60;
 
+      // ファイル名のリストを自動生成
+      for (let i = 1; i <= imageCount; i++) {
+        const numberString = i.toString().padStart(numberPadding, '0');
+        imageFileNames.push(`${filePrefix}${numberString}${fileSuffix}`);
+      }
+
       p.setup = () => {
         const canvasContainer = document.getElementById('canvas-container');
         p.createCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight).parent(canvasContainer);
         p.background(0);
         
+        // 最初の画像をランダムに選んで読み込む
         loadImageDynamically(p.floor(p.random(imageFileNames.length)), (img) => {
           currentImage = img;
           animationState = 'display';
@@ -77,7 +87,7 @@
 
       p.draw = () => {
         if (!currentImage) {
-          p.background(0);
+          p.background(0); // 最初の画像読み込み中は黒い画面
           return;
         }
 
@@ -112,17 +122,28 @@
         }
       };
 
+      // 動的に画像を1枚だけ読み込む関数（エラーハンドリング強化版）
       function loadImageDynamically(index, callback) {
         const loadingOverlay = document.getElementById('loading-overlay');
         loadingOverlay.classList.add('is-active');
+
+        // ファイル名が存在しないインデックスが指定された場合の安全対策
+        if (index < 0 || index >= imageFileNames.length) {
+            console.error(`不正なインデックス: ${index}`);
+            const newIndex = p.floor(p.random(imageFileNames.length));
+            loadImageDynamically(newIndex, callback); // ランダムな別の画像でリトライ
+            return;
+        }
+
         p.loadImage(imageFileNames[index], 
-          (img) => {
+          (img) => { // 成功した場合
             img.filePath = imageFileNames[index];
             callback(img);
             loadingOverlay.classList.remove('is-active');
           },
-          () => {
-            console.error(`画像の読み込みに失敗: ${imageFileNames[index]}`);
+          () => { // 失敗した場合 (ファイルが存在しない欠番など)
+            console.warn(`画像の読み込みに失敗 or 欠番: ${imageFileNames[index]}. 別の画像を試します。`);
+            // 失敗したら、別の画像をランダムに試す
             const newIndex = p.floor(p.random(imageFileNames.length));
             loadImageDynamically(newIndex, callback);
           }
