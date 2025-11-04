@@ -43,7 +43,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.5); /* 背景の暗さを少し調整 */
+      background: rgba(0, 0, 0, 0.5);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -57,12 +57,10 @@
       visibility: visible;
     }
     .modal-content {
-      /* ★変更点：ここからリキッドデザイン風のスタイル */
-      background: rgba(17, 24, 39, 0.8); /* 背景を半透明に */
-      -webkit-backdrop-filter: blur(16px); /* 背景をぼかす (Safari用) */
-      backdrop-filter: blur(16px);       /* 背景をぼかす */
-      border: 1px solid rgba(55, 65, 81, 0.5); /* 枠線も半透明に */
-      /* ★変更点ここまで */
+      background: rgba(17, 24, 39, 0.8);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(55, 65, 81, 0.5);
       border-radius: 0.75rem;
       padding: 2rem;
       max-width: 640px;
@@ -227,15 +225,19 @@
       
       const textElement = document.getElementById('typed-text');
       const cursorElement = document.querySelector('.cursor');
-      const textPart1 = "An Experimental Generative Art Brand GENERATIVE JUNKIE";
+      
+      // ★変更点: textPart1 を修正
+      const textPart1 = "An Experimental Generative Art Brand";
       const textPart2 = "Always Super High!";
       const typeSpeed = 80;
       const eraseSpeed = 40;
       const pauseAfterType1 = 2000;
       const pauseAfterType2 = 3000;
       const pauseBeforeNext = 500;
+      
       let textIndex = 0;
       const texts = [textPart1, textPart2];
+
       function typeText(text, charIndex, callback) {
         if (charIndex < text.length) {
           textElement.textContent += text.charAt(charIndex);
@@ -244,6 +246,7 @@
           if (callback) callback();
         }
       }
+
       function eraseText(callback) {
         cursorElement.classList.add('is-hidden');
         let currentText = textElement.textContent;
@@ -255,6 +258,7 @@
           if (callback) callback();
         }
       }
+
       function startAnimationLoop() {
         const currentText = texts[textIndex];
         const pauseAfter = (textIndex === 0) ? pauseAfterType1 : pauseAfterType2;
@@ -267,6 +271,7 @@
           }, pauseAfter);
         });
       }
+
       startAnimationLoop();
     });
   </script>
