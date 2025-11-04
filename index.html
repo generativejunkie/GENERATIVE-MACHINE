@@ -22,7 +22,6 @@
       transform: translateY(-5px);
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
     }
-    /* --- ▼ Aboutモーダル用のスタイルを追加 ▼ --- */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -75,7 +74,6 @@
 
   <header class="text-center mb-12">
     <h1 class="text-4xl md:text-5xl font-extrabold tracking-widest text-white">GENERATIVE JUNKIE</h1>
-    <!-- ★変更: サブテキスト変更 & Aboutリンク追加 -->
     <div class="flex items-center justify-center gap-4 mt-2">
       <p class="text-gray-400">An Experimental Generative Art Brand</p>
       <button id="open-modal-btn" class="text-blue-400 hover:text-blue-300 transition-colors text-sm font-semibold">About</button>
@@ -137,7 +135,7 @@
     <p class="text-white" style="font-size: 10px; font-family: Verdana, sans-serif;">©︎GENERATIVE JUNKIE</p>
   </footer>
 
-  <!-- --- ▼ AboutモーダルのHTMLを追加 ▼ --- -->
+  <!-- --- ▼ AboutモーダルのHTML（テキスト修正済み）▼ --- -->
   <div id="about-modal" class="modal-overlay">
     <div class="modal-content">
       <div id="close-modal-btn" class="modal-close">
@@ -153,7 +151,7 @@
             Founded by an art director and graphic designer, the brand stands at the crossroads of AI, subculture, music, and underground creativity, redefining how human intuition and machine logic co-create culture.
           </p>
           <p class="text-gray-300 mt-2 leading-relaxed">
-            Guided by the concept of “turning generation itself into culture,” GENERATIVE JUNKIE reconstructs visuals, sounds, words, and digital experiences born through AI and prompt design — transforming these generative traces into tangible expressions such as T-shirts, hoodies, and stickers.
+            Guided by the concept of “turning generation itself into culture,” GENERATIVE JUNKIE reconstructs visuals, sounds, words, and digital experiences born through AI and prompt design, sublimating these generative traces into both interactive digital works and physical art forms.
           </p>
           <p class="text-gray-300 mt-2 leading-relaxed">
             Each piece captures the tension between control and chaos, reflecting a future where creativity is engineered, yet alive.
@@ -171,7 +169,7 @@
             アートディレクター／グラフィックデザイナーによって立ち上げられ、AI、サブカルチャー、ミュージック、アンダーグラウンドの交差点から、人間の直感と機械の論理が共創する新しいカルチャーを発信しています。
           </p>
            <p class="text-gray-300 mt-2 leading-relaxed">
-            「生成すること自体をカルチャーにする」という思想のもと、AIとプロンプトデザインから生まれるビジュアル、サウンド、言葉、デジタル体験を再構築。その“生成の痕跡”をTシャツやフーディ、ステッカーなどのプロダクトへと昇華し、コントロールとカオスのあいだに宿る創造性を表現します。
+            「生成すること自体をカルチャーにする」という思想のもと、AIとプロンプトデザインから生まれるビジュアル、サウンド、言葉、デジタル体験を再構築。その“生成の痕跡”を、インタラクティブなデジタル作品や物理的なアートフォームへと昇華させ、コントロールとカオスのあいだに宿る創造性を表現します。
           </p>
            <p class="text-gray-300 mt-2 leading-relaxed">
             GENERATIVE JUNKIEは、人間の想像力と機械知性が交わる場所から生まれる、コード、リズム、そして歪んだ文化の新しい美学を体現します。
@@ -182,7 +180,6 @@
   </div>
 
   <script>
-    // --- ▼ Aboutモーダル用のスクリプトを追加 ▼ ---
     const openBtn = document.getElementById('open-modal-btn');
     const closeBtn = document.getElementById('close-modal-btn');
     const modal = document.getElementById('about-modal');
@@ -196,7 +193,6 @@
     });
 
     modal.addEventListener('click', (event) => {
-      // ウィンドウの外側をクリックした時に閉じる
       if (event.target === modal) {
         modal.classList.remove('is-visible');
       }
