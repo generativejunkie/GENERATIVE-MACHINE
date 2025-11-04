@@ -3,37 +3,212 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GENERATIVE MACHINE</title>
+  <title>IMAGE MACHINE</title>
+  
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
-  <meta name="msapplication-TileColor" content="#da532c">
-  <meta name="theme-color" content="#ffffff">
-  <link rel="stylesheet" href="style.css">
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-M6PMRQR437"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-M6PMRQR437');
-  </script>
+  <meta name="msapplication-TileColor" content="#000000">
+  <meta name="theme-color" content="#000000">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body { margin: 0; padding: 0; background-color: #000; color: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; overflow: hidden; }
+    #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; cursor: pointer; }
+    .ui-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
+    .ui-layer > * { pointer-events: auto; }
+    #loading-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: #000; z-index: 10;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 1.2rem; transition: opacity 0.5s ease;
+      opacity: 0; pointer-events: none;
+    }
+    #loading-overlay.is-active {
+      opacity: 1; pointer-events: auto;
+    }
+  </style>
 </head>
-<body id="main-body">
-  <div id="loading">Loading...</div>
+<body>
 
-  <img id="main-img" class="portrait" src="photos/photo001.webp" alt="Wallpaper">
-
-  <div class="center-container">
-    <button onclick="changeBackground()">GENERATIVE MACHINE</button>
+  <div id="loading-overlay">
+    <p>Loading...</p>
   </div>
 
-  <!-- ★変更点：フッターのスタイルをクラスに変更しレスポンシブ対応 -->
-  <footer class="relative mt-12 mb-4 text-center md:fixed md:bottom-4 md:left-0 md:right-0 md:mt-0 md:mb-0">
-    <p style="color: white; font-size: 10px; font-family: Verdana, sans-serif;">©︎GENERATIVE JUNKIE</p>
-  </footer>
+  <div id="canvas-container"></div>
 
-  <script src="script.js"></script>
-  <button id="sound-toggle">SOUND ON</button>
+  <div class="ui-layer flex flex-col justify-between p-4">
+    <div>
+      <a href="/" class="text-white text-lg hover:opacity-75 transition-opacity">← Back</a>
+    </div>
+    <footer class="w-full text-center">
+      <p style="color: white; font-size: 10px; font-family: Verdana, sans-serif;">©︎GENERATIVE JUNKIE</p>
+    </footer>
+  </div>
+
+  <script>
+    const sketch = (p) => {
+      const imageCount = 394;
+      const filePrefix = "photos/photo";
+      const fileSuffix = ".webp";
+      const numberPadding = 3;
+
+      let imageFileNames = [];
+      let currentImage = null;
+      let nextImage = null;
+      
+      let animationState = 'loading';
+      let animationFrame = 0;
+      const chaosDuration = 30;
+      const transitionDuration = 60;
+
+      for (let i = 1; i <= imageCount; i++) {
+        const numberString = i.toString().padStart(numberPadding, '0');
+        imageFileNames.push(`${filePrefix}${numberString}${fileSuffix}`);
+      }
+
+      p.setup = () => {
+        const canvasContainer = document.getElementById('canvas-container');
+        p.createCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight).parent(canvasContainer);
+        p.background(0);
+        
+        loadImageDynamically(p.floor(p.random(imageFileNames.length)), (img) => {
+          currentImage = img;
+          animationState = 'display';
+        });
+      };
+
+      p.draw = () => {
+        if (!currentImage) {
+          p.background(0);
+          return;
+        }
+
+        switch (animationState) {
+          case 'decay':
+            drawImageWithBlocks(currentImage, animationFrame / transitionDuration, true);
+            animationFrame++;
+            if (animationFrame > transitionDuration) {
+              animationFrame = 0;
+              animationState = 'chaos';
+            }
+            break;
+            
+          case 'chaos':
+            drawGlitch();
+            animationFrame++;
+            if (animationFrame > chaosDuration) {
+              animationFrame = 0;
+              animationState = 'rebuild';
+              currentImage = nextImage;
+              nextImage = null;
+            }
+            break;
+
+          case 'rebuild':
+            drawImageWithBlocks(currentImage, animationFrame / transitionDuration, false);
+            animationFrame++;
+            if (animationFrame > transitionDuration) {
+              animationFrame = 0;
+              animationState = 'display';
+            }
+            break;
+            
+          case 'display':
+          default:
+            drawImageFullscreen(currentImage);
+            break;
+        }
+      };
+
+      function loadImageDynamically(index, callback) {
+        const loadingOverlay = document.getElementById('loading-overlay');
+        loadingOverlay.classList.add('is-active');
+        p.loadImage(imageFileNames[index], 
+          (img) => {
+            img.filePath = imageFileNames[index]; // 後で比較できるようにファイルパスを保存
+            callback(img);
+            loadingOverlay.classList.remove('is-active');
+          },
+          () => {
+            console.error(`画像の読み込みに失敗: ${imageFileNames[index]}`);
+            const newIndex = p.floor(p.random(imageFileNames.length));
+            loadImageDynamically(newIndex, callback);
+          }
+        );
+      }
+      
+      function drawImageWithBlocks(img, progress, isDecay) {
+        p.background(0);
+        const blockSize = p.map(progress, 0, 1, 100, 5);
+        const alpha = p.map(progress, 0, 1, 255, 50);
+
+        for (let y = 0; y < p.height; y += blockSize) {
+          for (let x = 0; x < p.width; x += blockSize) {
+            let probability = isDecay ? progress : (1 - progress);
+            if (p.random() < probability * 1.5) {
+              let c = img.get(x + p.random(-10, 10), y + p.random(-10, 10));
+              p.fill(c, alpha);
+              p.noStroke();
+              p.rect(x, y, blockSize, blockSize);
+            }
+          }
+        }
+      }
+      
+      function drawGlitch() {
+        for (let i = 0; i < 50; i++) {
+          let x = p.random(p.width);
+          let y = p.random(p.height);
+          let w = p.random(20, p.width * 0.7);
+          let h = p.random(5, 30);
+          if (nextImage) {
+              let c = nextImage.get(x, y);
+              p.fill(c);
+          }
+          p.noStroke();
+          p.rect(x, y, w, h);
+        }
+      }
+      
+      function drawImageFullscreen(img) {
+          p.imageMode(p.CENTER);
+          const canvasRatio = p.width / p.height;
+          const imageRatio = img.width / img.height;
+          if (canvasRatio > imageRatio) {
+              p.image(img, p.width / 2, p.height / 2, p.width, p.width / imageRatio);
+          } else {
+              p.image(img, p.width / 2, p.height / 2, p.height * imageRatio, p.height);
+          }
+      }
+
+      p.mousePressed = () => {
+        if (animationState === 'display' && !nextImage) {
+          const currentIndex = imageFileNames.indexOf(currentImage.filePath);
+          let newIndex = p.floor(p.random(imageFileNames.length));
+          while (newIndex === currentIndex) {
+            newIndex = p.floor(p.random(imageFileNames.length));
+          }
+          
+          loadImageDynamically(newIndex, (img) => {
+            nextImage = img;
+            animationFrame = 0;
+            animationState = 'decay';
+          });
+        }
+      };
+
+      p.windowResized = () => {
+        const canvasContainer = document.getElementById('canvas-container');
+        p.resizeCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
+      };
+    };
+
+    new p5(sketch);
+  </script>
+
 </body>
 </html>
