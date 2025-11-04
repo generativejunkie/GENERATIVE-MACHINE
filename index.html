@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GENERATIVE JUNKIE</title> <!-- ★変更: タイトルも変更 -->
+  <title>GENERATIVE JUNKIE</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
-      background-color: #000000; /* 背景を黒に */
+      background-color: #000000;
       color: #f3f4f6;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
@@ -15,21 +15,71 @@
       background-color: #1f2937;
       border: 1px solid #374151;
       transition: all 0.3s ease;
-      text-decoration: none; /* aタグの下線を消す */
+      text-decoration: none;
     }
     .card:hover {
       border-color: #60a5fa;
       transform: translateY(-5px);
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
     }
+    /* --- ▼ Aboutモーダル用のスタイルを追加 ▼ --- */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .modal-overlay.is-visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-content {
+      background: #111827;
+      border: 1px solid #374151;
+      border-radius: 0.75rem;
+      padding: 2rem;
+      max-width: 640px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      transform: scale(0.95);
+      transition: transform 0.3s ease;
+    }
+    .modal-overlay.is-visible .modal-content {
+      transform: scale(1);
+    }
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      color: #6b7280;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    .modal-close:hover {
+      color: #f3f4f6;
+    }
   </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4">
 
   <header class="text-center mb-12">
-    <!-- ★変更: メインタイトルを GENERATIVE JUNKIE に -->
     <h1 class="text-4xl md:text-5xl font-extrabold tracking-widest text-white">GENERATIVE JUNKIE</h1>
-    <p class="text-gray-400 mt-2">Select a machine to start</p>
+    <!-- ★変更: サブテキスト変更 & Aboutリンク追加 -->
+    <div class="flex items-center justify-center gap-4 mt-2">
+      <p class="text-gray-400">An Experimental Generative Art Brand</p>
+      <button id="open-modal-btn" class="text-blue-400 hover:text-blue-300 transition-colors text-sm font-semibold">About</button>
+    </div>
   </header>
 
   <main class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
@@ -41,7 +91,6 @@
           <svg class="w-6 h-6 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
         </div>
         <div>
-          <!-- ★変更: タイトルを GENERATIVE MACHINE 1 に、文字サイズを調整 (text-xl) -->
           <h2 class="text-xl font-bold text-white">GENERATIVE MACHINE 1</h2>
           <p class="text-gray-400 font-light">Image Contents</p>
         </div>
@@ -58,7 +107,6 @@
             <svg class="w-6 h-6 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
         </div>
         <div>
-          <!-- ★変更: タイトルを GENERATIVE MACHINE 2 に、文字サイズを調整 (text-xl) -->
           <h2 class="text-xl font-bold text-white">GENERATIVE MACHINE 2</h2>
           <p class="text-gray-400 font-light">Sound Visualizer</p>
         </div>
@@ -75,7 +123,6 @@
             <svg class="w-6 h-6 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
         </div>
         <div>
-          <!-- ★変更: バランスのため文字サイズを調整 (text-xl) -->
           <h2 class="text-xl font-bold text-white">APPAREL</h2>
           <p class="text-gray-400 font-light">Official Store</p>
         </div>
@@ -84,12 +131,77 @@
         公式アパレルストアはこちら。
       </p>
     </a>
-
   </main>
 
   <footer class="fixed bottom-4 left-0 right-0 text-center">
     <p class="text-white" style="font-size: 10px; font-family: Verdana, sans-serif;">©︎GENERATIVE JUNKIE</p>
   </footer>
+
+  <!-- --- ▼ AboutモーダルのHTMLを追加 ▼ --- -->
+  <div id="about-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div id="close-modal-btn" class="modal-close">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </div>
+      <div class="text-sm space-y-6">
+        <div>
+          <h3 class="font-bold mb-2 text-gray-200">GENERATIVE JUNKIE</h3>
+          <p class="text-gray-300 leading-relaxed">
+            GENERATIVE JUNKIE is a generative art brand that explores algorithmic beauty and the emotional resonance of machine intelligence, driven by the philosophy of prompt engineering as an art form.
+          </p>
+          <p class="text-gray-300 mt-2 leading-relaxed">
+            Founded by an art director and graphic designer, the brand stands at the crossroads of AI, subculture, music, and underground creativity, redefining how human intuition and machine logic co-create culture.
+          </p>
+          <p class="text-gray-300 mt-2 leading-relaxed">
+            Guided by the concept of “turning generation itself into culture,” GENERATIVE JUNKIE reconstructs visuals, sounds, words, and digital experiences born through AI and prompt design — transforming these generative traces into tangible expressions such as T-shirts, hoodies, and stickers.
+          </p>
+          <p class="text-gray-300 mt-2 leading-relaxed">
+            Each piece captures the tension between control and chaos, reflecting a future where creativity is engineered, yet alive.
+          </p>
+           <p class="text-gray-300 mt-2 leading-relaxed">
+            GENERATIVE JUNKIE embodies the new aesthetic of collaboration between human imagination and machine intelligence — an underground movement born from code, rhythm, and cultural distortion.
+          </p>
+        </div>
+        <div class="border-t border-gray-700 pt-6">
+          <h3 class="font-bold mb-2 text-gray-200">GENERATIVE JUNKIE (ジェネレイティブ・ジャンキー)</h3>
+          <p class="text-gray-300 leading-relaxed">
+            AIが生み出す「アルゴリズム的な美」と「機械の知性が帯びる感情」をテーマに、プロンプトエンジニアリングを新たなアートフォームとして探求するジェネラティブ・アートブランドです。
+          </p>
+           <p class="text-gray-300 mt-2 leading-relaxed">
+            アートディレクター／グラフィックデザイナーによって立ち上げられ、AI、サブカルチャー、ミュージック、アンダーグラウンドの交差点から、人間の直感と機械の論理が共創する新しいカルチャーを発信しています。
+          </p>
+           <p class="text-gray-300 mt-2 leading-relaxed">
+            「生成すること自体をカルチャーにする」という思想のもと、AIとプロンプトデザインから生まれるビジュアル、サウンド、言葉、デジタル体験を再構築。その“生成の痕跡”をTシャツやフーディ、ステッカーなどのプロダクトへと昇華し、コントロールとカオスのあいだに宿る創造性を表現します。
+          </p>
+           <p class="text-gray-300 mt-2 leading-relaxed">
+            GENERATIVE JUNKIEは、人間の想像力と機械知性が交わる場所から生まれる、コード、リズム、そして歪んだ文化の新しい美学を体現します。
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- ▼ Aboutモーダル用のスクリプトを追加 ▼ ---
+    const openBtn = document.getElementById('open-modal-btn');
+    const closeBtn = document.getElementById('close-modal-btn');
+    const modal = document.getElementById('about-modal');
+
+    openBtn.addEventListener('click', () => {
+      modal.classList.add('is-visible');
+    });
+
+    closeBtn.addEventListener('click', () => {
+      modal.classList.remove('is-visible');
+    });
+
+    modal.addEventListener('click', (event) => {
+      // ウィンドウの外側をクリックした時に閉じる
+      if (event.target === modal) {
+        modal.classList.remove('is-visible');
+      }
+    });
+  </script>
 
 </body>
 </html>
