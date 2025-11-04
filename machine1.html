@@ -25,22 +25,24 @@
       background-color: #000; z-index: 10;
       display: flex; align-items: center; justify-content: center;
       color: white; font-size: 1.2rem; transition: opacity 0.5s ease;
+      opacity: 0; pointer-events: none;
     }
+    #loading-overlay.is-active { opacity: 1; pointer-events: auto; }
     #prompt-text {
         position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
         z-index: 3; font-size: 1.5rem; font-weight: 200; letter-spacing: 0.2em;
-        color: rgba(255, 255, 255, 0.8); opacity: 0;
+        color: rgba(255, 255, 255, 0.7); opacity: 0;
         transition: opacity 1s ease-in-out; animation: subtle-pulse 2s infinite;
         pointer-events: none; text-shadow: 0 0 5px rgba(0,0,0,0.5);
     }
     #prompt-text.is-visible { opacity: 1; }
-    @keyframes subtle-pulse { 0%, 100% { opacity: 0.8; } 50% { opacity: 0.5; } }
+    @keyframes subtle-pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 0.4; } }
     .text-shadow { text-shadow: 0 0 8px rgba(0,0,0,0.7); }
   </style>
 </head>
 <body>
 
-  <div id="loading-overlay"><p>Loading Machine...</p></div>
+  <div id="loading-overlay"><p>Loading...</p></div>
   <div id="canvas-container"></div>
   <div id="prompt-text">CLICK / TAP</div>
 
@@ -67,10 +69,13 @@
       
       let animationState = 'loading';
       let animationFrame = 0;
-      const transitionDuration = 30;
+      let transitionType = 'blocks';
+      const chaosDuration = 20;
+      const transitionDuration = 60;
       
       let promptTimer = null;
       const promptText = document.getElementById('prompt-text');
+      let effectParams = {};
 
       for (let i = 1; i <= imageCount; i++) {
         imageFileNames.push(`${filePrefix}${i.toString().padStart(numberPadding, '0')}${fileSuffix}`);
@@ -78,54 +83,60 @@
       
       p.setup = () => {
         const canvasContainer = document.getElementById('canvas-container');
-        p.createCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight, p.WEBGL).parent(canvasContainer);
+        p.createCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight).parent(canvasContainer);
+        p.background(0);
         
         const initialIndex = p.floor(p.random(imageFileNames.length));
         loadImageDynamically(imageFileNames[initialIndex], (img) => {
           currentImageKey = img.filePath;
           animationState = 'display';
           const loadingOverlay = document.getElementById('loading-overlay');
-          loadingOverlay.style.opacity = '0';
-          setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
+          if (loadingOverlay) {
+            loadingOverlay.style.opacity = '0';
+            setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
+          }
           promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 3000);
         });
+        
+        const userStartAudio = () => { if (p.getAudioContext().state !== 'running') { p.getAudioContext().resume(); } };
+        canvasContainer.addEventListener('touchstart', userStartAudio, { once: true });
+        canvasContainer.addEventListener('mousedown', userStartAudio, { once: true });
       };
 
       p.draw = () => {
-        p.background(0);
-        if (!currentImageKey || !allImages[currentImageKey]) return;
+        if (!currentImageKey || !allImages[currentImageKey]) { p.background(0); return; }
 
-        switch(animationState) {
-            case 'fade-out':
-                p.push();
-                p.tint(255, p.map(animationFrame, 0, transitionDuration, 255, 0));
-                drawImageContained(allImages[currentImageKey]);
-                p.pop();
-                animationFrame++;
-                if (animationFrame > transitionDuration) {
-                    animationFrame = 0;
-                    animationState = 'fade-in';
-                    currentImageKey = nextImageKey;
-                    nextImageKey = null;
-                }
-                break;
+        const currentImage = allImages[currentImageKey];
+        const nextImage = allImages[nextImageKey];
+
+        switch (animationState) {
+          case 'decay':
+            runTransition(currentImage, animationFrame / transitionDuration, true);
+            animationFrame++;
+            if (animationFrame > transitionDuration) { animationFrame = 0; animationState = 'chaos'; }
+            break;
             
-            case 'fade-in':
-                p.push();
-                p.tint(255, p.map(animationFrame, 0, transitionDuration, 0, 255));
-                drawImageContained(allImages[currentImageKey]);
-                p.pop();
-                animationFrame++;
-                if (animationFrame > transitionDuration) {
-                    animationFrame = 0;
-                    animationState = 'display';
-                    promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 5000);
-                }
-                break;
+          case 'chaos':
+            drawGlitch(nextImage);
+            animationFrame++;
+            if (animationFrame > chaosDuration) {
+              animationFrame = 0; animationState = 'rebuild';
+              currentImageKey = nextImageKey; nextImageKey = null;
+            }
+            break;
 
-            default: // display
-                drawImageContained(allImages[currentImageKey]);
-                break;
+          case 'rebuild':
+            runTransition(allImages[currentImageKey], animationFrame / transitionDuration, false);
+            animationFrame++;
+            if (animationFrame > transitionDuration) {
+              animationFrame = 0; animationState = 'display';
+              promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 5000);
+            }
+            break;
+            
+          default:
+            drawImageFullscreen(currentImage);
+            break;
         }
       };
 
@@ -135,13 +146,14 @@
             return;
         }
         const loadingOverlay = document.getElementById('loading-overlay');
-        loadingOverlay.classList.add('is-active');
+        if (loadingOverlay) loadingOverlay.classList.add('is-active');
+
         p.loadImage(filePath, 
           (img) => {
             img.filePath = filePath;
             allImages[filePath] = img;
             callback(img);
-            if(loadingOverlay.classList.contains('is-active')) loadingOverlay.classList.remove('is-active');
+            if(loadingOverlay) loadingOverlay.classList.remove('is-active');
           },
           () => {
             console.warn(`Failed to load: ${filePath}. Retrying.`);
@@ -151,28 +163,95 @@
         );
       }
       
-      function drawImageContained(img) {
+      function runTransition(img, progress, isDecay) {
+        switch(transitionType) {
+          case 'blocks':
+            drawBlocks(img, progress, isDecay);
+            break;
+          case 'slide':
+            drawSlide(img, progress, isDecay);
+            break;
+          case 'circles':
+            drawCircles(img, progress, isDecay);
+            break;
+        }
+      }
+
+      function drawBlocks(img, progress, isDecay) {
+        p.background(0);
+        const blockSize = isDecay ? p.map(progress, 0, 1, effectParams.startSize, effectParams.endSize) : p.map(progress, 0, 1, effectParams.endSize, effectParams.startSize);
+        for (let y = 0; y < p.height; y += blockSize) {
+          for (let x = 0; x < p.width; x += blockSize) {
+            if (p.random() < effectParams.density) {
+              let c = img.get(x, y);
+              p.fill(c); p.noStroke();
+              p.rect(x, y, blockSize, blockSize);
+            }
+          }
+        }
+      }
+
+      function drawSlide(img, progress, isDecay) {
+        p.background(0);
+        const sliceHeight = p.height / effectParams.sliceCount;
+        for (let i = 0; i < effectParams.sliceCount; i++) {
+          let y = i * sliceHeight;
+          let offset = p.sin(i * effectParams.wave + p.frameCount * 2) * effectParams.offsetAmount;
+          let currentProgress = isDecay ? progress : 1.0 - progress;
+          let slideAmount = p.map(currentProgress, 0, 1, 0, p.width * 1.5);
+          p.copy(img, 0, y, img.width, sliceHeight, p.random(-slideAmount, slideAmount) + offset, y, p.width, sliceHeight);
+        }
+      }
+
+      function drawCircles(img, progress, isDecay) {
+        p.background(0);
+        let currentProgress = isDecay ? progress : 1.0 - progress;
+        for(let i=0; i < effectParams.circleCount; i++) {
+          let x = p.random(p.width);
+          let y = p.random(p.height);
+          let c = img.get(x,y);
+          p.fill(c, p.random(100, 255));
           p.noStroke();
-          p.texture(img);
+          let radius = p.map(currentProgress, 0, 1, 0, effectParams.maxRadius) * p.noise(x,y,p.frameCount);
+          p.ellipse(x, y, radius, radius);
+        }
+      }
+
+      function drawGlitch(nextImg) {
+        for (let i = 0; i < p.random(30, 120); i++) {
+          let x = p.random(p.width); let y = p.random(p.height);
+          let w = p.random(5, p.width * 0.9); let h = p.random(1, 15);
+          if (nextImg) {
+              let c = nextImg.get(x, y);
+              p.fill(p.red(c) + p.random(-100, 100), p.green(c) + p.random(-20, 20), p.blue(c) + p.random(-100, 100));
+          }
+          p.noStroke(); p.rect(x, y, w, h);
+        }
+      }
+      
+      function drawImageFullscreen(img) {
+          p.imageMode(p.CENTER);
           const canvasRatio = p.width / p.height;
           const imageRatio = img.width / img.height;
-          let w, h;
           if (canvasRatio > imageRatio) {
-              h = p.height;
-              w = h * imageRatio;
+              p.image(img, p.width / 2, p.height / 2, p.width, p.width / imageRatio);
           } else {
-              w = p.width;
-              h = w / imageRatio;
+              p.image(img, p.width / 2, p.height / 2, p.height * imageRatio, p.height);
           }
-          p.plane(w, h);
       }
       
       const handleInteraction = () => {
         if (p.getAudioContext().state !== 'running') { p.getAudioContext().resume(); }
-
         if (animationState === 'display' && !nextImageKey && imageFileNames.length > 1) {
           promptText.classList.remove('is-visible');
           clearTimeout(promptTimer);
+          
+          const transitionTypes = ['blocks', 'slide', 'circles'];
+          transitionType = p.random(transitionTypes);
+          
+          if (transitionType === 'blocks') { effectParams = { startSize: 5, endSize: p.random(80, 150), density: p.random(0.6, 1.0) }; }
+          else if (transitionType === 'slide') { effectParams = { sliceCount: p.random(20, 80), wave: p.random(5, 15), offsetAmount: p.random(20, 80) }; }
+          else if (transitionType === 'circles') { effectParams = { circleCount: p.random(100, 400), maxRadius: p.random(100, 500) }; }
           
           let newIndex = p.floor(p.random(imageFileNames.length));
           while (imageFileNames[newIndex] === currentImageKey) { 
@@ -182,7 +261,7 @@
           loadImageDynamically(imageFileNames[newIndex], (img) => {
             nextImageKey = img.filePath;
             animationFrame = 0;
-            animationState = 'fade-out';
+            animationState = 'decay';
           });
         }
       };
