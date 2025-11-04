@@ -4,17 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IMAGE MACHINE</title>
-  
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
   <meta name="msapplication-TileColor" content="#000000">
   <meta name="theme-color" content="#000000">
-  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-
   <style>
     body { margin: 0; padding: 0; background-color: #000; color: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; overflow: hidden; }
     #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; cursor: pointer; }
@@ -51,12 +48,14 @@
 
   <script>
     const sketch = (p) => {
-      const imageCount = 394;
-      const filePrefix = "photos/photo";
-      const fileSuffix = ".webp";
-      const numberPadding = 3;
+      // --- ▼▼▼ ここを編集してください ▼▼▼ ---
+      // ステップ2でコピーした、カンマ区切りのファイル名リストを以下の "" の中に貼り付けます
+      const fileListString = "photo001.webp,photo002.webp,photo003.webp,photo004.webp,photo005.webp"; // ← 例：ここに貼り付け
 
-      let imageFileNames = [];
+      // 上の文字列を配列に変換し、各ファイル名の前に "photos/" を付けます
+      const imageFileNames = fileListString.split(',').map(name => `photos/${name.trim()}`);
+      // --- ▲▲▲ 編集ここまで ▲▲▲ ---
+
       let currentImage = null;
       let nextImage = null;
       
@@ -64,11 +63,6 @@
       let animationFrame = 0;
       const chaosDuration = 30;
       const transitionDuration = 60;
-
-      for (let i = 1; i <= imageCount; i++) {
-        const numberString = i.toString().padStart(numberPadding, '0');
-        imageFileNames.push(`${filePrefix}${numberString}${fileSuffix}`);
-      }
 
       p.setup = () => {
         const canvasContainer = document.getElementById('canvas-container');
@@ -91,10 +85,7 @@
           case 'decay':
             drawImageWithBlocks(currentImage, animationFrame / transitionDuration, true);
             animationFrame++;
-            if (animationFrame > transitionDuration) {
-              animationFrame = 0;
-              animationState = 'chaos';
-            }
+            if (animationFrame > transitionDuration) { animationFrame = 0; animationState = 'chaos'; }
             break;
             
           case 'chaos':
@@ -111,10 +102,7 @@
           case 'rebuild':
             drawImageWithBlocks(currentImage, animationFrame / transitionDuration, false);
             animationFrame++;
-            if (animationFrame > transitionDuration) {
-              animationFrame = 0;
-              animationState = 'display';
-            }
+            if (animationFrame > transitionDuration) { animationFrame = 0; animationState = 'display'; }
             break;
             
           case 'display':
@@ -129,7 +117,7 @@
         loadingOverlay.classList.add('is-active');
         p.loadImage(imageFileNames[index], 
           (img) => {
-            img.filePath = imageFileNames[index]; // 後で比較できるようにファイルパスを保存
+            img.filePath = imageFileNames[index];
             callback(img);
             loadingOverlay.classList.remove('is-active');
           },
@@ -144,14 +132,12 @@
       function drawImageWithBlocks(img, progress, isDecay) {
         p.background(0);
         const blockSize = p.map(progress, 0, 1, 100, 5);
-        const alpha = p.map(progress, 0, 1, 255, 50);
-
         for (let y = 0; y < p.height; y += blockSize) {
           for (let x = 0; x < p.width; x += blockSize) {
             let probability = isDecay ? progress : (1 - progress);
             if (p.random() < probability * 1.5) {
-              let c = img.get(x + p.random(-10, 10), y + p.random(-10, 10));
-              p.fill(c, alpha);
+              let c = img.get(x, y);
+              p.fill(c);
               p.noStroke();
               p.rect(x, y, blockSize, blockSize);
             }
@@ -161,23 +147,16 @@
       
       function drawGlitch() {
         for (let i = 0; i < 50; i++) {
-          let x = p.random(p.width);
-          let y = p.random(p.height);
-          let w = p.random(20, p.width * 0.7);
-          let h = p.random(5, 30);
-          if (nextImage) {
-              let c = nextImage.get(x, y);
-              p.fill(c);
-          }
-          p.noStroke();
-          p.rect(x, y, w, h);
+          let x = p.random(p.width); let y = p.random(p.height);
+          let w = p.random(20, p.width * 0.7); let h = p.random(5, 30);
+          if (nextImage) { p.fill(nextImage.get(x, y)); }
+          p.noStroke(); p.rect(x, y, w, h);
         }
       }
       
       function drawImageFullscreen(img) {
           p.imageMode(p.CENTER);
-          const canvasRatio = p.width / p.height;
-          const imageRatio = img.width / img.height;
+          const canvasRatio = p.width / p.height; const imageRatio = img.width / img.height;
           if (canvasRatio > imageRatio) {
               p.image(img, p.width / 2, p.height / 2, p.width, p.width / imageRatio);
           } else {
@@ -186,13 +165,12 @@
       }
 
       p.mousePressed = () => {
-        if (animationState === 'display' && !nextImage) {
+        if (animationState === 'display' && !nextImage && imageFileNames.length > 1) {
           const currentIndex = imageFileNames.indexOf(currentImage.filePath);
           let newIndex = p.floor(p.random(imageFileNames.length));
           while (newIndex === currentIndex) {
             newIndex = p.floor(p.random(imageFileNames.length));
           }
-          
           loadImageDynamically(newIndex, (img) => {
             nextImage = img;
             animationFrame = 0;
