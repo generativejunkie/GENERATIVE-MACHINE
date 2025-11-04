@@ -6,14 +6,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Sound Visualizer</title>
-    <!-- ▼▼▼ ここからファビコン用のコードを追加 ▼▼▼ -->
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
   <meta name="msapplication-TileColor" content="#da532c">
   <meta name="theme-color" content="#ffffff">
-  <!-- ▲▲▲ ここまでファビコン用のコード ▲▲▲ -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -38,15 +36,13 @@
 <body>
   <div id="root"></div>
 
-  <!-- ★変更点：フッターをロゴなしのテキストのみに（黒文字） -->
-  <footer class="fixed bottom-4 left-0 right-0 text-center">
+  <!-- ★変更点：フッターのクラスを変更してレスポンシブ対応 -->
+  <footer class="relative mt-12 mb-4 text-center md:fixed md:bottom-4 md:left-0 md:right-0 md:mt-0 md:mb-0">
     <p class="text-black" style="font-size: 10px; font-family: Verdana, sans-serif;">©︎GENERATIVE JUNKIE</p>
   </footer>
   
   <script>
-    // ...（JavaScriptの大部分は変更なし）...
-    // ★変更点：コントロールパネル内の古いフッター記述を削除
-
+    // ...（JavaScriptは変更なし）...
     let audioContext, analyser, source, buffer;
     let startTime = 0, pauseTime = 0;
     let isPlaying = false;
@@ -375,7 +371,7 @@
       document.getElementById('file-input').onchange = handleFileChange;
       const controlPanel = document.createElement('div');
       controlPanel.id = 'control-panel';
-      controlPanel.className = 'absolute bottom-20 left-0 right-0 p-3 z-20'; // bottom-20 に変更してフッターと被らないように
+      controlPanel.className = 'absolute bottom-12 left-0 right-0 p-3 z-20'; // bottom-12 に変更してフッターと被らないように
       controlPanel.style.display = 'none';
       controlPanel.innerHTML = `
         <div class="max-w-4xl mx-auto backdrop-blur-xl bg-black/60 rounded-xl p-3 border border-white/20">
