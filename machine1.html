@@ -25,9 +25,7 @@
       background-color: #000; z-index: 10;
       display: flex; align-items: center; justify-content: center;
       color: white; font-size: 1.2rem; transition: opacity 0.5s ease;
-      opacity: 0; pointer-events: none;
     }
-    #loading-overlay.is-active { opacity: 1; pointer-events: auto; }
     #prompt-text {
         position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
         z-index: 3; font-size: 1.5rem; font-weight: 200; letter-spacing: 0.2em;
@@ -42,7 +40,7 @@
 </head>
 <body>
 
-  <div id="loading-overlay"><p>Loading...</p></div>
+  <div id="loading-overlay"><p>Loading Machine...</p></div>
   <div id="canvas-container"></div>
   <div id="prompt-text">CLICK / TAP</div>
 
@@ -144,14 +142,14 @@
             return;
         }
         const loadingOverlay = document.getElementById('loading-overlay');
-        loadingOverlay.classList.add('is-active');
+        if (loadingOverlay) loadingOverlay.classList.add('is-active');
 
         p.loadImage(filePath, 
           (img) => {
             img.filePath = filePath;
             allImages[filePath] = img;
             callback(img);
-            if(loadingOverlay.classList.contains('is-active')) loadingOverlay.classList.remove('is-active');
+            if(loadingOverlay) loadingOverlay.classList.remove('is-active');
           },
           () => {
             console.warn(`Failed to load: ${filePath}. Retrying.`);
@@ -203,8 +201,11 @@
       }
 
       function drawGlitch(nextImg) {
-        if (!nextImg) return;
-        drawImageFullscreen(nextImg); // 次の画像をうっすら表示
+        if (!nextImg) {
+          p.background(0);
+          return;
+        }
+        drawImageFullscreen(nextImg);
         for (let i = 0; i < 20; i++) {
             let x = p.random(p.width);
             let y = p.random(p.height);
