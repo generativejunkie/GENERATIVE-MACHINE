@@ -81,10 +81,7 @@
       <button id="open-modal-btn" class="text-blue-400 hover:text-blue-300 transition-colors text-sm font-semibold">About</button>
     </div>
   </header>
-
   <main class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
-    
-    <!-- GENERATIVE MACHINE 1 -->
     <a href="machine1.html" class="card rounded-xl p-8 block">
       <div class="flex items-center mb-4">
         <div class="p-2 bg-blue-500/20 rounded-full mr-4">
@@ -99,8 +96,6 @@
         インタラクティブな画像コンテンツを体験します。
       </p>
     </a>
-
-    <!-- GENERATIVE MACHINE 2 -->
     <a href="machine2.html" class="card rounded-xl p-8 block">
       <div class="flex items-center mb-4">
         <div class="p-2 bg-green-500/20 rounded-full mr-4">
@@ -115,8 +110,6 @@
         読み込んだオーディオファイルに合わせて変化するビジュアライザーです。
       </p>
     </a>
-
-    <!-- APPAREL STORE -->
     <a href="https://generativejunkie.stores.jp/" target="_blank" rel="noopener noreferrer" class="card rounded-xl p-8 block">
       <div class="flex items-center mb-4">
         <div class="p-2 bg-purple-500/20 rounded-full mr-4">
@@ -133,10 +126,10 @@
     </a>
   </main>
   
-  <!-- ★変更点：フッターにロゴを追加 -->
   <footer class="fixed bottom-4 left-0 right-0 text-center">
     <div class="flex flex-col items-center">
-      <img src="logo/gj_logo_white.png" alt="GENERATIVE JUNKIE Logo" class="w-36 mb-2">
+      <!-- ★変更点：画像パスの先頭に / を追加 -->
+      <img src="/logo/gj_logo_white.png" alt="GENERATIVE JUNKIE Logo" class="w-36 mb-2">
       <p class="text-white" style="font-size: 10px; font-family: Verdana, sans-serif;">©︎GENERATIVE JUNKIE</p>
     </div>
   </footer>
@@ -184,26 +177,21 @@
       </div>
     </div>
   </div>
-
   <script>
     const openBtn = document.getElementById('open-modal-btn');
     const closeBtn = document.getElementById('close-modal-btn');
     const modal = document.getElementById('about-modal');
-
     openBtn.addEventListener('click', () => {
       modal.classList.add('is-visible');
     });
-
     closeBtn.addEventListener('click', () => {
       modal.classList.remove('is-visible');
     });
-
     modal.addEventListener('click', (event) => {
       if (event.target === modal) {
         modal.classList.remove('is-visible');
       }
     });
   </script>
-
 </body>
 </html>

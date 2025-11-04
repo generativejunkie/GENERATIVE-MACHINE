@@ -30,84 +30,55 @@
 <body>
   <div id="root"></div>
 
-  <!-- ★変更点：新しい統一フッターを追加（黒バージョン） -->
+  <!-- ★変更点：フッターをロゴなしのテキストのみに（黒文字） -->
   <footer class="fixed bottom-4 left-0 right-0 text-center">
-    <div class="flex flex-col items-center">
-      <img src="logo/gj_logo_black.png" alt="GENERATIVE JUNKIE Logo" class="w-36 mb-2">
-      <p class="text-black" style="font-size: 10px; font-family: Verdana, sans-serif;">©︎GENERATIVE JUNKIE</p>
-    </div>
+    <p class="text-black" style="font-size: 10px; font-family: Verdana, sans-serif;">©︎GENERATIVE JUNKIE</p>
   </footer>
   
   <script>
-    // ...（JavaScript部分は変更なし）...
-    // ★変更点：コントロールパネル内の古いフッターを削除
-    
-    // グローバル変数
+    // ...（JavaScriptの大部分は変更なし）...
+    // ★変更点：コントロールパネル内の古いフッター記述を削除
+
     let audioContext, analyser, source, buffer;
     let startTime = 0, pauseTime = 0;
     let isPlaying = false;
     let fileName = '', artist = 'Unknown Artist', duration = 0, currentTime = 0;
     let frequencyData = { low: 0, mid: 0, high: 0 };
     let settingsOpen = false;
-    
-    // 設定
     let pillCount = 1, pillSize = 0.7, spreadWidth = 0;
     let rotationSpeed = 1, scaleIntensity = 1;
     let wireframeMode = false, blockMode = false, particleMode = false;
-    
-    // Three.js
     let scene, camera, renderer, pillGroups = [];
     let canvas;
-    
-    // 初期化
     function init() {
       const root = document.getElementById('root');
-      
-      // Canvas作成
       canvas = document.createElement('canvas');
       canvas.className = 'absolute inset-0';
       root.appendChild(canvas);
-      
-      // Three.js setup
       scene = new THREE.Scene();
       scene.background = new THREE.Color(0xcccccc);
-      
       camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
       camera.position.set(0, 0, 5);
       camera.lookAt(0, 0, 0);
-      
       renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      
-      // ライト
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
       scene.add(ambientLight);
       const mainLight = new THREE.DirectionalLight(0xffffff, 1);
       mainLight.position.set(5, 5, 5);
       scene.add(mainLight);
-      
-      // 初期カプセル作成
       createPills();
-      
-      // UI作成
       createUI();
-      
-      // リサイズ
       window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
-      
-      // アニメーション開始
       animate();
     }
-    
-    // カプセル作成
     function createPill() {
       const pillGroup = new THREE.Group();
-      
       const whiteMat = new THREE.MeshStandardMaterial({
         color: 0xffffff, metalness: 0.3, roughness: 0.4,
         emissive: 0x111111, wireframe: wireframeMode
@@ -116,7 +87,6 @@
         color: 0x000000, metalness: 0.3, roughness: 0.4,
         emissive: 0x000000, wireframe: wireframeMode
       });
-      
       if (blockMode) {
         const topBox = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), whiteMat);
         topBox.position.y = 0.5;
@@ -143,10 +113,8 @@
         bottomSphere.rotation.x = Math.PI;
         pillGroup.add(bottomSphere);
       }
-      
       return pillGroup;
     }
-    
     function createPills() {
       pillGroups.forEach(pill => {
         scene.remove(pill);
@@ -156,7 +124,6 @@
         });
       });
       pillGroups = [];
-      
       for (let i = 0; i < pillCount; i++) {
         const pill = createPill();
         if (pillCount === 1) {
@@ -173,53 +140,38 @@
         pillGroups.push(pill);
       }
     }
-    
-    // アニメーション
     function animate() {
       requestAnimationFrame(animate);
-      
       let low = 0, mid = 0, high = 0;
-      
       if (analyser && isPlaying) {
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
         analyser.getByteFrequencyData(dataArray);
-        
         const bufferLength = dataArray.length;
         const lowEnd = Math.floor(bufferLength * 0.1);
         const midEnd = Math.floor(bufferLength * 0.5);
-        
         for (let i = 0; i < lowEnd; i++) low += dataArray[i];
         for (let i = lowEnd; i < midEnd; i++) mid += dataArray[i];
         for (let i = midEnd; i < bufferLength; i++) high += dataArray[i];
-        
         low = (low / lowEnd) / 255;
         mid = (mid / (midEnd - lowEnd)) / 255;
         high = (high / (bufferLength - midEnd)) / 255;
-        
         frequencyData = { low, mid, high };
-        
         if (audioContext && source) {
           const elapsed = audioContext.currentTime - startTime;
           currentTime = Math.min(elapsed, duration);
           updateTimeDisplay();
         }
       }
-      
-      // カプセルアニメーション
       pillGroups.forEach((pillGroup, index) => {
         const audioReaction = (low + mid + high) / 3;
         const targetScale = pillSize + audioReaction * 1.0 * scaleIntensity;
-        
         pillGroup.scale.x = targetScale;
         pillGroup.scale.y = targetScale;
         pillGroup.scale.z = targetScale;
-        
         const speed = rotationSpeed;
         pillGroup.rotation.x += (0.005 + mid * 0.02) * speed;
         pillGroup.rotation.y += (0.003 + low * 0.01) * speed;
         pillGroup.rotation.z += (0.002 + high * 0.015) * speed;
-        
-        // 位置を固定（spreadWidthに基づく）
         if (pillCount === 1) {
           pillGroup.position.set(0, 0, 0);
         } else {
@@ -228,7 +180,6 @@
           pillGroup.position.y = 0;
           pillGroup.position.z = Math.sin(angle) * spreadWidth;
         }
-        
         const emissive = audioReaction * 0.5;
         pillGroup.children.forEach((child, idx) => {
           if (child.material) {
@@ -244,16 +195,11 @@
           }
         });
       });
-      
       renderer.render(scene, camera);
     }
-    
-    // ファイル選択
     async function handleFileChange(e) {
       const file = e.target.files[0];
       if (!file) return;
-      
-      // 前の曲を停止
       if (source) {
         try {
           source.stop();
@@ -266,35 +212,20 @@
       isPlaying = false;
       pauseTime = 0;
       currentTime = 0;
-      
-      console.log('=== FILE SELECTED ===');
-      console.log('File:', file.name, 'Type:', file.type, 'Size:', file.size);
       fileName = file.name;
-      
       const nameParts = file.name.replace(/\.[^/.]+$/, '').split('-');
       artist = nameParts.length > 1 ? nameParts[0].trim() : 'Unknown Artist';
-      
       updateUI();
-      
       try {
         if (!audioContext) {
           audioContext = new (window.AudioContext || window.webkitAudioContext)();
-          console.log('AudioContext created');
         }
-        
-        // iOS対応：先にresumeを試みる
         if (audioContext.state !== 'running') {
           await audioContext.resume();
-          console.log('AudioContext resumed');
         }
-        
         const arrayBuffer = await file.arrayBuffer();
-        console.log('File loaded:', arrayBuffer.byteLength, 'bytes');
-        
-        // iOS Safari対応：デコードエラーをキャッチ
         try {
           const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-          console.log('Decoded:', audioBuffer.duration, 'seconds');
           buffer = audioBuffer;
           duration = audioBuffer.duration;
         } catch (decodeError) {
@@ -302,34 +233,24 @@
           alert('このファイル形式は再生できません。MP3またはWAVファイルを選択してください。');
           return;
         }
-        
         if (!analyser) {
           analyser = audioContext.createAnalyser();
           analyser.fftSize = 1024;
           analyser.smoothingTimeConstant = 0.8;
           analyser.connect(audioContext.destination);
-          console.log('Analyser created');
         }
-        
-        console.log('=== READY TO PLAY ===');
         updateUI();
       } catch (error) {
         console.error('=== ERROR ===', error);
         alert('エラー: ' + error.message);
       }
     }
-    
-    // 再生/停止
     async function togglePlay() {
-      console.log('=== TOGGLE PLAY ===');
-      
       if (!audioContext || !buffer || !analyser) {
         alert('ファイルを選択してください');
         return;
       }
-      
       if (isPlaying) {
-        console.log('STOPPING');
         if (source) {
           try {
             source.stop();
@@ -344,45 +265,31 @@
         updateUI();
         return;
       }
-      
-      console.log('STARTING');
-      
       try {
         if (audioContext.state !== 'running') {
           await audioContext.resume();
         }
-        
         source = audioContext.createBufferSource();
         source.buffer = buffer;
         source.connect(analyser);
-        
         const offset = pauseTime || 0;
         startTime = audioContext.currentTime - offset;
-        
         source.start(0, offset);
-        
         source.onended = () => {
-          console.log('ENDED');
           isPlaying = false;
           pauseTime = 0;
           currentTime = 0;
           updateUI();
         };
-        
         isPlaying = true;
-        console.log('=== PLAYING ===');
         updateUI();
       } catch (error) {
         console.error('=== PLAY ERROR ===', error);
         alert('再生エラー: ' + error.message);
       }
     }
-    
-    // UI作成
     function createUI() {
       const root = document.getElementById('root');
-      
-      // 設定ボタン
       const settingsBtn = document.createElement('button');
       settingsBtn.className = 'absolute top-4 right-4 w-10 h-10 rounded-full bg-black/60 hover:bg-black/70 transition-colors flex items-center justify-center border border-white/20 z-50';
       settingsBtn.innerHTML = '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>';
@@ -391,51 +298,21 @@
         updateUI();
       };
       root.appendChild(settingsBtn);
-      
-      // 設定パネル
       const settingsPanel = document.createElement('div');
       settingsPanel.id = 'settings-panel';
       settingsPanel.className = 'absolute top-16 right-4 w-64 backdrop-blur-xl bg-black/70 rounded-xl p-4 border border-white/20 text-xs z-40';
       settingsPanel.style.display = 'none';
       settingsPanel.innerHTML = `
         <h3 class="text-white text-sm font-light mb-3">Settings</h3>
-        <div class="mb-3">
-          <label class="text-white/70 text-xs mb-1 block">Capsules: <span id="pill-count-val">1</span></label>
-          <input type="range" id="pill-count" min="1" max="12" value="1" class="w-full">
-        </div>
-        <div class="mb-3">
-          <label class="text-white/70 text-xs mb-1 block">Capsule Size: <span id="pill-size-val">0.7</span></label>
-          <input type="range" id="pill-size" min="0.3" max="1.5" step="0.1" value="0.7" class="w-full">
-        </div>
-        <div class="mb-3">
-          <label class="text-white/70 text-xs mb-1 block">Spread: <span id="spread-val">0.0</span></label>
-          <input type="range" id="spread" min="0" max="5" step="0.1" value="0" class="w-full">
-        </div>
-        <div class="mb-3">
-          <label class="text-white/70 text-xs mb-1 block">Rotation Speed: <span id="rotation-val">1.0</span>x</label>
-          <input type="range" id="rotation" min="0" max="3" step="0.1" value="1" class="w-full">
-        </div>
-        <div class="mb-3">
-          <label class="text-white/70 text-xs mb-1 block">Scale: <span id="scale-val">1.0</span>x</label>
-          <input type="range" id="scale" min="0" max="3" step="0.1" value="1" class="w-full">
-        </div>
-        <div class="mb-3">
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" id="wireframe" class="w-3 h-3">
-            <span class="text-white/70 text-xs">Wireframe Mode</span>
-          </label>
-        </div>
-        <div class="mb-3">
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" id="block-mode" class="w-3 h-3">
-            <span class="text-white/70 text-xs">Block Mode</span>
-          </label>
-        </div>
-        <button id="reset-btn" class="w-full py-1.5 px-3 bg-white/10 hover:bg-white/20 rounded text-white text-xs transition-colors">Reset to Default</button>
-      `;
+        <div class="mb-3"><label class="text-white/70 text-xs mb-1 block">Capsules: <span id="pill-count-val">1</span></label><input type="range" id="pill-count" min="1" max="12" value="1" class="w-full"></div>
+        <div class="mb-3"><label class="text-white/70 text-xs mb-1 block">Capsule Size: <span id="pill-size-val">0.7</span></label><input type="range" id="pill-size" min="0.3" max="1.5" step="0.1" value="0.7" class="w-full"></div>
+        <div class="mb-3"><label class="text-white/70 text-xs mb-1 block">Spread: <span id="spread-val">0.0</span></label><input type="range" id="spread" min="0" max="5" step="0.1" value="0" class="w-full"></div>
+        <div class="mb-3"><label class="text-white/70 text-xs mb-1 block">Rotation Speed: <span id="rotation-val">1.0</span>x</label><input type="range" id="rotation" min="0" max="3" step="0.1" value="1" class="w-full"></div>
+        <div class="mb-3"><label class="text-white/70 text-xs mb-1 block">Scale: <span id="scale-val">1.0</span>x</label><input type="range" id="scale" min="0" max="3" step="0.1" value="1" class="w-full"></div>
+        <div class="mb-3"><label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="wireframe" class="w-3 h-3"><span class="text-white/70 text-xs">Wireframe Mode</span></label></div>
+        <div class="mb-3"><label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="block-mode" class="w-3 h-3"><span class="text-white/70 text-xs">Block Mode</span></label></div>
+        <button id="reset-btn" class="w-full py-1.5 px-3 bg-white/10 hover:bg-white/20 rounded text-white text-xs transition-colors">Reset to Default</button>`;
       root.appendChild(settingsPanel);
-      
-      // 設定イベント
       document.getElementById('pill-count').oninput = (e) => {
         pillCount = parseInt(e.target.value);
         document.getElementById('pill-count-val').textContent = pillCount;
@@ -467,25 +344,11 @@
         createPills();
       };
       document.getElementById('reset-btn').onclick = () => {
-        pillCount = 1; pillSize = 0.7; spreadWidth = 0;
-        rotationSpeed = 1; scaleIntensity = 1;
-        wireframeMode = false; blockMode = false;
-        document.getElementById('pill-count').value = 1;
-        document.getElementById('pill-size').value = 0.7;
-        document.getElementById('spread').value = 0;
-        document.getElementById('rotation').value = 1;
-        document.getElementById('scale').value = 1;
-        document.getElementById('wireframe').checked = false;
-        document.getElementById('block-mode').checked = false;
-        document.getElementById('pill-count-val').textContent = '1';
-        document.getElementById('pill-size-val').textContent = '0.7';
-        document.getElementById('spread-val').textContent = '0.0';
-        document.getElementById('rotation-val').textContent = '1.0';
-        document.getElementById('scale-val').textContent = '1.0';
+        pillCount = 1; pillSize = 0.7; spreadWidth = 0; rotationSpeed = 1; scaleIntensity = 1; wireframeMode = false; blockMode = false;
+        document.getElementById('pill-count').value = 1; document.getElementById('pill-size').value = 0.7; document.getElementById('spread').value = 0; document.getElementById('rotation').value = 1; document.getElementById('scale').value = 1; document.getElementById('wireframe').checked = false; document.getElementById('block-mode').checked = false;
+        document.getElementById('pill-count-val').textContent = '1'; document.getElementById('pill-size-val').textContent = '0.7'; document.getElementById('spread-val').textContent = '0.0'; document.getElementById('rotation-val').textContent = '1.0'; document.getElementById('scale-val').textContent = '1.0';
         createPills();
       };
-      
-      // ファイル選択前のUI
       const dropZone = document.createElement('div');
       dropZone.id = 'drop-zone';
       dropZone.className = 'absolute inset-0 flex items-center justify-center z-10';
@@ -499,57 +362,28 @@
             <p class="text-lg font-light mb-2">Drop audio file here</p>
             <p class="text-sm text-gray-600">or click to browse</p>
           </div>
-        </label>
-      `;
+        </label>`;
       root.appendChild(dropZone);
-      
       document.getElementById('file-input').onchange = handleFileChange;
-      
-      // コントロールパネル
       const controlPanel = document.createElement('div');
       controlPanel.id = 'control-panel';
-      controlPanel.className = 'absolute bottom-0 left-0 right-0 p-3 z-20';
+      controlPanel.className = 'absolute bottom-20 left-0 right-0 p-3 z-20'; // bottom-20 に変更してフッターと被らないように
       controlPanel.style.display = 'none';
-      // ★変更点：innerHTMLから古いフッター部分を削除
       controlPanel.innerHTML = `
         <div class="max-w-4xl mx-auto backdrop-blur-xl bg-black/60 rounded-xl p-3 border border-white/20">
-          <div class="mb-2">
-            <div class="text-white text-sm font-light truncate mb-0.5" id="file-name"></div>
-            <div class="text-white/50 text-xs font-light" id="artist-name"></div>
-          </div>
+          <div class="mb-2"><div class="text-white text-sm font-light truncate mb-0.5" id="file-name"></div><div class="text-white/50 text-xs font-light" id="artist-name"></div></div>
           <div class="flex items-center gap-4">
-            <div class="flex-1 flex items-center gap-3">
-              <span class="text-white/70 text-xs font-mono w-10 text-right" id="current-time">0:00</span>
-              <div class="flex-1 h-1.5 bg-white/20 rounded-full cursor-pointer relative group" id="seek-bar">
-                <div id="progress-bar" class="h-full bg-white rounded-full transition-all duration-100" style="width: 0%"></div>
-              </div>
-              <span class="text-white/70 text-xs font-mono w-10" id="duration-time">0:00</span>
-            </div>
+            <div class="flex-1 flex items-center gap-3"><span class="text-white/70 text-xs font-mono w-10 text-right" id="current-time">0:00</span><div class="flex-1 h-1.5 bg-white/20 rounded-full cursor-pointer relative group" id="seek-bar"><div id="progress-bar" class="h-full bg-white rounded-full transition-all duration-100" style="width: 0%"></div></div><span class="text-white/70 text-xs font-mono w-10" id="duration-time">0:00</span></div>
             <div class="flex items-end gap-1 h-12" id="freq-bars"></div>
             <div class="flex items-center gap-2">
-              <button id="play-btn" class="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 transition-colors flex items-center justify-center border border-white/30">
-                <svg class="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z"/>
-                </svg>
-              </button>
-              <label class="cursor-pointer">
-                <input type="file" id="file-input-2" accept="audio/mpeg,audio/mp3,audio/wav,audio/aac,audio/*" class="hidden">
-                <div class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 transition-colors flex items-center justify-center border border-white/30">
-                  <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
-                  </svg>
-                </div>
-              </label>
+              <button id="play-btn" class="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 transition-colors flex items-center justify-center border border-white/30"><svg class="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+              <label class="cursor-pointer"><input type="file" id="file-input-2" accept="audio/mpeg,audio/mp3,audio/wav,audio/aac,audio/*" class="hidden"><div class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 transition-colors flex items-center justify-center border border-white/30"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg></div></label>
             </div>
           </div>
-        </div>
-      `;
+        </div>`;
       root.appendChild(controlPanel);
-      
       document.getElementById('file-input-2').onchange = handleFileChange;
       document.getElementById('play-btn').onclick = togglePlay;
-      
-      // 周波数バー作成
       const freqBars = document.getElementById('freq-bars');
       ['low', 'mid', 'high'].forEach(freq => {
         const col = document.createElement('div');
@@ -564,22 +398,17 @@
         freqBars.appendChild(col);
       });
     }
-    
-    // UI更新
     function updateUI() {
       const dropZone = document.getElementById('drop-zone');
       const controlPanel = document.getElementById('control-panel');
       const settingsPanel = document.getElementById('settings-panel');
-      
       if (fileName) {
         dropZone.style.display = 'none';
         controlPanel.style.display = 'block';
         document.getElementById('file-name').textContent = fileName.replace(/\.[^/.]+$/, '');
         document.getElementById('artist-name').textContent = artist;
       }
-      
       settingsPanel.style.display = settingsOpen ? 'block' : 'none';
-      
       const playBtn = document.getElementById('play-btn');
       if (playBtn) {
         playBtn.innerHTML = isPlaying 
@@ -587,13 +416,10 @@
           : '<svg class="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
       }
     }
-    
     function updateTimeDisplay() {
       document.getElementById('current-time').textContent = formatTime(currentTime);
       document.getElementById('duration-time').textContent = formatTime(duration);
       document.getElementById('progress-bar').style.width = `${(currentTime / duration) * 100}%`;
-      
-      // 周波数バー更新
       ['low', 'mid', 'high'].forEach(freq => {
         const bars = document.querySelectorAll(`.freq-${freq}`);
         bars.forEach((bar, i) => {
@@ -603,21 +429,17 @@
           if (i >= 8) color = '#ff0000';
           else if (i >= 6) color = '#ffaa00';
           else if (i >= 4) color = '#ffff00';
-          
           bar.style.backgroundColor = isActive ? color : '#1a1a1a';
           bar.style.boxShadow = isActive ? `0 0 4px ${color}` : 'none';
         });
       });
     }
-    
     function formatTime(sec) {
       if (isNaN(sec)) return '0:00';
       const m = Math.floor(sec / 60);
       const s = Math.floor(sec % 60);
       return `${m}:${s.toString().padStart(2, '0')}`;
     }
-    
-    // 起動
     init();
   </script>
 </body>
