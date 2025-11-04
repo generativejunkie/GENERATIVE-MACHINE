@@ -32,7 +32,8 @@
     <p class="text-gray-400 mt-2">Select a machine to start</p>
   </header>
 
-  <main class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
+  <!-- ★変更点：3カラム表示にするため、クラスを md:grid-cols-3 に、横幅を max-w-6xl に変更 -->
+  <main class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
     
     <!-- GENERATIVE MACHINE 1 -->
     <a href="machine1.html" class="card rounded-xl p-8 block">
@@ -63,6 +64,23 @@
       </div>
       <p class="text-gray-300">
         読み込んだオーディオファイルに合わせて変化するビジュアライザーです。
+      </p>
+    </a>
+
+    <!-- ★追加項目：APPAREL STORE -->
+    <a href="https://generativejunkie.stores.jp/" target="_blank" rel="noopener noreferrer" class="card rounded-xl p-8 block">
+      <div class="flex items-center mb-4">
+        <div class="p-2 bg-purple-500/20 rounded-full mr-4">
+            <!-- Shopping Bag Icon -->
+            <svg class="w-6 h-6 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-white">APPAREL</h2>
+          <p class="text-gray-400 font-light">Official Store</p>
+        </div>
+      </div>
+      <p class="text-gray-300">
+        公式アパレルストアはこちら。
       </p>
     </a>
 
