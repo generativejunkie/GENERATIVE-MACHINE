@@ -85,21 +85,20 @@
     }
     
     /* --- ▼▼▼ タイピングカーソルのスタイルを全面変更 ▼▼▼ --- */
-    .typing-cursor {
-      position: relative; /* ::after の位置基準のため */
-    }
-    .typing-cursor::after {
-      content: '';
+    .cursor {
       display: inline-block;
       width: 2px;
-      height: 0.9em; /* 文字の高さ(em)に合わせて調整 */
+      height: 1em; /* 文字の高さに合わせる */
       background-color: rgba(255, 255, 255, 0.75);
-      margin-left: 4px; /* 文字とカーソルの間に少し余白 */
-      animation: blink 0.7s step-end infinite;
+      margin-left: 2px;
+      animation: blink 0.7s infinite;
     }
     @keyframes blink {
-      from, to { background-color: transparent; }
-      50% { background-color: rgba(255, 255, 255, 0.75); }
+      0%, 100% { background-color: rgba(255, 255, 255, 0.75); }
+      50% { background-color: transparent; }
+    }
+    .cursor.is-hidden {
+      display: none;
     }
     /* --- ▲▲▲ ここまで ▲▲▲ --- */
 
@@ -110,78 +109,39 @@
   <header class="text-center mb-12">
     <h1 class="text-4xl md:text-5xl font-extrabold tracking-widest text-white">GENERATIVE MACHINE</h1>
     <div class="flex items-center justify-center gap-4 mt-2">
-      <p id="typing-subtitle" class="text-gray-400 typing-cursor h-10 flex items-center"></p>
+      <!-- ★変更点: HTML構造を変更 -->
+      <p id="typing-container" class="text-gray-400 h-10 flex items-center">
+        <span id="typed-text"></span><span class="cursor"></span>
+      </p>
       <button id="open-modal-btn" class="text-blue-400 hover:text-blue-300 transition-colors text-sm font-semibold">About</button>
     </div>
   </header>
 
   <main class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
-    
-    <a href="machine1.html" class="card rounded-xl p-8 block">
-      <div class="flex items-center mb-4">
-        <div class="p-2 bg-blue-500/20 rounded-full mr-4">
-          <svg class="w-6 h-6 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-        </div>
-        <div>
-          <h2 class="text-xl font-bold text-white">IMAGE MACHINE</h2>
-          <p class="text-gray-400 font-light">Image Contents</p>
-        </div>
-      </div>
-      <p class="text-gray-300 text-sm">
-        Explore an interactive visual experience
-      </p>
-    </a>
-
-    <a href="machine2.html" class="card rounded-xl p-8 block">
-      <div class="flex items-center mb-4">
-        <div class="p-2 bg-green-500/20 rounded-full mr-4">
-            <svg class="w-6 h-6 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
-        </div>
-        <div>
-          <h2 class="text-xl font-bold text-white">SOUND MACHINE</h2>
-          <p class="text-gray-400 font-light">Sound Visualizer</p>
-        </div>
-      </div>
-      <p class="text-gray-300 text-sm">
-        A sound visualizer that transforms your audio into generative art
-      </p>
-    </a>
-
-    <a href="https://generativejunkie.stores.jp/" target="_blank" rel="noopener noreferrer" class="card rounded-xl p-8 block">
-      <div class="flex items-center mb-4">
-        <div class="p-2 bg-purple-500/20 rounded-full mr-4">
-            <svg class="w-6 h-6 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-        </div>
-        <div>
-          <h2 class="text-xl font-bold text-white">APPAREL</h2>
-          <p class="text-gray-400 font-light">Official Store</p>
-        </div>
-      </div>
-      <p class="text-gray-300 text-sm">
-        Discover the official apparel and goods
-      </p>
-    </a>
+    <!-- ... (コンテンツ部分は変更なし) ... -->
   </main>
   
   <footer class="relative mt-12 mb-4 text-center md:fixed md:bottom-4 md:left-0 md:right-0 md:mt-0 md:mb-0">
-    <div class="flex flex-col items-center">
-      <img src="/logo/gj_logo_white.png" alt="GENERATIVE JUNKIE Logo" class="w-32 mb-2">
-      <p class="text-white" style="font-size: 10px; font-family: Verdana, sans-serif;">©︎GENERATIVE JUNKIE</p>
-    </div>
+    <!-- ... (フッター部分は変更なし) ... -->
   </footer>
 
   <div id="about-modal" class="modal-overlay">
-    <!-- ... (モーダルの中身は変更なし) ... -->
+    <!-- ... (モーダル部分は変更なし) ... -->
   </div>
 
   <script>
-    const openBtn = document.getElementById('open-modal-btn');
-    const closeBtn = document.getElementById('close-modal-btn');
-    const modal = document.getElementById('about-modal');
-    // ... (モーダルのスクリプトは変更なし) ...
-
     document.addEventListener('DOMContentLoaded', function() {
-      const subtitleElement = document.getElementById('typing-subtitle');
+      
+      const openBtn = document.getElementById('open-modal-btn');
+      const closeBtn = document.getElementById('close-modal-btn');
+      const modal = document.getElementById('about-modal');
+      openBtn.addEventListener('click', () => { modal.classList.add('is-visible'); });
+      closeBtn.addEventListener('click', () => { modal.classList.remove('is-visible'); });
+      modal.addEventListener('click', (event) => { if (event.target === modal) { modal.classList.remove('is-visible'); } });
+      
+      // --- ▼▼▼ タイピングアニメーションのスクリプトを全面変更 ▼▼▼ ---
+      const textElement = document.getElementById('typed-text');
+      const cursorElement = document.querySelector('.cursor');
       
       const textPart1 = "An Experimental Generative Art Brand GENERATIVE JUNKIE";
       const textPart2 = "Always Super High!";
@@ -195,28 +155,22 @@
       const texts = [textPart1, textPart2];
 
       function typeText(text, charIndex, callback) {
-        // ★変更点: タイピング中はカーソルを非表示にする
-        subtitleElement.classList.remove('typing-cursor'); 
         if (charIndex < text.length) {
-          subtitleElement.textContent += text.charAt(charIndex);
+          textElement.textContent += text.charAt(charIndex);
           setTimeout(() => typeText(text, charIndex + 1, callback), typeSpeed);
         } else {
-          // ★変更点: タイピング完了後にカーソルを再表示
-          subtitleElement.classList.add('typing-cursor');
           if (callback) callback();
         }
       }
 
       function eraseText(callback) {
-        // ★変更点: 消去中はカーソルを非表示にする
-        subtitleElement.classList.remove('typing-cursor');
-        let currentText = subtitleElement.textContent;
+        cursorElement.classList.add('is-hidden'); // 消去中はカーソルを隠す
+        let currentText = textElement.textContent;
         if (currentText.length > 0) {
-          subtitleElement.textContent = currentText.slice(0, -1);
+          textElement.textContent = currentText.slice(0, -1);
           setTimeout(() => eraseText(callback), eraseSpeed);
         } else {
-          // ★変更点: 消去完了後にカーソルを再表示
-          subtitleElement.classList.add('typing-cursor');
+          cursorElement.classList.remove('is-hidden'); // 消去完了後にカーソルを表示
           if (callback) callback();
         }
       }
@@ -236,6 +190,7 @@
       }
 
       startAnimationLoop();
+      // --- ▲▲▲ ここまで ▲▲▲ ---
     });
   </script>
 
