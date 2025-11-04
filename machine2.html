@@ -15,20 +15,46 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    body, a, button, label, input {
+      cursor: none;
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body, html { width: 100%; height: 100%; overflow: hidden; position: fixed; }
     #root { width: 100%; height: 100%; }
     .text-shadow { text-shadow: 0 0 5px rgba(255,255,255,0.5); }
+    #custom-cursor {
+      position: fixed;
+      width: 24px;
+      height: 24px;
+      background-color: transparent;
+      border: 1px solid #111827;
+      border-radius: 50%;
+      z-index: 9999;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: transform 0.2s ease-out, background-color 0.2s ease-out, border-color 0.2s ease-out;
+    }
+    #custom-cursor.cursor-hover {
+      background-color: #111827;
+      border-color: transparent;
+      transform: translate(-50%, -50%) scale(0.6);
+    }
+    @media (pointer: coarse) {
+      #custom-cursor { display: none; }
+      body, a, button, label, input { cursor: auto; }
+    }
   </style>
 </head>
 <body>
+  
+  <div id="custom-cursor"></div>
   <div id="root"></div>
 
   <div class="fixed top-4 left-4 z-50">
       <a href="/" class="text-black text-lg hover:opacity-75 transition-opacity text-shadow">← Back</a>
   </div>
   <footer class="relative mt-12 mb-4 text-center md:fixed md:bottom-4 md:left-0 md:right-0 md:mt-0 md:mb-0">
-    <p class="text-black text-shadow" style="font-size: 10px; font-family: Verdana, sans-serif;">©︎GENERATIVE JUNKIE</p>
+    <p class="text-black text-shadow" style="font-size: 10px; font-family: Verdana, sans-serif;">©︎2025</p>
   </footer>
   
   <script>
@@ -70,18 +96,23 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
       animate();
+
+      const cursor = document.getElementById('custom-cursor');
+      const interactiveElements = document.querySelectorAll('a, button, label, input[type="range"]');
+      window.addEventListener('mousemove', (e) => {
+        cursor.style.left = `${e.clientX}px`;
+        cursor.style.top = `${e.clientY}px`;
+      });
+      interactiveElements.forEach(el => {
+        el.addEventListener('mouseover', () => { cursor.classList.add('cursor-hover'); });
+        el.addEventListener('mouseout', () => { cursor.classList.remove('cursor-hover'); });
+      });
     }
 
     function createPill() {
       const pillGroup = new THREE.Group();
-      const whiteMat = new THREE.MeshStandardMaterial({
-        color: 0xffffff, metalness: 0.3, roughness: 0.4,
-        emissive: 0x111111, wireframe: wireframeMode
-      });
-      const blackMat = new THREE.MeshStandardMaterial({
-        color: 0x000000, metalness: 0.3, roughness: 0.4,
-        emissive: 0x000000, wireframe: wireframeMode
-      });
+      const whiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4, emissive: 0x111111, wireframe: wireframeMode });
+      const blackMat = new THREE.MeshStandardMaterial({ color: 0x000000, metalness: 0.3, roughness: 0.4, emissive: 0x000000, wireframe: wireframeMode });
       if (blockMode) {
         const topBox = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), whiteMat);
         topBox.position.y = 0.5;
@@ -96,45 +127,28 @@
         const bottomCyl = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 1, 32), blackMat);
         bottomCyl.position.y = -0.5;
         pillGroup.add(bottomCyl);
-        const topSphere = new THREE.Mesh(
-          new THREE.SphereGeometry(0.5, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2), whiteMat
-        );
+        const topSphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2), whiteMat);
         topSphere.position.y = 1;
         pillGroup.add(topSphere);
-        const bottomSphere = new THREE.Mesh(
-          new THREE.SphereGeometry(0.5, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2), blackMat
-        );
+        const bottomSphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2), blackMat);
         bottomSphere.position.y = -1;
         bottomSphere.rotation.x = Math.PI;
         pillGroup.add(bottomSphere);
       }
       return pillGroup;
     }
-
+    
     function createPills() {
-      pillGroups.forEach(pill => {
-        scene.remove(pill);
-        pill.children.forEach(child => {
-          if (child.geometry) child.geometry.dispose();
-          if (child.material) child.material.dispose();
-        });
-      });
+      pillGroups.forEach(pill => { scene.remove(pill); pill.children.forEach(child => { if (child.geometry) child.geometry.dispose(); if (child.material) child.material.dispose(); }); });
       pillGroups = [];
       for (let i = 0; i < pillCount; i++) {
         const pill = createPill();
-        if (pillCount === 1) {
-          pill.position.set(0, 0, 0);
-        } else {
-          const angle = (i / pillCount) * Math.PI * 2;
-          pill.position.set(
-            Math.cos(angle) * spreadWidth, 0, Math.sin(angle) * spreadWidth
-          );
-        }
+        if (pillCount === 1) { pill.position.set(0, 0, 0); } else { const angle = (i / pillCount) * Math.PI * 2; pill.position.set( Math.cos(angle) * spreadWidth, 0, Math.sin(angle) * spreadWidth ); }
         scene.add(pill);
         pillGroups.push(pill);
       }
     }
-
+    
     function animate() {
       requestAnimationFrame(animate);
       let low = 0, mid = 0, high = 0;
@@ -147,9 +161,9 @@
         for (let i = 0; i < lowEnd; i++) low += dataArray[i];
         for (let i = lowEnd; i < midEnd; i++) mid += dataArray[i];
         for (let i = midEnd; i < bufferLength; i++) high += dataArray[i];
-        low = (low / lowEnd) / 255;
-        mid = (mid / (midEnd - lowEnd)) / 255;
-        high = (high / (bufferLength - midEnd)) / 255;
+        low = isNaN(low / lowEnd) ? 0 : (low / lowEnd) / 255;
+        mid = isNaN(mid / (midEnd - lowEnd)) ? 0 : (mid / (midEnd - lowEnd)) / 255;
+        high = isNaN(high / (bufferLength - midEnd)) ? 0 : (high / (bufferLength - midEnd)) / 255;
         frequencyData = { low, mid, high };
         if (audioContext && source) {
           const elapsed = audioContext.currentTime - startTime;
@@ -183,37 +197,24 @@
       });
       renderer.render(scene, camera);
     }
-
+    
     async function handleFileChange(e) {
       const file = e.target.files[0];
       if (!file) return;
-      if (source) {
-        try { source.stop(); source.disconnect(); } catch (e) {}
-        source = null;
-      }
-      isPlaying = false;
-      pauseTime = 0;
-      currentTime = 0;
+      if (source) { try { source.stop(); source.disconnect(); } catch (e) {} source = null; }
+      isPlaying = false; pauseTime = 0; currentTime = 0;
       fileName = file.name;
       const nameParts = file.name.replace(/\.[^/.]+$/, '').split('-');
       artist = nameParts.length > 1 ? nameParts[0].trim() : 'Unknown Artist';
       updateUI();
       try {
-        if (!audioContext) {
-          audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioContext.state !== 'running') {
-          await audioContext.resume();
-        }
+        if (!audioContext) { audioContext = new (window.AudioContext || window.webkitAudioContext)(); }
+        if (audioContext.state !== 'running') { await audioContext.resume(); }
         const arrayBuffer = await file.arrayBuffer();
         try {
-          const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-          buffer = audioBuffer;
-          duration = audioBuffer.duration;
-        } catch (decodeError) {
-          alert('このファイル形式は再生できません。MP3またはWAVファイルを選択してください。');
-          return;
-        }
+          buffer = await audioContext.decodeAudioData(arrayBuffer);
+          duration = buffer.duration;
+        } catch (decodeError) { alert('このファイル形式は再生できません。MP3またはWAVファイルを選択してください。'); return; }
         if (!analyser) {
           analyser = audioContext.createAnalyser();
           analyser.fftSize = 1024;
@@ -221,60 +222,39 @@
           analyser.connect(audioContext.destination);
         }
         updateUI();
-      } catch (error) {
-        alert('エラー: ' + error.message);
-      }
+      } catch (error) { alert('エラー: ' + error.message); }
     }
-
+    
     async function togglePlay() {
-      if (!audioContext || !buffer || !analyser) {
-        alert('ファイルを選択してください');
-        return;
-      }
+      if (!audioContext || !buffer || !analyser) { alert('ファイルを選択してください'); return; }
       if (isPlaying) {
-        if (source) {
-          try { source.stop(); source.disconnect(); } catch (e) {}
-          source = null;
-        }
+        if (source) { try { source.stop(); } catch (e) {} }
         pauseTime = audioContext.currentTime - startTime;
         isPlaying = false;
         updateUI();
         return;
       }
       try {
-        if (audioContext.state !== 'running') {
-          await audioContext.resume();
-        }
+        if (audioContext.state !== 'running') { await audioContext.resume(); }
         source = audioContext.createBufferSource();
         source.buffer = buffer;
         source.connect(analyser);
         const offset = pauseTime || 0;
         startTime = audioContext.currentTime - offset;
         source.start(0, offset);
-        source.onended = () => {
-          isPlaying = false;
-          pauseTime = 0;
-          currentTime = 0;
-          updateUI();
-        };
+        source.onended = () => { isPlaying = false; pauseTime = 0; currentTime = 0; updateUI(); };
         isPlaying = true;
         updateUI();
-      } catch (error) {
-        alert('再生エラー: ' + error.message);
-      }
+      } catch (error) { alert('再生エラー: ' + error.message); }
     }
-
+    
     function createUI() {
       const root = document.getElementById('root');
       const settingsBtn = document.createElement('button');
       settingsBtn.className = 'absolute top-4 right-4 w-10 h-10 rounded-full bg-black/60 hover:bg-black/70 transition-colors flex items-center justify-center border border-white/20 z-50';
       settingsBtn.innerHTML = '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>';
-      settingsBtn.onclick = () => {
-        settingsOpen = !settingsOpen;
-        updateUI();
-      };
+      settingsBtn.onclick = () => { settingsOpen = !settingsOpen; updateUI(); };
       root.appendChild(settingsBtn);
-      
       const settingsPanel = document.createElement('div');
       settingsPanel.id = 'settings-panel';
       settingsPanel.className = 'absolute top-16 right-4 w-64 backdrop-blur-xl bg-black/70 rounded-xl p-4 border border-white/20 text-xs z-40';
@@ -291,7 +271,6 @@
         <button id="reset-btn" class="w-full py-1.5 px-3 bg-white/10 hover:bg-white/20 rounded text-white text-xs transition-colors">Reset to Default</button>
       `;
       root.appendChild(settingsPanel);
-      
       document.getElementById('pill-count').oninput = (e) => { pillCount = parseInt(e.target.value); document.getElementById('pill-count-val').textContent = pillCount; createPills(); };
       document.getElementById('pill-size').oninput = (e) => { pillSize = parseFloat(e.target.value); document.getElementById('pill-size-val').textContent = pillSize.toFixed(1); };
       document.getElementById('spread').oninput = (e) => { spreadWidth = parseFloat(e.target.value); document.getElementById('spread-val').textContent = spreadWidth.toFixed(1); createPills(); };
@@ -306,7 +285,6 @@
         ['pill-count-val','pill-size-val','spread-val','rotation-val','scale-val'].forEach(id => document.getElementById(id).textContent = {'pill-count-val':'1','pill-size-val':'0.7','spread-val':'0.0','rotation-val':'1.0','scale-val':'1.0'}[id]);
         createPills();
       };
-      
       const dropZone = document.createElement('div');
       dropZone.id = 'drop-zone';
       dropZone.className = 'absolute inset-0 flex items-center justify-center z-10';
@@ -321,25 +299,16 @@
         </label>
       `;
       root.appendChild(dropZone);
-      
       document.getElementById('file-input').onchange = handleFileChange;
-      
       const controlPanel = document.createElement('div');
       controlPanel.id = 'control-panel';
       controlPanel.className = 'absolute bottom-12 left-0 right-0 p-3 z-20';
       controlPanel.style.display = 'none';
       controlPanel.innerHTML = `
         <div class="max-w-4xl mx-auto backdrop-blur-xl bg-black/60 rounded-xl p-3 border border-white/20">
-          <div class="mb-2">
-            <div class="text-white text-sm font-light truncate mb-0.5" id="file-name"></div>
-            <div class="text-white/50 text-xs font-light" id="artist-name"></div>
-          </div>
+          <div class="mb-2"><div class="text-white text-sm font-light truncate mb-0.5" id="file-name"></div><div class="text-white/50 text-xs font-light" id="artist-name"></div></div>
           <div class="flex items-center gap-4">
-            <div class="flex-1 flex items-center gap-3">
-              <span class="text-white/70 text-xs font-mono w-10 text-right" id="current-time">0:00</span>
-              <div class="flex-1 h-1.5 bg-white/20 rounded-full cursor-pointer relative group" id="seek-bar"><div id="progress-bar" class="h-full bg-white rounded-full transition-all duration-100" style="width: 0%"></div></div>
-              <span class="text-white/70 text-xs font-mono w-10" id="duration-time">0:00</span>
-            </div>
+            <div class="flex-1 flex items-center gap-3"><span class="text-white/70 text-xs font-mono w-10 text-right" id="current-time">0:00</span><div class="flex-1 h-1.5 bg-white/20 rounded-full cursor-pointer relative group" id="seek-bar"><div id="progress-bar" class="h-full bg-white rounded-full transition-all duration-100" style="width: 0%"></div></div><span class="text-white/70 text-xs font-mono w-10" id="duration-time">0:00</span></div>
             <div class="flex items-end gap-1 h-12" id="freq-bars"></div>
             <div class="flex items-center gap-2">
               <button id="play-btn" class="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 transition-colors flex items-center justify-center border border-white/30"><svg class="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
@@ -349,10 +318,8 @@
         </div>
       `;
       root.appendChild(controlPanel);
-      
       document.getElementById('file-input-2').onchange = handleFileChange;
       document.getElementById('play-btn').onclick = togglePlay;
-      
       const freqBars = document.getElementById('freq-bars');
       ['low', 'mid', 'high'].forEach(freq => {
         const col = document.createElement('div');
@@ -366,7 +333,6 @@
         freqBars.appendChild(col);
       });
     }
-
     function updateUI() {
       const dropZone = document.getElementById('drop-zone');
       const controlPanel = document.getElementById('control-panel');
@@ -385,7 +351,6 @@
           : '<svg class="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
       }
     }
-
     function updateTimeDisplay() {
       if(document.getElementById('current-time')) {
         document.getElementById('current-time').textContent = formatTime(currentTime);
@@ -404,7 +369,6 @@
         });
       });
     }
-
     function formatTime(sec) {
       if (isNaN(sec)) return '0:00';
       const m = Math.floor(sec / 60);
