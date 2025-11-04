@@ -31,11 +31,11 @@
         z-index: 3; font-size: 1.5rem; font-weight: 200; letter-spacing: 0.2em;
         color: rgba(255, 255, 255, 0.8); opacity: 0;
         transition: opacity 1s ease-in-out; animation: subtle-pulse 2s infinite;
-        pointer-events: none; text-shadow: 0 0 5px rgba(0,0,0,0.5); /* 文字の視認性向上のため */
+        pointer-events: none; text-shadow: 0 0 5px rgba(0,0,0,0.5);
     }
     #prompt-text.is-visible { opacity: 1; }
     @keyframes subtle-pulse { 0%, 100% { opacity: 0.8; } 50% { opacity: 0.5; } }
-    .text-shadow { text-shadow: 0 0 8px rgba(0,0,0,0.7); } /* UI文字の視認性向上のため */
+    .text-shadow { text-shadow: 0 0 8px rgba(0,0,0,0.7); }
   </style>
 </head>
 <body>
@@ -65,9 +65,9 @@
       let currentImageKey = null;
       let nextImageKey = null;
       
-      let animationState = 'display';
+      let animationState = 'loading';
       let animationFrame = 0;
-      const transitionDuration = 30; // 高速化
+      const transitionDuration = 30;
       
       let promptTimer = null;
       const promptText = document.getElementById('prompt-text');
@@ -83,6 +83,7 @@
         const initialIndex = p.floor(p.random(imageFileNames.length));
         loadImageDynamically(imageFileNames[initialIndex], (img) => {
           currentImageKey = img.filePath;
+          animationState = 'display';
           const loadingOverlay = document.getElementById('loading-overlay');
           loadingOverlay.style.opacity = '0';
           setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
@@ -92,16 +93,13 @@
 
       p.draw = () => {
         p.background(0);
-        if (!currentImageKey) return;
-
-        const currentImage = allImages[currentImageKey];
-        if (!currentImage) return;
+        if (!currentImageKey || !allImages[currentImageKey]) return;
 
         switch(animationState) {
             case 'fade-out':
                 p.push();
                 p.tint(255, p.map(animationFrame, 0, transitionDuration, 255, 0));
-                drawImageContained(currentImage);
+                drawImageContained(allImages[currentImageKey]);
                 p.pop();
                 animationFrame++;
                 if (animationFrame > transitionDuration) {
@@ -113,13 +111,10 @@
                 break;
             
             case 'fade-in':
-                const imgToFadeIn = allImages[currentImageKey];
-                if (imgToFadeIn) {
-                    p.push();
-                    p.tint(255, p.map(animationFrame, 0, transitionDuration, 0, 255));
-                    drawImageContained(imgToFadeIn);
-                    p.pop();
-                }
+                p.push();
+                p.tint(255, p.map(animationFrame, 0, transitionDuration, 0, 255));
+                drawImageContained(allImages[currentImageKey]);
+                p.pop();
                 animationFrame++;
                 if (animationFrame > transitionDuration) {
                     animationFrame = 0;
@@ -129,7 +124,7 @@
                 break;
 
             default: // display
-                drawImageContained(currentImage);
+                drawImageContained(allImages[currentImageKey]);
                 break;
         }
       };
@@ -156,21 +151,16 @@
         );
       }
       
-      // ★変更点：画像を画面内に完全に収める描画関数
       function drawImageContained(img) {
           p.noStroke();
-          p.texture(img); // 毎回テクスチャをバインド
-          
+          p.texture(img);
           const canvasRatio = p.width / p.height;
           const imageRatio = img.width / img.height;
           let w, h;
-
           if (canvasRatio > imageRatio) {
-              // キャンバスが画像より横長の場合、高さを基準に合わせる
               h = p.height;
               w = h * imageRatio;
           } else {
-              // キャンバスが画像より縦長の場合、幅を基準に合わせる
               w = p.width;
               h = w / imageRatio;
           }
