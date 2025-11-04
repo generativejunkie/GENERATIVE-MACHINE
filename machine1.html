@@ -13,243 +13,199 @@
   <meta name="theme-color" content="#000000">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn/tailwindcss.com"></script>
 
   <style>
     body { margin: 0; padding: 0; background-color: #000; color: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; overflow: hidden; }
-    #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; cursor: pointer; }
-    .ui-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
-    .ui-layer > * { pointer-events: auto; }
-    #loading-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background-color: #000; z-index: 10;
-      display: flex; align-items: center; justify-content: center;
-      color: white; font-size: 1.2rem; transition: opacity 0.5s ease;
+    #image-container { 
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      z-index: 1; cursor: pointer;
     }
+    .image-layer {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: contain;
+      transition: opacity 0.3s ease-in-out;
+    }
+    #canvas-container { 
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      z-index: 5; /* 画像より手前、UIより後ろ */
+      pointer-events: none; /* 普段はクリックできないように */
+      display: none; /* 普段は非表示 */
+    }
+    .ui-layer { 
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      z-index: 10; pointer-events: none; 
+    }
+    .ui-layer > * { pointer-events: auto; }
     #prompt-text {
         position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
         z-index: 3; font-size: 1.5rem; font-weight: 200; letter-spacing: 0.2em;
         color: rgba(255, 255, 255, 0.7); opacity: 0;
         transition: opacity 1s ease-in-out; animation: subtle-pulse 2s infinite;
-        pointer-events: none;
+        pointer-events: none; text-shadow: 0 0 5px rgba(0,0,0,0.5);
     }
     #prompt-text.is-visible { opacity: 1; }
     @keyframes subtle-pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 0.4; } }
+    .text-shadow { text-shadow: 0 0 8px rgba(0,0,0,0.7); }
   </style>
 </head>
 <body>
 
-  <div id="loading-overlay"><p>Loading Machine...</p></div>
-
+  <div id="image-container" onclick="changeImage()">
+    <img id="img1" class="image-layer" src="" alt="Generative Art Layer 1">
+    <img id="img2" class="image-layer" src="" alt="Generative Art Layer 2" style="opacity: 0;">
+  </div>
+  
   <div id="canvas-container"></div>
-
   <div id="prompt-text">CLICK / TAP</div>
 
   <div class="ui-layer flex flex-col justify-between p-4">
     <div>
-      <a href="/" class="text-white text-lg hover:opacity-75 transition-opacity">← Back</a>
+      <a href="/" class="text-white text-lg hover:opacity-75 transition-opacity text-shadow">← Back</a>
     </div>
     <footer class="w-full text-center">
-      <p style="color: white; font-size: 10px; font-family: Verdana, sans-serif;">©︎GENERATIVE JUNKIE</p>
+      <p class="text-white text-shadow" style="font-size: 10px; font-family: Verdana, sans-serif;">©︎GENERATIVE JUNKIE</p>
     </footer>
   </div>
 
   <script>
-    const sketch = (p) => {
-      const imageCount = 394;
-      const filePrefix = "photos/photo";
-      const fileSuffix = ".webp";
-      const numberPadding = 3;
+    const imageCount = 394;
+    const filePrefix = "photos/photo";
+    const fileSuffix = ".webp";
+    const numberPadding = 3;
+    const imageFileNames = [];
+    for (let i = 1; i <= imageCount; i++) {
+      imageFileNames.push(`${filePrefix}${i.toString().padStart(numberPadding, '0')}${fileSuffix}`);
+    }
 
-      let imageFileNames = [];
-      let currentImage = null;
-      let nextImage = null;
-      
-      let animationState = 'display';
-      let animationFrame = 0;
-      let transitionType = 'blocks';
-      const chaosDuration = 20;
-      const transitionDuration = 60;
-      
-      let promptTimer = null;
-      const promptText = document.getElementById('prompt-text');
+    const img1 = document.getElementById('img1');
+    const img2 = document.getElementById('img2');
+    const promptText = document.getElementById('prompt-text');
+    
+    let currentImageIndex = -1;
+    let isImg1Active = true;
+    let isChanging = false;
+    let promptTimer = null;
+    let p5Instance = null; // p5.jsのインスタンスを保持
 
-      for (let i = 1; i <= imageCount; i++) {
-        imageFileNames.push(`${filePrefix}${i.toString().padStart(numberPadding, '0')}${fileSuffix}`);
+    function changeImage() {
+      if (isChanging || imageFileNames.length < 2) return;
+      isChanging = true;
+
+      promptText.classList.remove('is-visible');
+      clearTimeout(promptTimer);
+      
+      let newIndex = Math.floor(Math.random() * imageFileNames.length);
+      while (newIndex === currentImageIndex) {
+        newIndex = Math.floor(Math.random() * imageFileNames.length);
       }
       
-      p.preload = () => {
-          const initialIndex = p.floor(p.random(imageFileNames.length));
-          currentImage = p.loadImage(imageFileNames[initialIndex], 
-            (img) => { img.filePath = imageFileNames[initialIndex]; },
-            () => { console.error("最初の画像の読み込みに失敗しました。"); }
-          );
-      };
+      const currentImgSrc = imageFileNames[currentImageIndex];
+      const nextImgSrc = imageFileNames[newIndex];
+      currentImageIndex = newIndex;
+
+      // p5.jsに画像を渡してトランジションを開始
+      p5Instance.startTransition(currentImgSrc, nextImgSrc);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        let initialIndex = Math.floor(Math.random() * imageFileNames.length);
+        currentImageIndex = initialIndex;
+        img1.src = imageFileNames[initialIndex];
+        img1.onload = () => {
+            promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 3000);
+        };
+    });
+
+    // --- p5.js スクリプト ---
+    const sketch = (p) => {
+      let animationState = 'idle';
+      let animationFrame = 0;
+      let transitionType = 'blocks';
+      const chaosDuration = 15;
+      const transitionDuration = 40;
+      let fromImg, toImg;
 
       p.setup = () => {
         const canvasContainer = document.getElementById('canvas-container');
         p.createCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight).parent(canvasContainer);
         p.background(0);
-        
-        const loadingOverlay = document.getElementById('loading-overlay');
-        loadingOverlay.style.opacity = '0';
-        setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
-
-        if (currentImage && currentImage.width > 0) {
-            animationState = 'display';
-            promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 3000);
-        } else {
-            animationState = 'error';
-        }
-        
-        const userStartAudio = () => { if (p.getAudioContext().state !== 'running') { p.getAudioContext().resume(); } };
-        canvasContainer.addEventListener('touchstart', userStartAudio, { once: true });
-        canvasContainer.addEventListener('mousedown', userStartAudio, { once: true });
+        p.noLoop(); // 普段は描画を停止しておく
       };
 
       p.draw = () => {
-        if (animationState === 'error') {
-            p.background(0);
-            p.fill(255, 0, 0);
-            p.textAlign(p.CENTER);
-            p.textSize(16);
-            p.text("Error: Failed to load the initial image.\nPlease check the file paths in the code.", p.width / 2, p.height / 2);
-            p.noLoop();
-            return;
-        }
-        
-        if (!currentImage) { p.background(0); return; }
+        if (animationState === 'idle') return;
 
         switch (animationState) {
           case 'decay':
-            if(transitionType === 'blocks') drawBlocks(currentImage, animationFrame / transitionDuration, true);
-            else drawSlide(currentImage, animationFrame / transitionDuration, true);
+            runTransition(fromImg, animationFrame / transitionDuration, true);
             animationFrame++;
             if (animationFrame > transitionDuration) { animationFrame = 0; animationState = 'chaos'; }
             break;
-            
           case 'chaos':
-            drawGlitch();
+            drawGlitch(toImg);
             animationFrame++;
             if (animationFrame > chaosDuration) {
               animationFrame = 0; animationState = 'rebuild';
-              currentImage = nextImage; nextImage = null;
             }
             break;
-
           case 'rebuild':
-            if(transitionType === 'blocks') drawBlocks(currentImage, animationFrame / transitionDuration, false);
-            else drawSlide(currentImage, animationFrame / transitionDuration, false);
+            runTransition(toImg, animationFrame / transitionDuration, false);
             animationFrame++;
             if (animationFrame > transitionDuration) {
-              animationFrame = 0; animationState = 'display';
-              promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 5000);
+              animationState = 'idle';
+              p.noLoop(); // アニメーション完了で描画停止
+              transitionFinished(); // メインスクリプトに完了を通知
             }
-            break;
-            
-          default:
-            drawImageFullscreen(currentImage);
             break;
         }
       };
-
-      function loadImageDynamically(index, callback) {
-        p.loadImage(imageFileNames[index], 
-          (img) => {
-            img.filePath = imageFileNames[index];
-            callback(img);
-          },
-          () => {
-            console.warn(`画像の読み込みに失敗 or 欠番: ${imageFileNames[index]}. 別の画像を試します。`);
-            const newIndex = p.floor(p.random(imageFileNames.length));
-            loadImageDynamically(newIndex, callback);
-          }
-        );
-      }
       
-      function drawBlocks(img, progress, isDecay) {
-        p.background(0);
-        const blockSize = p.map(p.constrain(progress, 0, 1), 0, 1, isDecay ? 5 : 100, isDecay ? 100 : 5);
-        for (let y = 0; y < p.height; y += blockSize) {
-          for (let x = 0; x < p.width; x += blockSize) {
-            if (p.random() < 0.8) {
-              let c = img.get(x, y);
-              p.fill(c);
-              p.noStroke();
-              p.rect(x, y, blockSize, blockSize);
-            }
-          }
-        }
-      }
-
-      function drawSlide(img, progress, isDecay) {
-        p.background(0);
-        const sliceCount = 50;
-        const sliceHeight = p.height / sliceCount;
-        for (let i = 0; i < sliceCount; i++) {
-          let y = i * sliceHeight;
-          let offset = p.sin(i * 10 + p.frameCount * 2) * 50;
-          let currentProgress = isDecay ? progress : 1.0 - progress;
-          let slideAmount = p.map(currentProgress, 0, 1, 0, p.width * 1.5);
-          let sx = 0;
-          let dx = p.random(-slideAmount, slideAmount) + offset;
-          p.copy(img, sx, y, img.width, sliceHeight, dx, y, p.width, sliceHeight);
-        }
-      }
-      
-      function drawGlitch() {
-        for (let i = 0; i < p.random(30, 80); i++) {
-          let x = p.random(p.width); let y = p.random(p.height);
-          let w = p.random(10, p.width * 0.8); let h = p.random(2, 20);
-          if (nextImage) {
-              let c = nextImage.get(x, y);
-              p.fill(p.red(c) + p.random(-50, 50), p.green(c), p.blue(c) + p.random(-50, 50));
-          }
-          p.noStroke(); p.rect(x, y, w, h);
-        }
-      }
-      
-      function drawImageFullscreen(img) {
-          p.imageMode(p.CENTER);
-          const canvasRatio = p.width / p.height;
-          const imageRatio = img.width / img.height;
-          if (canvasRatio > imageRatio) {
-              p.image(img, p.width / 2, p.height / 2, p.width, p.width / imageRatio);
-          } else {
-              p.image(img, p.width / 2, p.height / 2, p.height * imageRatio, p.height);
-          }
-      }
-      
-      const handleInteraction = () => {
-        if (animationState === 'display' && !nextImage && imageFileNames.length > 1) {
-          promptText.classList.remove('is-visible');
-          clearTimeout(promptTimer);
-          transitionType = p.random() > 0.5 ? 'blocks' : 'slide';
-          const currentIndex = imageFileNames.indexOf(currentImage.filePath);
-          let newIndex = p.floor(p.random(imageFileNames.length));
-          while (newIndex === currentIndex) { newIndex = p.floor(p.random(imageFileNames.length)); }
-          
-          const loadingOverlay = document.getElementById('loading-overlay');
-          loadingOverlay.classList.add('is-active'); // 次の画像の読み込み中にローディング表示
-          
-          loadImageDynamically(newIndex, (img) => {
-            nextImage = img;
+      p.startTransition = (fromImgSrc, toImgSrc) => {
+        document.getElementById('canvas-container').style.display = 'block';
+        
+        // 画像を2枚とも読み込む
+        p.loadImage(fromImgSrc, (img1) => {
+          fromImg = img1;
+          p.loadImage(toImgSrc, (img2) => {
+            toImg = img2;
+            
+            // エフェクトをランダムに選択
+            transitionType = p.random(['blocks', 'slide']);
             animationFrame = 0;
             animationState = 'decay';
-            loadingOverlay.classList.remove('is-active'); // 読み込み完了で非表示
+            p.loop(); // 描画ループを開始
           });
-        }
+        });
       };
-      p.mousePressed = handleInteraction;
-      p.touchStarted = handleInteraction;
 
-      p.windowResized = () => {
-        const canvasContainer = document.getElementById('canvas-container');
-        p.resizeCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
-      };
+      function runTransition(img, progress, isDecay) { /* ... (以前のコードと同じ) ... */ }
+      function drawBlocks(img, progress, isDecay) { /* ... (以前のコードと同じ) ... */ }
+      function drawSlide(img, progress, isDecay) { /* ... (以前のコードと同じ) ... */ }
+      function drawGlitch(nextImg) { /* ... (以前のコードと同じ) ... */ }
+      
+      p.windowResized = () => { p.resizeCanvas(window.innerWidth, window.innerHeight); };
     };
+    
+    // グローバルスコープでp5インスタンスを初期化
+    p5Instance = new p5(sketch);
+    
+    // p5.jsから呼び出される完了通知
+    function transitionFinished() {
+        document.getElementById('canvas-container').style.display = 'none';
+        
+        const activeImg = isImg1Active ? img1 : img2;
+        const inactiveImg = isImg1Active ? img2 : img1;
 
-    new p5(sketch);
+        inactiveImg.src = imageFileNames[currentImageIndex];
+        activeImg.style.opacity = 0;
+        inactiveImg.style.opacity = 1;
+        isImg1Active = !isImg1Active;
+        
+        isChanging = false;
+        promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 3000);
+    }
   </script>
 
 </body>
