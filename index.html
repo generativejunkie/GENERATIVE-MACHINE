@@ -97,13 +97,12 @@
       height: 40px;
       background-color: rgba(255, 255, 255, 0.8);
     }
-    /* スマホやタブレットではカスタムカーソルを非表示に */
     @media (pointer: coarse) {
       #custom-cursor {
         display: none;
       }
       body, a, button {
-        cursor: auto; /* デフォルトカーソルに戻す */
+        cursor: auto;
       }
     }
   </style>
@@ -130,7 +129,8 @@
           <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
         </div>
         <div>
-          <h2 class="text-xl font-bold text-gray-800">IMAGE MACHINE</h2>
+          <!-- ★変更点: font-bold を font-light に変更 -->
+          <h2 class="text-xl font-light text-gray-800">IMAGE MACHINE</h2>
           <p class="text-gray-500 font-light">Image Contents</p>
         </div>
       </div>
@@ -145,7 +145,8 @@
             <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
         </div>
         <div>
-          <h2 class="text-xl font-bold text-gray-800">SOUND MACHINE</h2>
+          <!-- ★変更点: font-bold を font-light に変更 -->
+          <h2 class="text-xl font-light text-gray-800">SOUND MACHINE</h2>
           <p class="text-gray-500 font-light">Sound Visualizer</p>
         </div>
       </div>
@@ -160,7 +161,8 @@
             <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
         </div>
         <div>
-          <h2 class="text-xl font-bold text-gray-800">MATERIALIZE MACHINE</h2>
+          <!-- ★変更点: font-bold を font-light に変更 -->
+          <h2 class="text-xl font-light text-gray-800">MATERIALIZE MACHINE</h2>
           <p class="text-gray-500 font-light">Digital to Physical</p>
         </div>
       </div>
@@ -175,7 +177,8 @@
             <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
         </div>
         <div>
-          <h2 class="text-xl font-bold text-gray-800">APPAREL</h2>
+          <!-- ★変更点: font-bold を font-light に変更 -->
+          <h2 class="text-xl font-light text-gray-800">APPAREL</h2>
           <p class="text-gray-500 font-light">Official Store</p>
         </div>
       </div>
@@ -257,9 +260,39 @@
       let textIndex = 0;
       const texts = [textPart1, textPart2];
 
-      function typeText(text, charIndex, callback) { /* ... */ }
-      function eraseText(callback) { /* ... */ }
-      function startAnimationLoop() { /* ... */ }
+      function typeText(text, charIndex, callback) {
+        if (charIndex < text.length) {
+          textElement.textContent += text.charAt(charIndex);
+          setTimeout(() => typeText(text, charIndex + 1, callback), typeSpeed);
+        } else {
+          if (callback) callback();
+        }
+      }
+
+      function eraseText(callback) {
+        cursorElement.classList.add('is-hidden');
+        let currentText = textElement.textContent;
+        if (currentText.length > 0) {
+          textElement.textContent = currentText.slice(0, -1);
+          setTimeout(() => eraseText(callback), eraseSpeed);
+        } else {
+          cursorElement.classList.remove('is-hidden');
+          if (callback) callback();
+        }
+      }
+
+      function startAnimationLoop() {
+        const currentText = texts[textIndex];
+        const pauseAfter = (textIndex === 0) ? pauseAfterType1 : pauseAfterType2;
+        typeText(currentText, 0, () => {
+          setTimeout(() => {
+            eraseText(() => {
+              textIndex = (textIndex + 1) % texts.length;
+              setTimeout(startAnimationLoop, pauseBeforeNext);
+            });
+          }, pauseAfter);
+        });
+      }
       startAnimationLoop();
 
       const cursor = document.getElementById('custom-cursor');
