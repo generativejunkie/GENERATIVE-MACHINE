@@ -4,9 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GENERATIVE JUNKIE</title>
+
+  <!-- ▼▼▼ ここからOGPタグ（サイトの名刺）を追加 ▼▼▼ -->
+  <meta property="og:title" content="GENERATIVE JUNKIE">
+  <meta property="og:description" content="An Experimental Generative Art Brand exploring algorithmic beauty and the emotional resonance of machine intelligence.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://generativejunkie.net/">
+  <!-- ★注意：og:imageのパスは、ご自身の画像ファイルの場所に合わせてください -->
+  <meta property="og:image" content="https://generativejunkie.net/og-image.png"> 
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- ▲▲▲ ここまでOGPタグ ▲▲▲ -->
+
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* ...（スタイル部分は変更なし）... */
+    /* ...（残りのコードは変更ありません）... */
     body {
       background-color: #000000;
       color: #f3f4f6;
@@ -83,7 +94,6 @@
 
   <main class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
     
-    <!-- GENERATIVE MACHINE 1 -->
     <a href="machine1.html" class="card rounded-xl p-8 block">
       <div class="flex items-center mb-4">
         <div class="p-2 bg-blue-500/20 rounded-full mr-4">
@@ -94,13 +104,11 @@
           <p class="text-gray-400 font-light">Image Contents</p>
         </div>
       </div>
-      <!-- ★変更点：文字サイズを小さく (text-sm を追加) -->
       <p class="text-gray-300 text-sm">
         インタラクティブな画像コンテンツを体験します。
       </p>
     </a>
 
-    <!-- GENERATIVE MACHINE 2 -->
     <a href="machine2.html" class="card rounded-xl p-8 block">
       <div class="flex items-center mb-4">
         <div class="p-2 bg-green-500/20 rounded-full mr-4">
@@ -111,13 +119,11 @@
           <p class="text-gray-400 font-light">Sound Visualizer</p>
         </div>
       </div>
-      <!-- ★変更点：文字サイズを小さく (text-sm を追加) -->
       <p class="text-gray-300 text-sm">
         読み込んだオーディオファイルに合わせて変化するビジュアライザーです。
       </p>
     </a>
 
-    <!-- APPAREL STORE -->
     <a href="https://generativejunkie.stores.jp/" target="_blank" rel="noopener noreferrer" class="card rounded-xl p-8 block">
       <div class="flex items-center mb-4">
         <div class="p-2 bg-purple-500/20 rounded-full mr-4">
@@ -128,7 +134,6 @@
           <p class="text-gray-400 font-light">Official Store</p>
         </div>
       </div>
-      <!-- ★変更点：文字サイズを小さく (text-sm を追加) -->
       <p class="text-gray-300 text-sm">
         公式アパレルストアはこちら。
       </p>
@@ -142,7 +147,6 @@
     </div>
   </footer>
 
-  <!-- ...（モーダルとスクリプトは変更なし）... -->
   <div id="about-modal" class="modal-overlay">
     <div class="modal-content">
       <div id="close-modal-btn" class="modal-close">
