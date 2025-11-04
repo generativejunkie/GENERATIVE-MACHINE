@@ -120,6 +120,7 @@
           setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
           promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 3000);
         });
+<<<<<<< HEAD
 
         // カスタムカーソル処理
         const cursor = document.getElementById('custom-cursor');
@@ -132,6 +133,12 @@
           el.addEventListener('mouseover', () => { cursor.classList.add('cursor-hover'); });
           el.addEventListener('mouseout', () => { cursor.classList.remove('cursor-hover'); });
         });
+=======
+        
+        const userStartAudio = () => { if (p.getAudioContext().state !== 'running') { p.getAudioContext().resume(); } };
+        canvasContainer.addEventListener('touchstart', userStartAudio, { once: true });
+        canvasContainer.addEventListener('mousedown', userStartAudio, { once: true });
+>>>>>>> parent of 7ff0519 (修正完全版)
       };
 
       p.draw = () => {
