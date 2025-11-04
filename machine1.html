@@ -25,9 +25,7 @@
       background-color: #000; z-index: 10;
       display: flex; align-items: center; justify-content: center;
       color: white; font-size: 1.2rem; transition: opacity 0.5s ease;
-      opacity: 0; pointer-events: none;
     }
-    #loading-overlay.is-active { opacity: 1; pointer-events: auto; }
     #prompt-text {
         position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
         z-index: 3; font-size: 1.5rem; font-weight: 200; letter-spacing: 0.2em;
@@ -41,7 +39,7 @@
 </head>
 <body>
 
-  <div id="loading-overlay"><p>Loading...</p></div>
+  <div id="loading-overlay"><p>Loading Machine...</p></div>
   <div id="canvas-container"></div>
   <div id="prompt-text">CLICK / TAP</div>
 
@@ -62,19 +60,16 @@
       const numberPadding = 3;
 
       let imageFileNames = [];
-      let allImages = {}; // オブジェクトとして画像をキャッシュ
+      let allImages = {};
       let currentImageKey = null;
       let nextImageKey = null;
       
-      let animationState = 'loading';
+      let animationState = 'display';
       let animationFrame = 0;
-      let transitionType = 'blocks';
-      const chaosDuration = 15;
-      const transitionDuration = 40;
+      const transitionDuration = 60; // フェードの時間
       
       let promptTimer = null;
       const promptText = document.getElementById('prompt-text');
-      let effectParams = {};
 
       for (let i = 1; i <= imageCount; i++) {
         imageFileNames.push(`${filePrefix}${i.toString().padStart(numberPadding, '0')}${fileSuffix}`);
@@ -82,108 +77,116 @@
       
       p.setup = () => {
         const canvasContainer = document.getElementById('canvas-container');
-        p.createCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight).parent(canvasContainer);
-        p.background(0);
+        p.createCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight, p.WEBGL).parent(canvasContainer); // ★WEBGLモードに変更
         
         const initialIndex = p.floor(p.random(imageFileNames.length));
         loadImageDynamically(imageFileNames[initialIndex], (img) => {
           currentImageKey = img.filePath;
-          animationState = 'display';
+          const loadingOverlay = document.getElementById('loading-overlay');
+          loadingOverlay.style.opacity = '0';
+          setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
           promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 3000);
         });
-        
-        const userStartAudio = () => { if (p.getAudioContext().state !== 'running') { p.getAudioContext().resume(); } };
-        canvasContainer.addEventListener('touchstart', userStartAudio, { once: true });
-        canvasContainer.addEventListener('mousedown', userStartAudio, { once: true });
       };
 
       p.draw = () => {
-        if (!currentImageKey) { p.background(0); return; }
+        p.background(0);
+        if (!currentImageKey) return;
 
         const currentImage = allImages[currentImageKey];
-        const nextImage = allImages[nextImageKey];
-        
-        if (!currentImage) { p.background(0); return; }
+        if (!currentImage) return;
 
-        switch (animationState) {
-          case 'decay':
-            runTransition(currentImage, animationFrame / transitionDuration, true);
-            animationFrame++;
-            if (animationFrame > transitionDuration) { animationFrame = 0; animationState = 'chaos'; }
-            break;
+        switch(animationState) {
+            case 'fade-out':
+                p.push();
+                p.tint(255, p.map(animationFrame, 0, transitionDuration, 255, 0));
+                drawImageFullscreen(currentImage);
+                p.pop();
+                animationFrame++;
+                if (animationFrame > transitionDuration) {
+                    animationFrame = 0;
+                    animationState = 'fade-in';
+                    currentImageKey = nextImageKey;
+                    nextImageKey = null;
+                }
+                break;
             
-          case 'chaos':
-            drawGlitch(nextImage);
-            animationFrame++;
-            if (animationFrame > chaosDuration) {
-              animationFrame = 0; animationState = 'rebuild';
-              currentImageKey = nextImageKey; nextImageKey = null;
-            }
-            break;
+            case 'fade-in':
+                p.push();
+                p.tint(255, p.map(animationFrame, 0, transitionDuration, 0, 255));
+                drawImageFullscreen(allImages[currentImageKey]);
+                p.pop();
+                animationFrame++;
+                if (animationFrame > transitionDuration) {
+                    animationFrame = 0;
+                    animationState = 'display';
+                    promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 5000);
+                }
+                break;
 
-          case 'rebuild':
-            runTransition(allImages[currentImageKey], animationFrame / transitionDuration, false);
-            animationFrame++;
-            if (animationFrame > transitionDuration) {
-              animationFrame = 0; animationState = 'display';
-              promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 5000);
-            }
-            break;
-            
-          default:
-            drawImageFullscreen(currentImage);
-            break;
+            default: // display
+                drawImageFullscreen(currentImage);
+                break;
         }
       };
 
       function loadImageDynamically(filePath, callback) {
-        if (allImages[filePath]) { // もし画像がキャッシュにあれば、それを使う
+        if (allImages[filePath]) {
             callback(allImages[filePath]);
             return;
         }
-
         const loadingOverlay = document.getElementById('loading-overlay');
         loadingOverlay.classList.add('is-active');
-
         p.loadImage(filePath, 
           (img) => {
             img.filePath = filePath;
-            allImages[filePath] = img; // 読み込んだ画像をキャッシュに保存
+            allImages[filePath] = img;
             callback(img);
-            loadingOverlay.classList.remove('is-active');
+            if(loadingOverlay.classList.contains('is-active')) loadingOverlay.classList.remove('is-active');
           },
           () => {
-            console.warn(`画像の読み込みに失敗 or 欠番: ${filePath}. 別の画像を試します。`);
+            console.warn(`Failed to load: ${filePath}. Retrying with another image.`);
             const newIndex = p.floor(p.random(imageFileNames.length));
             loadImageDynamically(imageFileNames[newIndex], callback);
           }
         );
       }
       
-      function runTransition(img, progress, isDecay) { /* ... (省略) ... */ }
-      function drawBlocks(img, progress, isDecay) { /* ... (省略) ... */ }
-      function drawSlide(img, progress, isDecay) { /* ... (省略) ... */ }
-      function drawCircles(img, progress, isDecay) { /* ... (省略) ... */ }
-      function drawGlitch(nextImg) { /* ... (省略) ... */ }
-      function drawImageFullscreen(img) { /* ... (省略) ... */ }
+      // ★WEBGL用に描画関数を修正
+      function drawImageFullscreen(img) {
+          p.noStroke();
+          p.textureMode(p.NORMAL);
+          p.texture(img);
+          
+          const canvasRatio = p.width / p.height;
+          const imageRatio = img.width / img.height;
+          let w, h;
+          if (canvasRatio > imageRatio) {
+              w = p.width;
+              h = p.width / imageRatio;
+          } else {
+              w = p.height * imageRatio;
+              h = p.height;
+          }
+          p.plane(w, h); // 3D空間の平面に画像を貼り付ける
+      }
       
       const handleInteraction = () => {
+        if (p.getAudioContext().state !== 'running') { p.getAudioContext().resume(); }
+
         if (animationState === 'display' && !nextImageKey && imageFileNames.length > 1) {
           promptText.classList.remove('is-visible');
           clearTimeout(promptTimer);
           
-          transitionType = p.random(['blocks', 'slide', 'circles']);
-          if (transitionType === 'blocks') { effectParams = { startSize: 5, endSize: p.random(80, 150), density: p.random(0.6, 1.0) }; }
-          else if (transitionType === 'slide') { effectParams = { sliceCount: p.random(20, 80), wave: p.random(5, 15), offsetAmount: p.random(20, 80) }; }
-          else if (transitionType === 'circles') { effectParams = { circleCount: p.random(100, 400), maxRadius: p.random(100, 500) }; }
-          
           let newIndex = p.floor(p.random(imageFileNames.length));
-          while (imageFileNames[newIndex] === currentImageKey) { newIndex = p.floor(p.random(imageFileNames.length)); }
+          while (imageFileNames[newIndex] === currentImageKey) { 
+            newIndex = p.floor(p.random(imageFileNames.length));
+          }
           
           loadImageDynamically(imageFileNames[newIndex], (img) => {
             nextImageKey = img.filePath;
             animationFrame = 0;
-            animationState = 'decay';
+            animationState = 'fade-out';
           });
         }
       };
