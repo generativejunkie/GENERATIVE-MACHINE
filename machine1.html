@@ -60,8 +60,9 @@
       const numberPadding = 3;
 
       let imageFileNames = [];
-      let currentImage = null;
-      let nextImage = null;
+      let allImages = []; // 全ての画像をここに格納
+      let currentImageIndex = 0;
+      let nextImageIndex = 0;
       
       let animationState = 'display';
       let animationFrame = 0;
@@ -71,19 +72,46 @@
       
       let promptTimer = null;
       const promptText = document.getElementById('prompt-text');
-      
-      // ★追加: エフェクトのパラメータを保存するオブジェクト
       let effectParams = {};
 
       for (let i = 1; i <= imageCount; i++) {
         imageFileNames.push(`${filePrefix}${i.toString().padStart(numberPadding, '0')}${fileSuffix}`);
       }
       
-      p.preload = () => { /* ... (変更なし) ... */ };
-      p.setup = () => { /* ... (変更なし) ... */ };
+      // ★変更点：preloadはファイルの読み込みだけに専念させる
+      p.preload = () => {
+        for (let i = 0; i < imageFileNames.length; i++) {
+            allImages.push(p.loadImage(imageFileNames[i]));
+        }
+      };
+
+      // ★変更点：setupで初期設定をすべて行う
+      p.setup = () => {
+        const canvasContainer = document.getElementById('canvas-container');
+        p.createCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight).parent(canvasContainer);
+        p.background(0);
+        
+        // 読み込まれた画像にファイルパスを紐付ける
+        for(let i=0; i<allImages.length; i++) {
+            allImages[i].filePath = imageFileNames[i];
+        }
+
+        const loadingOverlay = document.getElementById('loading-overlay');
+        loadingOverlay.style.opacity = '0';
+        setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
+
+        currentImageIndex = p.floor(p.random(allImages.length));
+        animationState = 'display';
+        promptTimer = setTimeout(() => promptText.classList.add('is-visible'), 3000);
+        
+        const userStartAudio = () => { if (p.getAudioContext().state !== 'running') { p.getAudioContext().resume(); } };
+        canvasContainer.addEventListener('touchstart', userStartAudio, { once: true });
+        canvasContainer.addEventListener('mousedown', userStartAudio, { once: true });
+      };
 
       p.draw = () => {
-        if (!currentImage) { p.background(0); return; }
+        const currentImage = allImages[currentImageIndex];
+        const nextImage = allImages[nextImageIndex];
 
         switch (animationState) {
           case 'decay':
@@ -93,16 +121,16 @@
             break;
             
           case 'chaos':
-            drawGlitch();
+            drawGlitch(nextImage);
             animationFrame++;
             if (animationFrame > chaosDuration) {
               animationFrame = 0; animationState = 'rebuild';
-              currentImage = nextImage; nextImage = null;
+              currentImageIndex = nextImageIndex;
             }
             break;
 
           case 'rebuild':
-            runTransition(currentImage, animationFrame / transitionDuration, false);
+            runTransition(allImages[currentImageIndex], animationFrame / transitionDuration, false);
             animationFrame++;
             if (animationFrame > transitionDuration) {
               animationFrame = 0; animationState = 'display';
@@ -116,115 +144,40 @@
         }
       };
 
-      // --- ▼▼▼ エフェクト関連の関数を再編成・追加 ▼▼▼ ---
-
-      function loadImageDynamically(index, callback) { /* ... (変更なし) ... */ }
+      function runTransition(img, progress, isDecay) { /* ... (変更なし) ... */ }
+      function drawBlocks(img, progress, isDecay) { /* ... (変更なし) ... */ }
+      function drawSlide(img, progress, isDecay) { /* ... (変更なし) ... */ }
+      function drawCircles(img, progress, isDecay) { /* ... (変更なし) ... */ }
+      function drawGlitch(nextImg) { /* ... (変更なし) ... */ }
       function drawImageFullscreen(img) { /* ... (変更なし) ... */ }
-
-      // エフェクトを実行するメインの関数
-      function runTransition(img, progress, isDecay) {
-        switch(transitionType) {
-          case 'blocks':
-            drawBlocks(img, progress, isDecay);
-            break;
-          case 'slide':
-            drawSlide(img, progress, isDecay);
-            break;
-          case 'circles':
-            drawCircles(img, progress, isDecay);
-            break;
-        }
-      }
-
-      function drawBlocks(img, progress, isDecay) {
-        p.background(0);
-        const blockSize = isDecay ? p.map(progress, 0, 1, effectParams.startSize, effectParams.endSize) : p.map(progress, 0, 1, effectParams.endSize, effectParams.startSize);
-        for (let y = 0; y < p.height; y += blockSize) {
-          for (let x = 0; x < p.width; x += blockSize) {
-            if (p.random() < effectParams.density) {
-              let c = img.get(x, y);
-              p.fill(c); p.noStroke();
-              p.rect(x, y, blockSize, blockSize);
-            }
-          }
-        }
-      }
-
-      function drawSlide(img, progress, isDecay) {
-        p.background(0);
-        const sliceHeight = p.height / effectParams.sliceCount;
-        for (let i = 0; i < effectParams.sliceCount; i++) {
-          let y = i * sliceHeight;
-          let offset = p.sin(i * effectParams.wave + p.frameCount * 2) * effectParams.offsetAmount;
-          let currentProgress = isDecay ? progress : 1.0 - progress;
-          let slideAmount = p.map(currentProgress, 0, 1, 0, p.width * 1.5);
-          p.copy(img, 0, y, img.width, sliceHeight, p.random(-slideAmount, slideAmount) + offset, y, p.width, sliceHeight);
-        }
-      }
-
-      // ★追加: 新しい円形エフェクト
-      function drawCircles(img, progress, isDecay) {
-        p.background(0);
-        let currentProgress = isDecay ? progress : 1.0 - progress;
-        for(let i=0; i < effectParams.circleCount; i++) {
-          let x = p.random(p.width);
-          let y = p.random(p.height);
-          let c = img.get(x,y);
-          p.fill(c, p.random(100, 255));
-          p.noStroke();
-          let radius = p.map(currentProgress, 0, 1, 0, effectParams.maxRadius) * p.noise(x,y,p.frameCount);
-          p.ellipse(x, y, radius, radius);
-        }
-      }
-
-      function drawGlitch() {
-        for (let i = 0; i < p.random(30, 120); i++) {
-          let x = p.random(p.width); let y = p.random(p.height);
-          let w = p.random(5, p.width * 0.9); let h = p.random(1, 15);
-          if (nextImage) {
-              let c = nextImage.get(x, y);
-              p.fill(p.red(c) + p.random(-100, 100), p.green(c) + p.random(-20, 20), p.blue(c) + p.random(-100, 100));
-          }
-          p.noStroke(); p.rect(x, y, w, h);
-        }
-      }
       
       const handleInteraction = () => {
-        if (animationState === 'display' && !nextImage && imageFileNames.length > 1) {
+        if (animationState === 'display' && allImages.length > 1) {
           promptText.classList.remove('is-visible');
           clearTimeout(promptTimer);
           
-          // ★変更点: エフェクトタイプをランダムに選び、パラメータも設定
           const transitionTypes = ['blocks', 'slide', 'circles'];
           transitionType = p.random(transitionTypes);
           
-          if (transitionType === 'blocks') {
-            effectParams = { startSize: 5, endSize: p.random(80, 150), density: p.random(0.6, 1.0) };
-          } else if (transitionType === 'slide') {
-            effectParams = { sliceCount: p.random(20, 80), wave: p.random(5, 15), offsetAmount: p.random(20, 80) };
-          } else if (transitionType === 'circles') {
-            effectParams = { circleCount: p.random(100, 400), maxRadius: p.random(100, 500) };
-          }
+          if (transitionType === 'blocks') { effectParams = { startSize: 5, endSize: p.random(80, 150), density: p.random(0.6, 1.0) }; }
+          else if (transitionType === 'slide') { effectParams = { sliceCount: p.random(20, 80), wave: p.random(5, 15), offsetAmount: p.random(20, 80) }; }
+          else if (transitionType === 'circles') { effectParams = { circleCount: p.random(100, 400), maxRadius: p.random(100, 500) }; }
           
-          const currentIndex = imageFileNames.indexOf(currentImage.filePath);
-          let newIndex = p.floor(p.random(imageFileNames.length));
-          while (newIndex === currentIndex) { newIndex = p.floor(p.random(imageFileNames.length)); }
-          
-          const loadingOverlay = document.getElementById('loading-overlay');
-          loadingOverlay.classList.add('is-active');
-          
-          loadImageDynamically(newIndex, (img) => {
-            nextImage = img;
-            animationFrame = 0;
-            animationState = 'decay';
-            loadingOverlay.classList.remove('is-active');
-          });
+          let newIndex = p.floor(p.random(allImages.length));
+          while (newIndex === currentImageIndex) { newIndex = p.floor(p.random(allImages.length)); }
+          nextImageIndex = newIndex;
+
+          animationFrame = 0;
+          animationState = 'decay';
         }
       };
       p.mousePressed = handleInteraction;
       p.touchStarted = handleInteraction;
 
-      p.windowResized = () => { /* ... (変更なし) ... */ };
+      p.windowResized = () => {
+        const canvasContainer = document.getElementById('canvas-container');
+        p.resizeCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
+      };
     };
 
     new p5(sketch);
