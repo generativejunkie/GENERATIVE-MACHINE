@@ -1,304 +1,2020 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GENERATIVE MACHINE</title>
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="manifest" href="/site.webmanifest">
-  <meta name="msapplication-TileColor" content="#ffffff">
-  <meta name="theme-color" content="#ffffff">
-  <link rel="canonical" href="https://www.generativejunkie.net/" />
-  <meta property="og:title" content="GENERATIVE JUNKIE">
-  <meta property="og:description" content="An Experimental Generative Art Brand exploring algorithmic beauty and the emotional resonance of machine intelligence.">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="GENERATIVE JUNKIE">
-  <meta property="og:url" content="https://www.generativejunkie.net/">
-  <meta property="og:image" content="https://www.generativejunkie.net/og-image.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image:alt" content="GENERATIVE JUNKIE Brand Logo">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body, a, button {
-      cursor: none;
-    }
-    body {
-      background-color: #FFFFFF;
-      color: #111827;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    }
-    .card {
-      background-color: #F3F4F6;
-      border: 1px solid #E5E7EB;
-      transition: all 0.3s ease;
-      text-decoration: none;
-    }
-    .card:not(.is-disabled):hover {
-      border-color: #9CA3AF;
-      transform: translateY(-5px);
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    }
-    .card.is-disabled {
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 50; opacity: 0; visibility: hidden;
-      transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-    .modal-overlay.is-visible { opacity: 1; visibility: visible; }
-    .modal-content {
-      background: rgba(255, 255, 255, 0.7);
-      -webkit-backdrop-filter: blur(16px);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(229, 231, 235, 0.5);
-      color: #1f2937;
-      border-radius: 0.75rem; padding: 2rem; max-width: 640px;
-      width: 90%; max-height: 80vh; overflow-y: auto;
-      position: relative; transform: scale(0.95);
-      transition: transform 0.3s ease;
-    }
-    .modal-overlay.is-visible .modal-content { transform: scale(1); }
-    .modal-close {
-      position: absolute; top: 1rem; right: 1rem;
-      color: #6b7280; cursor: pointer; transition: color 0.2s ease;
-    }
-    .modal-close:hover { color: #1f2937; }
-    .cursor {
-      display: inline-block; width: 2px; height: 1em;
-      background-color: rgba(31, 41, 55, 0.75);
-      margin-left: 2px;
-      animation: blink-dark 0.7s infinite;
-    }
-    @keyframes blink-dark {
-      0%, 100% { background-color: rgba(31, 41, 55, 0.75); }
-      50% { background-color: transparent; }
-    }
-    .cursor.is-hidden { display: none; }
-    #custom-cursor {
-      position: fixed;
-      width: 24px;
-      height: 24px;
-      background-color: transparent;
-      border: 1px solid #111827;
-      border-radius: 50%;
-      z-index: 9999;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      transition: transform 0.2s ease-out, background-color 0.2s ease-out, border-color 0.2s ease-out;
-    }
-    #custom-cursor.cursor-hover {
-      background-color: #111827;
-      border-color: transparent;
-      transform: translate(-50%, -50%) scale(0.6);
-    }
-    @media (pointer: coarse) {
-      #custom-cursor { display: none; }
-      body, a, button { cursor: auto; }
-    }
-  </style>
-</head>
-<body class="flex flex-col items-center justify-center min-h-screen p-4">
-
-  <div id="custom-cursor"></div>
-
-  <header class="text-center mb-12">
-    <h1 class="text-4xl md:text-5xl font-normal tracking-widest text-gray-800">GENERATIVE MACHINE</h1>
-    <div class="flex items-center justify-center gap-4 mt-2">
-      <p id="typing-container" class="text-gray-500 h-10 flex items-center">
-        <span id="typed-text"></span><span class="cursor"></span>
-      </p>
-      <button id="open-modal-btn" class="text-blue-600 hover:text-blue-800 transition-colors text-sm font-semibold">About</button>
-    </div>
-  </header>
-
-  <main class="grid grid-cols-1 md:grid-cols-4 gap-8 w-full max-w-7xl">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="GENERATIVE MACHINE - Interactive Generative Art Experience">
+    <title>GENERATIVE MACHINE</title>
     
-    <a href="machine1.html" class="card rounded-xl p-8 block">
-      <div class="flex items-center mb-4">
-        <div class="p-2 bg-blue-500/20 rounded-full mr-4">
-          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-        </div>
-        <div>
-          <h2 class="text-xl font-light text-gray-800">IMAGE MACHINE</h2>
-          <p class="text-gray-500 font-light">Image Contents</p>
-        </div>
-      </div>
-      <p class="text-gray-600 text-sm">
-        Explore an interactive visual experience
-      </p>
-    </a>
-
-    <a href="machine2.html" class="card rounded-xl p-8 block">
-      <div class="flex items-center mb-4">
-        <div class="p-2 bg-green-500/20 rounded-full mr-4">
-            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
-        </div>
-        <div>
-          <h2 class="text-xl font-light text-gray-800">SOUND MACHINE</h2>
-          <p class="text-gray-500 font-light">Sound Visualizer</p>
-        </div>
-      </div>
-      <p class="text-gray-600 text-sm">
-        A sound visualizer that transforms your audio into generative art
-      </p>
-    </a>
-
-    <div class="card rounded-xl p-8 block is-disabled">
-      <div class="flex items-center mb-4">
-        <div class="p-2 bg-yellow-500/20 rounded-full mr-4">
-            <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-        </div>
-        <div>
-          <h2 class="text-xl font-light text-gray-800">MATERIALIZE MACHINE</h2>
-          <p class="text-gray-500 font-light">Digital to Physical</p>
-        </div>
-      </div>
-      <p class="text-gray-600 text-sm">
-        Coming Soon...
-      </p>
-    </div>
-
-    <a href="https://generativejunkie.stores.jp/" target="_blank" rel="noopener noreferrer" class="card rounded-xl p-8 block">
-      <div class="flex items-center mb-4">
-        <div class="p-2 bg-purple-500/20 rounded-full mr-4">
-            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-        </div>
-        <div>
-          <h2 class="text-xl font-light text-gray-800">APPAREL</h2>
-          <p class="text-gray-500 font-light">Official Store</p>
-        </div>
-      </div>
-      <p class="text-gray-600 text-sm">
-        Discover the official apparel and goods
-      </p>
-    </a>
-  </main>
-  
-  <footer class="relative mt-12 mb-4 text-center md:fixed md:bottom-4 md:left-0 md:right-0 md:mt-0 md:mb-0">
-    <div class="flex flex-col items-center">
-      <img src="/logo/gj_logo_black.png" alt="GENERATIVE JUNKIE Logo" class="w-32 mb-3">
-      <p class="text-gray-800" style="font-size: 10px; font-family: Verdana, sans-serif;">©︎2025</p>
-    </div>
-  </footer>
-
-  <div id="about-modal" class="modal-overlay">
-    <div class="modal-content">
-      <div id="close-modal-btn" class="modal-close">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-      </div>
-      <div class="text-sm space-y-6">
-        <div>
-          <h3 class="font-bold mb-2 text-gray-800">GENERATIVE JUNKIE</h3>
-          <p class="text-gray-600 leading-relaxed">
-            GENERATIVE JUNKIE is a generative art brand that explores algorithmic beauty and the emotional resonance of machine intelligence, driven by the philosophy of prompt engineering as an art form.
-          </p>
-          <p class="text-gray-600 mt-2 leading-relaxed">
-            Founded by an art director and graphic designer, the brand stands at the crossroads of AI, subculture, music, and underground creativity, redefining how human intuition and machine logic co-create culture.
-          </p>
-          <p class="text-gray-600 mt-2 leading-relaxed">
-            Guided by the concept of “turning generation itself into culture,” GENERATIVE JUNKIE reconstructs visuals, sounds, words, and digital experiences born through AI and prompt design, sublimating these generative traces into both interactive digital works and physical art forms.
-          </p>
-          <p class="text-gray-600 mt-2 leading-relaxed">
-            Each piece captures the tension between control and chaos, reflecting a future where creativity is engineered, yet alive.
-          </p>
-           <p class="text-gray-600 mt-2 leading-relaxed">
-            GENERATIVE JUNKIE embodies the new aesthetic of collaboration between human imagination and machine intelligence — an underground movement born from code, rhythm, and cultural distortion.
-          </p>
-        </div>
-        <div class="border-t border-gray-300 pt-6">
-          <h3 class="font-bold mb-2 text-gray-800">GENERATIVE JUNKIE (ジェネレイティブ・ジャンキー)</h3>
-          <p class="text-gray-600 leading-relaxed">
-            AIが生み出す「アルゴリズム的な美」と「機械の知性が帯びる感情」をテーマに、プロンプトエンジニアリングを新たなアートフォームとして探求するジェネラティブ・アートブランドです。
-          </p>
-           <p class="text-gray-600 mt-2 leading-relaxed">
-            アートディレクター／グラフィックデザイナーによって立ち上げられ、AI、サブカルチャー、ミュージック、アンダーグラウンドの交差点から、人間の直感と機械の論理が共創する新しいカルチャーを発信しています。
-          </p>
-           <p class="text-gray-600 mt-2 leading-relaxed">
-            「生成すること自体をカルチャーにする」という思想のもと、AIとプロンプトデザインから生まれるビジュアル、サウンド、言葉、デジタル体験を再構築。その“生成の痕跡”を、インタラクティブなデジタル作品や物理的なアートフォームへと昇華させ、コントロールとカオスのあいだに宿る創造性を表現します。
-          </p>
-           <p class="text-gray-600 mt-2 leading-relaxed">
-            GENERATIVE JUNKIEは、人間の想像力と機械知性が交わる場所から生まれる、コード、リズム、そして歪んだ文化の新しい美学を体現します。
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      
-      const openBtn = document.getElementById('open-modal-btn');
-      const modal = document.getElementById('about-modal');
-      const closeBtn = document.getElementById('close-modal-btn');
-      openBtn.addEventListener('click', () => { modal.classList.add('is-visible'); });
-      closeBtn.addEventListener('click', () => { modal.classList.remove('is-visible'); });
-      modal.addEventListener('click', (event) => { if (event.target === modal) { modal.classList.remove('is-visible'); } });
-      
-      const textElement = document.getElementById('typed-text');
-      const cursorElement = document.querySelector('.cursor');
-      const textPart1 = "An Experimental Generative Art Brand";
-      const textPart2 = "Always Super High!";
-      const typeSpeed = 80;
-      const eraseSpeed = 40;
-      const pauseAfterType1 = 2000;
-      const pauseAfterType2 = 3000;
-      const pauseBeforeNext = 500;
-      let textIndex = 0;
-      const texts = [textPart1, textPart2];
-
-      function typeText(text, charIndex, callback) {
-        if (charIndex < text.length) {
-          textElement.textContent += text.charAt(charIndex);
-          setTimeout(() => typeText(text, charIndex + 1, callback), typeSpeed);
-        } else {
-          if (callback) callback();
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        /* ==================== Design Tokens ==================== */
+        :root {
+            --color-bg-primary: #ffffff;
+            --color-bg-secondary: #fafafa;
+            --color-bg-tertiary: #f5f5f5;
+            --color-text-primary: #0a0a0a;
+            --color-text-secondary: #666666;
+            --color-text-tertiary: #999999;
+            --color-accent: #0a0a0a;
+            --color-border: #e5e5e5;
+            --color-border-strong: #d0d0d0;
+            
+            --font-family-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            --font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            
+            --font-size-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+            --font-size-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
+            --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+            --font-size-lg: clamp(1.125rem, 1rem + 0.625vw, 1.5rem);
+            --font-size-xl: clamp(1.5rem, 1.25rem + 1.25vw, 2.25rem);
+            --font-size-2xl: clamp(2rem, 1.5rem + 2.5vw, 3.5rem);
+            --font-size-3xl: clamp(2.5rem, 2rem + 2.5vw, 4.5rem);
+            
+            --space-xs: clamp(0.5rem, 0.4rem + 0.5vw, 0.75rem);
+            --space-sm: clamp(1rem, 0.9rem + 0.5vw, 1.5rem);
+            --space-md: clamp(1.5rem, 1.3rem + 1vw, 2.5rem);
+            --space-lg: clamp(2rem, 1.7rem + 1.5vw, 3.5rem);
+            --space-xl: clamp(3rem, 2.5rem + 2.5vw, 5rem);
+            --space-2xl: clamp(4rem, 3rem + 5vw, 7rem);
+            
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
         }
-      }
-
-      function eraseText(callback) {
-        cursorElement.classList.add('is-hidden');
-        let currentText = textElement.textContent;
-        if (currentText.length > 0) {
-          textElement.textContent = currentText.slice(0, -1);
-          setTimeout(() => eraseText(callback), eraseSpeed);
-        } else {
-          cursorElement.classList.remove('is-hidden');
-          if (callback) callback();
+        
+        /* ==================== Reset & Base ==================== */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-      }
-
-      function startAnimationLoop() {
-        const currentText = texts[textIndex];
-        const pauseAfter = (textIndex === 0) ? pauseAfterType1 : pauseAfterType2;
-        typeText(currentText, 0, () => {
-          setTimeout(() => {
-            eraseText(() => {
-              textIndex = (textIndex + 1) % texts.length;
-              setTimeout(startAnimationLoop, pauseBeforeNext);
+        
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        body {
+            font-family: var(--font-family-primary);
+            font-size: var(--font-size-base);
+            line-height: 1.6;
+            color: var(--color-text-primary);
+            background-color: var(--color-bg-primary);
+            overflow-x: hidden;
+        }
+        
+        /* ==================== Typography ==================== */
+        h1, h2, h3 {
+            line-height: 1.2;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+        }
+        
+        h1 { font-size: var(--font-size-3xl); }
+        h2 { font-size: var(--font-size-2xl); font-weight: 400; }
+        h3 { font-size: var(--font-size-xl); font-weight: 400; }
+        
+        /* Typing Animation */
+        .typing-text {
+            display: inline;
+        }
+        
+        .typing-text::after {
+            content: '|';
+            display: inline-block;
+            margin-left: 2px;
+            animation: blink 1s step-end infinite;
+        }
+        
+        .typing-text.completed::after {
+            display: none;
+        }
+        
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        
+        /* ==================== Skip Link ==================== */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 0;
+            background: var(--color-accent);
+            color: var(--color-bg-primary);
+            padding: var(--space-sm);
+            z-index: 1000;
+            font-weight: 500;
+        }
+        
+        .skip-link:focus {
+            top: 0;
+        }
+        
+        /* ==================== Header ==================== */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-sm) var(--space-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: var(--font-size-lg);
+            font-weight: 300;
+            color: var(--color-text-primary);
+            text-decoration: none;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: var(--space-md);
+            list-style: none;
+        }
+        
+        .nav-link {
+            font-size: var(--font-size-sm);
+            font-weight: 400;
+            color: var(--color-text-secondary);
+            transition: color var(--transition-base);
+            text-decoration: none;
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--color-accent);
+            transition: width var(--transition-base);
+        }
+        
+        .nav-link:hover::after,
+        .nav-link:focus::after {
+            width: 100%;
+        }
+        
+        /* ==================== Hero ==================== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: var(--space-2xl) var(--space-md);
+            padding-top: calc(var(--space-2xl) + 60px);
+        }
+        
+        .hero-content {
+            max-width: 800px;
+        }
+        
+        .hero-title {
+            margin-bottom: var(--space-md);
+            font-weight: 300;
+            letter-spacing: -0.03em;
+        }
+        
+        .hero-subtitle {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-lg);
+            font-weight: 300;
+        }
+        
+        .hero-description {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+            line-height: 1.8;
+            min-height: 3em;
+        }
+        
+        /* ==================== Section ==================== */
+        .section {
+            min-height: 100vh;
+            padding: var(--space-2xl) var(--space-md);
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .section:nth-child(even) {
+            background: var(--color-bg-secondary);
+        }
+        
+        .section-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-header {
+            margin-bottom: var(--space-xl);
+            text-align: center;
+        }
+        
+        .section-number {
+            display: block;
+            font-size: var(--font-size-xs);
+            font-family: var(--font-family-mono);
+            color: var(--color-text-tertiary);
+            margin-bottom: var(--space-xs);
+        }
+        
+        .section-title {
+            margin-bottom: var(--space-sm);
+        }
+        
+        .section-description {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+            line-height: 1.7;
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: 2em;
+        }
+        
+        /* ==================== Machine Canvas ==================== */
+        .machine-canvas-wrapper {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            max-height: 600px;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            overflow: hidden;
+            background: var(--color-bg-tertiary);
+            margin-bottom: var(--space-lg);
+        }
+        
+        #imageCanvas-container,
+        #soundCanvas-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .canvas-prompt {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: var(--font-size-lg);
+            font-weight: 200;
+            letter-spacing: 0.2em;
+            color: var(--color-text-tertiary);
+            opacity: 0.7;
+            pointer-events: none;
+            transition: opacity 1s ease;
+        }
+        
+        .canvas-prompt.hidden {
+            opacity: 0;
+        }
+        
+        /* ==================== Controls ==================== */
+        .machine-controls {
+            display: grid;
+            gap: var(--space-md);
+            padding: var(--space-lg);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            background: var(--color-bg-primary);
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+        
+        .control-label {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+            font-weight: 400;
+        }
+        
+        input[type="file"] {
+            font-size: var(--font-size-sm);
+            padding: var(--space-sm);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            background: var(--color-bg-primary);
+            transition: border-color var(--transition-base);
+        }
+        
+        input[type="file"]:hover {
+            border-color: var(--color-border-strong);
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 2px;
+            background: var(--color-border);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--color-accent);
+            cursor: pointer;
+            border-radius: 50%;
+            transition: transform var(--transition-fast);
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: var(--color-accent);
+            cursor: pointer;
+            border-radius: 50%;
+            border: none;
+            transition: transform var(--transition-fast);
+        }
+        
+        select {
+            padding: var(--space-sm);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            background: var(--color-bg-primary);
+            font-size: var(--font-size-sm);
+            transition: border-color var(--transition-base);
+        }
+        
+        .btn {
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--color-accent);
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            font-size: var(--font-size-sm);
+            font-weight: 400;
+            border-radius: 4px;
+            transition: all var(--transition-base);
+        }
+        
+        .btn:hover:not(:disabled) {
+            background: var(--color-accent);
+            color: var(--color-bg-primary);
+        }
+        
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .btn-primary {
+            background: var(--color-accent);
+            color: var(--color-bg-primary);
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: var(--color-text-primary);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+        
+        /* ==================== Sound Machine Specific ==================== */
+        .sound-controls {
+            display: grid;
+            gap: var(--space-md);
+        }
+        
+        .audio-player {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-md);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            background: var(--color-bg-secondary);
+        }
+        
+        .audio-player > * {
+            flex-shrink: 0;
+        }
+        
+        .audio-player > div:nth-child(2) {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .time-display {
+            font-size: var(--font-size-xs);
+            font-family: var(--font-family-mono);
+            color: var(--color-text-secondary);
+            min-width: 45px;
+        }
+        
+        .seek-bar {
+            flex: 1;
+            height: 4px;
+            background: var(--color-border);
+            border-radius: 2px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .seek-bar-progress {
+            height: 100%;
+            background: var(--color-accent);
+            border-radius: 2px;
+            transition: width 100ms linear;
+        }
+        
+        .freq-display {
+            display: flex;
+            gap: var(--space-sm);
+            padding: var(--space-md);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            background: var(--color-bg-secondary);
+            justify-content: center;
+        }
+        
+        .freq-bar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+        
+        .freq-bars {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 2px;
+            height: 60px;
+        }
+        
+        .freq-bar {
+            width: 20px;
+            height: 4px;
+            background: var(--color-border);
+            border-radius: 2px;
+            transition: all 75ms ease;
+        }
+        
+        .freq-bar.active {
+            background: var(--color-accent);
+        }
+        
+        .freq-label {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-tertiary);
+            text-transform: uppercase;
+            font-family: var(--font-family-mono);
+        }
+        
+        .settings-panel {
+            position: absolute;
+            top: calc(var(--space-sm) + 50px);
+            right: var(--space-sm);
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            padding: var(--space-md);
+            z-index: 90;
+            display: none;
+            max-height: calc(100% - var(--space-sm) - 60px);
+            overflow-y: auto;
+        }
+        
+        .settings-panel.open {
+            display: block;
+        }
+        
+        .settings-btn {
+            position: absolute;
+            top: var(--space-sm);
+            right: var(--space-sm);
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--color-border);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 91;
+            transition: all var(--transition-base);
+        }
+        
+        .settings-btn:hover {
+            background: var(--color-bg-secondary);
+        }
+        
+        /* ==================== Store ==================== */
+        .store-card {
+            text-align: center;
+            padding: var(--space-xl);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .store-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto var(--space-md);
+            border: 2px solid var(--color-accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .store-icon svg {
+            width: 30px;
+            height: 30px;
+        }
+        
+        /* ==================== Footer ==================== */
+        .site-footer {
+            border-top: 1px solid var(--color-border);
+            padding: var(--space-xl) var(--space-md);
+            background: var(--color-bg-secondary);
+            text-align: center;
+        }
+        
+        .footer-content {
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-sm);
+        }
+        
+        /* ==================== Responsive ==================== */
+        @media (max-width: 768px) {
+            .nav-menu {
+                gap: var(--space-sm);
+            }
+            
+            .nav-link {
+                font-size: var(--font-size-xs);
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn-group .btn {
+                width: 100%;
+            }
+            
+            .settings-panel {
+                right: var(--space-sm);
+                width: calc(100% - var(--space-md));
+            }
+            
+            .settings-btn {
+                right: var(--space-sm);
+            }
+        }
+        
+        /* ==================== Accessibility ==================== */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            html {
+                scroll-behavior: auto;
+            }
+        }
+        
+        :focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 2px;
+        }
+        
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Header -->
+    <header class="site-header">
+        <nav class="nav-container">
+            <a href="#hero" class="logo">GENERATIVE JUNKIE</a>
+            <ul class="nav-menu">
+                <li><a href="#image-machine" class="nav-link">Image</a></li>
+                <li><a href="#sound-machine" class="nav-link">Sound</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#store" class="nav-link">Store</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Hero -->
+        <section id="hero" class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">GENERATIVE MACHINE</h1>
+                <p class="hero-description"><span id="description-text" class="typing-text"></span></p>
+            </div>
+        </section>
+        
+        <!-- Image Machine -->
+        <section id="image-machine" class="section">
+            <div class="section-container">
+                <header class="section-header">
+                    <span class="section-number">01</span>
+                    <h2 class="section-title">IMAGE MACHINE</h2>
+                    <p class="section-description"><span id="image-desc-text" class="typing-text"></span></p>
+                </header>
+                
+                <div class="machine-canvas-wrapper">
+                    <div id="imageCanvas-container"></div>
+                    <div id="imagePrompt" class="canvas-prompt">CLICK / TAP</div>
+                </div>
+                
+                <div class="machine-controls">
+                    <p style="text-align: center; color: var(--color-text-secondary);">
+                        Click or tap the canvas to switch between random generative images with transition effects
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Sound Machine -->
+        <section id="sound-machine" class="section">
+            <div class="section-container">
+                <header class="section-header">
+                    <span class="section-number">02</span>
+                    <h2 class="section-title">SOUND MACHINE</h2>
+                    <p class="section-description"><span id="sound-desc-text" class="typing-text"></span></p>
+                </header>
+                
+                <div class="machine-canvas-wrapper">
+                    <button class="settings-btn" id="settingsBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                    
+                    <div class="settings-panel" id="settingsPanel">
+                        <h3 style="margin-bottom: var(--space-md); font-size: var(--font-size-base);">Settings</h3>
+                        <div class="control-group" style="margin-bottom: var(--space-sm);">
+                            <label class="control-label">Capsules: <span id="pillCountVal">1</span></label>
+                            <input type="range" id="pillCount" min="1" max="12" value="1">
+                        </div>
+                        <div class="control-group" style="margin-bottom: var(--space-sm);">
+                            <label class="control-label">Size: <span id="pillSizeVal">0.7</span></label>
+                            <input type="range" id="pillSize" min="0.3" max="1.5" step="0.1" value="0.7">
+                        </div>
+                        <div class="control-group" style="margin-bottom: var(--space-sm);">
+                            <label class="control-label">Spread: <span id="spreadVal">0.0</span></label>
+                            <input type="range" id="spread" min="0" max="5" step="0.1" value="0">
+                        </div>
+                        <div class="control-group" style="margin-bottom: var(--space-sm);">
+                            <label class="control-label">Rotation: <span id="rotationVal">1.0</span>x</label>
+                            <input type="range" id="rotation" min="0" max="3" step="0.1" value="1">
+                        </div>
+                        <div class="control-group" style="margin-bottom: var(--space-sm);">
+                            <label class="control-label">Scale: <span id="scaleVal">1.0</span>x</label>
+                            <input type="range" id="scale" min="0" max="3" step="0.1" value="1">
+                        </div>
+                        <div class="control-group" style="margin-bottom: var(--space-sm);">
+                            <label style="display: flex; align-items: center; gap: var(--space-xs);">
+                                <input type="checkbox" id="wireframe">
+                                <span class="control-label">Wireframe</span>
+                            </label>
+                        </div>
+                        <div class="control-group" style="margin-bottom: var(--space-md);">
+                            <label style="display: flex; align-items: center; gap: var(--space-xs);">
+                                <input type="checkbox" id="blockMode">
+                                <span class="control-label">Block Mode</span>
+                            </label>
+                        </div>
+                        <button class="btn" id="resetBtn" style="width: 100%;">Reset</button>
+                    </div>
+                    
+                    <div id="soundCanvas-container"></div>
+                    <div id="dropZone" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none;">
+                        <label style="pointer-events: auto; cursor: pointer;">
+                            <input type="file" id="audioFile" accept="audio/mp3,audio/mpeg,audio/wav,audio/m4a,audio/aac,audio/*" style="display: none;">
+                            <div style="text-align: center; padding: var(--space-xl); background: rgba(255, 255, 255, 0.5); border-radius: 4px; border: 2px dashed var(--color-border);">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto var(--space-md);">
+                                    <path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+                                </svg>
+                                <p style="font-size: var(--font-size-base); margin-bottom: var(--space-xs);">Drop audio file here</p>
+                                <p style="font-size: var(--font-size-sm); color: var(--color-text-secondary);">or click to browse</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="machine-controls sound-controls">
+                    <div id="audioPlayer" style="display: none;">
+                        <div class="audio-player">
+                            <div style="display: flex; align-items: center; gap: var(--space-sm);">
+                                <button class="btn btn-primary" id="playBtn">Play</button>
+                                <button class="btn" id="pauseBtn" disabled>Pause</button>
+                                <label style="cursor: pointer;">
+                                    <input type="file" id="audioFileSelect" accept="audio/mp3,audio/mpeg,audio/wav,audio/m4a,audio/aac,audio/*" style="display: none;">
+                                    <button type="button" class="btn" onclick="document.getElementById('audioFileSelect').click()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+                                        </svg>
+                                    </button>
+                                </label>
+                            </div>
+                            <div style="flex: 1; display: flex; align-items: center; gap: var(--space-sm);">
+                                <span class="time-display" id="currentTime">0:00</span>
+                                <div class="seek-bar" id="seekBar">
+                                    <div class="seek-bar-progress" id="seekBarProgress"></div>
+                                </div>
+                                <span class="time-display" id="duration">0:00</span>
+                            </div>
+                            <div class="freq-display" style="margin: 0; border: none; padding: 0; background: transparent;">
+                                <div class="freq-bar-container">
+                                    <div class="freq-bars" id="lowFreq">
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                    </div>
+                                    <span class="freq-label">Low</span>
+                                </div>
+                                <div class="freq-bar-container">
+                                    <div class="freq-bars" id="midFreq">
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                    </div>
+                                    <span class="freq-label">Mid</span>
+                                </div>
+                                <div class="freq-bar-container">
+                                    <div class="freq-bars" id="highFreq">
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                        <div class="freq-bar"></div>
+                                    </div>
+                                    <span class="freq-label">High</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Store -->
+        <section id="store" class="section">
+            <div class="section-container">
+                <header class="section-header">
+                    <span class="section-number">03</span>
+                    <h2 class="section-title">OFFICIAL STORE</h2>
+                    <p class="section-description"><span id="store-desc-text" class="typing-text"></span></p>
+                </header>
+                
+                <div class="store-card">
+                    <div class="store-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                        </svg>
+                    </div>
+                    <h3 style="margin-bottom: var(--space-sm);">Apparel & Goods</h3>
+                    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-md);">
+                        Limited apparel, art prints, and original merchandise
+                    </p>
+                    <a href="https://generativejunkie.stores.jp/" 
+                       class="btn btn-primary" 
+                       target="_blank" 
+                       rel="noopener noreferrer">
+                        Visit Store
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- About -->
+        <section id="about" class="section">
+            <div class="section-container">
+                <header class="section-header">
+                    <span class="section-number">04</span>
+                    <h2 class="section-title">ABOUT</h2>
+                </header>
+                
+                <div style="max-width: 900px; margin: 0 auto;">
+                    <div style="margin-bottom: var(--space-xl);">
+                        <h3 style="font-size: var(--font-size-lg); font-weight: 400; margin-bottom: var(--space-md); text-align: center;">
+                            Manifesto
+                        </h3>
+                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
+                            GENERATIVE JUNKIE is a generative art brand that explores algorithmic beauty and the emotional resonance of machine intelligence, driven by the philosophy of prompt engineering as an art form.
+                        </p>
+                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
+                            Founded by an art director and graphic designer, the brand stands at the crossroads of AI, subculture, music, and underground creativity, redefining how human intuition and machine logic co-create culture.
+                        </p>
+                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
+                            Guided by the concept of "turning generation itself into culture," GENERATIVE JUNKIE reconstructs visuals, sounds, words, and digital experiences born through AI and prompt design, sublimating these generative traces into both interactive digital works and physical art forms.
+                        </p>
+                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
+                            Each piece captures the tension between control and chaos, reflecting a future where creativity is engineered, yet alive.
+                        </p>
+                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary);">
+                            GENERATIVE JUNKIE embodies the new aesthetic of collaboration between human imagination and machine intelligence — an underground movement born from code, rhythm, and cultural distortion.
+                        </p>
+                    </div>
+                    
+                    <div style="border-top: 1px solid var(--color-border); padding-top: var(--space-xl);">
+                        <h3 style="font-size: var(--font-size-lg); font-weight: 400; margin-bottom: var(--space-md); text-align: center; font-family: var(--font-family-mono);">
+                            マニフェスト
+                        </h3>
+                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
+                            GENERATIVE JUNKIE (ジェネレイティブ・ジャンキー)は、AIが生み出す「アルゴリズム的な美」と「機械の知性が帯びる感情」をテーマに、プロンプトエンジニアリングを新たなアートフォームとして探求するジェネラティブ・アートブランドです。
+                        </p>
+                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
+                            アートディレクター／グラフィックデザイナーによって立ち上げられ、AI、サブカルチャー、ミュージック、アンダーグラウンドの交差点から、人間の直感と機械の論理が共創する新しいカルチャーを発信しています。
+                        </p>
+                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
+                            「生成すること自体をカルチャーにする」という思想のもと、AIとプロンプトデザインから生まれるビジュアル、サウンド、言葉、デジタル体験を再構築。その"生成の痕跡"を、インタラクティブなデジタル作品や物理的なアートフォームへと昇華させ、コントロールとカオスのあいだに宿る創造性を表現します。
+                        </p>
+                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary);">
+                            GENERATIVE JUNKIEは、人間の想像力と機械知性が交わる場所から生まれる、コード、リズム、そして歪んだ文化の新しい美学を体現します。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>&copy; 2024 GENERATIVE JUNKIE. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        // ==================== Typing Animation ====================
+        function typeText(element, text, speed = 50, loop = false) {
+            return new Promise((resolve) => {
+                let i = 0;
+                element.textContent = '';
+                element.classList.remove('completed');
+                
+                const typeChar = () => {
+                    if (i < text.length) {
+                        element.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeChar, speed);
+                    } else {
+                        if (loop) {
+                            setTimeout(() => {
+                                element.textContent = '';
+                                i = 0;
+                                typeChar();
+                            }, 5000); // 5秒待機
+                        } else {
+                            element.classList.add('completed');
+                            resolve();
+                        }
+                    }
+                };
+                
+                typeChar();
             });
-          }, pauseAfter);
+        }
+        
+        // Initialize typing animations on scroll
+        const typingObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && entry.target.textContent === '') {
+                    const text = entry.target.dataset.text;
+                    const loop = entry.target.dataset.loop === 'true';
+                    typeText(entry.target, text, 50, loop);
+                }
+            });
+        }, { threshold: 0.5 });
+        
+        // Setup typing texts
+        document.addEventListener('DOMContentLoaded', () => {
+            const descEl = document.getElementById('description-text');
+            const imageDescEl = document.getElementById('image-desc-text');
+            const soundDescEl = document.getElementById('sound-desc-text');
+            const storeDescEl = document.getElementById('store-desc-text');
+            
+            descEl.dataset.text = 'Exploring algorithmic beauty and the emotional resonance of machine intelligence. Prompt engineering as an art form.';
+            descEl.dataset.loop = 'true';
+            imageDescEl.dataset.text = 'Click or tap to switch between random images with generative transition effects';
+            imageDescEl.dataset.loop = 'true';
+            soundDescEl.dataset.text = 'Upload audio to experience real-time sound visualization';
+            soundDescEl.dataset.loop = 'true';
+            storeDescEl.dataset.text = 'Embody the GENERATIVE JUNKIE aesthetic';
+            storeDescEl.dataset.loop = 'true';
+            
+            // Start hero description typing immediately with loop
+            typeText(descEl, descEl.dataset.text, 30, true);
+            
+            // Observe other sections
+            typingObserver.observe(imageDescEl);
+            typingObserver.observe(soundDescEl);
+            typingObserver.observe(storeDescEl);
         });
-      }
-      startAnimationLoop();
-
-      const cursor = document.getElementById('custom-cursor');
-      const interactiveElements = document.querySelectorAll('a, button');
-      window.addEventListener('mousemove', (e) => {
-        cursor.style.left = `${e.clientX}px`;
-        cursor.style.top = `${e.clientY}px`;
-      });
-      interactiveElements.forEach(el => {
-        el.addEventListener('mouseover', () => { cursor.classList.add('cursor-hover'); });
-        el.addEventListener('mouseout', () => { cursor.classList.remove('cursor-hover'); });
-      });
-    });
-  </script>
-
+        
+        // ==================== IMAGE MACHINE ====================
+        const imageMachineSketch = (p) => {
+            const imageCount = 394;
+            const imageFileNames = [];
+            
+            // Generate image file names
+            for (let i = 1; i <= imageCount; i++) {
+                imageFileNames.push(`/photos/photo${i.toString().padStart(3, '0')}.webp`);
+            }
+            
+            // Fallback color patterns if images not available
+            const colorPatterns = [
+                ['#FF6B6B', '#4ECDC4', '#45B7D1', '#F7DC6F', '#BB8FCE'],
+                ['#96CEB4', '#FFEAA7', '#DFE6E9', '#74B9FF', '#FD79A8'],
+                ['#A29BFE', '#FD79A8', '#FDCB6E', '#6C5CE7', '#00B894'],
+                ['#74B9FF', '#A29BFE', '#FD79A8', '#FDCB6E', '#00CEC9'],
+                ['#00B894', '#00CEC9', '#0984E3', '#6C5CE7', '#FD79A8'],
+                ['#E17055', '#FDCB6E', '#00B894', '#74B9FF', '#A29BFE'],
+                ['#2D3436', '#636E72', '#B2BEC3', '#DFE6E9', '#FFFFFF']
+            ];
+            
+            let allImages = {};
+            let currentImageKey = null;
+            let nextImageKey = null;
+            let animationState = 'loading';
+            let animationFrame = 0;
+            let transitionType = 'blocks';
+            const chaosDuration = 15;
+            const transitionDuration = 40;
+            let promptTimer = null;
+            let useColorMode = false; // Flag for fallback mode
+            let imageLoadAttempts = 0;
+            const maxLoadAttempts = 3;
+            
+            // Available transition effects
+            const transitionEffects = [
+                'blocks',
+                'slide',
+                'pixelate',
+                'wave',
+                'spiral',
+                'zoom',
+                'rgb-split',
+                'scan',
+                'mosaic',
+                'reveal'
+            ];
+            
+            p.setup = () => {
+                const container = document.getElementById('imageCanvas-container');
+                p.createCanvas(container.offsetWidth, container.offsetHeight).parent(container);
+                p.background(255);
+                
+                // Try to load initial image, fallback to color mode
+                const initialIndex = p.floor(p.random(imageFileNames.length));
+                loadImageDynamically(imageFileNames[initialIndex], (result) => {
+                    if (result.success) {
+                        currentImageKey = result.img.filePath;
+                        useColorMode = false;
+                    } else {
+                        // Use color pattern fallback
+                        useColorMode = true;
+                        currentImageKey = `color-${p.floor(p.random(colorPatterns.length))}`;
+                    }
+                    animationState = 'display';
+                    document.getElementById('imagePrompt').classList.remove('hidden');
+                    promptTimer = setTimeout(() => {
+                        document.getElementById('imagePrompt').classList.add('hidden');
+                    }, 3000);
+                });
+            };
+            
+            p.draw = () => {
+                if (!currentImageKey) {
+                    p.background(255);
+                    return;
+                }
+                
+                const currentContent = useColorMode ? 
+                    getColorPattern(currentImageKey) : 
+                    allImages[currentImageKey];
+                    
+                const nextContent = useColorMode ?
+                    getColorPattern(nextImageKey) :
+                    allImages[nextImageKey];
+                
+                if (!currentContent && !useColorMode) {
+                    p.background(255);
+                    return;
+                }
+                
+                switch(animationState) {
+                    case 'decay':
+                        runTransition(currentContent, animationFrame / transitionDuration, true);
+                        animationFrame++;
+                        if (animationFrame > transitionDuration) {
+                            animationFrame = 0;
+                            animationState = 'chaos';
+                        }
+                        break;
+                        
+                    case 'chaos':
+                        drawGlitch(nextContent);
+                        animationFrame++;
+                        if (animationFrame > chaosDuration) {
+                            animationFrame = 0;
+                            animationState = 'rebuild';
+                            currentImageKey = nextImageKey;
+                            nextImageKey = null;
+                        }
+                        break;
+                        
+                    case 'rebuild':
+                        const rebuildContent = useColorMode ? 
+                            getColorPattern(currentImageKey) : 
+                            allImages[currentImageKey];
+                        runTransition(rebuildContent, animationFrame / transitionDuration, false);
+                        animationFrame++;
+                        if (animationFrame > transitionDuration) {
+                            animationFrame = 0;
+                            animationState = 'display';
+                            promptTimer = setTimeout(() => {
+                                document.getElementById('imagePrompt').classList.remove('hidden');
+                            }, 5000);
+                        }
+                        break;
+                        
+                    default:
+                        if (useColorMode) {
+                            drawColorPattern(currentContent);
+                        } else {
+                            drawImageFullscreen(currentContent);
+                        }
+                        break;
+                }
+            };
+            
+            function getColorPattern(key) {
+                if (!key) return null;
+                const index = parseInt(key.replace('color-', ''));
+                return colorPatterns[index] || colorPatterns[0];
+            }
+            
+            function loadImageDynamically(filePath, callback) {
+                if (allImages[filePath]) {
+                    callback({ success: true, img: allImages[filePath] });
+                    return;
+                }
+                
+                imageLoadAttempts++;
+                
+                p.loadImage(filePath,
+                    (img) => {
+                        img.filePath = filePath;
+                        allImages[filePath] = img;
+                        imageLoadAttempts = 0;
+                        callback({ success: true, img: img });
+                    },
+                    () => {
+                        console.warn(`Failed to load: ${filePath}`);
+                        if (imageLoadAttempts < maxLoadAttempts) {
+                            const newIndex = p.floor(p.random(imageFileNames.length));
+                            loadImageDynamically(imageFileNames[newIndex], callback);
+                        } else {
+                            // Switch to color mode after max attempts
+                            console.log('Switching to color pattern mode');
+                            imageLoadAttempts = 0;
+                            callback({ success: false });
+                        }
+                    }
+                );
+            }
+            
+            function runTransition(content, progress, isDecay) {
+                if (!content) return;
+                
+                switch(transitionType) {
+                    case 'blocks':
+                        drawBlocks(content, progress, isDecay);
+                        break;
+                    case 'slide':
+                        drawSlide(content, progress, isDecay);
+                        break;
+                    case 'pixelate':
+                        drawPixelate(content, progress, isDecay);
+                        break;
+                    case 'wave':
+                        drawWave(content, progress, isDecay);
+                        break;
+                    case 'spiral':
+                        drawSpiral(content, progress, isDecay);
+                        break;
+                    case 'zoom':
+                        drawZoom(content, progress, isDecay);
+                        break;
+                    case 'rgb-split':
+                        drawRGBSplit(content, progress, isDecay);
+                        break;
+                    case 'scan':
+                        drawScan(content, progress, isDecay);
+                        break;
+                    case 'mosaic':
+                        drawMosaic(content, progress, isDecay);
+                        break;
+                    case 'reveal':
+                        drawReveal(content, progress, isDecay);
+                        break;
+                }
+            }
+            
+            function drawBlocks(content, progress, isDecay) {
+                p.background(255);
+                const blockSize = isDecay ? p.map(progress, 0, 1, 5, 100) : p.map(progress, 0, 1, 100, 5);
+                
+                if (useColorMode) {
+                    // Color pattern mode
+                    const colors = Array.isArray(content) ? content : colorPatterns[0];
+                    for (let y = 0; y < p.height; y += blockSize) {
+                        for (let x = 0; x < p.width; x += blockSize) {
+                            let probability = isDecay ? progress : (1.0 - progress);
+                            if (p.random() < probability) {
+                                const colorIndex = p.floor(p.random(colors.length));
+                                p.fill(colors[colorIndex]);
+                                p.noStroke();
+                                p.rect(x, y, blockSize, blockSize);
+                            }
+                        }
+                    }
+                } else {
+                    // Image mode
+                    for (let y = 0; y < p.height; y += blockSize) {
+                        for (let x = 0; x < p.width; x += blockSize) {
+                            let probability = isDecay ? progress : (1.0 - progress);
+                            if (p.random() < probability) {
+                                let c = content.get(x, y);
+                                p.fill(c);
+                                p.noStroke();
+                                p.rect(x, y, blockSize, blockSize);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            function drawSlide(content, progress, isDecay) {
+                p.background(255);
+                const sliceCount = 80;
+                const sliceHeight = p.height / sliceCount;
+                
+                if (useColorMode) {
+                    // Color pattern mode
+                    const colors = Array.isArray(content) ? content : colorPatterns[0];
+                    for (let i = 0; i < sliceCount; i++) {
+                        let y = i * sliceHeight;
+                        let currentProgress = isDecay ? progress : 1.0 - progress;
+                        let slideAmount = p.map(currentProgress, 0, 1, 0, p.width) * p.noise(i * 0.1);
+                        let dx = p.random(-slideAmount, slideAmount);
+                        const colorIndex = p.floor(p.random(colors.length));
+                        p.fill(colors[colorIndex]);
+                        p.noStroke();
+                        p.rect(dx, y, p.width, sliceHeight);
+                    }
+                } else {
+                    // Image mode
+                    for (let i = 0; i < sliceCount; i++) {
+                        let y = i * sliceHeight;
+                        let currentProgress = isDecay ? progress : 1.0 - progress;
+                        let slideAmount = p.map(currentProgress, 0, 1, 0, p.width) * p.noise(i * 0.1, p.frameCount * 0.01);
+                        let sx = 0;
+                        let dx = p.random(-slideAmount, slideAmount);
+                        p.copy(content, sx, y, content.width, sliceHeight, dx, y, p.width, sliceHeight);
+                    }
+                }
+            }
+            
+            function drawPixelate(content, progress, isDecay) {
+                p.background(255);
+                const pixelSize = isDecay ? 
+                    p.map(progress, 0, 1, 1, 50) : 
+                    p.map(progress, 0, 1, 50, 1);
+                
+                if (useColorMode) {
+                    const colors = Array.isArray(content) ? content : colorPatterns[0];
+                    for (let y = 0; y < p.height; y += pixelSize) {
+                        for (let x = 0; x < p.width; x += pixelSize) {
+                            const colorIndex = p.floor(p.random(colors.length));
+                            p.fill(colors[colorIndex]);
+                            p.noStroke();
+                            p.rect(x, y, pixelSize, pixelSize);
+                        }
+                    }
+                } else {
+                    for (let y = 0; y < p.height; y += pixelSize) {
+                        for (let x = 0; x < p.width; x += pixelSize) {
+                            let c = content.get(p.floor(x), p.floor(y));
+                            p.fill(c);
+                            p.noStroke();
+                            p.rect(x, y, pixelSize, pixelSize);
+                        }
+                    }
+                }
+            }
+            
+            function drawWave(content, progress, isDecay) {
+                p.background(255);
+                const amplitude = isDecay ? 
+                    p.map(progress, 0, 1, 0, 100) : 
+                    p.map(progress, 0, 1, 100, 0);
+                
+                if (useColorMode) {
+                    const colors = Array.isArray(content) ? content : colorPatterns[0];
+                    for (let y = 0; y < p.height; y += 2) {
+                        const offset = p.sin(y * 0.05 + p.frameCount * 0.1) * amplitude;
+                        const colorIndex = p.floor(p.random(colors.length));
+                        p.stroke(colors[colorIndex]);
+                        p.line(0, y, p.width, y + offset);
+                    }
+                } else {
+                    for (let y = 0; y < p.height; y += 2) {
+                        const offset = p.sin(y * 0.05 + p.frameCount * 0.1) * amplitude;
+                        p.copy(content, 0, y, content.width, 2, offset, y, p.width, 2);
+                    }
+                }
+            }
+            
+            function drawSpiral(content, progress, isDecay) {
+                p.background(255);
+                const maxRadius = p.dist(0, 0, p.width / 2, p.height / 2);
+                const currentRadius = isDecay ? 
+                    p.map(progress, 0, 1, maxRadius, 0) : 
+                    p.map(progress, 0, 1, 0, maxRadius);
+                
+                const centerX = p.width / 2;
+                const centerY = p.height / 2;
+                const segments = 200;
+                
+                for (let i = 0; i < segments; i++) {
+                    const angle = (i / segments) * p.TWO_PI * 8;
+                    const radius = (i / segments) * currentRadius;
+                    const x = centerX + p.cos(angle) * radius;
+                    const y = centerY + p.sin(angle) * radius;
+                    const size = 10;
+                    
+                    if (x >= 0 && x < p.width && y >= 0 && y < p.height) {
+                        if (useColorMode) {
+                            const colors = Array.isArray(content) ? content : colorPatterns[0];
+                            const colorIndex = p.floor(p.random(colors.length));
+                            p.fill(colors[colorIndex]);
+                        } else {
+                            let c = content.get(p.floor(x), p.floor(y));
+                            p.fill(c);
+                        }
+                        p.noStroke();
+                        p.ellipse(x, y, size, size);
+                    }
+                }
+            }
+            
+            function drawZoom(content, progress, isDecay) {
+                p.background(255);
+                const scale = isDecay ? 
+                    p.map(progress, 0, 1, 1, 2.5) : 
+                    p.map(progress, 0, 1, 2.5, 1);
+                const opacity = isDecay ? 
+                    p.map(progress, 0, 1, 255, 0) : 
+                    p.map(progress, 0, 1, 0, 255);
+                
+                p.push();
+                p.translate(p.width / 2, p.height / 2);
+                p.scale(scale);
+                p.translate(-p.width / 2, -p.height / 2);
+                p.tint(255, opacity);
+                
+                if (useColorMode) {
+                    drawColorPattern(content);
+                } else {
+                    drawImageFullscreen(content);
+                }
+                p.pop();
+            }
+            
+            function drawRGBSplit(content, progress, isDecay) {
+                p.background(255);
+                const offset = isDecay ? 
+                    p.map(progress, 0, 1, 0, 50) : 
+                    p.map(progress, 0, 1, 50, 0);
+                
+                if (!useColorMode && content) {
+                    p.blendMode(p.SCREEN);
+                    
+                    // Red channel
+                    p.tint(255, 0, 0);
+                    p.image(content, p.width / 2 - offset, p.height / 2, p.height * (content.width / content.height), p.height);
+                    
+                    // Green channel
+                    p.tint(0, 255, 0);
+                    p.image(content, p.width / 2, p.height / 2, p.height * (content.width / content.height), p.height);
+                    
+                    // Blue channel
+                    p.tint(0, 0, 255);
+                    p.image(content, p.width / 2 + offset, p.height / 2, p.height * (content.width / content.height), p.height);
+                    
+                    p.blendMode(p.BLEND);
+                    p.noTint();
+                } else {
+                    drawColorPattern(content);
+                }
+            }
+            
+            function drawScan(content, progress, isDecay) {
+                p.background(255);
+                const scanLine = isDecay ? 
+                    p.map(progress, 0, 1, 0, p.height) : 
+                    p.map(progress, 0, 1, p.height, 0);
+                
+                if (useColorMode) {
+                    const colors = Array.isArray(content) ? content : colorPatterns[0];
+                    const gridSize = 20;
+                    for (let y = 0; y < scanLine; y += gridSize) {
+                        for (let x = 0; x < p.width; x += gridSize) {
+                            const colorIndex = p.floor(p.random(colors.length));
+                            p.fill(colors[colorIndex]);
+                            p.noStroke();
+                            p.rect(x, y, gridSize, gridSize);
+                        }
+                    }
+                } else {
+                    p.copy(content, 0, 0, content.width, content.height * (scanLine / p.height), 
+                           0, 0, p.width, scanLine);
+                }
+                
+                // Scan line effect
+                p.stroke(255, 255, 255, 100);
+                p.strokeWeight(3);
+                p.line(0, scanLine, p.width, scanLine);
+            }
+            
+            function drawMosaic(content, progress, isDecay) {
+                p.background(255);
+                const tileSize = 40;
+                const shuffleAmount = isDecay ? progress : 1 - progress;
+                
+                for (let y = 0; y < p.height; y += tileSize) {
+                    for (let x = 0; x < p.width; x += tileSize) {
+                        const offsetX = p.random(-shuffleAmount * 100, shuffleAmount * 100);
+                        const offsetY = p.random(-shuffleAmount * 100, shuffleAmount * 100);
+                        
+                        if (useColorMode) {
+                            const colors = Array.isArray(content) ? content : colorPatterns[0];
+                            const colorIndex = p.floor(p.random(colors.length));
+                            p.fill(colors[colorIndex]);
+                            p.noStroke();
+                            p.rect(x + offsetX, y + offsetY, tileSize, tileSize);
+                        } else {
+                            const srcX = p.constrain(x, 0, content.width - tileSize);
+                            const srcY = p.constrain(y, 0, content.height - tileSize);
+                            p.copy(content, srcX, srcY, tileSize, tileSize, 
+                                   x + offsetX, y + offsetY, tileSize, tileSize);
+                        }
+                    }
+                }
+            }
+            
+            function drawReveal(content, progress, isDecay) {
+                p.background(255);
+                const circleCount = 30;
+                const maxRadius = p.dist(0, 0, p.width, p.height);
+                
+                for (let i = 0; i < circleCount; i++) {
+                    const x = p.random(p.width);
+                    const y = p.random(p.height);
+                    const radius = isDecay ? 
+                        p.map(progress, 0, 1, 0, maxRadius) * p.random(0.5, 1.5) : 
+                        p.map(progress, 0, 1, maxRadius, 0) * p.random(0.5, 1.5);
+                    
+                    p.push();
+                    p.beginClip();
+                    p.circle(x, y, radius);
+                    p.endClip();
+                    
+                    if (useColorMode) {
+                        drawColorPattern(content);
+                    } else {
+                        drawImageFullscreen(content);
+                    }
+                    p.pop();
+                }
+            }
+            
+            function drawGlitch(content) {
+                if (!content) {
+                    p.background(255);
+                    return;
+                }
+                
+                if (useColorMode) {
+                    drawColorPattern(content);
+                    // Add glitch effect for color mode
+                    const colors = Array.isArray(content) ? content : colorPatterns[0];
+                    for (let i = 0; i < 20; i++) {
+                        let x = p.random(p.width);
+                        let y = p.random(p.height);
+                        let w = p.random(p.width * 0.1, p.width * 0.8);
+                        let h = p.random(1, p.height * 0.05);
+                        const colorIndex = p.floor(p.random(colors.length));
+                        p.fill(colors[colorIndex]);
+                        p.noStroke();
+                        p.rect(x, y, w, h);
+                    }
+                } else {
+                    drawImageFullscreen(content);
+                    
+                    for (let i = 0; i < 20; i++) {
+                        let x = p.random(p.width);
+                        let y = p.random(p.height);
+                        let w = p.random(p.width * 0.1, p.width * 0.8);
+                        let h = p.random(1, p.height * 0.05);
+                        let grabX = p.random(p.width);
+                        let grabY = p.random(p.height);
+                        p.copy(content, grabX, grabY, w, h, x, y, w, h);
+                    }
+                }
+            }
+            
+            function drawColorPattern(colors) {
+                if (!colors) return;
+                const colorArray = Array.isArray(colors) ? colors : colorPatterns[0];
+                p.background(255);
+                const gridSize = 40;
+                for (let y = 0; y < p.height; y += gridSize) {
+                    for (let x = 0; x < p.width; x += gridSize) {
+                        const colorIndex = p.floor(p.random(colorArray.length));
+                        p.fill(colorArray[colorIndex]);
+                        p.noStroke();
+                        p.rect(x, y, gridSize, gridSize);
+                    }
+                }
+            }
+            
+            function drawImageFullscreen(img) {
+                if (!img) return;
+                p.imageMode(p.CENTER);
+                const canvasRatio = p.width / p.height;
+                const imageRatio = img.width / img.height;
+                
+                if (canvasRatio > imageRatio) {
+                    p.image(img, p.width / 2, p.height / 2, p.width, p.width / imageRatio);
+                } else {
+                    p.image(img, p.width / 2, p.height / 2, p.height * imageRatio, p.height);
+                }
+            }
+            
+            const handleInteraction = () => {
+                if (animationState === 'display' && !nextImageKey) {
+                    document.getElementById('imagePrompt').classList.add('hidden');
+                    clearTimeout(promptTimer);
+                    
+                    // Randomly select transition effect
+                    transitionType = p.random(transitionEffects);
+                    
+                    if (useColorMode) {
+                        // Color mode - select different color pattern
+                        let newIndex = p.floor(p.random(colorPatterns.length));
+                        const currentIndex = parseInt(currentImageKey.replace('color-', ''));
+                        while (newIndex === currentIndex) {
+                            newIndex = p.floor(p.random(colorPatterns.length));
+                        }
+                        nextImageKey = `color-${newIndex}`;
+                        animationFrame = 0;
+                        animationState = 'decay';
+                    } else {
+                        // Image mode - try to load new image
+                        let newIndex = p.floor(p.random(imageFileNames.length));
+                        while (imageFileNames[newIndex] === currentImageKey) {
+                            newIndex = p.floor(p.random(imageFileNames.length));
+                        }
+                        
+                        loadImageDynamically(imageFileNames[newIndex], (result) => {
+                            if (result.success) {
+                                nextImageKey = result.img.filePath;
+                            } else {
+                                // Switch to color mode
+                                useColorMode = true;
+                                nextImageKey = `color-${p.floor(p.random(colorPatterns.length))}`;
+                            }
+                            animationFrame = 0;
+                            animationState = 'decay';
+                        });
+                    }
+                }
+            };
+            
+            p.mousePressed = handleInteraction;
+            p.touchStarted = (e) => {
+                handleInteraction();
+                return false;
+            };
+            
+            p.windowResized = () => {
+                const container = document.getElementById('imageCanvas-container');
+                p.resizeCanvas(container.offsetWidth, container.offsetHeight);
+            };
+        };
+        
+        new p5(imageMachineSketch);
+        
+        // ==================== SOUND MACHINE ====================
+        let audioContext, analyser, source, buffer;
+        let isPlaying = false;
+        let startTime = 0, pauseTime = 0;
+        let duration = 0, currentTime = 0;
+        let scene, camera, renderer, pillGroups = [];
+        let frequencyData = { low: 0, mid: 0, high: 0 };
+        let pillCount = 1, pillSize = 0.7, spreadWidth = 0;
+        let rotationSpeed = 1, scaleIntensity = 1;
+        let wireframeMode = false, blockMode = false;
+        let audioElement = null; // HTML Audio element for iOS compatibility
+        
+        function initSoundMachine() {
+            const container = document.getElementById('soundCanvas-container');
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xfafafa);
+            
+            camera = new THREE.PerspectiveCamera(
+                75,
+                container.offsetWidth / container.offsetHeight,
+                0.1,
+                100
+            );
+            camera.position.set(0, 0, 5);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.offsetWidth, container.offsetHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+            
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            
+            const mainLight = new THREE.DirectionalLight(0xffffff, 1);
+            mainLight.position.set(5, 5, 5);
+            scene.add(mainLight);
+            
+            createPills();
+            animateSound();
+            
+            window.addEventListener('resize', () => {
+                camera.aspect = container.offsetWidth / container.offsetHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.offsetWidth, container.offsetHeight);
+            });
+        }
+        
+        function createPill() {
+            const pillGroup = new THREE.Group();
+            
+            const whiteMat = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                metalness: 0.3,
+                roughness: 0.4,
+                wireframe: wireframeMode
+            });
+            
+            const blackMat = new THREE.MeshStandardMaterial({
+                color: 0x0a0a0a,
+                metalness: 0.3,
+                roughness: 0.4,
+                wireframe: wireframeMode
+            });
+            
+            if (blockMode) {
+                const topBox = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), whiteMat);
+                topBox.position.y = 0.5;
+                pillGroup.add(topBox);
+                
+                const bottomBox = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), blackMat);
+                bottomBox.position.y = -0.5;
+                pillGroup.add(bottomBox);
+            } else {
+                const topCyl = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 1, 32), whiteMat);
+                topCyl.position.y = 0.5;
+                pillGroup.add(topCyl);
+                
+                const bottomCyl = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 1, 32), blackMat);
+                bottomCyl.position.y = -0.5;
+                pillGroup.add(bottomCyl);
+                
+                const topSphere = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.5, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2),
+                    whiteMat
+                );
+                topSphere.position.y = 1;
+                pillGroup.add(topSphere);
+                
+                const bottomSphere = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.5, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2),
+                    blackMat
+                );
+                bottomSphere.position.y = -1;
+                bottomSphere.rotation.x = Math.PI;
+                pillGroup.add(bottomSphere);
+            }
+            
+            return pillGroup;
+        }
+        
+        function createPills() {
+            pillGroups.forEach(pill => {
+                scene.remove(pill);
+                pill.children.forEach(child => {
+                    if (child.geometry) child.geometry.dispose();
+                    if (child.material) child.material.dispose();
+                });
+            });
+            pillGroups = [];
+            
+            for (let i = 0; i < pillCount; i++) {
+                const pill = createPill();
+                if (pillCount === 1) {
+                    pill.position.set(0, 0, 0);
+                } else {
+                    const angle = (i / pillCount) * Math.PI * 2;
+                    pill.position.set(
+                        Math.cos(angle) * spreadWidth,
+                        0,
+                        Math.sin(angle) * spreadWidth
+                    );
+                }
+                scene.add(pill);
+                pillGroups.push(pill);
+            }
+        }
+        
+        function animateSound() {
+            requestAnimationFrame(animateSound);
+            
+            if (analyser && isPlaying) {
+                const dataArray = new Uint8Array(analyser.frequencyBinCount);
+                analyser.getByteFrequencyData(dataArray);
+                
+                const bufferLength = dataArray.length;
+                const lowEnd = Math.floor(bufferLength * 0.1);
+                const midEnd = Math.floor(bufferLength * 0.5);
+                
+                let low = 0, mid = 0, high = 0;
+                
+                for (let i = 0; i < lowEnd; i++) low += dataArray[i];
+                for (let i = lowEnd; i < midEnd; i++) mid += dataArray[i];
+                for (let i = midEnd; i < bufferLength; i++) high += dataArray[i];
+                
+                low = (low / lowEnd) / 255;
+                mid = (mid / (midEnd - lowEnd)) / 255;
+                high = (high / (bufferLength - midEnd)) / 255;
+                
+                frequencyData = { low, mid, high };
+                updateFrequencyBars();
+                
+                if (audioContext && source) {
+                    const elapsed = audioContext.currentTime - startTime;
+                    currentTime = Math.min(elapsed, duration);
+                    updateTimeDisplay();
+                }
+            }
+            
+            pillGroups.forEach((pillGroup, index) => {
+                const audioReaction = (frequencyData.low + frequencyData.mid + frequencyData.high) / 3;
+                const targetScale = pillSize + audioReaction * 1.0 * scaleIntensity;
+                pillGroup.scale.set(targetScale, targetScale, targetScale);
+                
+                pillGroup.rotation.x += (0.005 + frequencyData.mid * 0.02) * rotationSpeed;
+                pillGroup.rotation.y += (0.003 + frequencyData.low * 0.01) * rotationSpeed;
+                pillGroup.rotation.z += (0.002 + frequencyData.high * 0.015) * rotationSpeed;
+                
+                if (pillCount > 1) {
+                    const angle = (index / pillCount) * Math.PI * 2;
+                    pillGroup.position.x = Math.cos(angle) * spreadWidth;
+                    pillGroup.position.z = Math.sin(angle) * spreadWidth;
+                }
+            });
+            
+            renderer.render(scene, camera);
+        }
+        
+        function updateFrequencyBars() {
+            const freqTypes = ['low', 'mid', 'high'];
+            freqTypes.forEach(type => {
+                const bars = document.querySelectorAll(`#${type}Freq .freq-bar`);
+                const value = frequencyData[type.replace('Freq', '')];
+                bars.forEach((bar, index) => {
+                    if (value > index / 10) {
+                        bar.classList.add('active');
+                    } else {
+                        bar.classList.remove('active');
+                    }
+                });
+            });
+        }
+        
+        function updateTimeDisplay() {
+            document.getElementById('currentTime').textContent = formatTime(currentTime);
+            document.getElementById('duration').textContent = formatTime(duration);
+            const progress = (currentTime / duration) * 100;
+            document.getElementById('seekBarProgress').style.width = `${progress}%`;
+        }
+        
+        function formatTime(sec) {
+            if (isNaN(sec)) return '0:00';
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60);
+            return `${m}:${s.toString().padStart(2, '0')}`;
+        }
+        
+        // Audio file handling
+        document.getElementById('audioFile').addEventListener('change', handleAudioFile);
+        document.getElementById('audioFileSelect').addEventListener('change', handleAudioFile);
+        
+        async function handleAudioFile(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            // Stop any existing playback
+            if (audioElement) {
+                audioElement.pause();
+                audioElement.src = '';
+            }
+            if (source && source.stop) {
+                try {
+                    source.stop();
+                    source.disconnect();
+                } catch (err) {}
+                source = null;
+            }
+            
+            isPlaying = false;
+            pauseTime = 0;
+            currentTime = 0;
+            
+            try {
+                // Create audio element for iOS compatibility
+                if (!audioElement) {
+                    audioElement = new Audio();
+                    audioElement.crossOrigin = 'anonymous';
+                }
+                
+                // Create object URL for the file
+                const objectURL = URL.createObjectURL(file);
+                audioElement.src = objectURL;
+                
+                // Initialize Web Audio API
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                
+                // Resume audio context (required for iOS)
+                if (audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                }
+                
+                // Create analyser
+                if (!analyser) {
+                    analyser = audioContext.createAnalyser();
+                    analyser.fftSize = 1024;
+                    analyser.smoothingTimeConstant = 0.8;
+                    analyser.connect(audioContext.destination);
+                }
+                
+                // Connect audio element to analyser
+                if (!source || source.mediaElement !== audioElement) {
+                    source = audioContext.createMediaElementSource(audioElement);
+                    source.connect(analyser);
+                }
+                
+                // Wait for metadata to load
+                await new Promise((resolve, reject) => {
+                    audioElement.onloadedmetadata = resolve;
+                    audioElement.onerror = reject;
+                });
+                
+                duration = audioElement.duration;
+                
+                // Update time during playback
+                audioElement.ontimeupdate = () => {
+                    currentTime = audioElement.currentTime;
+                    updateTimeDisplay();
+                };
+                
+                audioElement.onended = () => {
+                    isPlaying = false;
+                    pauseTime = 0;
+                    currentTime = 0;
+                    document.getElementById('playBtn').disabled = false;
+                    document.getElementById('pauseBtn').disabled = true;
+                    updateTimeDisplay();
+                };
+                
+                document.getElementById('dropZone').style.display = 'none';
+                document.getElementById('audioPlayer').style.display = 'block';
+                document.getElementById('playBtn').disabled = false;
+                updateTimeDisplay();
+            } catch (error) {
+                console.error('Audio loading error:', error);
+                alert('Error loading audio file. Please try a different file format (MP3 or WAV recommended).');
+            }
+        }
+        
+        document.getElementById('playBtn').addEventListener('click', async () => {
+            if (!audioElement) return;
+            
+            try {
+                if (audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                }
+                
+                await audioElement.play();
+                
+                isPlaying = true;
+                document.getElementById('playBtn').disabled = true;
+                document.getElementById('pauseBtn').disabled = false;
+            } catch (error) {
+                console.error('Playback error:', error);
+                alert('Playback error. Please try again.');
+            }
+        });
+        
+        document.getElementById('pauseBtn').addEventListener('click', () => {
+            if (audioElement) {
+                audioElement.pause();
+            }
+            isPlaying = false;
+            document.getElementById('playBtn').disabled = false;
+            document.getElementById('pauseBtn').disabled = true;
+        });
+        
+        // Seek bar functionality
+        document.getElementById('seekBar').addEventListener('click', (e) => {
+            if (!audioElement) return;
+            
+            const rect = e.target.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            const newTime = percent * duration;
+            
+            audioElement.currentTime = newTime;
+            currentTime = newTime;
+            updateTimeDisplay();
+        });
+        
+        // Settings panel
+        document.getElementById('settingsBtn').addEventListener('click', () => {
+            document.getElementById('settingsPanel').classList.toggle('open');
+        });
+        
+        document.getElementById('pillCount').addEventListener('input', (e) => {
+            pillCount = parseInt(e.target.value);
+            document.getElementById('pillCountVal').textContent = pillCount;
+            createPills();
+        });
+        
+        document.getElementById('pillSize').addEventListener('input', (e) => {
+            pillSize = parseFloat(e.target.value);
+            document.getElementById('pillSizeVal').textContent = pillSize.toFixed(1);
+        });
+        
+        document.getElementById('spread').addEventListener('input', (e) => {
+            spreadWidth = parseFloat(e.target.value);
+            document.getElementById('spreadVal').textContent = spreadWidth.toFixed(1);
+            createPills();
+        });
+        
+        document.getElementById('rotation').addEventListener('input', (e) => {
+            rotationSpeed = parseFloat(e.target.value);
+            document.getElementById('rotationVal').textContent = rotationSpeed.toFixed(1);
+        });
+        
+        document.getElementById('scale').addEventListener('input', (e) => {
+            scaleIntensity = parseFloat(e.target.value);
+            document.getElementById('scaleVal').textContent = scaleIntensity.toFixed(1);
+        });
+        
+        document.getElementById('wireframe').addEventListener('change', (e) => {
+            wireframeMode = e.target.checked;
+            createPills();
+        });
+        
+        document.getElementById('blockMode').addEventListener('change', (e) => {
+            blockMode = e.target.checked;
+            createPills();
+        });
+        
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            pillCount = 1;
+            pillSize = 0.7;
+            spreadWidth = 0;
+            rotationSpeed = 1;
+            scaleIntensity = 1;
+            wireframeMode = false;
+            blockMode = false;
+            
+            document.getElementById('pillCount').value = 1;
+            document.getElementById('pillSize').value = 0.7;
+            document.getElementById('spread').value = 0;
+            document.getElementById('rotation').value = 1;
+            document.getElementById('scale').value = 1;
+            document.getElementById('wireframe').checked = false;
+            document.getElementById('blockMode').checked = false;
+            
+            document.getElementById('pillCountVal').textContent = '1';
+            document.getElementById('pillSizeVal').textContent = '0.7';
+            document.getElementById('spreadVal').textContent = '0.0';
+            document.getElementById('rotationVal').textContent = '1.0';
+            document.getElementById('scaleVal').textContent = '1.0';
+            
+            createPills();
+        });
+        
+        initSoundMachine();
+        
+        // ==================== Smooth Scroll ====================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
