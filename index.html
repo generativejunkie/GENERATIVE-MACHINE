@@ -1022,6 +1022,20 @@
             let imageLoadAttempts = 0;
             const maxLoadAttempts = 3;
             
+            // Available transition effects
+            const transitionEffects = [
+                'blocks',
+                'slide',
+                'pixelate',
+                'wave',
+                'spiral',
+                'zoom',
+                'rgb-split',
+                'scan',
+                'mosaic',
+                'reveal'
+            ];
+            
             p.setup = () => {
                 const container = document.getElementById('imageCanvas-container');
                 p.createCanvas(container.offsetWidth, container.offsetHeight).parent(container);
@@ -1157,6 +1171,30 @@
                     case 'slide':
                         drawSlide(content, progress, isDecay);
                         break;
+                    case 'pixelate':
+                        drawPixelate(content, progress, isDecay);
+                        break;
+                    case 'wave':
+                        drawWave(content, progress, isDecay);
+                        break;
+                    case 'spiral':
+                        drawSpiral(content, progress, isDecay);
+                        break;
+                    case 'zoom':
+                        drawZoom(content, progress, isDecay);
+                        break;
+                    case 'rgb-split':
+                        drawRGBSplit(content, progress, isDecay);
+                        break;
+                    case 'scan':
+                        drawScan(content, progress, isDecay);
+                        break;
+                    case 'mosaic':
+                        drawMosaic(content, progress, isDecay);
+                        break;
+                    case 'reveal':
+                        drawReveal(content, progress, isDecay);
+                        break;
                 }
             }
             
@@ -1222,6 +1260,220 @@
                         let dx = p.random(-slideAmount, slideAmount);
                         p.copy(content, sx, y, content.width, sliceHeight, dx, y, p.width, sliceHeight);
                     }
+                }
+            }
+            
+            function drawPixelate(content, progress, isDecay) {
+                p.background(255);
+                const pixelSize = isDecay ? 
+                    p.map(progress, 0, 1, 1, 50) : 
+                    p.map(progress, 0, 1, 50, 1);
+                
+                if (useColorMode) {
+                    const colors = Array.isArray(content) ? content : colorPatterns[0];
+                    for (let y = 0; y < p.height; y += pixelSize) {
+                        for (let x = 0; x < p.width; x += pixelSize) {
+                            const colorIndex = p.floor(p.random(colors.length));
+                            p.fill(colors[colorIndex]);
+                            p.noStroke();
+                            p.rect(x, y, pixelSize, pixelSize);
+                        }
+                    }
+                } else {
+                    for (let y = 0; y < p.height; y += pixelSize) {
+                        for (let x = 0; x < p.width; x += pixelSize) {
+                            let c = content.get(p.floor(x), p.floor(y));
+                            p.fill(c);
+                            p.noStroke();
+                            p.rect(x, y, pixelSize, pixelSize);
+                        }
+                    }
+                }
+            }
+            
+            function drawWave(content, progress, isDecay) {
+                p.background(255);
+                const amplitude = isDecay ? 
+                    p.map(progress, 0, 1, 0, 100) : 
+                    p.map(progress, 0, 1, 100, 0);
+                
+                if (useColorMode) {
+                    const colors = Array.isArray(content) ? content : colorPatterns[0];
+                    for (let y = 0; y < p.height; y += 2) {
+                        const offset = p.sin(y * 0.05 + p.frameCount * 0.1) * amplitude;
+                        const colorIndex = p.floor(p.random(colors.length));
+                        p.stroke(colors[colorIndex]);
+                        p.line(0, y, p.width, y + offset);
+                    }
+                } else {
+                    for (let y = 0; y < p.height; y += 2) {
+                        const offset = p.sin(y * 0.05 + p.frameCount * 0.1) * amplitude;
+                        p.copy(content, 0, y, content.width, 2, offset, y, p.width, 2);
+                    }
+                }
+            }
+            
+            function drawSpiral(content, progress, isDecay) {
+                p.background(255);
+                const maxRadius = p.dist(0, 0, p.width / 2, p.height / 2);
+                const currentRadius = isDecay ? 
+                    p.map(progress, 0, 1, maxRadius, 0) : 
+                    p.map(progress, 0, 1, 0, maxRadius);
+                
+                const centerX = p.width / 2;
+                const centerY = p.height / 2;
+                const segments = 200;
+                
+                for (let i = 0; i < segments; i++) {
+                    const angle = (i / segments) * p.TWO_PI * 8;
+                    const radius = (i / segments) * currentRadius;
+                    const x = centerX + p.cos(angle) * radius;
+                    const y = centerY + p.sin(angle) * radius;
+                    const size = 10;
+                    
+                    if (x >= 0 && x < p.width && y >= 0 && y < p.height) {
+                        if (useColorMode) {
+                            const colors = Array.isArray(content) ? content : colorPatterns[0];
+                            const colorIndex = p.floor(p.random(colors.length));
+                            p.fill(colors[colorIndex]);
+                        } else {
+                            let c = content.get(p.floor(x), p.floor(y));
+                            p.fill(c);
+                        }
+                        p.noStroke();
+                        p.ellipse(x, y, size, size);
+                    }
+                }
+            }
+            
+            function drawZoom(content, progress, isDecay) {
+                p.background(255);
+                const scale = isDecay ? 
+                    p.map(progress, 0, 1, 1, 2.5) : 
+                    p.map(progress, 0, 1, 2.5, 1);
+                const opacity = isDecay ? 
+                    p.map(progress, 0, 1, 255, 0) : 
+                    p.map(progress, 0, 1, 0, 255);
+                
+                p.push();
+                p.translate(p.width / 2, p.height / 2);
+                p.scale(scale);
+                p.translate(-p.width / 2, -p.height / 2);
+                p.tint(255, opacity);
+                
+                if (useColorMode) {
+                    drawColorPattern(content);
+                } else {
+                    drawImageFullscreen(content);
+                }
+                p.pop();
+            }
+            
+            function drawRGBSplit(content, progress, isDecay) {
+                p.background(255);
+                const offset = isDecay ? 
+                    p.map(progress, 0, 1, 0, 50) : 
+                    p.map(progress, 0, 1, 50, 0);
+                
+                if (!useColorMode && content) {
+                    p.blendMode(p.SCREEN);
+                    
+                    // Red channel
+                    p.tint(255, 0, 0);
+                    p.image(content, p.width / 2 - offset, p.height / 2, p.height * (content.width / content.height), p.height);
+                    
+                    // Green channel
+                    p.tint(0, 255, 0);
+                    p.image(content, p.width / 2, p.height / 2, p.height * (content.width / content.height), p.height);
+                    
+                    // Blue channel
+                    p.tint(0, 0, 255);
+                    p.image(content, p.width / 2 + offset, p.height / 2, p.height * (content.width / content.height), p.height);
+                    
+                    p.blendMode(p.BLEND);
+                    p.noTint();
+                } else {
+                    drawColorPattern(content);
+                }
+            }
+            
+            function drawScan(content, progress, isDecay) {
+                p.background(255);
+                const scanLine = isDecay ? 
+                    p.map(progress, 0, 1, 0, p.height) : 
+                    p.map(progress, 0, 1, p.height, 0);
+                
+                if (useColorMode) {
+                    const colors = Array.isArray(content) ? content : colorPatterns[0];
+                    const gridSize = 20;
+                    for (let y = 0; y < scanLine; y += gridSize) {
+                        for (let x = 0; x < p.width; x += gridSize) {
+                            const colorIndex = p.floor(p.random(colors.length));
+                            p.fill(colors[colorIndex]);
+                            p.noStroke();
+                            p.rect(x, y, gridSize, gridSize);
+                        }
+                    }
+                } else {
+                    p.copy(content, 0, 0, content.width, content.height * (scanLine / p.height), 
+                           0, 0, p.width, scanLine);
+                }
+                
+                // Scan line effect
+                p.stroke(255, 255, 255, 100);
+                p.strokeWeight(3);
+                p.line(0, scanLine, p.width, scanLine);
+            }
+            
+            function drawMosaic(content, progress, isDecay) {
+                p.background(255);
+                const tileSize = 40;
+                const shuffleAmount = isDecay ? progress : 1 - progress;
+                
+                for (let y = 0; y < p.height; y += tileSize) {
+                    for (let x = 0; x < p.width; x += tileSize) {
+                        const offsetX = p.random(-shuffleAmount * 100, shuffleAmount * 100);
+                        const offsetY = p.random(-shuffleAmount * 100, shuffleAmount * 100);
+                        
+                        if (useColorMode) {
+                            const colors = Array.isArray(content) ? content : colorPatterns[0];
+                            const colorIndex = p.floor(p.random(colors.length));
+                            p.fill(colors[colorIndex]);
+                            p.noStroke();
+                            p.rect(x + offsetX, y + offsetY, tileSize, tileSize);
+                        } else {
+                            const srcX = p.constrain(x, 0, content.width - tileSize);
+                            const srcY = p.constrain(y, 0, content.height - tileSize);
+                            p.copy(content, srcX, srcY, tileSize, tileSize, 
+                                   x + offsetX, y + offsetY, tileSize, tileSize);
+                        }
+                    }
+                }
+            }
+            
+            function drawReveal(content, progress, isDecay) {
+                p.background(255);
+                const circleCount = 30;
+                const maxRadius = p.dist(0, 0, p.width, p.height);
+                
+                for (let i = 0; i < circleCount; i++) {
+                    const x = p.random(p.width);
+                    const y = p.random(p.height);
+                    const radius = isDecay ? 
+                        p.map(progress, 0, 1, 0, maxRadius) * p.random(0.5, 1.5) : 
+                        p.map(progress, 0, 1, maxRadius, 0) * p.random(0.5, 1.5);
+                    
+                    p.push();
+                    p.beginClip();
+                    p.circle(x, y, radius);
+                    p.endClip();
+                    
+                    if (useColorMode) {
+                        drawColorPattern(content);
+                    } else {
+                        drawImageFullscreen(content);
+                    }
+                    p.pop();
                 }
             }
             
@@ -1293,7 +1545,8 @@
                     document.getElementById('imagePrompt').classList.add('hidden');
                     clearTimeout(promptTimer);
                     
-                    transitionType = p.random(['blocks', 'slide']);
+                    // Randomly select transition effect
+                    transitionType = p.random(transitionEffects);
                     
                     if (useColorMode) {
                         // Color mode - select different color pattern
