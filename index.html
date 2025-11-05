@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="description" content="GENERATIVE JUNKIE - Interactive Generative Art Experience">
-    <title>GENERATIVE JUNKIE</title>
+    <meta name="description" content="GENERATIVE MACHINE - Interactive Generative Art Experience">
+    <title>GENERATIVE MACHINE</title>
     
     <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
@@ -68,35 +68,6 @@
             color: var(--color-text-primary);
             background-color: var(--color-bg-primary);
             overflow-x: hidden;
-        }
-        
-        body, a, button, label, input {
-            cursor: none;
-        }
-        
-        /* ==================== Custom Cursor ==================== */
-        #custom-cursor {
-            position: fixed;
-            width: 24px;
-            height: 24px;
-            background-color: transparent;
-            border: 1px solid var(--color-accent);
-            border-radius: 50%;
-            z-index: 9999;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            transition: transform 0.2s ease-out, background-color 0.2s ease-out;
-            mix-blend-mode: difference;
-        }
-        
-        #custom-cursor.cursor-hover {
-            background-color: var(--color-accent);
-            transform: translate(-50%, -50%) scale(0.6);
-        }
-        
-        @media (pointer: coarse) {
-            #custom-cursor { display: none; }
-            body, a, button, label, input { cursor: auto; }
         }
         
         /* ==================== Typography ==================== */
@@ -671,9 +642,6 @@
     </style>
 </head>
 <body>
-    <!-- Custom Cursor -->
-    <div id="custom-cursor"></div>
-    
     <!-- Skip Link -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
     
@@ -695,8 +663,7 @@
         <!-- Hero -->
         <section id="hero" class="hero">
             <div class="hero-content">
-                <h1 class="hero-title">GENERATIVE JUNKIE</h1>
-                <p class="hero-subtitle">Creative Machines for Digital Artists</p>
+                <h1 class="hero-title">GENERATIVE MACHINE</h1>
                 <p class="hero-description"><span id="description-text" class="typing-text"></span></p>
             </div>
         </section>
@@ -779,7 +746,7 @@
                     <div id="soundCanvas-container"></div>
                     <div id="dropZone" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none;">
                         <label style="pointer-events: auto; cursor: pointer;">
-                            <input type="file" id="audioFile" accept="audio/*" style="display: none;">
+                            <input type="file" id="audioFile" accept="audio/mp3,audio/mpeg,audio/wav,audio/m4a,audio/aac,audio/*" style="display: none;">
                             <div style="text-align: center; padding: var(--space-xl); background: rgba(255, 255, 255, 0.5); border-radius: 4px; border: 2px dashed var(--color-border);">
                                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto var(--space-md);">
                                     <path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
@@ -798,7 +765,7 @@
                                 <button class="btn btn-primary" id="playBtn">Play</button>
                                 <button class="btn" id="pauseBtn" disabled>Pause</button>
                                 <label style="cursor: pointer;">
-                                    <input type="file" id="audioFileSelect" accept="audio/*" style="display: none;">
+                                    <input type="file" id="audioFileSelect" accept="audio/mp3,audio/mpeg,audio/wav,audio/m4a,audio/aac,audio/*" style="display: none;">
                                     <button type="button" class="btn" onclick="document.getElementById('audioFileSelect').click()">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
@@ -906,7 +873,7 @@
                 <div style="max-width: 900px; margin: 0 auto;">
                     <div style="margin-bottom: var(--space-xl);">
                         <h3 style="font-size: var(--font-size-lg); font-weight: 400; margin-bottom: var(--space-md); text-align: center;">
-                            Philosophy
+                            Manifesto
                         </h3>
                         <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
                             GENERATIVE JUNKIE is a generative art brand that explores algorithmic beauty and the emotional resonance of machine intelligence, driven by the philosophy of prompt engineering as an art form.
@@ -927,7 +894,7 @@
                     
                     <div style="border-top: 1px solid var(--color-border); padding-top: var(--space-xl);">
                         <h3 style="font-size: var(--font-size-lg); font-weight: 400; margin-bottom: var(--space-md); text-align: center; font-family: var(--font-family-mono);">
-                            哲学
+                            マニフェスト
                         </h3>
                         <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
                             GENERATIVE JUNKIE (ジェネレイティブ・ジャンキー)は、AIが生み出す「アルゴリズム的な美」と「機械の知性が帯びる感情」をテーマに、プロンプトエンジニアリングを新たなアートフォームとして探求するジェネラティブ・アートブランドです。
@@ -1019,20 +986,6 @@
             typingObserver.observe(imageDescEl);
             typingObserver.observe(soundDescEl);
             typingObserver.observe(storeDescEl);
-        });
-        
-        // ==================== Custom Cursor ====================
-        const cursor = document.getElementById('custom-cursor');
-        const interactiveElements = document.querySelectorAll('a, button, label, input, canvas');
-        
-        window.addEventListener('mousemove', (e) => {
-            cursor.style.left = `${e.clientX}px`;
-            cursor.style.top = `${e.clientY}px`;
-        });
-        
-        interactiveElements.forEach(el => {
-            el.addEventListener('mouseover', () => cursor.classList.add('cursor-hover'));
-            el.addEventListener('mouseout', () => cursor.classList.remove('cursor-hover'));
         });
         
         // ==================== IMAGE MACHINE ====================
@@ -1398,6 +1351,7 @@
         let pillCount = 1, pillSize = 0.7, spreadWidth = 0;
         let rotationSpeed = 1, scaleIntensity = 1;
         let wireframeMode = false, blockMode = false;
+        let audioElement = null; // HTML Audio element for iOS compatibility
         
         function initSoundMachine() {
             const container = document.getElementById('soundCanvas-container');
@@ -1602,7 +1556,12 @@
             const file = e.target.files[0];
             if (!file) return;
             
-            if (source) {
+            // Stop any existing playback
+            if (audioElement) {
+                audioElement.pause();
+                audioElement.src = '';
+            }
+            if (source && source.stop) {
                 try {
                     source.stop();
                     source.disconnect();
@@ -1615,18 +1574,27 @@
             currentTime = 0;
             
             try {
+                // Create audio element for iOS compatibility
+                if (!audioElement) {
+                    audioElement = new Audio();
+                    audioElement.crossOrigin = 'anonymous';
+                }
+                
+                // Create object URL for the file
+                const objectURL = URL.createObjectURL(file);
+                audioElement.src = objectURL;
+                
+                // Initialize Web Audio API
                 if (!audioContext) {
                     audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 }
                 
-                if (audioContext.state !== 'running') {
+                // Resume audio context (required for iOS)
+                if (audioContext.state === 'suspended') {
                     await audioContext.resume();
                 }
                 
-                const arrayBuffer = await file.arrayBuffer();
-                buffer = await audioContext.decodeAudioData(arrayBuffer);
-                duration = buffer.duration;
-                
+                // Create analyser
                 if (!analyser) {
                     analyser = audioContext.createAnalyser();
                     analyser.fftSize = 1024;
@@ -1634,32 +1602,27 @@
                     analyser.connect(audioContext.destination);
                 }
                 
-                document.getElementById('dropZone').style.display = 'none';
-                document.getElementById('audioPlayer').style.display = 'block';
-                document.getElementById('playBtn').disabled = false;
-                updateTimeDisplay();
-            } catch (error) {
-                alert('Error: ' + error.message);
-            }
-        }
-        
-        document.getElementById('playBtn').addEventListener('click', async () => {
-            if (!audioContext || !buffer) return;
-            
-            try {
-                if (audioContext.state !== 'running') {
-                    await audioContext.resume();
+                // Connect audio element to analyser
+                if (!source || source.mediaElement !== audioElement) {
+                    source = audioContext.createMediaElementSource(audioElement);
+                    source.connect(analyser);
                 }
                 
-                source = audioContext.createBufferSource();
-                source.buffer = buffer;
-                source.connect(analyser);
+                // Wait for metadata to load
+                await new Promise((resolve, reject) => {
+                    audioElement.onloadedmetadata = resolve;
+                    audioElement.onerror = reject;
+                });
                 
-                const offset = pauseTime || 0;
-                startTime = audioContext.currentTime - offset;
-                source.start(0, offset);
+                duration = audioElement.duration;
                 
-                source.onended = () => {
+                // Update time during playback
+                audioElement.ontimeupdate = () => {
+                    currentTime = audioElement.currentTime;
+                    updateTimeDisplay();
+                };
+                
+                audioElement.onended = () => {
                     isPlaying = false;
                     pauseTime = 0;
                     currentTime = 0;
@@ -1668,21 +1631,39 @@
                     updateTimeDisplay();
                 };
                 
+                document.getElementById('dropZone').style.display = 'none';
+                document.getElementById('audioPlayer').style.display = 'block';
+                document.getElementById('playBtn').disabled = false;
+                updateTimeDisplay();
+            } catch (error) {
+                console.error('Audio loading error:', error);
+                alert('Error loading audio file. Please try a different file format (MP3 or WAV recommended).');
+            }
+        }
+        
+        document.getElementById('playBtn').addEventListener('click', async () => {
+            if (!audioElement) return;
+            
+            try {
+                if (audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                }
+                
+                await audioElement.play();
+                
                 isPlaying = true;
                 document.getElementById('playBtn').disabled = true;
                 document.getElementById('pauseBtn').disabled = false;
             } catch (error) {
-                alert('Playback error: ' + error.message);
+                console.error('Playback error:', error);
+                alert('Playback error. Please try again.');
             }
         });
         
         document.getElementById('pauseBtn').addEventListener('click', () => {
-            if (source) {
-                try {
-                    source.stop();
-                } catch (err) {}
+            if (audioElement) {
+                audioElement.pause();
             }
-            pauseTime = audioContext.currentTime - startTime;
             isPlaying = false;
             document.getElementById('playBtn').disabled = false;
             document.getElementById('pauseBtn').disabled = true;
@@ -1690,30 +1671,15 @@
         
         // Seek bar functionality
         document.getElementById('seekBar').addEventListener('click', (e) => {
-            if (!buffer) return;
+            if (!audioElement) return;
             
             const rect = e.target.getBoundingClientRect();
             const percent = (e.clientX - rect.left) / rect.width;
             const newTime = percent * duration;
             
-            if (isPlaying) {
-                if (source) {
-                    try {
-                        source.stop();
-                    } catch (err) {}
-                }
-                
-                source = audioContext.createBufferSource();
-                source.buffer = buffer;
-                source.connect(analyser);
-                startTime = audioContext.currentTime - newTime;
-                source.start(0, newTime);
-                pauseTime = 0;
-            } else {
-                pauseTime = newTime;
-                currentTime = newTime;
-                updateTimeDisplay();
-            }
+            audioElement.currentTime = newTime;
+            currentTime = newTime;
+            updateTimeDisplay();
         });
         
         // Settings panel
