@@ -67,6 +67,8 @@
             line-height: 1.6;
             color: var(--color-text-primary);
             background-color: var(--color-bg-primary);
+            min-height: 100vh;
+            position: relative;
         }
         
         /* ==================== Typography ==================== */
@@ -219,6 +221,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            touch-action: pan-y;
         }
         
         .section:nth-child(even) {
@@ -277,6 +280,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            touch-action: none;
+        }
+        
+        #imageCanvas-container canvas,
+        #soundCanvas-container canvas {
+            touch-action: none;
         }
         
         .canvas-prompt {
@@ -1603,8 +1612,13 @@
             
             p.mousePressed = handleInteraction;
             p.touchStarted = (e) => {
-                handleInteraction();
-                return false;
+                // Check if touch is on canvas
+                const canvas = document.querySelector('#imageCanvas-container canvas');
+                if (canvas && e.target === canvas) {
+                    handleInteraction();
+                    return false; // Prevent default only on canvas
+                }
+                return true; // Allow default behavior for other elements
             };
             
             p.windowResized = () => {
