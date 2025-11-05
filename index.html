@@ -1042,91 +1042,104 @@
             ];
             
             p.setup = () => {
-                const container = document.getElementById('imageCanvas-container');
-                p.createCanvas(container.offsetWidth, container.offsetHeight).parent(container);
-                p.background(255);
-                
-                // Try to load initial image, fallback to color mode
-                const initialIndex = p.floor(p.random(imageFileNames.length));
-                loadImageDynamically(imageFileNames[initialIndex], (result) => {
-                    if (result.success) {
-                        currentImageKey = result.img.filePath;
-                        useColorMode = false;
-                    } else {
-                        // Use color pattern fallback
-                        useColorMode = true;
-                        currentImageKey = `color-${p.floor(p.random(colorPatterns.length))}`;
-                    }
+                try {
+                    const container = document.getElementById('imageCanvas-container');
+                    p.createCanvas(container.offsetWidth, container.offsetHeight).parent(container);
+                    p.background(255);
+                    
+                    // Try to load initial image, fallback to color mode
+                    const initialIndex = p.floor(p.random(imageFileNames.length));
+                    loadImageDynamically(imageFileNames[initialIndex], (result) => {
+                        if (result.success) {
+                            currentImageKey = result.img.filePath;
+                            useColorMode = false;
+                        } else {
+                            // Use color pattern fallback
+                            useColorMode = true;
+                            currentImageKey = `color-${p.floor(p.random(colorPatterns.length))}`;
+                        }
+                        animationState = 'display';
+                        document.getElementById('imagePrompt').classList.remove('hidden');
+                        promptTimer = setTimeout(() => {
+                            document.getElementById('imagePrompt').classList.add('hidden');
+                        }, 3000);
+                    });
+                } catch (error) {
+                    console.error('Setup error:', error);
+                    // Fallback to color mode
+                    useColorMode = true;
+                    currentImageKey = `color-0`;
                     animationState = 'display';
-                    document.getElementById('imagePrompt').classList.remove('hidden');
-                    promptTimer = setTimeout(() => {
-                        document.getElementById('imagePrompt').classList.add('hidden');
-                    }, 3000);
-                });
+                }
             };
             
             p.draw = () => {
-                if (!currentImageKey) {
-                    p.background(255);
-                    return;
-                }
-                
-                const currentContent = useColorMode ? 
-                    getColorPattern(currentImageKey) : 
-                    allImages[currentImageKey];
+                try {
+                    if (!currentImageKey) {
+                        p.background(255);
+                        return;
+                    }
                     
-                const nextContent = useColorMode ?
-                    getColorPattern(nextImageKey) :
-                    allImages[nextImageKey];
-                
-                if (!currentContent && !useColorMode) {
+                    const currentContent = useColorMode ? 
+                        getColorPattern(currentImageKey) : 
+                        allImages[currentImageKey];
+                        
+                    const nextContent = useColorMode ?
+                        getColorPattern(nextImageKey) :
+                        allImages[nextImageKey];
+                    
+                    if (!currentContent && !useColorMode) {
+                        p.background(255);
+                        return;
+                    }
+                    
+                    switch(animationState) {
+                        case 'decay':
+                            runTransition(currentContent, animationFrame / transitionDuration, true);
+                            animationFrame++;
+                            if (animationFrame > transitionDuration) {
+                                animationFrame = 0;
+                                animationState = 'chaos';
+                            }
+                            break;
+                            
+                        case 'chaos':
+                            drawGlitch(nextContent);
+                            animationFrame++;
+                            if (animationFrame > chaosDuration) {
+                                animationFrame = 0;
+                                animationState = 'rebuild';
+                                currentImageKey = nextImageKey;
+                                nextImageKey = null;
+                            }
+                            break;
+                            
+                        case 'rebuild':
+                            const rebuildContent = useColorMode ? 
+                                getColorPattern(currentImageKey) : 
+                                allImages[currentImageKey];
+                            runTransition(rebuildContent, animationFrame / transitionDuration, false);
+                            animationFrame++;
+                            if (animationFrame > transitionDuration) {
+                                animationFrame = 0;
+                                animationState = 'display';
+                                promptTimer = setTimeout(() => {
+                                    document.getElementById('imagePrompt').classList.remove('hidden');
+                                }, 5000);
+                            }
+                            break;
+                            
+                        default:
+                            if (useColorMode) {
+                                drawColorPattern(currentContent);
+                            } else {
+                                drawImageFullscreen(currentContent);
+                            }
+                            break;
+                    }
+                } catch (error) {
+                    console.error('Draw error:', error);
                     p.background(255);
-                    return;
-                }
-                
-                switch(animationState) {
-                    case 'decay':
-                        runTransition(currentContent, animationFrame / transitionDuration, true);
-                        animationFrame++;
-                        if (animationFrame > transitionDuration) {
-                            animationFrame = 0;
-                            animationState = 'chaos';
-                        }
-                        break;
-                        
-                    case 'chaos':
-                        drawGlitch(nextContent);
-                        animationFrame++;
-                        if (animationFrame > chaosDuration) {
-                            animationFrame = 0;
-                            animationState = 'rebuild';
-                            currentImageKey = nextImageKey;
-                            nextImageKey = null;
-                        }
-                        break;
-                        
-                    case 'rebuild':
-                        const rebuildContent = useColorMode ? 
-                            getColorPattern(currentImageKey) : 
-                            allImages[currentImageKey];
-                        runTransition(rebuildContent, animationFrame / transitionDuration, false);
-                        animationFrame++;
-                        if (animationFrame > transitionDuration) {
-                            animationFrame = 0;
-                            animationState = 'display';
-                            promptTimer = setTimeout(() => {
-                                document.getElementById('imagePrompt').classList.remove('hidden');
-                            }, 5000);
-                        }
-                        break;
-                        
-                    default:
-                        if (useColorMode) {
-                            drawColorPattern(currentContent);
-                        } else {
-                            drawImageFullscreen(currentContent);
-                        }
-                        break;
                 }
             };
             
@@ -1377,26 +1390,36 @@
             function drawRGBSplit(content, progress, isDecay) {
                 p.background(255);
                 const offset = isDecay ? 
-                    p.map(progress, 0, 1, 0, 50) : 
-                    p.map(progress, 0, 1, 50, 0);
+                    p.map(progress, 0, 1, 0, 30) : 
+                    p.map(progress, 0, 1, 30, 0);
                 
                 if (!useColorMode && content) {
-                    p.blendMode(p.SCREEN);
+                    // Draw three times with offset
+                    p.push();
+                    p.imageMode(p.CENTER);
+                    const canvasRatio = p.width / p.height;
+                    const imageRatio = content.width / content.height;
+                    let w, h;
                     
-                    // Red channel
-                    p.tint(255, 0, 0);
-                    p.image(content, p.width / 2 - offset, p.height / 2, p.height * (content.width / content.height), p.height);
+                    if (canvasRatio > imageRatio) {
+                        w = p.width;
+                        h = p.width / imageRatio;
+                    } else {
+                        w = p.height * imageRatio;
+                        h = p.height;
+                    }
                     
-                    // Green channel
-                    p.tint(0, 255, 0);
-                    p.image(content, p.width / 2, p.height / 2, p.height * (content.width / content.height), p.height);
+                    p.tint(255, 0, 0, 150);
+                    p.image(content, p.width / 2 - offset, p.height / 2, w, h);
                     
-                    // Blue channel
-                    p.tint(0, 0, 255);
-                    p.image(content, p.width / 2 + offset, p.height / 2, p.height * (content.width / content.height), p.height);
+                    p.tint(0, 255, 0, 150);
+                    p.image(content, p.width / 2, p.height / 2, w, h);
                     
-                    p.blendMode(p.BLEND);
+                    p.tint(0, 0, 255, 150);
+                    p.image(content, p.width / 2 + offset, p.height / 2, w, h);
+                    
                     p.noTint();
+                    p.pop();
                 } else {
                     drawColorPattern(content);
                 }
@@ -1461,24 +1484,23 @@
                 const circleCount = 30;
                 const maxRadius = p.dist(0, 0, p.width, p.height);
                 
+                if (useColorMode) {
+                    drawColorPattern(content);
+                } else {
+                    drawImageFullscreen(content);
+                }
+                
+                // Draw reveal circles
                 for (let i = 0; i < circleCount; i++) {
                     const x = p.random(p.width);
                     const y = p.random(p.height);
                     const radius = isDecay ? 
-                        p.map(progress, 0, 1, 0, maxRadius) * p.random(0.5, 1.5) : 
-                        p.map(progress, 0, 1, maxRadius, 0) * p.random(0.5, 1.5);
+                        p.map(progress, 0, 1, maxRadius, 0) * p.random(0.5, 1.5) : 
+                        p.map(progress, 0, 1, 0, maxRadius) * p.random(0.5, 1.5);
                     
-                    p.push();
-                    p.beginClip();
+                    p.fill(255);
+                    p.noStroke();
                     p.circle(x, y, radius);
-                    p.endClip();
-                    
-                    if (useColorMode) {
-                        drawColorPattern(content);
-                    } else {
-                        drawImageFullscreen(content);
-                    }
-                    p.pop();
                 }
             }
             
