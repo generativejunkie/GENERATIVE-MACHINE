@@ -46,14 +46,6 @@
             const soundDescEl = document.getElementById('sound-desc-text');
             const storeDescEl = document.getElementById('store-desc-text');
             
-            // About section
-            const aboutTitleEl = document.getElementById('about-title-text');
-            const aboutText1El = document.getElementById('about-text-1');
-            const aboutText2El = document.getElementById('about-text-2');
-            const aboutText3El = document.getElementById('about-text-3');
-            const aboutText4El = document.getElementById('about-text-4');
-            const aboutText5El = document.getElementById('about-text-5');
-            
             descEl.dataset.text = 'Exploring algorithmic beauty and the emotional resonance of machine intelligence. Prompt engineering as an art form.';
             descEl.dataset.loop = 'true';
             imageDescEl.dataset.text = 'Click or tap to switch between random images with generative transition effects';
@@ -63,20 +55,6 @@
             storeDescEl.dataset.text = 'Embody the GENERATIVE JUNKIE aesthetic';
             storeDescEl.dataset.loop = 'true';
             
-            // About section texts
-            aboutTitleEl.dataset.text = 'Manifesto';
-            aboutTitleEl.dataset.loop = 'true';
-            aboutText1El.dataset.text = 'GENERATIVE JUNKIE is a generative art brand that explores algorithmic beauty and the emotional resonance of machine intelligence, driven by the philosophy of prompt engineering as an art form.';
-            aboutText1El.dataset.loop = 'true';
-            aboutText2El.dataset.text = 'Founded by an art director and graphic designer, the brand stands at the crossroads of AI, subculture, music, and underground creativity, redefining how human intuition and machine logic co-create culture.';
-            aboutText2El.dataset.loop = 'true';
-            aboutText3El.dataset.text = 'Guided by the concept of "turning generation itself into culture," GENERATIVE JUNKIE reconstructs visuals, sounds, words, and digital experiences born through AI and prompt design, sublimating these generative traces into both interactive digital works and physical art forms.';
-            aboutText3El.dataset.loop = 'true';
-            aboutText4El.dataset.text = 'Each piece captures the tension between control and chaos, reflecting a future where creativity is engineered, yet alive.';
-            aboutText4El.dataset.loop = 'true';
-            aboutText5El.dataset.text = 'GENERATIVE JUNKIE embodies the new aesthetic of collaboration between human imagination and machine intelligence — an underground movement born from code, rhythm, and cultural distortion.';
-            aboutText5El.dataset.loop = 'true';
-            
             // Start hero description typing immediately with loop
             typeText(descEl, descEl.dataset.text, 30, true);
             
@@ -84,12 +62,6 @@
             typingObserver.observe(imageDescEl);
             typingObserver.observe(soundDescEl);
             typingObserver.observe(storeDescEl);
-            typingObserver.observe(aboutTitleEl);
-            typingObserver.observe(aboutText1El);
-            typingObserver.observe(aboutText2El);
-            typingObserver.observe(aboutText3El);
-            typingObserver.observe(aboutText4El);
-            typingObserver.observe(aboutText5El);
         });
         
         // ==================== IMAGE MACHINE ====================
