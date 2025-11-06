@@ -412,22 +412,35 @@
         
         .audio-player {
             display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: var(--space-md);
+            flex-direction: column;
+            align-items: stretch;
+            gap: var(--space-sm);
             padding: var(--space-md);
             border: 1px solid var(--color-border);
             border-radius: 4px;
             background: var(--color-bg-secondary);
         }
         
-        .audio-player > * {
-            flex-shrink: 0;
+        .audio-player-controls {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            justify-content: center;
         }
         
-        .audio-player > div:nth-child(2) {
-            flex: 1;
-            min-width: 200px;
+        .audio-player-timeline {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            width: 100%;
+        }
+        
+        .audio-player-frequency {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            padding-top: var(--space-sm);
+            border-top: 1px solid var(--color-border);
         }
         
         .time-display {
@@ -455,12 +468,9 @@
         
         .freq-display {
             display: flex;
-            gap: var(--space-sm);
-            padding: var(--space-md);
-            border: 1px solid var(--color-border);
-            border-radius: 4px;
-            background: var(--color-bg-secondary);
+            gap: var(--space-md);
             justify-content: center;
+            align-items: flex-end;
         }
         
         .freq-bar-container {
@@ -468,6 +478,7 @@
             flex-direction: column;
             align-items: center;
             gap: var(--space-xs);
+            min-width: 40px;
         }
         
         .freq-bars {

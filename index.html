@@ -134,10 +134,10 @@
                 <div class="machine-controls sound-controls">
                     <div id="audioPlayer" style="display: none;">
                         <div class="audio-player">
-                            <div style="display: flex; align-items: center; gap: var(--space-sm);">
+                            <div class="audio-player-controls">
                                 <button class="btn btn-primary" id="playBtn">Play</button>
                                 <button class="btn" id="pauseBtn" disabled>Pause</button>
-                                <label style="cursor: pointer;">
+                                <label style="cursor: pointer; display: flex;">
                                     <input type="file" id="audioFileSelect" accept="audio/mp3,audio/mpeg,audio/wav,audio/m4a,audio/aac,audio/*" style="display: none;">
                                     <button type="button" class="btn" onclick="document.getElementById('audioFileSelect').click()">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -146,58 +146,60 @@
                                     </button>
                                 </label>
                             </div>
-                            <div style="flex: 1; display: flex; align-items: center; gap: var(--space-sm);">
+                            <div class="audio-player-timeline">
                                 <span class="time-display" id="currentTime">0:00</span>
                                 <div class="seek-bar" id="seekBar">
                                     <div class="seek-bar-progress" id="seekBarProgress"></div>
                                 </div>
                                 <span class="time-display" id="duration">0:00</span>
                             </div>
-                            <div class="freq-display" style="margin: 0; border: none; padding: 0; background: transparent;">
-                                <div class="freq-bar-container">
-                                    <div class="freq-bars" id="lowFreq">
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
+                            <div class="audio-player-frequency">
+                                <div class="freq-display">
+                                    <div class="freq-bar-container">
+                                        <div class="freq-bars" id="lowFreq">
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                        </div>
+                                        <span class="freq-label">Low</span>
                                     </div>
-                                    <span class="freq-label">Low</span>
-                                </div>
-                                <div class="freq-bar-container">
-                                    <div class="freq-bars" id="midFreq">
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
+                                    <div class="freq-bar-container">
+                                        <div class="freq-bars" id="midFreq">
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                        </div>
+                                        <span class="freq-label">Mid</span>
                                     </div>
-                                    <span class="freq-label">Mid</span>
-                                </div>
-                                <div class="freq-bar-container">
-                                    <div class="freq-bars" id="highFreq">
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
-                                        <div class="freq-bar"></div>
+                                    <div class="freq-bar-container">
+                                        <div class="freq-bars" id="highFreq">
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                            <div class="freq-bar"></div>
+                                        </div>
+                                        <span class="freq-label">High</span>
                                     </div>
-                                    <span class="freq-label">High</span>
                                 </div>
                             </div>
                         </div>
