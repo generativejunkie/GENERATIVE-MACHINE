@@ -103,7 +103,6 @@
                 'blocks',
                 'slide',
                 'pixelate',
-                'wave',
                 'spiral',
                 'zoom',
                 'rgb-split',
@@ -264,9 +263,6 @@
                         break;
                     case 'pixelate':
                         drawPixelate(content, progress, isDecay);
-                        break;
-                    case 'wave':
-                        drawWave(content, progress, isDecay);
                         break;
                     case 'spiral':
                         drawSpiral(content, progress, isDecay);
