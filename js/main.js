@@ -108,8 +108,10 @@
                 'zoom',
                 'rgb-split',
                 'scan',
-                'mosaic',
-                'reveal'
+                'reveal',
+                'stripe',
+                'fade',
+                'grid'
             ];
             
             p.setup = () => {
@@ -278,11 +280,17 @@
                     case 'scan':
                         drawScan(content, progress, isDecay);
                         break;
-                    case 'mosaic':
-                        drawMosaic(content, progress, isDecay);
-                        break;
                     case 'reveal':
                         drawReveal(content, progress, isDecay);
+                        break;
+                    case 'stripe':
+                        drawStripe(content, progress, isDecay);
+                        break;
+                    case 'fade':
+                        drawFade(content, progress, isDecay);
+                        break;
+                    case 'grid':
+                        drawGrid(content, progress, isDecay);
                         break;
                 }
             }
@@ -524,27 +532,90 @@
                 p.line(0, scanLine, p.width, scanLine);
             }
             
-            function drawMosaic(content, progress, isDecay) {
+            function drawStripe(content, progress, isDecay) {
                 p.background(255);
-                const tileSize = 40;
-                const shuffleAmount = isDecay ? progress : 1 - progress;
+                const stripeCount = 20;
+                const stripeWidth = p.width / stripeCount;
+                const currentProgress = isDecay ? progress : 1 - progress;
                 
-                for (let y = 0; y < p.height; y += tileSize) {
-                    for (let x = 0; x < p.width; x += tileSize) {
-                        const offsetX = p.random(-shuffleAmount * 100, shuffleAmount * 100);
-                        const offsetY = p.random(-shuffleAmount * 100, shuffleAmount * 100);
+                for (let i = 0; i < stripeCount; i++) {
+                    const x = i * stripeWidth;
+                    const delay = (i / stripeCount) * 0.5;
+                    const localProgress = p.constrain((currentProgress - delay) / 0.5, 0, 1);
+                    const offsetY = p.map(localProgress, 0, 1, 0, p.height);
+                    
+                    if (useColorMode) {
+                        const colors = Array.isArray(content) ? content : colorPatterns[0];
+                        const colorIndex = p.floor(p.random(colors.length));
+                        p.fill(colors[colorIndex]);
+                        p.noStroke();
+                        p.rect(x, offsetY, stripeWidth, p.height - offsetY);
+                    } else {
+                        p.copy(content, x, 0, stripeWidth, content.height, 
+                               x, offsetY, stripeWidth, p.height - offsetY);
+                    }
+                }
+            }
+            
+            function drawFade(content, progress, isDecay) {
+                p.background(255);
+                const opacity = isDecay ? 
+                    p.map(progress, 0, 1, 255, 0) : 
+                    p.map(progress, 0, 1, 0, 255);
+                
+                p.push();
+                p.tint(255, opacity);
+                
+                if (useColorMode) {
+                    drawColorPattern(content);
+                } else {
+                    drawImageFullscreen(content);
+                }
+                
+                p.pop();
+            }
+            
+            function drawGrid(content, progress, isDecay) {
+                p.background(255);
+                const gridSize = 8;
+                const cellWidth = p.width / gridSize;
+                const cellHeight = p.height / gridSize;
+                
+                for (let row = 0; row < gridSize; row++) {
+                    for (let col = 0; col < gridSize; col++) {
+                        const index = row * gridSize + col;
+                        const delay = (index / (gridSize * gridSize)) * 0.7;
+                        const currentProgress = isDecay ? progress : 1 - progress;
+                        const localProgress = p.constrain((currentProgress - delay) / 0.3, 0, 1);
                         
-                        if (useColorMode) {
-                            const colors = Array.isArray(content) ? content : colorPatterns[0];
-                            const colorIndex = p.floor(p.random(colors.length));
-                            p.fill(colors[colorIndex]);
-                            p.noStroke();
-                            p.rect(x + offsetX, y + offsetY, tileSize, tileSize);
-                        } else {
-                            const srcX = p.constrain(x, 0, content.width - tileSize);
-                            const srcY = p.constrain(y, 0, content.height - tileSize);
-                            p.copy(content, srcX, srcY, tileSize, tileSize, 
-                                   x + offsetX, y + offsetY, tileSize, tileSize);
+                        if (localProgress > 0) {
+                            const x = col * cellWidth;
+                            const y = row * cellHeight;
+                            const scale = isDecay ? 
+                                p.map(localProgress, 0, 1, 1, 0) : 
+                                p.map(localProgress, 0, 1, 0, 1);
+                            
+                            p.push();
+                            p.translate(x + cellWidth / 2, y + cellHeight / 2);
+                            p.scale(scale);
+                            p.translate(-cellWidth / 2, -cellHeight / 2);
+                            
+                            if (useColorMode) {
+                                const colors = Array.isArray(content) ? content : colorPatterns[0];
+                                const colorIndex = p.floor(p.random(colors.length));
+                                p.fill(colors[colorIndex]);
+                                p.noStroke();
+                                p.rect(0, 0, cellWidth, cellHeight);
+                            } else {
+                                const srcX = p.map(col, 0, gridSize, 0, content.width);
+                                const srcY = p.map(row, 0, gridSize, 0, content.height);
+                                const srcW = content.width / gridSize;
+                                const srcH = content.height / gridSize;
+                                p.image(content, 0, 0, cellWidth, cellHeight, 
+                                       srcX, srcY, srcW, srcH);
+                            }
+                            
+                            p.pop();
                         }
                     }
                 }
