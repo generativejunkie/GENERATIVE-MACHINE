@@ -975,6 +975,8 @@
         document.getElementById('audioFile').addEventListener('change', handleAudioFile);
         document.getElementById('audioFileSelect').addEventListener('change', handleAudioFile);
         
+        let sourceCreated = false;
+        
         async function handleAudioFile(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -982,14 +984,7 @@
             // Stop any existing playback
             if (audioElement) {
                 audioElement.pause();
-                audioElement.src = '';
-            }
-            if (source && source.stop) {
-                try {
-                    source.stop();
-                    source.disconnect();
-                } catch (err) {}
-                source = null;
+                audioElement.currentTime = 0;
             }
             
             isPlaying = false;
@@ -1025,16 +1020,18 @@
                     analyser.connect(audioContext.destination);
                 }
                 
-                // Connect audio element to analyser
-                if (!source || source.mediaElement !== audioElement) {
+                // Connect audio element to analyser (only once)
+                if (!sourceCreated) {
                     source = audioContext.createMediaElementSource(audioElement);
                     source.connect(analyser);
+                    sourceCreated = true;
                 }
                 
                 // Wait for metadata to load
                 await new Promise((resolve, reject) => {
                     audioElement.onloadedmetadata = resolve;
                     audioElement.onerror = reject;
+                    setTimeout(reject, 5000); // timeout after 5s
                 });
                 
                 duration = audioElement.duration;
@@ -1058,9 +1055,12 @@
                 document.getElementById('audioPlayer').style.display = 'block';
                 document.getElementById('playBtn').disabled = false;
                 updateTimeDisplay();
+                
+                // Reset file input
+                e.target.value = '';
             } catch (error) {
                 console.error('Audio loading error:', error);
-                alert('Error loading audio file. Please try a different file format (MP3 or WAV recommended).');
+                alert('音声ファイルの読み込みに失敗しました。MP3またはWAV形式のファイルをお試しください。');
             }
         }
         

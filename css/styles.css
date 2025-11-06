@@ -413,19 +413,25 @@
         .audio-player {
             display: flex;
             flex-direction: column;
-            align-items: stretch;
-            gap: var(--space-sm);
+            gap: var(--space-md);
             padding: var(--space-md);
             border: 1px solid var(--color-border);
             border-radius: 4px;
             background: var(--color-bg-secondary);
+            width: 100%;
         }
         
         .audio-player-controls {
             display: flex;
             align-items: center;
-            gap: var(--space-sm);
             justify-content: center;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+        
+        .audio-player-controls .btn {
+            min-width: 80px;
+            flex-shrink: 0;
         }
         
         .audio-player-timeline {
@@ -437,9 +443,8 @@
         
         .audio-player-frequency {
             display: flex;
-            gap: var(--space-md);
             justify-content: center;
-            padding-top: var(--space-sm);
+            padding-top: var(--space-md);
             border-top: 1px solid var(--color-border);
         }
         
