@@ -45,6 +45,7 @@
             const imageDescEl = document.getElementById('image-desc-text');
             const soundDescEl = document.getElementById('sound-desc-text');
             const storeDescEl = document.getElementById('store-desc-text');
+            const manifestoEl = document.getElementById('manifesto-text');
             
             descEl.dataset.text = 'Exploring algorithmic beauty and the emotional resonance of machine intelligence. Prompt engineering as an art form.';
             descEl.dataset.loop = 'true';
@@ -54,6 +55,8 @@
             soundDescEl.dataset.loop = 'true';
             storeDescEl.dataset.text = 'Embody the GENERATIVE JUNKIE aesthetic';
             storeDescEl.dataset.loop = 'true';
+            manifestoEl.dataset.text = 'Manifesto';
+            manifestoEl.dataset.loop = 'true';
             
             // Start hero description typing immediately with loop
             typeText(descEl, descEl.dataset.text, 30, true);
@@ -62,6 +65,7 @@
             typingObserver.observe(imageDescEl);
             typingObserver.observe(soundDescEl);
             typingObserver.observe(storeDescEl);
+            typingObserver.observe(manifestoEl);
         });
         
         // ==================== IMAGE MACHINE ====================
