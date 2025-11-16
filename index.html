@@ -130,42 +130,60 @@
                     <div id="soundCanvas-container"></div>
                     <div id="dropZone" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none;">
                         <label style="pointer-events: auto; cursor: pointer;">
-                            <input type="file" id="audioFile" accept="audio/mp3,audio/mpeg,audio/wav,audio/m4a,audio/aac,audio/*" style="display: none;">
-                            <div style="text-align: center; padding: var(--space-xl); background: rgba(255, 255, 255, 0.5); border-radius: 4px; border: 2px dashed var(--color-border);">
-                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto var(--space-md);">
-                                    <path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
-                                </svg>
-                                <p style="font-size: var(--font-size-base); margin-bottom: var(--space-xs);">Drop audio file here</p>
-                                <p style="font-size: var(--font-size-sm); color: var(--color-text-secondary);">or click to browse</p>
+                            <input type="file" id="audioInput" accept="audio/*" style="display: none;">
+                            <div style="text-align: center; padding: var(--space-xl);">
+                                <div style="font-size: 3rem; margin-bottom: var(--space-md); opacity: 0.3;">🎵</div>
+                                <div style="font-family: var(--font-family-mono); color: var(--color-text-secondary); font-size: var(--font-size-sm); letter-spacing: 0.1em;">
+                                    DROP AUDIO FILE OR CLICK TO SELECT
+                                </div>
                             </div>
                         </label>
                     </div>
-                </div>
-                
-                <div class="machine-controls sound-controls">
-                    <div id="audioPlayer" style="display: none;">
-                        <div class="audio-player">
-                            <div class="audio-player-controls">
-                                <button class="btn btn-primary" id="playBtn">Play</button>
-                                <button class="btn" id="pauseBtn" disabled>Pause</button>
-                                <label style="cursor: pointer; display: flex;">
-                                    <input type="file" id="audioFileSelect" accept="audio/mp3,audio/mpeg,audio/wav,audio/m4a,audio/aac,audio/*" style="display: none;">
-                                    <button type="button" class="btn" onclick="document.getElementById('audioFileSelect').click()">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
-                                        </svg>
-                                    </button>
-                                </label>
+                    <div id="soundPrompt" class="canvas-prompt" style="display: none;"></div>
+                    
+                    <div class="audio-controls" id="audioControls" style="display: none;">
+                        <div style="display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-md);">
+                            <button class="control-btn" id="playPauseBtn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path id="playIcon" d="M8 5v14l11-7z"/>
+                                    <g id="pauseIcon" style="display: none;">
+                                        <rect x="6" y="4" width="4" height="16"/>
+                                        <rect x="14" y="4" width="4" height="16"/>
+                                    </g>
+                                </svg>
+                            </button>
+                            <div style="flex: 1; display: flex; align-items: center; gap: var(--space-sm);">
+                                <span id="currentTime" style="font-family: var(--font-family-mono); font-size: var(--font-size-xs); min-width: 40px;">0:00</span>
+                                <input type="range" id="seekBar" min="0" max="100" value="0" style="flex: 1;">
+                                <span id="duration" style="font-family: var(--font-family-mono); font-size: var(--font-size-xs); min-width: 40px;">0:00</span>
                             </div>
-                            <div class="audio-player-timeline">
-                                <span class="time-display" id="currentTime">0:00</span>
-                                <div class="seek-bar" id="seekBar">
-                                    <div class="seek-bar-progress" id="seekBarProgress"></div>
+                            <div style="display: flex; align-items: center; gap: var(--space-sm);">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/>
+                                </svg>
+                                <input type="range" id="volumeControl" min="0" max="100" value="70" style="width: 80px;">
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: center; margin-top: var(--space-md);">
+                            <div style="display: flex; gap: var(--space-lg);">
+                                <div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-xs);">
+                                    <div style="font-family: var(--font-family-mono); font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-bottom: 2px;">LEVEL</div>
+                                    <div style="display: flex; gap: 4px;">
+                                        <div class="level-meter">
+                                            <div class="level-bar" id="levelL"></div>
+                                        </div>
+                                        <div class="level-meter">
+                                            <div class="level-bar" id="levelR"></div>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: var(--space-sm); font-family: var(--font-family-mono); font-size: 9px; color: var(--color-text-secondary);">
+                                        <span>L</span>
+                                        <span>R</span>
+                                    </div>
                                 </div>
-                                <span class="time-display" id="duration">0:00</span>
-                            </div>
-                            <div class="audio-player-frequency">
-                                <div class="freq-display">
+                                
+                                <div style="display: flex; gap: var(--space-md); align-items: flex-end;">
                                     <div class="freq-bar-container">
                                         <div class="freq-bars" id="lowFreq">
                                             <div class="freq-bar"></div>
@@ -273,21 +291,6 @@
                         </p>
                         <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary);">
                             GENERATIVE JUNKIE embodies the new aesthetic of collaboration between human imagination and machine intelligence — an underground movement born from code, rhythm, and cultural distortion.
-                        </p>
-                    </div>
-                    
-                    <div style="border-top: 1px solid var(--color-border); padding-top: var(--space-xl);">
-                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
-                            GENERATIVE JUNKIE (ジェネレイティブ・ジャンキー)は、AIが生み出す「アルゴリズム的な美」と「機械の知性が帯びる感情」をテーマに、プロンプトエンジニアリングを新たなアートフォームとして探求するジェネラティブ・アートブランドです。
-                        </p>
-                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
-                            アートディレクター／グラフィックデザイナーによって立ち上げられ、AI、サブカルチャー、ミュージック、アンダーグラウンドの交差点から、人間の直感と機械の論理が共創する新しいカルチャーを発信しています。
-                        </p>
-                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
-                            「生成すること自体をカルチャーにする」という思想のもと、AIとプロンプトデザインから生まれるビジュアル、サウンド、言葉、デジタル体験を再構築。その"生成の痕跡"を、インタラクティブなデジタル作品や物理的なアートフォームへと昇華させ、コントロールとカオスのあいだに宿る創造性を表現します。
-                        </p>
-                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary);">
-                            GENERATIVE JUNKIEは、人間の想像力と機械知性が交わる場所から生まれる、コード、リズム、そして歪んだ文化の新しい美学を体現します。
                         </p>
                     </div>
                 </div>
