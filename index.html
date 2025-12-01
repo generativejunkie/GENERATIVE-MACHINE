@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,26 +8,27 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description" content="GENERATIVE MACHINE - Interactive Generative Art Experience">
     <title>GENERATIVE MACHINE</title>
-    
+
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-M6PMRQR437"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-M6PMRQR437');
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-M6PMRQR437');
     </script>
-    
+
     <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    
-        <link rel="stylesheet" href="css/styles.css">
+
+    <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
     <!-- Skip Link -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
-    
+
     <!-- Header -->
     <header class="site-header">
         <nav class="nav-container">
@@ -39,7 +41,7 @@
             </ul>
         </nav>
     </header>
-    
+
     <!-- Main Content -->
     <main id="main-content">
         <!-- Hero -->
@@ -49,7 +51,7 @@
                 <p class="hero-description"><span id="description-text" class="typing-text"></span></p>
             </div>
         </section>
-        
+
         <!-- Image Machine -->
         <section id="image-machine" class="section">
             <div class="section-container">
@@ -58,22 +60,22 @@
                     <h2 class="section-title">IMAGE MACHINE</h2>
                     <p class="section-description"><span id="image-desc-text" class="typing-text"></span></p>
                 </header>
-                
+
                 <div class="machine-canvas-wrapper">
                     <div id="imageCanvas-container"></div>
                     <div id="imagePrompt" class="canvas-prompt">CLICK / TAP</div>
                 </div>
-                
+
                 <div class="machine-controls">
-                    <p style="text-align: center; color: var(--color-text-secondary); font-family: var(--font-family-mono); font-size: var(--font-size-sm); letter-spacing: 0.05em;">
-                        <span style="display: inline-block; margin: 0 var(--space-md);">CLICK / TAP — Switch Image</span>
-                        <span style="display: inline-block; margin: 0 var(--space-md);">394 Images</span>
-                        <span style="display: inline-block; margin: 0 var(--space-md);">11 Effects</span>
+                    <p class="machine-stats-text">
+                        <span class="machine-stat-item">CLICK / TAP — Switch Image</span>
+                        <span class="machine-stat-item">383 Images</span>
+                        <span class="machine-stat-item">15 Effects</span>
                     </p>
                 </div>
             </div>
         </section>
-        
+
         <!-- Sound Machine -->
         <section id="sound-machine" class="section">
             <div class="section-container">
@@ -82,77 +84,87 @@
                     <h2 class="section-title">SOUND MACHINE</h2>
                     <p class="section-description"><span id="sound-desc-text" class="typing-text"></span></p>
                 </header>
-                
+
                 <div class="machine-canvas-wrapper">
                     <button class="settings-btn" id="settingsBtn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M4 6h16M4 12h16M4 18h16"/>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
-                    
+
                     <div class="settings-panel" id="settingsPanel">
-                        <h3 style="margin-bottom: var(--space-md); font-size: var(--font-size-base);">Settings</h3>
-                        <div class="control-group" style="margin-bottom: var(--space-sm);">
+                        <h3 class="settings-header">Settings</h3>
+                        <div class="control-group mb-sm">
                             <label class="control-label">Capsules: <span id="pillCountVal">1</span></label>
                             <input type="range" id="pillCount" min="1" max="12" value="1">
                         </div>
-                        <div class="control-group" style="margin-bottom: var(--space-sm);">
+                        <div class="control-group mb-sm">
                             <label class="control-label">Size: <span id="pillSizeVal">0.7</span></label>
                             <input type="range" id="pillSize" min="0.3" max="1.5" step="0.1" value="0.7">
                         </div>
-                        <div class="control-group" style="margin-bottom: var(--space-sm);">
+                        <div class="control-group mb-sm">
                             <label class="control-label">Spread: <span id="spreadVal">0.0</span></label>
                             <input type="range" id="spread" min="0" max="5" step="0.1" value="0">
                         </div>
-                        <div class="control-group" style="margin-bottom: var(--space-sm);">
+                        <div class="control-group mb-sm">
                             <label class="control-label">Rotation: <span id="rotationVal">1.0</span>x</label>
                             <input type="range" id="rotation" min="0" max="3" step="0.1" value="1">
                         </div>
-                        <div class="control-group" style="margin-bottom: var(--space-sm);">
+                        <div class="control-group mb-sm">
                             <label class="control-label">Scale: <span id="scaleVal">1.0</span>x</label>
                             <input type="range" id="scale" min="0" max="3" step="0.1" value="1">
                         </div>
-                        <div class="control-group" style="margin-bottom: var(--space-sm);">
-                            <label style="display: flex; align-items: center; gap: var(--space-xs);">
+                        <div class="control-group mb-sm">
+                            <label class="flex-center-gap">
                                 <input type="checkbox" id="wireframe">
                                 <span class="control-label">Wireframe</span>
                             </label>
                         </div>
-                        <div class="control-group" style="margin-bottom: var(--space-md);">
-                            <label style="display: flex; align-items: center; gap: var(--space-xs);">
+                        <div class="control-group mb-md">
+                            <label class="flex-center-gap">
                                 <input type="checkbox" id="blockMode">
                                 <span class="control-label">Block Mode</span>
                             </label>
                         </div>
-                        <button class="btn" id="resetBtn" style="width: 100%;">Reset</button>
+                        <button class="btn w-full" id="resetBtn">Reset</button>
                     </div>
-                    
+
                     <div id="soundCanvas-container"></div>
-                    <div id="dropZone" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none;">
-                        <label style="pointer-events: auto; cursor: pointer;">
-                            <input type="file" id="audioFile" accept="audio/mp3,audio/mpeg,audio/wav,audio/m4a,audio/aac,audio/*" style="display: none;">
-                            <div style="text-align: center; padding: var(--space-xl); background: rgba(255, 255, 255, 0.5); border-radius: 4px; border: 2px dashed var(--color-border);">
-                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto var(--space-md);">
-                                    <path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+                    <div id="dropZone" class="drop-zone">
+                        <label class="drop-zone-label">
+                            <input type="file" id="audioFile"
+                                accept="audio/*,audio/mp3,audio/mpeg,audio/wav,audio/m4a,audio/aac,audio/aiff,audio/x-aiff,audio/flac,audio/ogg"
+                                class="hidden">
+                            <div class="drop-zone-content">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5" class="drop-zone-icon">
+                                    <path
+                                        d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                                 </svg>
-                                <p style="font-size: var(--font-size-base); margin-bottom: var(--space-xs);">Drop audio file here</p>
-                                <p style="font-size: var(--font-size-sm); color: var(--color-text-secondary);">or click to browse</p>
+                                <p class="text-base mb-xs">Drop audio file here</p>
+                                <p class="text-sm text-secondary">or click to browse</p>
                             </div>
                         </label>
                     </div>
                 </div>
-                
+
                 <div class="machine-controls sound-controls">
-                    <div id="audioPlayer" style="display: none;">
+                    <div id="audioPlayer" class="hidden">
                         <div class="audio-player">
                             <div class="audio-player-controls">
                                 <button class="btn btn-primary" id="playBtn">Play</button>
                                 <button class="btn" id="pauseBtn" disabled>Pause</button>
-                                <label style="cursor: pointer; display: flex;">
-                                    <input type="file" id="audioFileSelect" accept="audio/mp3,audio/mpeg,audio/wav,audio/m4a,audio/aac,audio/*" style="display: none;">
-                                    <button type="button" class="btn" onclick="document.getElementById('audioFileSelect').click()">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+                                <label class="audio-player-file-label">
+                                    <input type="file" id="audioFileSelect"
+                                        accept="audio/*,audio/mp3,audio/mpeg,audio/wav,audio/m4a,audio/aac,audio/aiff,audio/x-aiff,audio/flac,audio/ogg"
+                                        class="hidden">
+                                    <button type="button" class="btn"
+                                        onclick="document.getElementById('audioFileSelect').click()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path
+                                                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                                         </svg>
                                     </button>
                                 </label>
@@ -218,7 +230,7 @@
                 </div>
             </div>
         </section>
-        
+
         <!-- Store -->
         <section id="store" class="section">
             <div class="section-container">
@@ -227,27 +239,25 @@
                     <h2 class="section-title">OFFICIAL STORE</h2>
                     <p class="section-description"><span id="store-desc-text" class="typing-text"></span></p>
                 </header>
-                
+
                 <div class="store-card">
                     <div class="store-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                            <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                         </svg>
                     </div>
-                    <h3 style="margin-bottom: var(--space-sm);">Apparel & Goods</h3>
-                    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-md);">
+                    <h3 class="mb-sm">Apparel & Goods</h3>
+                    <p class="text-secondary mb-md">
                         Limited apparel, art prints, and original merchandise
                     </p>
-                    <a href="https://generativejunkie.stores.jp/" 
-                       class="btn btn-primary" 
-                       target="_blank" 
-                       rel="noopener noreferrer">
+                    <a href="https://generativejunkie.stores.jp/" class="btn btn-primary" target="_blank"
+                        rel="noopener noreferrer">
                         Visit Store
                     </a>
                 </div>
             </div>
         </section>
-        
+
         <!-- About -->
         <section id="about" class="section">
             <div class="section-container">
@@ -256,37 +266,48 @@
                     <h2 class="section-title">ABOUT</h2>
                     <p class="section-description"><span id="manifesto-text" class="typing-text"></span></p>
                 </header>
-                
-                <div style="max-width: 900px; margin: 0 auto;">
-                    <div style="margin-bottom: var(--space-xl);">
-                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
-                            GENERATIVE JUNKIE is a generative art brand that explores algorithmic beauty and the emotional resonance of machine intelligence, driven by the philosophy of prompt engineering as an art form.
+
+                <div class="about-container">
+                    <div class="about-text-block">
+                        <p class="about-text">
+                            GENERATIVE JUNKIE is a generative art brand that explores algorithmic beauty and the
+                            emotional resonance of machine intelligence, driven by the philosophy of prompt engineering
+                            as an art form.
                         </p>
-                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
-                            Founded by an art director and graphic designer, the brand stands at the crossroads of AI, subculture, music, and underground creativity, redefining how human intuition and machine logic co-create culture.
+                        <p class="about-text">
+                            Founded by an art director and graphic designer, the brand stands at the crossroads of AI,
+                            subculture, music, and underground creativity, redefining how human intuition and machine
+                            logic co-create culture.
                         </p>
-                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
-                            Guided by the concept of "turning generation itself into culture," GENERATIVE JUNKIE reconstructs visuals, sounds, words, and digital experiences born through AI and prompt design, sublimating these generative traces into both interactive digital works and physical art forms.
+                        <p class="about-text">
+                            Guided by the concept of "turning generation itself into culture," GENERATIVE JUNKIE
+                            reconstructs visuals, sounds, words, and digital experiences born through AI and prompt
+                            design, sublimating these generative traces into both interactive digital works and physical
+                            art forms.
                         </p>
-                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
-                            Each piece captures the tension between control and chaos, reflecting a future where creativity is engineered, yet alive.
+                        <p class="about-text">
+                            Each piece captures the tension between control and chaos, reflecting a future where
+                            creativity is engineered, yet alive.
                         </p>
-                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary);">
-                            GENERATIVE JUNKIE embodies the new aesthetic of collaboration between human imagination and machine intelligence — an underground movement born from code, rhythm, and cultural distortion.
+                        <p class="about-text">
+                            GENERATIVE JUNKIE embodies the new aesthetic of collaboration between human imagination and
+                            machine intelligence — an underground movement born from code, rhythm, and cultural
+                            distortion.
                         </p>
                     </div>
-                    
-                    <div style="border-top: 1px solid var(--color-border); padding-top: var(--space-xl);">
-                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
-                            GENERATIVE JUNKIE (ジェネレイティブ・ジャンキー)は、AIが生み出す「アルゴリズム的な美」と「機械の知性が帯びる感情」をテーマに、プロンプトエンジニアリングを新たなアートフォームとして探求するジェネラティブ・アートブランドです。
+
+                    <div class="about-translation-block">
+                        <p class="about-text">
+                            GENERATIVE JUNKIE
+                            (ジェネレイティブ・ジャンキー)は、AIが生み出す「アルゴリズム的な美」と「機械の知性が帯びる感情」をテーマに、プロンプトエンジニアリングを新たなアートフォームとして探求するジェネラティブ・アートブランドです。
                         </p>
-                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
+                        <p class="about-text">
                             アートディレクター／グラフィックデザイナーによって立ち上げられ、AI、サブカルチャー、ミュージック、アンダーグラウンドの交差点から、人間の直感と機械の論理が共創する新しいカルチャーを発信しています。
                         </p>
-                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
+                        <p class="about-text">
                             「生成すること自体をカルチャーにする」という思想のもと、AIとプロンプトデザインから生まれるビジュアル、サウンド、言葉、デジタル体験を再構築。その"生成の痕跡"を、インタラクティブなデジタル作品や物理的なアートフォームへと昇華させ、コントロールとカオスのあいだに宿る創造性を表現します。
                         </p>
-                        <p style="font-size: var(--font-size-base); line-height: 1.8; color: var(--color-text-secondary);">
+                        <p class="about-text">
                             GENERATIVE JUNKIEは、人間の想像力と機械知性が交わる場所から生まれる、コード、リズム、そして歪んだ文化の新しい美学を体現します。
                         </p>
                     </div>
@@ -294,14 +315,15 @@
             </div>
         </section>
     </main>
-    
+
     <!-- Footer -->
     <footer class="site-footer">
         <div class="footer-content">
             <p>&copy; 2024 GENERATIVE JUNKIE. All rights reserved.</p>
         </div>
     </footer>
-    
-        <script src="js/main.js"></script>
+
+    <script type="module" src="js/main.js"></script>
 </body>
+
 </html>

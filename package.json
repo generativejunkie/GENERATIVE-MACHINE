@@ -1,0 +1,21 @@
+{
+  "name": "generative-machine",
+  "version": "1.0.0",
+  "description": "``` generative-junkie-refactored/ ├── index.html          # メインHTML（19KB） ├── css/ │   └── styles.css      # 全スタイル（19KB） ├── js/ │   └── main.js         # 全JavaScript（49KB） ├── photos/             # 画像フォルダ（空） └── README.md           # このファイル ```",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/generativejunkie/GENERATIVE-MACHINE.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/generativejunkie/GENERATIVE-MACHINE/issues"
+  },
+  "homepage": "https://github.com/generativejunkie/GENERATIVE-MACHINE#readme"
+}
