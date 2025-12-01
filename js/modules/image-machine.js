@@ -260,15 +260,28 @@ export const imageMachineSketch = (p) => {
                 }
             }
         } else {
-            // Image mode
+            // Image mode - Optimized with loadPixels
+            content.loadPixels();
+            const d = p.pixelDensity();
+
             for (let y = 0; y < p.height; y += blockSize) {
                 for (let x = 0; x < p.width; x += blockSize) {
                     let probability = isDecay ? progress : (1.0 - progress);
                     if (p.random() < probability) {
-                        let c = content.get(x, y);
-                        p.fill(c);
-                        p.noStroke();
-                        p.rect(x, y, blockSize, blockSize);
+                        // Get color from pixels array directly
+                        const sx = Math.floor(x);
+                        const sy = Math.floor(y);
+                        if (sx < content.width && sy < content.height) {
+                            const index = (sx + sy * content.width) * 4;
+                            const r = content.pixels[index];
+                            const g = content.pixels[index + 1];
+                            const b = content.pixels[index + 2];
+                            // const a = content.pixels[index + 3];
+
+                            p.fill(r, g, b);
+                            p.noStroke();
+                            p.rect(x, y, blockSize, blockSize);
+                        }
                     }
                 }
             }
@@ -323,12 +336,24 @@ export const imageMachineSketch = (p) => {
                 }
             }
         } else {
+            // Optimized with loadPixels
+            content.loadPixels();
+
             for (let y = 0; y < p.height; y += pixelSize) {
                 for (let x = 0; x < p.width; x += pixelSize) {
-                    let c = content.get(p.floor(x), p.floor(y));
-                    p.fill(c);
-                    p.noStroke();
-                    p.rect(x, y, pixelSize, pixelSize);
+                    const sx = Math.floor(x);
+                    const sy = Math.floor(y);
+
+                    if (sx < content.width && sy < content.height) {
+                        const index = (sx + sy * content.width) * 4;
+                        const r = content.pixels[index];
+                        const g = content.pixels[index + 1];
+                        const b = content.pixels[index + 2];
+
+                        p.fill(r, g, b);
+                        p.noStroke();
+                        p.rect(x, y, pixelSize, pixelSize);
+                    }
                 }
             }
         }
@@ -367,6 +392,10 @@ export const imageMachineSketch = (p) => {
         const centerY = p.height / 2;
         const segments = 200;
 
+        if (!useColorMode && content) {
+            content.loadPixels();
+        }
+
         for (let i = 0; i < segments; i++) {
             const angle = (i / segments) * p.TWO_PI * 8;
             const radius = (i / segments) * currentRadius;
@@ -380,8 +409,17 @@ export const imageMachineSketch = (p) => {
                     const colorIndex = p.floor(p.random(colors.length));
                     p.fill(colors[colorIndex]);
                 } else {
-                    let c = content.get(p.floor(x), p.floor(y));
-                    p.fill(c);
+                    const sx = Math.floor(x);
+                    const sy = Math.floor(y);
+                    if (sx < content.width && sy < content.height) {
+                        const index = (sx + sy * content.width) * 4;
+                        const r = content.pixels[index];
+                        const g = content.pixels[index + 1];
+                        const b = content.pixels[index + 2];
+                        p.fill(r, g, b);
+                    } else {
+                        continue;
+                    }
                 }
                 p.noStroke();
                 p.ellipse(x, y, size, size);
@@ -724,15 +762,25 @@ export const imageMachineSketch = (p) => {
                 p.push();
                 p.tint(255, 255 * (1 - matrixProgress));
                 const blockSize = 10;
+
+                content.loadPixels();
+
                 for (let y = 0; y < revealHeight; y += blockSize) {
                     for (let x = 0; x < p.width; x += blockSize) {
                         if (p.random() < (1 - matrixProgress)) {
                             const srcX = Math.floor((x / p.width) * content.width);
                             const srcY = Math.floor((y / p.height) * content.height);
-                            const c = content.get(srcX, srcY);
-                            p.fill(c);
-                            p.noStroke();
-                            p.rect(x, y, blockSize, blockSize);
+
+                            if (srcX < content.width && srcY < content.height) {
+                                const index = (srcX + srcY * content.width) * 4;
+                                const r = content.pixels[index];
+                                const g = content.pixels[index + 1];
+                                const b = content.pixels[index + 2];
+
+                                p.fill(r, g, b);
+                                p.noStroke();
+                                p.rect(x, y, blockSize, blockSize);
+                            }
                         }
                     }
                 }
