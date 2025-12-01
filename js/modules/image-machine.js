@@ -868,6 +868,14 @@ export const imageMachineSketch = (p) => {
         return true; // Allow default behavior for other elements
     };
 
+    p.keyPressed = () => {
+        // Handle spacebar for image switching
+        if (p.key === ' ' || p.keyCode === 32) {
+            handleInteraction();
+            return false; // Prevent page scroll
+        }
+    };
+
     p.windowResized = () => {
         const container = document.getElementById('imageCanvas-container');
         p.resizeCanvas(container.offsetWidth, container.offsetHeight);

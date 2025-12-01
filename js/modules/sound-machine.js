@@ -99,9 +99,11 @@ function setupEventListeners() {
 
     // Settings panel listeners
     const settingsBtn = document.getElementById('settingsBtn');
-    if (settingsBtn) {
+    const settingsPanel = document.getElementById('settingsPanel');
+    if (settingsBtn && settingsPanel) {
         settingsBtn.addEventListener('click', () => {
-            document.getElementById('settingsPanel').classList.toggle('open');
+            const isOpen = settingsPanel.classList.toggle('open');
+            settingsBtn.setAttribute('aria-expanded', isOpen);
         });
     }
 

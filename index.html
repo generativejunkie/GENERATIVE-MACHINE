@@ -5,8 +5,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="description" content="GENERATIVE MACHINE - Interactive Generative Art Experience">
-    <title>GENERATIVE MACHINE</title>
+
+    <!-- Primary Meta Tags -->
+    <meta name="title" content="GENERATIVE MACHINE - Interactive Generative Art Experience">
+    <meta name="description"
+        content="Exploring algorithmic beauty and the emotional resonance of machine intelligence. Experience interactive generative art through Image Machine and Sound Machine. Prompt engineering as an art form.">
+    <meta name="keywords"
+        content="generative art, AI art, interactive art, prompt engineering, algorithmic art, machine intelligence, digital art, sound visualization, GENERATIVE JUNKIE">
+    <meta name="author" content="GENERATIVE JUNKIE">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta name="theme-color" content="#000000">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://generativejunkie.com/">
+    <meta property="og:title" content="GENERATIVE MACHINE - Interactive Generative Art Experience">
+    <meta property="og:description"
+        content="Exploring algorithmic beauty and the emotional resonance of machine intelligence. Experience interactive generative art through Image Machine and Sound Machine.">
+    <meta property="og:image" content="https://generativejunkie.com/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="GENERATIVE JUNKIE">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://generativejunkie.com/">
+    <meta name="twitter:title" content="GENERATIVE MACHINE - Interactive Generative Art Experience">
+    <meta name="twitter:description"
+        content="Exploring algorithmic beauty and the emotional resonance of machine intelligence. Experience interactive generative art.">
+    <meta name="twitter:image" content="https://generativejunkie.com/og-image.jpg">
+    <meta name="twitter:creator" content="@generativejunkie">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://generativejunkie.com/">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <title>GENERATIVE MACHINE - Interactive Generative Art Experience</title>
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "GENERATIVE MACHINE",
+      "alternateName": "GENERATIVE JUNKIE",
+      "url": "https://generativejunkie.com/",
+      "description": "Exploring algorithmic beauty and the emotional resonance of machine intelligence through interactive generative art.",
+      "author": {
+        "@type": "Organization",
+        "name": "GENERATIVE JUNKIE",
+        "url": "https://generativejunkie.stores.jp/"
+      },
+      "potentialAction": {
+        "@type": "InteractAction",
+        "target": "https://generativejunkie.com/#image-machine",
+        "name": "Experience Image Machine"
+      }
+    }
+    </script>
 
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-M6PMRQR437"></script>
@@ -29,14 +90,14 @@
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <!-- Header -->
-    <header class="site-header">
-        <nav class="nav-container">
-            <a href="#hero" class="logo">GENERATIVE JUNKIE</a>
-            <ul class="nav-menu">
-                <li><a href="#image-machine" class="nav-link">Image</a></li>
-                <li><a href="#sound-machine" class="nav-link">Sound</a></li>
-                <li><a href="#about" class="nav-link">About</a></li>
-                <li><a href="#store" class="nav-link">Store</a></li>
+    <header class="site-header" role="banner">
+        <nav class="nav-container" role="navigation" aria-label="Main navigation">
+            <a href="#hero" class="logo" aria-label="GENERATIVE JUNKIE Home">GENERATIVE JUNKIE</a>
+            <ul class="nav-menu" role="menubar">
+                <li role="none"><a href="#image-machine" class="nav-link" role="menuitem">Image</a></li>
+                <li role="none"><a href="#sound-machine" class="nav-link" role="menuitem">Sound</a></li>
+                <li role="none"><a href="#about" class="nav-link" role="menuitem">About</a></li>
+                <li role="none"><a href="#store" class="nav-link" role="menuitem">Store</a></li>
             </ul>
         </nav>
     </header>
@@ -52,22 +113,25 @@
         </section>
 
         <!-- Image Machine -->
-        <section id="image-machine" class="section">
+        <section id="image-machine" class="section" aria-labelledby="image-machine-title">
             <div class="section-container">
                 <header class="section-header">
-                    <span class="section-number">01</span>
-                    <h2 class="section-title">IMAGE MACHINE</h2>
-                    <p class="section-description"><span id="image-desc-text" class="typing-text"></span></p>
+                    <span class="section-number" aria-label="Section 01">01</span>
+                    <h2 id="image-machine-title" class="section-title">IMAGE MACHINE</h2>
+                    <p class="section-description"><span id="image-desc-text" class="typing-text" role="status"
+                            aria-live="polite"></span></p>
                 </header>
 
-                <div class="machine-canvas-wrapper">
-                    <div id="imageCanvas-container"></div>
-                    <div id="imagePrompt" class="canvas-prompt">CLICK / TAP</div>
+                <div class="machine-canvas-wrapper" role="application"
+                    aria-label="Interactive image generator with transition effects">
+                    <div id="imageCanvas-container" aria-label="Generative image canvas"></div>
+                    <div id="imagePrompt" class="canvas-prompt" aria-hidden="true">CLICK / TAP</div>
                 </div>
 
                 <div class="machine-controls">
                     <p class="machine-stats-text">
                         <span class="machine-stat-item">CLICK / TAP — Switch Image</span>
+                        <span class="machine-stat-item">SPACE — Next Image</span>
                         <span class="machine-stat-item">383 Images</span>
                         <span class="machine-stat-item">15 Effects</span>
                     </p>
@@ -76,18 +140,20 @@
         </section>
 
         <!-- Sound Machine -->
-        <section id="sound-machine" class="section">
+        <section id="sound-machine" class="section" aria-labelledby="sound-machine-title">
             <div class="section-container">
                 <header class="section-header">
-                    <span class="section-number">02</span>
-                    <h2 class="section-title">SOUND MACHINE</h2>
-                    <p class="section-description"><span id="sound-desc-text" class="typing-text"></span></p>
+                    <span class="section-number" aria-label="Section 02">02</span>
+                    <h2 id="sound-machine-title" class="section-title">SOUND MACHINE</h2>
+                    <p class="section-description"><span id="sound-desc-text" class="typing-text" role="status"
+                            aria-live="polite"></span></p>
                 </header>
 
-                <div class="machine-canvas-wrapper">
-                    <button class="settings-btn" id="settingsBtn">
+                <div class="machine-canvas-wrapper" role="application" aria-label="Interactive sound visualizer">
+                    <button class="settings-btn" id="settingsBtn" aria-label="Open settings panel" aria-expanded="false"
+                        aria-controls="settingsPanel">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
+                            stroke-width="2" aria-hidden="true">
                             <path d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
@@ -231,16 +297,17 @@
         </section>
 
         <!-- Store -->
-        <section id="store" class="section">
+        <section id="store" class="section" aria-labelledby="store-title">
             <div class="section-container">
                 <header class="section-header">
-                    <span class="section-number">03</span>
-                    <h2 class="section-title">OFFICIAL STORE</h2>
-                    <p class="section-description"><span id="store-desc-text" class="typing-text"></span></p>
+                    <span class="section-number" aria-label="Section 03">03</span>
+                    <h2 id="store-title" class="section-title">OFFICIAL STORE</h2>
+                    <p class="section-description"><span id="store-desc-text" class="typing-text" role="status"
+                            aria-live="polite"></span></p>
                 </header>
 
                 <div class="store-card">
-                    <div class="store-icon">
+                    <div class="store-icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                         </svg>
@@ -250,7 +317,8 @@
                         Limited apparel, art prints, and original merchandise
                     </p>
                     <a href="https://generativejunkie.stores.jp/" class="btn btn-primary" target="_blank"
-                        rel="noopener noreferrer">
+                        rel="noopener noreferrer"
+                        aria-label="Visit GENERATIVE JUNKIE official store (opens in new tab)">
                         Visit Store
                     </a>
                 </div>
@@ -258,12 +326,13 @@
         </section>
 
         <!-- About -->
-        <section id="about" class="section">
+        <section id="about" class="section" aria-labelledby="about-title">
             <div class="section-container">
                 <header class="section-header">
-                    <span class="section-number">04</span>
-                    <h2 class="section-title">ABOUT</h2>
-                    <p class="section-description"><span id="manifesto-text" class="typing-text"></span></p>
+                    <span class="section-number" aria-label="Section 04">04</span>
+                    <h2 id="about-title" class="section-title">ABOUT</h2>
+                    <p class="section-description"><span id="manifesto-text" class="typing-text" role="status"
+                            aria-live="polite"></span></p>
                 </header>
 
                 <div class="about-container">
@@ -316,9 +385,10 @@
     </main>
 
     <!-- Footer -->
-    <footer class="site-footer">
+    <footer class="site-footer" role="contentinfo">
         <div class="footer-content">
-            <p><span id="footer-text" class="typing-text"></span></p>
+            <p><span id="footer-text" class="typing-text" role="status" aria-live="polite"
+                    aria-label="Site motto"></span></p>
         </div>
     </footer>
 
