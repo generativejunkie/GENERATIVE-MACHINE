@@ -370,16 +370,16 @@ input[type="range"] {
 
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
     background: #000000;
     cursor: pointer;
     border-radius: 50%;
     border: none;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
     transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-    margin-top: -10px;
-    /* Center thumb on track */
+    margin-top: -6px;
+    /* (TrackHeight 4px - ThumbHeight 16px) / 2 */
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
@@ -393,13 +393,13 @@ input[type="range"]::-webkit-slider-thumb:active {
 }
 
 input[type="range"]::-moz-range-thumb {
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
     background: #000000;
     cursor: pointer;
     border-radius: 50%;
     border: none;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
     transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
