@@ -63,6 +63,7 @@ export const imageMachineSketch = (p) => {
                 if (result.success) {
                     currentImageKey = result.img.filePath;
                     useColorMode = false;
+                    startPreloading();
                 } else {
                     // Use color pattern fallback
                     useColorMode = true;
@@ -180,13 +181,43 @@ export const imageMachineSketch = (p) => {
                     const newIndex = p.floor(p.random(imageFileNames.length));
                     loadImageDynamically(imageFileNames[newIndex], callback);
                 } else {
-                    // Switch to color mode after max attempts
                     console.log('Switching to color pattern mode');
                     imageLoadAttempts = 0;
                     callback({ success: false });
                 }
             }
         );
+    }
+
+    // Background preloading logic
+    function startPreloading() {
+        let preloadIndex = 0;
+        // Shuffle array for random preloading
+        const shuffledAttributes = [...imageFileNames].sort(() => 0.5 - Math.random());
+
+        const loadNext = () => {
+            if (preloadIndex >= shuffledAttributes.length) return;
+
+            const filePath = shuffledAttributes[preloadIndex];
+            if (!allImages[filePath]) {
+                p.loadImage(filePath, (img) => {
+                    img.filePath = filePath;
+                    allImages[filePath] = img;
+                });
+            }
+
+            preloadIndex++;
+
+            // Use requestIdleCallback if available, otherwise setTimeout
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(loadNext, { timeout: 1000 });
+            } else {
+                setTimeout(loadNext, 200);
+            }
+        };
+
+        // Start preloading after a short delay to allow initial render
+        setTimeout(loadNext, 2000);
     }
 
     function runTransition(content, progress, isDecay) {

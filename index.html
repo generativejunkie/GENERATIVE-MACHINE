@@ -45,6 +45,10 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 
+    <!-- Preload Critical Images -->
+    <link rel="preload" as="image" href="/photos/photo080.webp">
+    <link rel="preload" as="image" href="/logo/store-pill-icon.png">
+
     <title>GENERATIVE MACHINE - Interactive Generative Art Experience</title>
 
     <!-- Structured Data (JSON-LD) -->
@@ -79,8 +83,9 @@
     </script>
 
     <!-- External Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
 
     <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -360,19 +365,38 @@
                             aria-live="polite"></span></p>
                 </header>
 
-                <div class="store-card">
-                    <div class="store-icon" aria-hidden="true">
-                        <img src="logo/store-pill-icon.png" alt="Store Icon">
+                <div class="store-grid">
+                    <!-- Apparel & Goods -->
+                    <div class="store-card">
+                        <div class="store-icon" aria-hidden="true">
+                            <img src="logo/store-pill-icon.png" alt="Store Icon">
+                        </div>
+                        <h3 class="mb-sm">Apparel & Goods</h3>
+                        <p class="text-secondary mb-md">
+                            Limited apparel, art prints, and original merchandise
+                        </p>
+                        <a href="https://generativejunkie.stores.jp/" class="btn btn-primary" target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Visit GENERATIVE JUNKIE official store (opens in new tab)">
+                            Visit Store
+                        </a>
                     </div>
-                    <h3 class="mb-sm">Apparel & Goods</h3>
-                    <p class="text-secondary mb-md">
-                        Limited apparel, art prints, and original merchandise
-                    </p>
-                    <a href="https://generativejunkie.stores.jp/" class="btn btn-primary" target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="Visit GENERATIVE JUNKIE official store (opens in new tab)">
-                        Visit Store
-                    </a>
+
+                    <!-- Camera App -->
+                    <div class="store-card">
+                        <div class="store-icon" aria-hidden="true">
+                            <!-- Using same icon for now, or placeholder -->
+                            <img src="logo/store-pill-icon.png" alt="Camera App Icon" style="filter: invert(1);">
+                        </div>
+                        <h3 class="mb-sm">Camera App</h3>
+                        <p class="text-secondary mb-md">
+                            GENERATIVE MACHINE Camera Application<br>
+                            <span style="font-size: 0.8em; opacity: 0.8;">(Creating Now)</span>
+                        </p>
+                        <button class="btn btn-primary" disabled>
+                            Coming Soon
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>

@@ -65,7 +65,25 @@ export function initSoundMachine() {
     });
 
     setupEventListeners();
+
+    // Optimize rendering: only animate when visible
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                if (!isAnimating) {
+                    isAnimating = true;
+                    animateSound();
+                }
+            } else {
+                isAnimating = false;
+            }
+        });
+    }, { threshold: 0 });
+
+    observer.observe(container);
 }
+
+let isAnimating = false;
 
 function setupEventListeners() {
     const audioFile = document.getElementById('audioFile');
@@ -528,6 +546,7 @@ function createPills() {
 }
 
 function animateSound() {
+    if (!isAnimating) return;
     requestAnimationFrame(animateSound);
 
     // Update time for buffer mode
