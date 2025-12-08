@@ -81,9 +81,268 @@ export function initSoundMachine() {
     }, { threshold: 0 });
 
     observer.observe(container);
+
+    // Initialize Visual Controller
+    initVisualController();
 }
 
 let isAnimating = false;
+
+// ==================== VISUAL CONTROLLER (RADAR) ====================
+let visualController = null;
+
+class VisualController {
+    constructor(containerId, params, onChange) {
+        this.container = document.getElementById(containerId);
+        this.params = params; // Array of { name, value, min, max, label }
+        this.onChange = onChange;
+        this.canvas = document.createElement('canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.width = 300;
+        this.height = 300;
+        this.centerX = this.width / 2;
+        this.centerY = this.height / 2;
+        this.radius = 100;
+        this.draggingIndex = -1;
+
+        this.init();
+    }
+
+    init() {
+        this.canvas.width = this.width;
+        this.canvas.height = this.height;
+        this.canvas.style.width = '100%';
+        this.canvas.style.height = 'auto';
+        this.canvas.style.maxWidth = '300px';
+        this.canvas.style.display = 'block';
+        this.canvas.style.margin = '0 auto';
+        this.canvas.style.touchAction = 'none'; // Prevent scrolling while dragging
+
+        // Replace existing controls or append? User said "integrate", so let's insert before reset button
+        const settingsPanel = document.getElementById('settingsPanel');
+        const resetBtn = document.getElementById('resetBtn');
+        if (settingsPanel && resetBtn) {
+            // Remove old slider groups to cleanup UI
+            const controls = settingsPanel.querySelectorAll('.control-group:not(.checkbox-group)');
+            controls.forEach(el => el.style.display = 'none');
+
+            // Insert canvas
+            settingsPanel.insertBefore(this.canvas, resetBtn);
+        }
+
+        this.canvas.addEventListener('mousedown', this.handleStart.bind(this));
+        this.canvas.addEventListener('mousemove', this.handleMove.bind(this));
+        window.addEventListener('mouseup', this.handleEnd.bind(this));
+
+        this.canvas.addEventListener('touchstart', this.handleStart.bind(this), { passive: false });
+        this.canvas.addEventListener('touchmove', this.handleMove.bind(this), { passive: false });
+        window.addEventListener('touchend', this.handleEnd.bind(this));
+
+        this.draw();
+    }
+
+    getPointOnCircle(angle, dist) {
+        return {
+            x: this.centerX + Math.cos(angle - Math.PI / 2) * dist,
+            y: this.centerY + Math.sin(angle - Math.PI / 2) * dist
+        };
+    }
+
+    draw() {
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        const count = this.params.length;
+        const angleStep = (Math.PI * 2) / count;
+
+        // Draw background chart
+        this.ctx.beginPath();
+        for (let i = 0; i < count; i++) {
+            const p = this.getPointOnCircle(i * angleStep, this.radius);
+            if (i === 0) this.ctx.moveTo(p.x, p.y);
+            else this.ctx.lineTo(p.x, p.y);
+
+            // Draw axis line
+            this.ctx.strokeStyle = '#e5e5e5';
+            this.ctx.moveTo(this.centerX, this.centerY);
+            this.ctx.lineTo(p.x, p.y);
+        }
+        this.ctx.closePath();
+        this.ctx.strokeStyle = '#d0d0d0';
+        this.ctx.stroke();
+
+        // Draw data shape
+        this.ctx.beginPath();
+        this.ctx.fillStyle = 'rgba(10, 10, 10, 0.1)';
+        this.ctx.strokeStyle = '#0a0a0a';
+        this.ctx.lineWidth = 2;
+
+        this.params.forEach((param, i) => {
+            // Normalize value 0-1
+            const normalized = (param.value - param.min) / (param.max - param.min);
+            const dist = normalized * this.radius;
+            const p = this.getPointOnCircle(i * angleStep, dist);
+            if (i === 0) this.ctx.moveTo(p.x, p.y);
+            else this.ctx.lineTo(p.x, p.y);
+        });
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.stroke();
+
+        // Draw handles and labels
+        this.params.forEach((param, i) => {
+            const normalized = (param.value - param.min) / (param.max - param.min);
+            const dist = normalized * this.radius;
+            const p = this.getPointOnCircle(i * angleStep, dist);
+
+            // Handle
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.fill();
+            this.ctx.stroke();
+
+            // Label
+            const labelP = this.getPointOnCircle(i * angleStep, this.radius + 25);
+            this.ctx.fillStyle = '#666';
+            this.ctx.font = '10px sans-serif';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+
+            // Format value
+            let displayVal = param.value;
+            if (param.name === 'pillCount') displayVal = Math.round(displayVal);
+            else displayVal = displayVal.toFixed(1);
+
+            this.ctx.fillText(param.label, labelP.x, labelP.y - 7);
+            this.ctx.fillStyle = '#0a0a0a';
+            this.ctx.font = 'bold 11px sans-serif';
+            this.ctx.fillText(displayVal, labelP.x, labelP.y + 7);
+        });
+    }
+
+    handleStart(e) {
+        e.preventDefault();
+        const pos = this.getPos(e);
+        this.draggingIndex = this.getClosestHandle(pos);
+    }
+
+    handleMove(e) {
+        if (this.draggingIndex === -1) return;
+        e.preventDefault();
+        const pos = this.getPos(e);
+        const count = this.params.length;
+        const angleStep = (Math.PI * 2) / count;
+        const angle = this.draggingIndex * angleStep - Math.PI / 2;
+
+        // Project point onto axis vector
+        const dx = pos.x - this.centerX;
+        const dy = pos.y - this.centerY;
+        const axisX = Math.cos(angle);
+        const axisY = Math.sin(angle);
+
+        // Dot product to get distance along axis
+        let dist = dx * axisX + dy * axisY;
+        dist = Math.max(0, Math.min(dist, this.radius));
+
+        // Convert back to value
+        const normalized = dist / this.radius;
+        const param = this.params[this.draggingIndex];
+        let newValue = param.min + normalized * (param.max - param.min);
+
+        // Snap for integer values (pillCount)
+        if (param.name === 'pillCount') {
+            newValue = Math.round(newValue);
+        }
+
+        if (param.value !== newValue) {
+            param.value = newValue;
+            this.onChange(param.name, newValue);
+            this.draw();
+        }
+    }
+
+    handleEnd() {
+        this.draggingIndex = -1;
+    }
+
+    getPos(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+            x: clientX - rect.left,
+            y: clientY - rect.top
+        };
+    }
+
+    getClosestHandle(pos) {
+        const count = this.params.length;
+        const angleStep = (Math.PI * 2) / count;
+        let minDist = 20; // Hit radius
+        let closestIndex = -1;
+
+        this.params.forEach((param, i) => {
+            const normalized = (param.value - param.min) / (param.max - param.min);
+            const dist = normalized * this.radius;
+            const p = this.getPointOnCircle(i * angleStep, dist);
+
+            const dx = pos.x - p.x;
+            const dy = pos.y - p.y;
+            const d = Math.sqrt(dx * dx + dy * dy);
+
+            if (d < minDist) {
+                minDist = d;
+                closestIndex = i;
+            }
+        });
+
+        return closestIndex;
+    }
+
+    updateParam(name, value) {
+        const param = this.params.find(p => p.name === name);
+        if (param) {
+            param.value = value;
+            this.draw();
+        }
+    }
+}
+
+function initVisualController() {
+    // Initial parameter values
+    const params = [
+        { name: 'scale', label: 'Scale', value: scaleIntensity, min: 0, max: 3 },
+        { name: 'pillCount', label: 'Capsules', value: pillCount, min: 1, max: 12 },
+        { name: 'spread', label: 'Spread', value: spreadWidth, min: 0, max: 5 },
+        { name: 'pillSize', label: 'Size', value: pillSize, min: 0.3, max: 1.5 },
+        { name: 'rotation', label: 'Rotation', value: rotationSpeed, min: 0, max: 3 }
+    ];
+
+    visualController = new VisualController('settingsPanel', params, (name, val) => {
+        // Update variables based on name
+        switch (name) {
+            case 'pillCount':
+                const newCount = Math.round(val);
+                if (pillCount !== newCount) {
+                    pillCount = newCount;
+                    createPills();
+                }
+                break;
+            case 'pillSize':
+                pillSize = val;
+                break;
+            case 'spread':
+                spreadWidth = val;
+                createPills(); // spread changes positions
+                break;
+            case 'rotation':
+                rotationSpeed = val;
+                break;
+            case 'scale':
+                scaleIntensity = val;
+                break;
+        }
+    });
+}
 
 function setupEventListeners() {
     const audioFile = document.getElementById('audioFile');
@@ -125,33 +384,7 @@ function setupEventListeners() {
         });
     }
 
-    setupControlListener('pillCount', (val) => {
-        pillCount = parseInt(val);
-        document.getElementById('pillCountVal').textContent = pillCount;
-        createPills();
-    });
-
-    setupControlListener('pillSize', (val) => {
-        pillSize = parseFloat(val);
-        document.getElementById('pillSizeVal').textContent = pillSize.toFixed(1);
-    });
-
-    setupControlListener('spread', (val) => {
-        spreadWidth = parseFloat(val);
-        document.getElementById('spreadVal').textContent = spreadWidth.toFixed(1);
-        createPills();
-    });
-
-    setupControlListener('rotation', (val) => {
-        rotationSpeed = parseFloat(val);
-        document.getElementById('rotationVal').textContent = rotationSpeed.toFixed(1);
-    });
-
-    setupControlListener('scale', (val) => {
-        scaleIntensity = parseFloat(val);
-        document.getElementById('scaleVal').textContent = scaleIntensity.toFixed(1);
-    });
-
+    // Checkbox listeners (keep these separate from radar)
     const wireframeInput = document.getElementById('wireframe');
     if (wireframeInput) {
         wireframeInput.addEventListener('change', (e) => {
@@ -175,6 +408,7 @@ function setupEventListeners() {
 }
 
 function setupControlListener(id, callback) {
+    // Obsolete with Visual Controller, keeping for compatibility if needed or removed
     const el = document.getElementById(id);
     if (el) {
         el.addEventListener('input', (e) => callback(e.target.value));
@@ -190,23 +424,20 @@ function resetSettings() {
     wireframeMode = false;
     blockMode = false;
 
-    updateControlValue('pillCount', 1);
-    updateControlValue('pillSize', 0.7);
-    updateControlValue('spread', 0);
-    updateControlValue('rotation', 1);
-    updateControlValue('scale', 1);
+    // Reset Visual Controller
+    if (visualController) {
+        visualController.updateParam('pillCount', 1);
+        visualController.updateParam('pillSize', 0.7);
+        visualController.updateParam('spread', 0);
+        visualController.updateParam('rotation', 1);
+        visualController.updateParam('scale', 1);
+    }
 
     const wireframeInput = document.getElementById('wireframe');
     if (wireframeInput) wireframeInput.checked = false;
 
     const blockModeInput = document.getElementById('blockMode');
     if (blockModeInput) blockModeInput.checked = false;
-
-    document.getElementById('pillCountVal').textContent = '1';
-    document.getElementById('pillSizeVal').textContent = '0.7';
-    document.getElementById('spreadVal').textContent = '0.0';
-    document.getElementById('rotationVal').textContent = '1.0';
-    document.getElementById('scaleVal').textContent = '1.0';
 
     createPills();
 }
@@ -215,6 +446,7 @@ function updateControlValue(id, val) {
     const el = document.getElementById(id);
     if (el) el.value = val;
 }
+
 
 // ==================== AUDIO LOGIC ====================
 
