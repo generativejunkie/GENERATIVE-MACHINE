@@ -98,11 +98,11 @@ class VisualController {
         this.onChange = onChange;
         this.canvas = document.createElement('canvas');
         this.ctx = this.canvas.getContext('2d');
-        this.width = 300;
-        this.height = 300;
+        this.width = 240;
+        this.height = 240;
         this.centerX = this.width / 2;
         this.centerY = this.height / 2;
-        this.radius = 100;
+        this.radius = 80;
         this.draggingIndex = -1;
 
         this.init();
@@ -144,6 +144,7 @@ class VisualController {
         this.canvas.addEventListener('touchmove', this.handleMove.bind(this), { passive: false });
         window.addEventListener('touchend', this.handleEnd.bind(this));
 
+        // Initial drawing
         this.draw();
     }
 
@@ -310,9 +311,14 @@ class VisualController {
         const rect = this.canvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        // Critical fix: map CSS coordinates to Canvas internal coordinates
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+
         return {
-            x: clientX - rect.left,
-            y: clientY - rect.top
+            x: (clientX - rect.left) * scaleX,
+            y: (clientY - rect.top) * scaleY
         };
     }
 

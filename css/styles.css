@@ -517,6 +517,16 @@ select {
     background: var(--color-text-primary);
 }
 
+.btn-sm {
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 500;
+    min-width: auto;
+    width: auto;
+    display: table;
+    margin: 10px auto 0;
+}
+
 .btn-group {
     display: flex;
     gap: var(--space-sm);
@@ -640,7 +650,7 @@ select {
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
     border: none;
     border-radius: 12px;
-    padding: 32px;
+    padding: 20px;
     z-index: 90;
     display: none;
     max-height: calc(100% - var(--space-sm) - 60px);
@@ -648,9 +658,9 @@ select {
 }
 
 .settings-header {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 500;
-    margin-bottom: 32px;
+    margin-bottom: 16px;
     color: var(--color-text);
     letter-spacing: -0.02em;
 }
