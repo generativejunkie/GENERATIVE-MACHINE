@@ -124,16 +124,27 @@ class VisualController {
         const settingsPanel = document.getElementById('settingsPanel');
         const resetBtn = document.getElementById('resetBtn');
         if (settingsPanel && resetBtn) {
-            // Remove old slider groups to cleanup UI
-            const controls = settingsPanel.querySelectorAll('.control-group:not(.checkbox-group)');
-            controls.forEach(el => el.style.display = 'none');
+            // Remove old slider groups to cleanup UI, but keep checkboxes
+            const controls = settingsPanel.querySelectorAll('.control-group');
+            controls.forEach(el => {
+                if (el.classList.contains('checkbox-group')) {
+                    el.style.display = 'flex';
+                } else {
+                    el.style.display = 'none';
+                }
+            });
 
             // Check if canvas already exists and remove it to avoid duplicates
             const existingCanvas = settingsPanel.querySelector('canvas');
             if (existingCanvas) existingCanvas.remove();
 
-            // Insert canvas
-            settingsPanel.insertBefore(this.canvas, resetBtn);
+            // Insert canvas before the first checkbox group to keep layout clean: Chart -> Checkboxes -> Reset
+            const firstCheckbox = settingsPanel.querySelector('.checkbox-group');
+            if (firstCheckbox) {
+                settingsPanel.insertBefore(this.canvas, firstCheckbox);
+            } else {
+                settingsPanel.insertBefore(this.canvas, resetBtn);
+            }
         }
 
         this.canvas.addEventListener('mousedown', this.handleStart.bind(this));
