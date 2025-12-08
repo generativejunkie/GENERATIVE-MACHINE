@@ -256,10 +256,10 @@ h3 {
 .section-description {
     font-size: var(--font-size-base);
     color: var(--color-text-secondary);
-    line-height: 1.7;
+    line-height: 1.8;
     max-width: 800px;
     margin: 0 auto;
-    min-height: 2em;
+    min-height: 3em;
 }
 
 /* ==================== Machine Canvas ==================== */
