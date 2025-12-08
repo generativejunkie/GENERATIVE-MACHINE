@@ -794,10 +794,6 @@ select {
     .about-container {
         max-width: 1000px;
     }
-
-    .section-description {
-        font-size: var(--font-size-lg);
-    }
 }
 
 /* Mobile (max-width: 768px) */
