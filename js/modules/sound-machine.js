@@ -117,6 +117,8 @@ class VisualController {
         this.canvas.style.display = 'block';
         this.canvas.style.margin = '0 auto';
         this.canvas.style.touchAction = 'none'; // Prevent scrolling while dragging
+        this.canvas.style.cursor = 'pointer';
+        this.canvas.style.zIndex = '100'; // Ensure it's on top
 
         // Replace existing controls or append? User said "integrate", so let's insert before reset button
         const settingsPanel = document.getElementById('settingsPanel');
@@ -125,6 +127,10 @@ class VisualController {
             // Remove old slider groups to cleanup UI
             const controls = settingsPanel.querySelectorAll('.control-group:not(.checkbox-group)');
             controls.forEach(el => el.style.display = 'none');
+
+            // Check if canvas already exists and remove it to avoid duplicates
+            const existingCanvas = settingsPanel.querySelector('canvas');
+            if (existingCanvas) existingCanvas.remove();
 
             // Insert canvas
             settingsPanel.insertBefore(this.canvas, resetBtn);
@@ -153,38 +159,56 @@ class VisualController {
         const count = this.params.length;
         const angleStep = (Math.PI * 2) / count;
 
-        // Draw background chart
+        // Draw background chart (Axis and outline)
         this.ctx.beginPath();
         for (let i = 0; i < count; i++) {
             const p = this.getPointOnCircle(i * angleStep, this.radius);
             if (i === 0) this.ctx.moveTo(p.x, p.y);
             else this.ctx.lineTo(p.x, p.y);
+        }
+        this.ctx.closePath();
+        this.ctx.strokeStyle = '#e5e5e5';
+        this.ctx.stroke();
 
-            // Draw axis line
-            this.ctx.strokeStyle = '#e5e5e5';
+        // Draw axis lines from center
+        this.ctx.beginPath();
+        for (let i = 0; i < count; i++) {
+            const p = this.getPointOnCircle(i * angleStep, this.radius);
             this.ctx.moveTo(this.centerX, this.centerY);
             this.ctx.lineTo(p.x, p.y);
         }
-        this.ctx.closePath();
-        this.ctx.strokeStyle = '#d0d0d0';
+        this.ctx.strokeStyle = '#f0f0f0';
         this.ctx.stroke();
 
         // Draw data shape
         this.ctx.beginPath();
-        this.ctx.fillStyle = 'rgba(10, 10, 10, 0.1)';
-        this.ctx.strokeStyle = '#0a0a0a';
-        this.ctx.lineWidth = 2;
+        // Store first point to close path manually if needed
+        let firstPoint = null;
 
         this.params.forEach((param, i) => {
             // Normalize value 0-1
             const normalized = (param.value - param.min) / (param.max - param.min);
             const dist = normalized * this.radius;
             const p = this.getPointOnCircle(i * angleStep, dist);
-            if (i === 0) this.ctx.moveTo(p.x, p.y);
-            else this.ctx.lineTo(p.x, p.y);
+
+            if (i === 0) {
+                this.ctx.moveTo(p.x, p.y);
+                firstPoint = p;
+            } else {
+                this.ctx.lineTo(p.x, p.y);
+            }
         });
+
+        // Explicitly line to start
+        if (firstPoint) {
+            this.ctx.lineTo(firstPoint.x, firstPoint.y);
+        }
+
         this.ctx.closePath();
+        this.ctx.fillStyle = 'rgba(10, 10, 10, 0.15)'; // Slightly darker for better visibility
         this.ctx.fill();
+        this.ctx.strokeStyle = '#0a0a0a';
+        this.ctx.lineWidth = 2;
         this.ctx.stroke();
 
         // Draw handles and labels
@@ -195,13 +219,17 @@ class VisualController {
 
             // Handle
             this.ctx.beginPath();
-            this.ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+            this.ctx.arc(p.x, p.y, 8, 0, Math.PI * 2); // Larger handle
             this.ctx.fillStyle = '#ffffff';
             this.ctx.fill();
+            this.ctx.strokeStyle = '#0a0a0a';
+            this.ctx.lineWidth = 1.5;
             this.ctx.stroke();
 
             // Label
-            const labelP = this.getPointOnCircle(i * angleStep, this.radius + 25);
+            const labelDist = this.radius + 25;
+            const labelP = this.getPointOnCircle(i * angleStep, labelDist);
+
             this.ctx.fillStyle = '#666';
             this.ctx.font = '10px sans-serif';
             this.ctx.textAlign = 'center';
@@ -221,25 +249,35 @@ class VisualController {
 
     handleStart(e) {
         e.preventDefault();
+        e.stopPropagation();
         const pos = this.getPos(e);
         this.draggingIndex = this.getClosestHandle(pos);
+        if (this.draggingIndex !== -1) {
+            this.canvas.style.cursor = 'grabbing';
+        }
     }
 
     handleMove(e) {
         if (this.draggingIndex === -1) return;
         e.preventDefault();
+        e.stopPropagation();
+
         const pos = this.getPos(e);
         const count = this.params.length;
         const angleStep = (Math.PI * 2) / count;
         const angle = this.draggingIndex * angleStep - Math.PI / 2;
 
         // Project point onto axis vector
+        // Drag vector
         const dx = pos.x - this.centerX;
         const dy = pos.y - this.centerY;
+
+        // Axis unit vector
         const axisX = Math.cos(angle);
         const axisY = Math.sin(angle);
 
         // Dot product to get distance along axis
+        // We project the drag position onto the axis line
         let dist = dx * axisX + dy * axisY;
         dist = Math.max(0, Math.min(dist, this.radius));
 
@@ -253,15 +291,19 @@ class VisualController {
             newValue = Math.round(newValue);
         }
 
-        if (param.value !== newValue) {
+        // Limit updates to meaningful changes to improve perf
+        if (Math.abs(param.value - newValue) > 0.01) {
             param.value = newValue;
             this.onChange(param.name, newValue);
             this.draw();
         }
     }
 
-    handleEnd() {
-        this.draggingIndex = -1;
+    handleEnd(e) {
+        if (this.draggingIndex !== -1) {
+            this.draggingIndex = -1;
+            this.canvas.style.cursor = 'pointer';
+        }
     }
 
     getPos(e) {
@@ -277,7 +319,7 @@ class VisualController {
     getClosestHandle(pos) {
         const count = this.params.length;
         const angleStep = (Math.PI * 2) / count;
-        let minDist = 20; // Hit radius
+        let minDist = 40; // Increased hit radius for better touch interaction
         let closestIndex = -1;
 
         this.params.forEach((param, i) => {
