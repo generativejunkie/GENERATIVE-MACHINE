@@ -826,6 +826,21 @@ select {
     .settings-btn {
         right: var(--space-sm);
     }
+
+    /* Sound Machine Mobile Tweaks */
+    .audio-player-controls {
+        flex-direction: row;
+        justify-content: space-between;
+        gap: var(--space-sm);
+    }
+
+    .audio-player-controls .btn {
+        flex: 1;
+        min-width: 0;
+        /* Allow shrinking below min-width */
+        padding: var(--space-xs) var(--space-sm);
+        font-size: var(--font-size-xs);
+    }
 }
 
 /* ==================== Accessibility ==================== */
