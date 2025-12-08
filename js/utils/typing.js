@@ -56,7 +56,7 @@ export function initTyping() {
         descEl.dataset.text = 'Exploring algorithmic beauty and the emotional resonance of machine intelligence.\nPrompt engineering as an art form.';
         descEl.dataset.loop = 'true';
         // Start hero description typing immediately with loop
-        typeText(descEl, descEl.dataset.text, 10, true);
+        typeText(descEl, descEl.dataset.text, 30, true);
     }
 
     if (imageDescEl) {
