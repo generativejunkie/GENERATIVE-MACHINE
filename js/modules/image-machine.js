@@ -57,8 +57,8 @@ export const imageMachineSketch = (p) => {
             p.createCanvas(container.offsetWidth, container.offsetHeight).parent(container);
             p.background(255);
 
-            // Try to load initial image, fallback to color mode
-            const initialIndex = p.floor(p.random(imageFileNames.length));
+            // Load photo080.webp as default
+            const initialIndex = 79; // photo080.webp (0-indexed, so 80-1=79)
             loadImageDynamically(imageFileNames[initialIndex], (result) => {
                 if (result.success) {
                     currentImageKey = result.img.filePath;

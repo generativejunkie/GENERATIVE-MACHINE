@@ -2,18 +2,23 @@
 export function typeText(element, text, speed = 50, loop = false) {
     return new Promise((resolve) => {
         let i = 0;
-        element.textContent = '';
+        element.innerHTML = '';
         element.classList.remove('completed');
 
         const typeChar = () => {
             if (i < text.length) {
-                element.textContent += text.charAt(i);
+                const char = text.charAt(i);
+                if (char === '\n') {
+                    element.innerHTML += '<br>';
+                } else {
+                    element.innerHTML += char; // Use innerHTML to support <br>
+                }
                 i++;
                 setTimeout(typeChar, speed);
             } else {
                 if (loop) {
                     setTimeout(() => {
-                        element.textContent = '';
+                        element.innerHTML = '';
                         i = 0;
                         typeChar();
                     }, 5000); // 5秒待機
@@ -48,7 +53,7 @@ export function initTyping() {
     const footerEl = document.getElementById('footer-text');
 
     if (descEl) {
-        descEl.dataset.text = 'Exploring algorithmic beauty and the emotional resonance of machine intelligence. Prompt engineering as an art form.';
+        descEl.dataset.text = 'Exploring algorithmic beauty and the emotional resonance of machine intelligence.\nPrompt engineering as an art form.';
         descEl.dataset.loop = 'true';
         // Start hero description typing immediately with loop
         typeText(descEl, descEl.dataset.text, 30, true);
