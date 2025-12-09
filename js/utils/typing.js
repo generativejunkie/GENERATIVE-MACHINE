@@ -35,17 +35,21 @@ export function typeText(element, text, speed = 50, loop = false) {
 
 // Helper to prevent layout shift by reserving height
 function reserveHeight(element, text) {
-    if (!element) return;
+    if (!element || !element.parentElement) return;
 
     // Temporarily set full text to measure height
     const originalText = element.innerHTML;
     element.innerHTML = text.replace(/\n/g, '<br>');
 
-    // Get computed height
-    const height = element.offsetHeight;
+    // Force height calculation on parent
+    const parent = element.parentElement;
+    // Clear any previous height constraint to measure correctly
+    parent.style.minHeight = '';
 
-    // Set fixed height
-    element.style.minHeight = `${height}px`;
+    const height = parent.offsetHeight;
+
+    // Set fixed height on parent (because element is inline span)
+    parent.style.minHeight = `${height}px`;
 
     // Reset content
     element.innerHTML = originalText;
@@ -122,23 +126,22 @@ export function initTyping() {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
                 [descEl, imageDescEl, soundDescEl, storeDescEl, manifestoEl, footerEl].forEach(el => {
-                    if (el && el.dataset.text) {
+                    if (el && el.dataset.text && el.parentElement) {
+                        const parent = el.parentElement;
                         // Reset minHeight to allow recalculation
-                        el.style.minHeight = 'auto';
-                        // Only reserve height if not currently animating (simplification)
-                        // Or ideally, we should measure off-screen.
-                        // For now, simpler approach: just ensure minHeight is sufficient for full text
-                        // by creating a temporary clone to measure
-                        const clone = el.cloneNode(true);
-                        clone.style.position = 'absolute';
-                        clone.style.visibility = 'hidden';
-                        clone.style.height = 'auto';
-                        clone.style.width = getComputedStyle(el).width;
-                        clone.innerHTML = el.dataset.text.replace(/\n/g, '<br>');
-                        document.body.appendChild(clone);
-                        const h = clone.offsetHeight;
-                        document.body.removeChild(clone);
-                        el.style.minHeight = `${h}px`;
+                        parent.style.minHeight = '';
+
+                        // Measure needed height by temporarily filling content
+                        const originalHTML = el.innerHTML;
+                        el.innerHTML = el.dataset.text.replace(/\n/g, '<br>');
+
+                        const h = parent.offsetHeight;
+
+                        // Restore
+                        el.innerHTML = originalHTML;
+
+                        // Apply new height
+                        parent.style.minHeight = `${h}px`;
                     }
                 });
             }, 250);
