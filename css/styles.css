@@ -741,8 +741,17 @@ select {
     padding: var(--space-xl);
     border: 1px solid var(--color-border);
     border-radius: 4px;
+    width: 100%;
     max-width: 600px;
     margin: 0 auto;
+    box-sizing: border-box;
+    /* Ensure padding doesn't overflow width */
+}
+
+@media (max-width: 768px) {
+    .store-card {
+        padding: var(--space-md);
+    }
 }
 
 .store-icon {
