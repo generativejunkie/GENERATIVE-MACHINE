@@ -127,9 +127,12 @@ class VisualController {
             // Remove old slider groups to cleanup UI, but keep checkboxes
             const controls = settingsPanel.querySelectorAll('.control-group');
             controls.forEach(el => {
+                // If it's a checkbox group, ensure it's visible by clearing any inline display style
+                // forcing it to respect the CSS class definition.
                 if (el.classList.contains('checkbox-group')) {
-                    el.style.display = 'flex';
+                    el.style.display = '';
                 } else {
+                    // Hide the old slider controls
                     el.style.display = 'none';
                 }
             });
