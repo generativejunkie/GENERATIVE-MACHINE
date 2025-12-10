@@ -878,6 +878,25 @@ select {
         padding: var(--space-xs) var(--space-sm);
         font-size: var(--font-size-xs);
     }
+
+    /* Fix Sound Machine drop zone layout on mobile */
+    .drop-zone {
+        /* Padding to clear settings button (top) and balance margins */
+        padding: 70px 30px 30px 30px;
+    }
+
+    .drop-zone-content {
+        /* Make dashed box fill the available safe area */
+        width: 100%;
+        height: 100%;
+        /* Ensure content inside dashed box is centered */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        /* Reset padding since we use flex alignment now, or keep small padding */
+        padding: var(--space-md);
+    }
 }
 
 /* ==================== Accessibility ==================== */
