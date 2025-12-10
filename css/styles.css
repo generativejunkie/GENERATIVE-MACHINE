@@ -768,6 +768,13 @@ select {
     height: auto;
 }
 
+.manifesto-separator {
+    width: 60px;
+    height: 1px;
+    background-color: var(--color-border);
+    margin: var(--space-xl) auto;
+}
+
 /* ==================== Footer ==================== */
 .site-footer {
     border-top: 1px solid var(--color-border);
