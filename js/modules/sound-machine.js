@@ -530,6 +530,13 @@ async function initAudioContext() {
 }
 
 async function handleAudioFile(e) {
+    // Resume/Init context IMMEDIATELY to capture user gesture
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    // Always call resume on interaction
+    audioContext.resume().catch(() => { });
+
     const file = e.target.files[0];
     if (!file) return;
 
@@ -541,7 +548,12 @@ async function handleAudioFile(e) {
     updateTimeDisplay();
 
     try {
-        await initAudioContext();
+        if (!analyser) {
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 1024;
+            analyser.smoothingTimeConstant = 0.8;
+            analyser.connect(audioContext.destination);
+        }
 
         // Check file extension for AIFF to skip HTMLAudioElement
         // Chrome and some other browsers don't support AIFF in <audio> tags

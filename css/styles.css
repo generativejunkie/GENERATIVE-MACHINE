@@ -866,10 +866,15 @@ select {
 
     /* Sound Machine Mobile Tweaks */
     /* Sound Machine Mobile Tweaks */
+    /* Sound Machine Mobile Tweaks */
     .audio-player-controls {
         flex-direction: row;
         justify-content: center;
-        gap: 16px;
+        gap: 12px;
+        flex-wrap: nowrap;
+        /* Crucial for keeping them in one line */
+        width: 100%;
+        max-width: 100%;
     }
 
     /* Enforce fixed dimension for all control items (buttons and label wrapper) */
