@@ -458,7 +458,7 @@ input[type="range"]::-moz-range-thumb:hover {
 }
 
 .custom-checkbox input:checked~.checkmark {
-    background-color: var(--color-text);
+    background-color: var(--color-accent);
 }
 
 .checkmark:after {
