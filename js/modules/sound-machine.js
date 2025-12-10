@@ -588,7 +588,6 @@ function loadAudioAsElement(file) {
         const objectURL = URL.createObjectURL(file);
         const audio = new Audio();
         audio.crossOrigin = 'anonymous';
-        audio.src = objectURL;
 
         const timeout = setTimeout(() => {
             reject(new Error('Timeout waiting for metadata'));
@@ -600,10 +599,16 @@ function loadAudioAsElement(file) {
             playerState.element = audio;
             playerState.duration = audio.duration;
 
-            // Connect to analyser
-            const source = audioContext.createMediaElementSource(audio);
-            source.connect(analyser);
-            playerState.sourceNode = source;
+            try {
+                // Connect to analyser
+                const source = audioContext.createMediaElementSource(audio);
+                source.connect(analyser);
+                playerState.sourceNode = source;
+            } catch (e) {
+                console.warn('MediaElementSource creation failed, trying reset:', e);
+                reject(e);
+                return;
+            }
 
             // Event listeners
             audio.ontimeupdate = () => {
@@ -624,8 +629,12 @@ function loadAudioAsElement(file) {
 
         audio.onerror = (e) => {
             clearTimeout(timeout);
-            reject(e);
+            reject(new Error(`Audio element error: ${e.type}`));
         };
+
+        // Set src AFTER listeners are attached to prevent race condition
+        audio.src = objectURL;
+        audio.load();
     });
 }
 
@@ -730,9 +739,22 @@ function stopBuffer() {
 }
 
 function stopPlayback() {
+    if (playerState.sourceNode) {
+        try {
+            playerState.sourceNode.disconnect();
+        } catch (e) {
+            // Ignore if already disconnected
+        }
+        playerState.sourceNode = null;
+    }
+
     if (playerState.mode === 'element' && playerState.element) {
         playerState.element.pause();
         playerState.element.currentTime = 0;
+        // Optionally revoke object URL if we stored it, but we didn't store the URL string itself.
+        // Doing strict cleanup is good.
+        playerState.element.src = '';
+        playerState.element.load();
     } else if (playerState.mode === 'buffer') {
         stopBuffer();
     }
