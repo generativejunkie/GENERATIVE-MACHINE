@@ -563,6 +563,10 @@ select {
     border-radius: 4px;
     background: var(--color-bg-secondary);
     width: 100%;
+    max-width: 500px;
+    /* Constrain text width */
+    margin: 0 auto;
+    /* Center text/box */
 }
 
 .audio-player-controls {
