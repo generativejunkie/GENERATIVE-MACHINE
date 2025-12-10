@@ -54,7 +54,13 @@ export const imageMachineSketch = (p) => {
     p.setup = () => {
         try {
             const container = document.getElementById('imageCanvas-container');
-            p.createCanvas(container.offsetWidth, container.offsetHeight).parent(container);
+            if (!container) {
+                console.error('Image container not found');
+                return;
+            }
+            const w = container.offsetWidth || 300; // Fallback width
+            const h = container.offsetHeight || 300; // Fallback height
+            p.createCanvas(w, h).parent(container);
             p.background(255);
 
             // Load photo080.webp as default
