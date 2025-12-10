@@ -1411,3 +1411,20 @@ select {
         opacity: 0;
     }
 }
+
+.flash {
+    animation: flash-anim 0.1s infinite;
+    display: inline-block;
+}
+
+@keyframes flash-anim {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}

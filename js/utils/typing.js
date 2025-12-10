@@ -113,11 +113,8 @@ export function initTyping() {
         }
 
         if (footerEl) {
-            footerEl.dataset.text = 'ALL WAYS SUPER HIGH ⚡︎';
-            footerEl.dataset.loop = 'true';
-            reserveHeight(footerEl, footerEl.dataset.text);
-            // Start footer typing immediately with loop
-            typeText(footerEl, footerEl.dataset.text, 50, true);
+            // Static text with flashing effect (No typing animation)
+            footerEl.innerHTML = '<span class="flash">⚡︎</span> ALL WAYS SUPER HIGH <span class="flash">⚡︎</span>';
         }
 
         // Handle resize to update heights (debounced)
