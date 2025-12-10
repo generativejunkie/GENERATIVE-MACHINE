@@ -113,7 +113,7 @@ export function initTyping() {
         }
 
         if (footerEl) {
-            footerEl.dataset.text = 'ALL WAYS SUPER HIGH';
+            footerEl.dataset.text = 'ALL WAYS SUPER HIGH (^_^)';
             footerEl.dataset.loop = 'true';
             reserveHeight(footerEl, footerEl.dataset.text);
             // Start footer typing immediately with loop
