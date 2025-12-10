@@ -547,23 +547,11 @@ async function handleAudioFile(e) {
         // Chrome and some other browsers don't support AIFF in <audio> tags
         const isAIFF = file.name.toLowerCase().endsWith('.aiff') || file.name.toLowerCase().endsWith('.aif');
 
-        if (isAIFF) {
-            console.log('AIFF detected, skipping HTMLAudioElement and using AudioBuffer...');
-            await loadAudioAsBuffer(file);
-            console.log('Loaded as AudioBuffer');
-        } else {
-            // Try loading as Element first (streaming, better for long files)
-            try {
-                console.log('Attempting to load as HTMLAudioElement...');
-                await loadAudioAsElement(file);
-                console.log('Loaded as HTMLAudioElement');
-            } catch (elementError) {
-                console.warn('HTMLAudioElement failed, falling back to AudioBuffer:', elementError);
-                // Fallback to Buffer (better format support like AIFF)
-                await loadAudioAsBuffer(file);
-                console.log('Loaded as AudioBuffer');
-            }
-        }
+        // Always use AudioBuffer for reliable mobile performance and visualization
+        // HTMLAudioElement is flaky on iOS without direct user interaction for every step
+        console.log('Loading audio as AudioBuffer...');
+        await loadAudioAsBuffer(file);
+        console.log('Loaded as AudioBuffer');
 
         // UI Updates
         const dropZone = document.getElementById('dropZone');
@@ -571,7 +559,13 @@ async function handleAudioFile(e) {
         const playBtn = document.getElementById('playBtn');
 
         if (dropZone) dropZone.style.display = 'none';
-        if (audioPlayer) audioPlayer.classList.remove('hidden');
+        if (audioPlayer) {
+            audioPlayer.classList.remove('hidden');
+            // Ensure centered layout
+            audioPlayer.style.display = 'flex';
+            audioPlayer.style.justifyContent = 'center';
+            audioPlayer.style.width = '100%';
+        }
         if (playBtn) playBtn.disabled = false;
 
         // Reset file input
