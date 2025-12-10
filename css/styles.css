@@ -293,22 +293,24 @@ h3 {
 #imageCanvas-container,
 #soundCanvas-container {
     width: 100%;
-
-    .machine-controls {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-    }
-
-    .machine-controls.sound-controls {
-        display: grid;
-        gap: var(--space-md);
-        /* Ensure the grid itself takes full width but items are centered if they have max-width */
-        justify-items: center;
-    }
-
+    height: 100%;
+    display: flex;
+    align-items: center;
     justify-content: center;
     touch-action: none;
+}
+
+.machine-controls {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.machine-controls.sound-controls {
+    display: grid;
+    gap: var(--space-md);
+    /* Ensure the grid itself takes full width but items are centered if they have max-width */
+    justify-items: center;
 }
 
 #imageCanvas-container canvas,
