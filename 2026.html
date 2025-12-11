@@ -100,89 +100,57 @@
             animation: blink 2s ease-in-out infinite;
         }
 
-        /* SNS Links */
-        .sns-links {
-            display: flex;
-            align-items: center;
-        }
-
-        .sns-link {
-            display: block;
-            width: 32px;
-            /* 80% of previous 40px */
-            height: 32px;
-            color: var(--icon-color);
-            transition: color 0.3s ease, transform 0.3s ease;
-        }
-
-        .sns-link:hover {
-            color: var(--icon-hover);
-            transform: scale(1.1);
-        }
-
-        .sns-link svg {
-            width: 100%;
-            height: 100%;
-            fill: currentColor;
-        }
-
         /* Footer Container */
         .footer-links {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 2.4rem;
-            /* Reduced gap slightly */
+            gap: 3rem;
             margin-top: 4rem;
         }
 
-        /* Home Button (Footer Logo) */
-        .home-link {
-            display: block;
-            width: 96px;
-            /* 80% of previous 120px */
-            height: auto;
-            opacity: 0.8;
+        /* Common Footer Item Styles for alignment */
+        .footer-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: opacity 0.3s ease, transform 0.3s ease;
+            opacity: 0.7;
         }
 
-        .home-link:hover {
+        .footer-item:hover {
             opacity: 1;
-            transform: scale(1.05);
+            transform: scale(1.1);
         }
 
-        .home-link img {
+        .footer-item img,
+        .footer-item svg {
             display: block;
             width: 100%;
-            height: auto;
+            height: 100%;
             object-fit: contain;
+            fill: currentColor;
         }
 
-        /* Back Button (Top-Center Pill) */
+        /* 1. X Icon */
+        .sns-link {
+            width: 28px;
+            height: 28px;
+            color: var(--icon-color);
+        }
+
+        /* 2. Back Pill (Home) */
         .back-pill {
-            position: absolute;
-            top: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            display: block;
-            width: 50px;
-            /* Reduced to 50% of 100px */
+            width: 44px;
+            /* Visually balanced with X */
             height: auto;
-            z-index: 20;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            opacity: 0.8;
         }
 
-        .back-pill:hover {
-            opacity: 1;
-            transform: translateX(-50%) scale(1.05);
-            /* Maintain center transform */
-        }
-
-        .back-pill img {
-            width: 100%;
+        /* 3. Logo (Store) */
+        .home-link {
+            width: 70px;
+            /* Visually balanced with wide logo */
             height: auto;
-            display: block;
         }
 
         /* Mobile Responsive */
@@ -205,20 +173,9 @@
                 font-size: 0.6rem;
             }
 
-            .back-pill {
-                top: 1.5rem;
-                /* left/transform kept from main styles */
-                width: 40px;
-                /* Even smaller on mobile if needed, or keep 50px */
-            }
-
             .footer-links {
                 gap: 2rem;
                 margin-top: 3rem;
-            }
-
-            .home-link {
-                width: 100px;
             }
         }
 
@@ -238,11 +195,6 @@
 
 <body>
     <div class="glitch-layer"></div>
-
-    <!-- Back Button (Pill Image) -->
-    <a href="/" class="back-pill">
-        <img src="logo/back-arrow-white.png" alt="Back to Home">
-    </a>
 
     <!-- SoundCloud Background Audio (Invisible) -->
     <iframe width="1" height="1" scrolling="no" frameborder="no" allow="autoplay"
@@ -276,20 +228,24 @@
 
         <!-- Footer Links Container -->
         <div class="footer-links">
-            <!-- X (Twitter) - Share Link -->
-            <div class="sns-links">
-                <a href="https://twitter.com/intent/tweet?text=%3F%3F%3F%20%7C%20GENERATIVE%20JUNKIE&url=https%3A%2F%2Fgenerativejunkie.net%2F2026.html"
-                    target="_blank" rel="noopener noreferrer" class="sns-link" aria-label="Share on X">
-                    <svg viewBox="0 0 24 24">
-                        <path
-                            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                    </svg>
-                </a>
-            </div>
+            <!-- 1. X (Twitter) -->
+            <a href="https://twitter.com/intent/tweet?text=%3F%3F%3F%20%7C%20GENERATIVE%20JUNKIE&url=https%3A%2F%2Fgenerativejunkie.net%2F2026.html"
+                target="_blank" rel="noopener noreferrer" class="footer-item sns-link" aria-label="Share on X">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+            </a>
 
-            <!-- Home Button (Logo) -->
-            <a href="/" class="home-link" aria-label="Return to Home">
-                <img src="logo/home-icon.png" alt="Home">
+            <!-- 2. Back Pill (Home) -->
+            <a href="/" class="footer-item back-pill" aria-label="Back to Home">
+                <img src="logo/back-arrow-white.png" alt="Back to Home">
+            </a>
+
+            <!-- 3. Store (Logo) -->
+            <a href="https://generativejunkie.stores.jp" target="_blank" rel="noopener noreferrer"
+                class="footer-item home-link" aria-label="Store">
+                <img src="logo/home-icon.png" alt="Store">
             </a>
         </div>
     </div>
