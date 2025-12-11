@@ -1,15 +1,15 @@
-import { initTyping } from './utils/typing.js';
-import { initImageMachine } from './modules/image-machine.js';
-import { initSoundMachine } from './modules/sound-machine.js';
-// import { initCloneMachine } from './modules/clone-machine.js';
+// Main entry point for GENERATIVE MACHINE
+import { initImageMachine } from './modules/imageMachine.js';
+import { initSoundMachine } from './modules/soundMachine.js';
 import { initUI } from './modules/ui.js';
-import { initTour } from './modules/tour.js';
+import { initHero } from './modules/hero.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    initTyping();
+    // Initialize standard modules
+    initHero();
     initImageMachine();
     initSoundMachine();
-    // initCloneMachine();
     initUI();
-    initTour();
+
+    console.log('GENERATIVE MACHINE System Initialized');
 });
