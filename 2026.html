@@ -128,29 +128,26 @@
 
         /* Home Button */
         .home-link {
-            position: absolute;
-            top: 2rem;
-            left: 2rem;
-            width: 24px;
-            height: 24px;
+            display: block;
+            width: 32px;
+            /* Adjusted size for footer position if needed */
+            height: 32px;
             color: var(--icon-color);
-            transition: color 0.3s ease, transform 0.3s ease;
-            z-index: 20;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            margin-top: 4rem;
+            /* Spacing from X icon */
+            opacity: 0.5;
         }
 
         .home-link:hover {
-            color: var(--icon-hover);
+            opacity: 1;
             transform: scale(1.1);
         }
 
-        .home-link svg {
+        .home-link img {
             width: 100%;
             height: 100%;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
+            object-fit: contain;
         }
 
         /* Mobile Responsive */
@@ -172,11 +169,6 @@
             .unit-label {
                 font-size: 0.6rem;
             }
-
-            .home-link {
-                top: 1.5rem;
-                left: 1.5rem;
-            }
         }
 
         @keyframes blink {
@@ -195,11 +187,6 @@
 
 <body>
     <div class="glitch-layer"></div>
-
-    <!-- Home Button -->
-    <a href="/" class="home-link" aria-label="Return to Home">
-        <img src="logo/home-icon.png" alt="Home" style="width: 100%; height: 100%; object-fit: contain;">
-    </a>
 
     <div class="container">
         <!-- Countdown Timer -->
@@ -236,6 +223,11 @@
                 </svg>
             </a>
         </div>
+
+        <!-- Home Button -->
+        <a href="/" class="home-link" aria-label="Return to Home">
+            <img src="logo/home-icon.png" alt="Home">
+        </a>
     </div>
 
     <!-- Google Analytics -->
