@@ -126,28 +126,64 @@
             fill: currentColor;
         }
 
-        /* Home Button */
+        /* Home Button (Footer Logo) */
         .home-link {
             display: block;
-            width: 32px;
-            /* Adjusted size for footer position if needed */
-            height: 32px;
+            width: 80px;
+            /* Increased size */
+            height: 80px;
+            /* Increased size */
             color: var(--icon-color);
             transition: opacity 0.3s ease, transform 0.3s ease;
             margin-top: 4rem;
-            /* Spacing from X icon */
-            opacity: 0.5;
+            opacity: 0.8;
+            /* Increased visibility */
         }
 
         .home-link:hover {
             opacity: 1;
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
         .home-link img {
             width: 100%;
             height: 100%;
             object-fit: contain;
+        }
+
+        /* Back Button (Top-Left Pill) */
+        .back-pill {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 9999px;
+            /* Pill shape */
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+            z-index: 20;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .back-pill:hover {
+            border-color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .back-pill svg {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
         }
 
         /* Mobile Responsive */
@@ -169,6 +205,13 @@
             .unit-label {
                 font-size: 0.6rem;
             }
+
+            .back-pill {
+                top: 1.5rem;
+                left: 1.5rem;
+                padding: 0.4rem 1rem;
+                font-size: 0.7rem;
+            }
         }
 
         @keyframes blink {
@@ -187,6 +230,14 @@
 
 <body>
     <div class="glitch-layer"></div>
+
+    <!-- Back Button (Pill) -->
+    <a href="/" class="back-pill">
+        <svg viewBox="0 0 24 24">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span>BACK</span>
+    </a>
 
     <div class="container">
         <!-- Countdown Timer -->
