@@ -158,14 +158,15 @@
             object-fit: contain;
         }
 
-        /* Back Button (Top-Left Pill) */
+        /* Back Button (Top-Center Pill) */
         .back-pill {
             position: absolute;
             top: 2rem;
-            left: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
             display: block;
-            width: 100px;
-            /* Slight adjustment */
+            width: 50px;
+            /* Reduced to 50% of 100px */
             height: auto;
             z-index: 20;
             transition: opacity 0.3s ease, transform 0.3s ease;
@@ -174,7 +175,8 @@
 
         .back-pill:hover {
             opacity: 1;
-            transform: scale(1.05);
+            transform: translateX(-50%) scale(1.05);
+            /* Maintain center transform */
         }
 
         .back-pill img {
@@ -205,8 +207,9 @@
 
             .back-pill {
                 top: 1.5rem;
-                left: 1.5rem;
-                width: 100px;
+                /* left/transform kept from main styles */
+                width: 40px;
+                /* Even smaller on mobile if needed, or keep 50px */
             }
 
             .footer-links {
@@ -241,6 +244,12 @@
         <img src="logo/back-arrow-white.png" alt="Back to Home">
     </a>
 
+    <!-- SoundCloud Background Audio (Invisible) -->
+    <iframe width="1" height="1" scrolling="no" frameborder="no" allow="autoplay"
+        style="position: absolute; opacity: 0; pointer-events: none;"
+        src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/shota-miyagie/gie-maeda-kensuke&color=%23ff5500&auto_play=true&hide_related=false&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false">
+    </iframe>
+
     <div class="container">
         <!-- Countdown Timer -->
         <div class="countdown" id="countdown">
@@ -269,7 +278,7 @@
         <div class="footer-links">
             <!-- X (Twitter) - Share Link -->
             <div class="sns-links">
-                <a href="https://twitter.com/intent/tweet?text=%3F%3F%3F%20%7C%20GENERATIVE%20MACHINE&url=https%3A%2F%2Fgenerativejunkie.net%2F2026.html"
+                <a href="https://twitter.com/intent/tweet?text=%3F%3F%3F%20%7C%20GENERATIVE%20JUNKIE&url=https%3A%2F%2Fgenerativejunkie.net%2F2026.html"
                     target="_blank" rel="noopener noreferrer" class="sns-link" aria-label="Share on X">
                     <svg viewBox="0 0 24 24">
                         <path

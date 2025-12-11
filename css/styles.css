@@ -223,8 +223,8 @@ h3 {
 
 .countdown-icon {
     animation: blink-soft 2s infinite ease-in-out;
-    margin-top: -2px;
-    /* Fine-tune vertical alignment with text cap-height */
+    margin-top: 2px;
+    /* Pushed down to align with text baseline */
 }
 
 @keyframes blink-soft {
