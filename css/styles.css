@@ -1564,3 +1564,115 @@ select {
         opacity: 0;
     }
 }
+
+/* ==================== Manifesto 2.0 ==================== */
+/* ==================== Manifesto 2.0 (Refined) ==================== */
+.manifesto-header {
+    text-align: center;
+    margin-bottom: var(--space-lg);
+}
+
+.lead-text {
+    font-family: var(--font-family-primary);
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    font-weight: 300;
+}
+
+.manifesto-rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+}
+
+.manifesto-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+}
+
+@media (min-width: 900px) {
+    .manifesto-row {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-xl);
+    }
+}
+
+.lang-col {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Remove old lang-label styles if not used, or keep for potential future use */
+.lang-label {
+    display: none;
+}
+
+/* 01, 02, 03 Styling */
+.manifesto-h3 {
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-sm);
+    color: var(--color-text-primary);
+}
+
+.manifesto-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-md) 0;
+}
+
+.manifesto-list li {
+    font-family: var(--font-family-primary);
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-sm);
+    padding-left: var(--space-md);
+    position: relative;
+    line-height: 1.4;
+    font-weight: 300;
+}
+
+.manifesto-list li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+}
+
+.manifesto-list.plain li {
+    font-family: var(--font-family-primary);
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-sm);
+}
+
+.manifesto-list.plain li::before {
+    content: "•";
+    font-size: 0.8em;
+    top: 0;
+}
+
+.sub-label {
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin: var(--space-sm) 0;
+}
+
+.inline-link {
+    display: inline-block;
+    margin-top: var(--space-sm);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-sm);
+    text-decoration: none;
+    color: var(--color-accent);
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 2px;
+    transition: opacity var(--transition-base);
+}
+
+.inline-link:hover {
+    opacity: 0.6;
+}

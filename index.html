@@ -136,11 +136,47 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
 
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/tour.css">
 </head>
 
 <body>
     <!-- Skip Link -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Initial Tour Overlay -->
+    <div id="tourOverlay" class="tour-overlay">
+        <div class="tour-card">
+            <h3 class="tour-title">SYSTEM INITIATION</h3>
+            <div class="tour-steps">
+                <div class="tour-step">
+                    <span class="step-number">1</span>
+                    <div class="step-content">
+                        <h4>Touch the Chaos</h4>
+                        <p>Click or tap the <strong>Image Machine</strong> to generate random visual variances.</p>
+                    </div>
+                </div>
+                <div class="tour-step">
+                    <span class="step-number">2</span>
+                    <div class="step-content">
+                        <h4>Visualize Sound</h4>
+                        <p>Upload your own audio file to the <strong>Sound Machine</strong> to see the "Sixth Sense" in
+                            action.</p>
+                    </div>
+                </div>
+                <div class="tour-step">
+                    <span class="step-number">3</span>
+                    <div class="step-content">
+                        <h4>Explore the Logic</h4>
+                        <p>Visit the <strong>System Architecture</strong> page to understand the calculated aesthetics.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="tour-actions">
+                <button id="startTourBtn" class="btn-start">INITIALIZE</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Header -->
     <header class="site-header" role="banner">
@@ -441,59 +477,124 @@
                 </header>
 
                 <div class="about-container">
-                    <div class="manifesto-content">
-                        <!-- Ideology Tree (Thinker Update) -->
-                        <div class="ideology-tree">
-                            <div class="tree-level">
-                                <span class="level-label">VISION</span>
-                                <h3 class="level-title">Post-Capitalism / Economy of Love</h3>
-                                <p class="level-desc">Nullifying scarcity through infinite generation.</p>
+                    <div class="manifesto-header">
+                        <p class="lead-text">Human intuition × Machine intelligence.<br>Where imagination governs
+                            computation.</p>
+                    </div>
+
+                    <!-- Refactored Row-based Layout for Alignment -->
+                    <div class="manifesto-rows">
+
+                        <!-- ROW 01: IDEOLOGY -->
+                        <div class="manifesto-row">
+                            <div class="lang-col lang-en">
+                                <h3 class="manifesto-h3">01 — IDEOLOGY</h3>
+                                <p>GENERATIVE JUNKIE is a creative collective exploring prompt engineering as a pure
+                                    form of expression—a point where human intuition, conceptual design, and algorithmic
+                                    logic converge.</p>
+                                <p>We believe that the true power of AI is amplification, not automation. By
+                                    reprogramming machine logic through human perception, we aim to build an ecosystem
+                                    where gift, resonance, and imagination circulate beyond scarcity-driven systems.</p>
+                                <ul class="manifesto-list">
+                                    <li>Intuition governs logic</li>
+                                    <li>Generativity creates abundance</li>
+                                    <li>Beauty emerges between control and chaos</li>
+                                </ul>
                             </div>
-                            <div class="tree-connector">↓</div>
-                            <div class="tree-level">
-                                <span class="level-label">CONCEPT</span>
-                                <h3 class="level-title">Calculated Aesthetics x Machine Emotion</h3>
-                                <p class="level-desc">Human intuition guiding deeper logic.</p>
-                            </div>
-                            <div class="tree-connector">↓</div>
-                            <div class="tree-level">
-                                <span class="level-label">IMPLEMENTATION</span>
-                                <h3 class="level-title">GENERATIVE MACHINE</h3>
-                                <p class="level-desc">The apparatus for sensory expansion.</p>
+                            <div class="lang-col lang-jp">
+                                <h3 class="manifesto-h3">01 — イデオロギー</h3>
+                                <p>GENERATIVE JUNKIE
+                                    は、プロンプトエンジニアリングを純粋な表現形式として追求するクリエイティブ・コレクティブです。人間の直観、コンセプト設計、アルゴリズムが交差する地点を探求します。
+                                </p>
+                                <p>AI
+                                    の本質的な力は「自動化」ではなく、人間の感性を拡張することにあると考えています。直観によるロジックの再構築を通じて、贈与・共鳴・想像力が循環する新しい生態系を生み出します。
+                                </p>
+                                <ul class="manifesto-list">
+                                    <li>直観はロジックを統御する</li>
+                                    <li>生成は欠乏を超える</li>
+                                    <li>美は制御と混沌の狭間に宿る</li>
+                                </ul>
                             </div>
                         </div>
 
-                        <div class="manifesto-separator"></div>
-
-                        <!-- Philosophy References (Philosopher Update) -->
-                        <div class="philosophy-refs">
-                            <p class="ref-quote">"The simulation is no longer that of a territory, a referential
-                                being or a substance." — <em>Jean Baudrillard (Simulacra)</em></p>
-                            <p class="ref-quote">"Perception is not a science of the world, it is not an act, a
-                                deliberate taking up of a position; it is the background from which all acts stand
-                                out." — <em>Merleau-Ponty (Phenomenology)</em></p>
+                        <!-- ROW 02: PRACTICE -->
+                        <div class="manifesto-row">
+                            <div class="lang-col lang-en">
+                                <h3 class="manifesto-h3">02 — PRACTICE</h3>
+                                <p>We extend the five human senses and cultivate a sixth intelligence that arises at the
+                                    intersection of perception and computation.</p>
+                                <p class="sub-label">We design:</p>
+                                <ul class="manifesto-list">
+                                    <li>Algorithmic visual engines</li>
+                                    <li>Audio-reactive structures</li>
+                                    <li>Interactive installations</li>
+                                    <li>Conceptual frameworks</li>
+                                    <li>Physical artifacts and apparel</li>
+                                </ul>
+                                <p>Each output is a translation of imagination into machine-driven form.</p>
+                            </div>
+                            <div class="lang-col lang-jp">
+                                <h3 class="manifesto-h3">02 — プラクティス</h3>
+                                <p>五感を拡張し、知覚と計算の交差点に生まれる <strong>第六の知性</strong> を育てます。</p>
+                                <p class="sub-label">制作領域：</p>
+                                <ul class="manifesto-list">
+                                    <li>アルゴリズミック・ビジュアルシステム</li>
+                                    <li>オーディオリアクティブ表現</li>
+                                    <li>インタラクティブ作品</li>
+                                    <li>思想・文脈設計</li>
+                                    <li>生成ロジックを宿したプロダクト / アパレル</li>
+                                </ul>
+                                <p>すべてのアウトプットは、想像力を機械生成へ翻訳した「思考の痕跡」です。</p>
+                            </div>
                         </div>
 
-                        <p class="lang-en mt-md">
-                            GENERATIVE JUNKIE is a creative collective pursuing prompt engineering as the ultimate
-                            form
-                            of expression. We traverse all domains from art direction to engineering, pioneering
-                            unknown scenes where
-                            human intuition and imagination govern machine logic.
-                        </p>
-
-                        <p class="lang-jp mt-sm">
-                            GENERATIVE JUNKIE
-                            (ジェネレイティブ・ジャンキー)は、AIを自在に操る人間が描く「計算された美学」と「機械知性の情動」を核に、プロンプトエンジニアリングを表現の極致として追求するクリエイティブ・コレクティブです。
-                        </p>
-
-                        <div class="manifesto-actions mt-lg">
-                            <a href="architecture.html" class="btn btn-primary"
-                                style="width: 100%; text-align: center;">
-                                VIEW SYSTEM ARCHITECTURE <span
-                                    style="font-size: 0.8em; opacity: 0.7;">(BLUEPRINT)</span>
-                            </a>
+                        <!-- ROW 03: TECHNE -->
+                        <div class="manifesto-row">
+                            <div class="lang-col lang-en">
+                                <h3 class="manifesto-h3">03 — TECHNE</h3>
+                                <p>Our practice spans from art direction to engineering and system architecture.</p>
+                                <ul class="manifesto-list plain">
+                                    <li><strong>Image Machine:</strong> spatial modulation, noise structures, parametric
+                                        distortion</li>
+                                    <li><strong>Sound Machine:</strong> real-time frequency analysis mapped into visual
+                                        transformation</li>
+                                    <li><strong>Generative Capsules:</strong> encoded parameter worlds constructed
+                                        through prompt engineering</li>
+                                </ul>
+                                <p>A modular architecture allows ideas to evolve into tools—and tools into new creative
+                                    environments.</p>
+                                <a href="architecture.html" class="inline-link">VIEW SYSTEM ARCHITECTURE →</a>
+                            </div>
+                            <div class="lang-col lang-jp">
+                                <h3 class="manifesto-h3">03 — テクネ</h3>
+                                <p>アートディレクションから工学、システムアーキテクチャまで横断的に活動します。</p>
+                                <ul class="manifesto-list plain">
+                                    <li><strong>Image Machine：</strong>空間モジュレーション、ノイズ構造、パラメトリック変形</li>
+                                    <li><strong>Sound Machine：</strong>周波数解析・音響特性をリアルタイムで視覚化</li>
+                                    <li><strong>Generative Capsules：</strong>パラメータ世界をコード化した生成単位</li>
+                                </ul>
+                                <p>モジュール的な構造によって、アイデアはツールへ、ツールは新たな環境へと発展します。</p>
+                                <a href="architecture.html" class="inline-link">VIEW SYSTEM ARCHITECTURE →</a>
+                            </div>
                         </div>
+
+                        <!-- ROW 04: VISION -->
+                        <div class="manifesto-row">
+                            <div class="lang-col lang-en">
+                                <h3 class="manifesto-h3">04 — VISION</h3>
+                                <p>GENERATIVE JUNKIE reframes the aesthetics of an accelerating, distorted society into
+                                    new possibilities for expression and agency.</p>
+                                <p>Where human imagination commands digital computation, new norms begin to
+                                    emerge—shaped by code, rhythm, and emotional intelligence.</p>
+                            </div>
+                            <div class="lang-col lang-jp">
+                                <h3 class="manifesto-h3">04 — ビジョン</h3>
+                                <p>GENERATIVE JUNKIE は、加速し歪んだ社会の美学を、可能性と創造性へと反転させます。</p>
+                                <p>人間の想像力がデジタル演算を従える場所で、新しい規範が生まれる。</p>
+                                <p>コード、リズム、情動的知性によって形づくられた未来へ。</p>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>

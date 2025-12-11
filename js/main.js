@@ -3,6 +3,7 @@ import { initImageMachine } from './modules/image-machine.js';
 import { initSoundMachine } from './modules/sound-machine.js';
 // import { initCloneMachine } from './modules/clone-machine.js';
 import { initUI } from './modules/ui.js';
+import { initTour } from './modules/tour.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     initTyping();
@@ -10,4 +11,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initSoundMachine();
     // initCloneMachine();
     initUI();
+    initTour();
 });
