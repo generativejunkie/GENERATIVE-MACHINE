@@ -161,6 +161,15 @@ h3 {
     color: var(--color-text-primary);
     text-decoration: none;
     line-height: 1.1;
+    white-space: nowrap;
+    /* Prevent wrapping */
+}
+
+@media (max-width: 768px) {
+    .logo {
+        font-size: 1rem;
+        /* Smaller font size for mobile */
+    }
 }
 
 .nav-menu {
@@ -214,6 +223,8 @@ h3 {
 
 .countdown-icon {
     animation: blink-soft 2s infinite ease-in-out;
+    margin-top: -2px;
+    /* Fine-tune vertical alignment with text cap-height */
 }
 
 @keyframes blink-soft {
