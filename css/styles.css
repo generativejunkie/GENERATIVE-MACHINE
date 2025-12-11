@@ -194,6 +194,40 @@ h3 {
     width: 100%;
 }
 
+/* Countdown Icon */
+.countdown-link {
+    display: flex;
+    align-items: center;
+    opacity: 0.6;
+    transition: opacity var(--transition-base), color var(--transition-base);
+}
+
+.countdown-link:hover {
+    opacity: 1;
+    color: var(--color-accent);
+}
+
+.countdown-link::after {
+    display: none !important;
+    /* No underline for icon */
+}
+
+.countdown-icon {
+    animation: blink-soft 2s infinite ease-in-out;
+}
+
+@keyframes blink-soft {
+
+    0%,
+    100% {
+        opacity: 0.4;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
 /* ==================== Hero ==================== */
 .hero {
     min-height: 100vh;

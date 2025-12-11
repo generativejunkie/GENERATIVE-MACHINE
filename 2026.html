@@ -103,14 +103,14 @@
         /* SNS Links */
         .sns-links {
             display: flex;
-            gap: 2rem;
-            margin-top: 2rem;
+            align-items: center;
         }
 
         .sns-link {
             display: block;
-            width: 24px;
-            height: 24px;
+            width: 40px;
+            /* Matched visual size */
+            height: 40px;
             color: var(--icon-color);
             transition: color 0.3s ease, transform 0.3s ease;
         }
@@ -126,18 +126,24 @@
             fill: currentColor;
         }
 
+        /* Footer Container */
+        .footer-links {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3rem;
+            /* Spacing between X and Logo */
+            margin-top: 4rem;
+        }
+
         /* Home Button (Footer Logo) */
         .home-link {
             display: block;
-            width: 80px;
-            /* Increased size */
-            height: 80px;
-            /* Increased size */
-            color: var(--icon-color);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            margin-top: 4rem;
+            width: 120px;
+            /* Adjusted to visually match the X icon's weight */
+            height: auto;
             opacity: 0.8;
-            /* Increased visibility */
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
         .home-link:hover {
@@ -146,8 +152,9 @@
         }
 
         .home-link img {
+            display: block;
             width: 100%;
-            height: 100%;
+            height: auto;
             object-fit: contain;
         }
 
@@ -156,34 +163,24 @@
             position: absolute;
             top: 2rem;
             left: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1.2rem;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 9999px;
-            /* Pill shape */
-            color: var(--text-color);
-            text-decoration: none;
-            font-size: 0.8rem;
-            letter-spacing: 0.1em;
-            transition: all 0.3s ease;
+            display: block;
+            width: 120px;
+            /* Adjust based on image aspect ratio */
+            height: auto;
             z-index: 20;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            opacity: 0.8;
         }
 
         .back-pill:hover {
-            border-color: rgba(255, 255, 255, 0.8);
-            background: rgba(255, 255, 255, 0.1);
+            opacity: 1;
+            transform: scale(1.05);
         }
 
-        .back-pill svg {
-            width: 16px;
-            height: 16px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
+        .back-pill img {
+            width: 100%;
+            height: auto;
+            display: block;
         }
 
         /* Mobile Responsive */
@@ -209,8 +206,16 @@
             .back-pill {
                 top: 1.5rem;
                 left: 1.5rem;
-                padding: 0.4rem 1rem;
-                font-size: 0.7rem;
+                width: 100px;
+            }
+
+            .footer-links {
+                gap: 2rem;
+                margin-top: 3rem;
+            }
+
+            .home-link {
+                width: 100px;
             }
         }
 
@@ -231,12 +236,9 @@
 <body>
     <div class="glitch-layer"></div>
 
-    <!-- Back Button (Pill) -->
+    <!-- Back Button (Pill Image) -->
     <a href="/" class="back-pill">
-        <svg viewBox="0 0 24 24">
-            <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
-        <span>BACK</span>
+        <img src="logo/back-pill-new.png" alt="Back to Home">
     </a>
 
     <div class="container">
@@ -263,22 +265,24 @@
             </div>
         </div>
 
-        <!-- SNS Links -->
-        <div class="sns-links">
+        <!-- Footer Links Container -->
+        <div class="footer-links">
             <!-- X (Twitter) - Share Link -->
-            <a href="https://twitter.com/intent/tweet?text=COUNTDOWN%202026%20%7C%20GENERATIVE%20MACHINE&url=https%3A%2F%2Fgenerativejunkie.net%2F2026.html"
-                target="_blank" rel="noopener noreferrer" class="sns-link" aria-label="Share on X">
-                <svg viewBox="0 0 24 24">
-                    <path
-                        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
+            <div class="sns-links">
+                <a href="https://twitter.com/intent/tweet?text=COUNTDOWN%202026%20%7C%20GENERATIVE%20MACHINE&url=https%3A%2F%2Fgenerativejunkie.net%2F2026.html"
+                    target="_blank" rel="noopener noreferrer" class="sns-link" aria-label="Share on X">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    </svg>
+                </a>
+            </div>
+
+            <!-- Home Button (Logo) -->
+            <a href="/" class="home-link" aria-label="Return to Home">
+                <img src="logo/home-icon.png" alt="Home">
             </a>
         </div>
-
-        <!-- Home Button -->
-        <a href="/" class="home-link" aria-label="Return to Home">
-            <img src="logo/home-icon.png" alt="Home">
-        </a>
     </div>
 
     <!-- Google Analytics -->
