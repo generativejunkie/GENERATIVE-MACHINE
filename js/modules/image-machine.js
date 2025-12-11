@@ -1,23 +1,17 @@
 // ==================== IMAGE MACHINE ====================
+import { CONFIG } from '../config/config.js';
+
 export const imageMachineSketch = (p) => {
-    const imageCount = 383;
+    const imageCount = CONFIG.IMAGE_MACHINE.TOTAL_IMAGES;
     const imageFileNames = [];
 
     // Generate image file names
     for (let i = 1; i <= imageCount; i++) {
-        imageFileNames.push(`/photos/photo${i.toString().padStart(3, '0')}.webp`);
+        imageFileNames.push(`${CONFIG.IMAGE_MACHINE.PATH_PREFIX}${i.toString().padStart(3, '0')}${CONFIG.IMAGE_MACHINE.FILE_EXTENSION}`);
     }
 
     // Fallback color patterns if images not available
-    const colorPatterns = [
-        ['#FF6B6B', '#4ECDC4', '#45B7D1', '#F7DC6F', '#BB8FCE'],
-        ['#96CEB4', '#FFEAA7', '#DFE6E9', '#74B9FF', '#FD79A8'],
-        ['#A29BFE', '#FD79A8', '#FDCB6E', '#6C5CE7', '#00B894'],
-        ['#74B9FF', '#A29BFE', '#FD79A8', '#FDCB6E', '#00CEC9'],
-        ['#00B894', '#00CEC9', '#0984E3', '#6C5CE7', '#FD79A8'],
-        ['#E17055', '#FDCB6E', '#00B894', '#74B9FF', '#A29BFE'],
-        ['#2D3436', '#636E72', '#B2BEC3', '#DFE6E9', '#FFFFFF']
-    ];
+    const colorPatterns = CONFIG.COLOR_PATTERNS;
 
     let allImages = {};
     let currentImageKey = null;
@@ -25,8 +19,8 @@ export const imageMachineSketch = (p) => {
     let animationState = 'loading';
     let animationFrame = 0;
     let transitionType = 'blocks';
-    const chaosDuration = 15;
-    const transitionDuration = 20;
+    const chaosDuration = CONFIG.IMAGE_MACHINE.CHAOS_DURATION;
+    const transitionDuration = CONFIG.IMAGE_MACHINE.TRANSITION_DURATION;
     let promptTimer = null;
     let useColorMode = false; // Flag for fallback mode
     let imageLoadAttempts = 0;
@@ -64,7 +58,7 @@ export const imageMachineSketch = (p) => {
             p.background(255);
 
             // Load photo080.webp as default
-            const initialIndex = 79; // photo080.webp (0-indexed, so 80-1=79)
+            const initialIndex = CONFIG.IMAGE_MACHINE.INITIAL_IMAGE_INDEX; // photo080.webp (0-indexed)
             loadImageDynamically(imageFileNames[initialIndex], (result) => {
                 if (result.success) {
                     currentImageKey = result.img.filePath;
