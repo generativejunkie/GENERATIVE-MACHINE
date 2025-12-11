@@ -166,9 +166,22 @@ h3 {
 }
 
 @media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+
     .logo {
         font-size: 1rem;
         /* Smaller font size for mobile */
+        margin-bottom: 0.25rem;
+    }
+
+    .nav-menu {
+        gap: 1rem;
+        /* Reduce gap between links on mobile */
     }
 }
 
