@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Test</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background: #d4edda; }
+        .error { background: #f8d7da; }
+    </style>
+</head>
+<body>
+    <h1>Mandala Machine Debug Test</h1>
+    <div id="results"></div>
+
+    <script type="module">
+        const results = document.getElementById('results');
+
+        function addResult(test, success, message) {
+            const div = document.createElement('div');
+            div.className = 'test ' + (success ? 'success' : 'error');
+            div.innerHTML = `<strong>${test}:</strong> ${success ? '✓' : '✗'} ${message}`;
+            results.appendChild(div);
+        }
+
+        // Test 1: Three.js import
+        try {
+            const THREE = await import('three');
+            addResult('Three.js Import', true, 'Successfully imported THREE.js');
+        } catch (error) {
+            addResult('Three.js Import', false, error.message);
+        }
+
+        // Test 2: Application import
+        try {
+            const { Application } = await import('/src/core/Application.ts');
+            addResult('Application Import', true, 'Successfully imported Application class');
+
+            // Test 3: Create Application instance
+            try {
+                const app = new Application('test-container');
+                addResult('Application Instantiation', true, 'Application instance created');
+
+                // Test 4: Start application
+                try {
+                    app.start();
+                    addResult('Application Start', true, 'Application started successfully');
+
+                    // Show API
+                    const div = document.createElement('div');
+                    div.className = 'test';
+                    div.innerHTML = `
+                        <strong>Available Methods:</strong><br>
+                        - addRandomObject(): ${typeof window.addRandomObject}<br>
+                        - clearAll(): ${typeof window.clearAll}<br>
+                        - toggleMandala(): ${typeof window.toggleMandala}<br>
+                    `;
+                    results.appendChild(div);
+                } catch (error) {
+                    addResult('Application Start', false, error.message);
+                    console.error(error);
+                }
+            } catch (error) {
+                addResult('Application Instantiation', false, error.message);
+                console.error(error);
+            }
+        } catch (error) {
+            addResult('Application Import', false, error.message);
+            console.error(error);
+        }
+
+        // Test 5: MATERIALS import
+        try {
+            const { MATERIALS } = await import('/src/materials/geometries.ts');
+            addResult('Materials Import', true, `Loaded ${MATERIALS.length} materials`);
+        } catch (error) {
+            addResult('Materials Import', false, error.message);
+        }
+    </script>
+
+    <div id="test-container" style="width: 100px; height: 100px; background: #f0f0f0; margin-top: 20px;"></div>
+</body>
+</html>

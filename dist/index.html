@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>𖣔 Mandala Machine</title>
+    <link rel="icon" href="data:,">
+  <script type="module" crossorigin src="/assets/index-tqx9ZQ9s.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-STG_uaz5.css">
+</head>
+
+<body tabindex="0">
+    <div id="app-root">
+        <!-- 左パネル (PRESETS) -->
+        <div id="leftPanel" class="panel-side">
+            <div class="panel-header">
+                <h3 data-i18n="objects">OBJECTS</h3>
+                <div class="count-badge">
+                    <input type="number" id="objectCount" class="count-input" value="0" min="0" max="100">
+                </div>
+            </div>
+            <div class="preset-grid-left" id="presetGridLeft">
+                <!-- JavaScriptで動的生成 -->
+            </div>
+
+            <div class="panel-header" style="margin-top: 20px;">
+                <h3 data-i18n="visuals">VISUALS</h3>
+            </div>
+            <div class="preset-grid-left" id="visualGridLeft">
+                <!-- JavaScriptで動的生成 -->
+            </div>
+            <div class="upload-section">
+                <button id="uploadMediaBtn" class="upload-btn" data-i18n="upload">+ MEDIA</button>
+                <input type="file" id="mediaUpload" accept="image/*,video/*" style="display: none;">
+            </div>
+            <div class="text-input-section">
+                <input type="text" id="canvasText" placeholder="Enter text..." maxlength="50">
+            </div>
+
+            <!-- トランジションパネル (左パネルに移動) -->
+            <div class="transition-panel-compact">
+                <div class="panel-header">
+                    <h3 data-i18n="transition">TRANSITION</h3>
+                </div>
+                <div class="transition-buttons-grid">
+                    <button class="transition-btn" data-transition="fadeIn">Fade</button>
+                    <button class="transition-btn" data-transition="scaleIn">Scale</button>
+                    <button class="transition-btn" data-transition="slideIn">Slide</button>
+                    <button class="transition-btn" data-transition="rotateIn">Rotate</button>
+                    <button class="transition-btn active" data-transition="random">Random</button>
+                </div>
+                <button id="nextImageBtn" class="next-image-btn" data-i18n="next">Next Visual →</button>
+            </div>
+
+            <div class="panel-header" style="margin-top: 20px;">
+                <h3 data-i18n="wireframe">WIREFRAME</h3>
+            </div>
+            <div class="wireframe-controls-grid">
+                <button class="transition-btn stroke-btn active" data-wireframe="solid" id="solidModeBtn"
+                    data-i18n="solid">Solid</button>
+                <button class="transition-btn stroke-btn" data-wireframe="wireframe" id="wireModeBtn"
+                    data-i18n="wire">Wire</button>
+                <button class="transition-btn stroke-btn" data-wireframe="mixed" id="mixModeBtn"
+                    data-i18n="mix">Mix</button>
+            </div>
+        </div>
+
+        <!-- メインパネル (Canvas + Controls) -->
+        <div id="mainPanel">
+            <!-- 上部モードバー -->
+            <div id="topBar">
+                <div class="mode-control-bar">
+                    <!-- Left Side: Features -->
+                    <button id="topAiBtn" class="mode-btn" title="Space Mode" data-i18n-title="space">
+                        <span class="icon icon-space">✨</span>
+                        <span data-i18n="space">宇宙</span>
+                    </button>
+                    <button id="topMandalaBtn" class="mode-btn" title="Mandala Mode" aria-label="曼荼羅モードを切り替え"
+                        aria-pressed="false" role="switch" data-i18n-title="mandala">
+                        <span class="icon icon-mandala" aria-hidden="true"></span>
+                        <span data-i18n="mandala">MANDALA</span>
+                    </button>
+                    <button id="topMirrorBallBtn" class="mode-btn" title="Mirror Ball Mode">
+                        <span class="icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="2" x2="12" y2="22"></line>
+                                <path
+                                    d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                                </path>
+                                <path d="M2 12h20"></path>
+                            </svg>
+                        </span>
+                        <span>MIRROR</span>
+                    </button>
+                    <button id="topAutoBtn" class="mode-btn" title="Auto Generate" data-i18n-title="auto">
+                        <span class="icon icon-auto"></span>
+                        <span data-i18n="auto">AUTO</span>
+                    </button>
+                    <button id="topGravityBtn" class="mode-btn" title="Antigravity" data-i18n-title="gravity">
+                        <span class="icon icon-gravity"></span>
+                        <span data-i18n="gravity">GRAVITY</span>
+                    </button>
+
+                    <div class="divider-vertical"></div>
+
+                    <!-- Center: View Options -->
+                    <button id="topSolidBtn" class="mode-btn active" title="Solid Mode">
+                        <span class="icon icon-solid"></span>
+                    </button>
+                    <button id="topWireBtn" class="mode-btn" title="Wireframe Mode">
+                        <span class="icon icon-wire"></span>
+                    </button>
+                    <button id="topMixBtn" class="mode-btn" title="Mixed Mode">
+                        <span class="icon icon-mix"></span>
+                    </button>
+
+                    <div class="divider-vertical"></div>
+
+                    <!-- Right Side: System & Tools -->
+                    <button id="topMicBtn" class="mode-btn" title="Mic Input">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                            <line x1="12" y1="19" x2="12" y2="23"></line>
+                            <line x1="8" y1="23" x2="16" y2="23"></line>
+                        </svg>
+                    </button>
+                    <button id="topDarkModeBtn" class="mode-btn" title="Dark Mode">
+                        <svg class="moon-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <svg class="sun-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            style="display: none;">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                    </button>
+                    <button id="topFullscreenBtn" class="mode-btn" title="Fullscreen">
+                        <span class="icon icon-fullscreen"></span>
+                    </button>
+                </div>
+
+                <!-- Expandable Seekbars (Overlay) -->
+                <div class="mode-seekbars" id="modeSeekbars" style="display: none;">
+                    <div class="seekbar-item" id="mandalaSeekbar">
+                        <label>Symmetry: <span id="symmetryValue">4</span></label>
+                        <input type="range" id="symmetrySeekbar" min="3" max="12" step="1" value="4">
+                    </div>
+                    <div class="seekbar-item" id="aiSeekbar">
+                        <label>AI Speed: <span id="aiSpeedSeekValue">5</span></label>
+                        <input type="range" id="aiSpeedSeekbar" min="1" max="10" step="1" value="5">
+                    </div>
+                    <div class="seekbar-item" id="autoGenSeekbar">
+                        <label>Speed: <span id="autoSpeedSeekValue">0</span></label>
+                        <input type="range" id="autoSpeedSeekbar" min="-4" max="8" step="1" value="0">
+                    </div>
+                    <div class="seekbar-item" id="antigravitySeekbar">
+                        <label>Float Speed: <span id="gravitySpeedValue">0.1</span></label>
+                        <input type="range" id="gravitySpeedSeekbar" min="0.1" max="3" step="0.1" value="0.1">
+                    </div>
+                </div>
+            </div>
+
+            <!-- キャンバス -->
+            <div id="canvasWrapper">
+                <div class="canvas-container" id="canvasContainer"></div>
+                <div id="p5-container"
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5;">
+                </div>
+                <div id="generatingOverlay">Generating...</div>
+            </div>
+
+            <!-- Music Panel -->
+            <div id="musicPanel">
+                <div class="music-controls-left">
+                    <input type="file" id="musicUpload" accept="audio/*" style="display: none;">
+                    <button id="musicAddBtn" class="music-icon-btn" title="Open File">📂</button>
+                    <button id="musicPlayBtn" class="music-icon-btn" title="Play/Pause">▶</button>
+                    <span id="musicTrackTitle">No Track Selected</span>
+                    <div class="music-gain-control" style="display: flex; align-items: center; margin-left: 10px;">
+                        <label for="inputGainSlider"
+                            style="font-size: 10px; margin-right: 5px; color: #888;">GAIN</label>
+                        <input type="range" id="inputGainSlider" min="0" max="10.0" step="0.1" value="2.5"
+                            style="width: 60px;">
+                        <span id="inputGainDisplay"
+                            style="font-size: 10px; margin-left: 5px; width: 20px; display: inline-block; color: #aaa;">2.5</span>
+                    </div>
+                </div>
+
+                <div class="music-eq-center">
+                    <div class="eq-bar-group">
+                        <div class="eq-bar-container">
+                            <div class="eq-bar" id="eqBarHi"></div>
+                        </div>
+                        <span class="eq-label">HI</span>
+                    </div>
+                    <div class="eq-bar-group">
+                        <div class="eq-bar-container">
+                            <div class="eq-bar" id="eqBarMid"></div>
+                        </div>
+                        <span class="eq-label">MID</span>
+                    </div>
+                    <div class="eq-bar-group">
+                        <div class="eq-bar-container">
+                            <div class="eq-bar" id="eqBarLow"></div>
+                        </div>
+                        <span class="eq-label">LOW</span>
+                    </div>
+                </div>
+
+                <div class="music-stats-right">
+                    <span class="stat-item">BPM: <span id="bpmValue">--</span></span>
+                    <span class="stat-item">FPS: <span id="fpsValue">60</span></span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 右パネル (Settings) -->
+        <div id="rightPanel" class="panel-side">
+
+
+
+            <!-- 既存のサイドメニューの内容をここに移動 -->
+            <div class="menu-section">
+                <h3>VISUAL CONTROL</h3>
+                <div id="radarContainer" class="radar-container"></div>
+            </div>
+            <div class="menu-section">
+                <h3>SIZE</h3>
+                <div class="slider-wrapper">
+                    <input type="range" id="size" min="0.5" max="2" step="0.1" value="1">
+                    <span id="sizeValue">1.0×</span>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <h3>SPEED</h3>
+                <div class="slider-wrapper">
+                    <input type="range" id="speed" min="-3" max="3" step="0.1" value="1">
+                    <span id="speedValue">1.0×</span>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <h3>SCALE</h3>
+                <div class="slider-wrapper">
+                    <input type="range" id="spread" min="0.5" max="3" step="0.1" value="1">
+                    <span id="spreadValue">1.0×</span>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <h3>DISTANCE</h3>
+                <div class="slider-wrapper">
+                    <input type="range" id="spacing" min="0.1" max="30" step="0.1" value="15">
+                    <span id="spacingValue">15.0</span>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <h3>ROTATION</h3>
+                <div class="slider-wrapper">
+                    <input type="range" id="baseRotation" min="0" max="360" step="1" value="0">
+                    <span id="baseRotationValue">0°</span>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <h3>MANDALA</h3>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="mandalaMode">
+                    <span>Enable</span>
+                </label>
+                <div id="symmetryControls" class="symmetry-controls" style="display: none;">
+                    <button class="symmetry-btn active" data-value="4">4</button>
+                    <button class="symmetry-btn" data-value="6">6</button>
+                    <button class="symmetry-btn" data-value="8">8</button>
+                    <button class="symmetry-btn" data-value="12">12</button>
+                </div>
+                <label class="checkbox-label" style="margin-top: 10px;">
+                    <input type="checkbox" id="reflectMode">
+                    <span>Reflect</span>
+                </label>
+            </div>
+
+            <div class="menu-section">
+                <h3>AUTO GENERATE</h3>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="autoGenerateMode">
+                    <span>Enable</span>
+                </label>
+                <div id="autoGenerateSpeed" style="display: block; margin-top: 10px;">
+                    <label class="sub-label">Speed</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="autoSpeed" min="-4" max="8" step="1" value="0">
+                        <span id="autoSpeedValue">0×</span>
+                    </div>
+                </div>
+                <div id="autoGenerateSpacing" style="display: block; margin-top: 10px;">
+                    <label class="sub-label">Distance</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="autoDistance" min="5" max="40" step="1" value="20">
+                        <span id="autoDistanceValue">20</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <h3>FREQUENCY SPAWN</h3>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="frequencySpawnMode">
+                    <span>Enable</span>
+                </label>
+                <div class="info-text">Low: 0-7 | Mid: 8-15 | High: 16+</div>
+            </div>
+
+            <div class="menu-section">
+                <h3>GOLDEN RATIO</h3>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="goldenRatioMode">
+                    <span>Enable</span>
+                </label>
+                <div class="info-text">φ spiral pattern</div>
+            </div>
+
+            <div class="menu-section">
+                <h3>ANTIGRAVITY</h3>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="antigravityMode">
+                    <span>Enable</span>
+                </label>
+                <div class="info-text">Objects float upward</div>
+            </div>
+
+            <div class="menu-section">
+                <h3>MAX OBJECTS</h3>
+                <div class="slider-wrapper">
+                    <input type="number" id="maxObjects" min="1" max="40" step="1" value="20" class="number-input">
+                    <span id="maxObjectsValue">20</span>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <h3>COLORS</h3>
+                <label class="sub-label">Object Color</label>
+                <div class="color-sliders-compact">
+                    <div class="slider-wrapper"><span class="label-mini">R</span><input type="range" id="colorR" min="0"
+                            max="255" value="0"></div>
+                    <div class="slider-wrapper"><span class="label-mini">G</span><input type="range" id="colorG" min="0"
+                            max="255" value="0"></div>
+                    <div class="slider-wrapper"><span class="label-mini">B</span><input type="range" id="colorB" min="0"
+                            max="255" value="0"></div>
+                </div>
+                <div class="color-preview-box" id="objectColorPreview"></div>
+
+                <label class="sub-label" style="margin-top: 10px;">Background</label>
+                <div class="color-sliders-compact">
+                    <div class="slider-wrapper"><span class="label-mini">R</span><input type="range" id="bgColorR"
+                            min="0" max="255" value="255"></div>
+                    <div class="slider-wrapper"><span class="label-mini">G</span><input type="range" id="bgColorG"
+                            min="0" max="255" value="255"></div>
+                    <div class="slider-wrapper"><span class="label-mini">B</span><input type="range" id="bgColorB"
+                            min="0" max="255" value="255"></div>
+                </div>
+                <div class="color-preview-box" id="bgColorPreview"></div>
+            </div>
+
+            <div class="menu-section">
+                <h3>VJ PRO</h3>
+                <div class="vj-controls">
+                    <button class="vj-pro-btn" id="fullscreenBtn">FULLSCREEN</button>
+                    <button class="vj-pro-btn" id="recordBtn">REC</button>
+                </div>
+
+                <label class="sub-label">Master Intensity</label>
+                <div class="slider-wrapper">
+                    <input type="range" id="masterIntensity" min="0" max="200" value="100">
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <button class="reset-btn" id="resetScene">RESET SCENE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="contextMenu" class="context-menu">
+        <div class="context-menu-item" data-action="pin">📌 固定</div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" data-action="duplicate">📋 複製</div>
+        <div class="context-menu-item" data-action="savePreset">💾 プリセットに登録</div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" data-action="color">🎨 色を変更</div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" data-action="front">最前面へ</div>
+        <div class="context-menu-item" data-action="forward">前面へ</div>
+        <div class="context-menu-item" data-action="backward">背面へ</div>
+        <div class="context-menu-item" data-action="back">最背面へ</div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item danger" data-action="delete">削除</div>
+    </div>
+
+    <!-- Color Picker Modal -->
+    <div id="colorPickerModal" class="color-picker-modal" style="display: none;">
+        <div class="color-picker-content">
+            <h3>色を選択</h3>
+            <div class="color-sliders">
+                <div class="color-slider-group">
+                    <label>R: <span id="pickerRValue">0</span></label>
+                    <input type="range" id="pickerR" min="0" max="255" value="0">
+                </div>
+                <div class="color-slider-group">
+                    <label>G: <span id="pickerGValue">0</span></label>
+                    <input type="range" id="pickerG" min="0" max="255" value="0">
+                </div>
+                <div class="color-slider-group">
+                    <label>B: <span id="pickerBValue">0</span></label>
+                    <input type="range" id="pickerB" min="0" max="255" value="0">
+                </div>
+            </div>
+            <div class="color-preview" id="colorPreview"></div>
+            <div class="color-picker-buttons">
+                <button id="colorPickerApply">適用</button>
+                <button id="colorPickerCancel">キャンセル</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Accessibility: Color Blindness Filters -->
+    <svg style="display: none">
+        <defs>
+            <!-- Protanopia (Red-Blind) -->
+            <filter id="protanopia">
+                <feColorMatrix type="matrix" values="0.567, 0.433, 0, 0, 0
+                                           0.558, 0.442, 0, 0, 0
+                                           0, 0.242, 0.758, 0, 0
+                                           0, 0, 0, 1, 0" />
+            </filter>
+            <!-- Deuteranopia (Green-Blind) -->
+            <filter id="deuteranopia">
+                <feColorMatrix type="matrix" values="0.625, 0.375, 0, 0, 0
+                                           0.7, 0.3, 0, 0, 0
+                                           0, 0.3, 0.7, 0, 0
+                                           0, 0, 0, 1, 0" />
+            </filter>
+            <!-- Tritanopia (Blue-Blind) -->
+            <filter id="tritanopia">
+                <feColorMatrix type="matrix" values="0.95, 0.05, 0, 0, 0
+                                           0, 0.433, 0.567, 0, 0
+                                           0, 0.475, 0.525, 0, 0
+                                           0, 0, 0, 1, 0" />
+            </filter>
+        </defs>
+    </svg>
+</body>
+
+</html>

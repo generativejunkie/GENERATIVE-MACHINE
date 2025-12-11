@@ -1,0 +1,79 @@
+{
+  "name": "mandala-machine",
+  "version": "2.0.0",
+  "description": "Professional-grade 3D Audio Visualizer with Mandala Pattern Generation",
+  "type": "module",
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "keywords": [
+    "audio-visualizer",
+    "three.js",
+    "webgl",
+    "typescript",
+    "mandala",
+    "generative-art",
+    "music-visualization"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/mandala-machine.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/mandala-machine/issues"
+  },
+  "homepage": "https://github.com/yourusername/mandala-machine#readme",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,json,css,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,json,css,md}\"",
+    "test": "vitest",
+    "test:unit": "vitest run --dir tests/unit",
+    "test:integration": "vitest run --dir tests/integration",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest watch",
+    "clean": "rm -rf dist node_modules",
+    "prepare": "husky install"
+  },
+  "dependencies": {
+    "audio-decode": "^2.2.3",
+    "p5": "^2.1.1",
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/p5": "^1.7.7",
+    "@types/three": "^0.160.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "@vitest/coverage-v8": "^1.1.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "husky": "^8.0.3",
+    "jsdom": "^23.0.1",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10",
+    "vite-plugin-checker": "^0.6.2",
+    "vitest": "^1.1.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
