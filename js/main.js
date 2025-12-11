@@ -1,6 +1,6 @@
 // Main entry point for GENERATIVE MACHINE
-import { initImageMachine } from './modules/imageMachine.js';
-import { initSoundMachine } from './modules/soundMachine.js';
+import { initImageMachine } from './modules/image-machine.js';
+import { initSoundMachine } from './modules/sound-machine.js';
 import { initUI } from './modules/ui.js';
 import { initHero } from './modules/hero.js';
 
