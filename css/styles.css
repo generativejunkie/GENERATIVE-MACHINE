@@ -1040,6 +1040,8 @@ select {
         min-height: 600px !important;
         /* Matches user request for tall vertical space */
         max-height: none !important;
+        overflow: visible !important;
+        /* Allow capsules to be visible */
     }
 
     #audioPlayer {
@@ -1094,7 +1096,7 @@ select {
 
     /* Fix Sound Machine drop zone layout on mobile */
     .drop-zone {
-        /* Padding to clear settings button (top) and balance margins */
+        /* Equal padding on all sides for centering */
         padding: 20px;
     }
 
@@ -1105,16 +1107,17 @@ select {
     }
 
     .drop-zone-content {
-        /* Make dashed box fill most of the available space */
+        /* Make dashed box centered with equal margins */
         width: calc(100% - 40px);
-        min-height: 400px;
-        /* Ensure it's tall enough */
+        min-height: calc(100% - 40px);
+        /* Match width for equal padding */
+        max-height: calc(100% - 40px);
         /* Ensure content inside dashed box is centered */
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        /* Generous padding for breathing room */
+        /* Internal padding for text */
         padding: var(--space-lg);
         background: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(4px);
