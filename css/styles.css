@@ -964,6 +964,7 @@ select {
     .machine-canvas-wrapper {
         height: 60vh;
         max-height: 500px;
+        aspect-ratio: auto;
     }
 
     .section-container {
@@ -993,6 +994,7 @@ select {
         max-height: 700px;
     }
 
+
     .about-container {
         max-width: 1000px;
     }
@@ -1021,6 +1023,31 @@ select {
         width: calc(100% - var(--space-md));
     }
 
+    /* Explicitly separate layouts to prevent conflicts */
+
+    /* Image Machine: Forced 16:9 aspect ratio */
+    #image-machine .machine-canvas-wrapper {
+        aspect-ratio: 16 / 9 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+    }
+
+    /* Sound Machine: Forced Tall Layout */
+    #sound-machine .machine-canvas-wrapper {
+        aspect-ratio: auto !important;
+        height: auto !important;
+        min-height: 600px !important;
+        /* Matches user request for tall vertical space */
+        max-height: none !important;
+    }
+
+    #audioPlayer {
+        width: 100%;
+        display: block;
+    }
+
+
     .settings-btn {
         right: var(--space-sm);
     }
@@ -1031,19 +1058,25 @@ select {
     .audio-player-controls {
         flex-direction: row;
         justify-content: center;
-        gap: 12px;
+        gap: 8px;
+        /* Slightly tighter gap to ensure fit */
         flex-wrap: nowrap;
         /* Crucial for keeping them in one line */
         width: 100%;
         max-width: 100%;
     }
 
+    .audio-player {
+        padding: var(--space-md) var(--space-sm);
+        /* More vertical padding */
+    }
+
     /* Enforce fixed dimension for all control items (buttons and label wrapper) */
     .audio-player-controls>.btn,
     .audio-player-controls>.audio-player-file-label {
-        flex: 0 0 80px;
-        width: 80px;
-        min-width: 80px;
+        flex: 0 0 70px;
+        width: 70px;
+        min-width: 70px;
         margin: 0;
     }
 
@@ -1062,20 +1095,29 @@ select {
     /* Fix Sound Machine drop zone layout on mobile */
     .drop-zone {
         /* Padding to clear settings button (top) and balance margins */
-        padding: 70px 30px 30px 30px;
+        padding: 20px;
+    }
+
+    .drop-zone-icon {
+        width: 36px;
+        height: 36px;
+        margin-bottom: var(--space-sm);
     }
 
     .drop-zone-content {
-        /* Make dashed box fill the available safe area */
-        width: 100%;
-        height: 100%;
+        /* Make dashed box fill most of the available space */
+        width: calc(100% - 40px);
+        min-height: 400px;
+        /* Ensure it's tall enough */
         /* Ensure content inside dashed box is centered */
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        /* Reset padding since we use flex alignment now, or keep small padding */
-        padding: var(--space-md);
+        /* Generous padding for breathing room */
+        padding: var(--space-lg);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(4px);
     }
 }
 

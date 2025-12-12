@@ -300,7 +300,6 @@ async function handleAudioFile(e) {
 
         if (dropZone) dropZone.style.display = 'none';
         if (audioPlayer) {
-            audioPlayer.classList.remove('hidden');
             // Ensure centered layout
             audioPlayer.style.display = 'flex';
             audioPlayer.style.justifyContent = 'center';
