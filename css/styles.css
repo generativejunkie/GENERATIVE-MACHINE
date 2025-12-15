@@ -1033,14 +1033,13 @@ select {
         max-height: none !important;
     }
 
-    /* Sound Machine: Revert to 16:9 to restore capsule visibility */
+    /* Sound Machine: Aspect Ratio 3:4 for mobile to prevent text cutoff while safe for 3D */
     #sound-machine .machine-canvas-wrapper {
-        aspect-ratio: 16 / 9 !important;
+        aspect-ratio: 3 / 4 !important;
         height: auto !important;
-        min-height: 0 !important;
+        min-height: 400px !important;
         max-height: none !important;
         overflow: hidden !important;
-        /* Revert overflow */
     }
 
     #audioPlayer {
