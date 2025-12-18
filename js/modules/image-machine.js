@@ -1093,7 +1093,7 @@ export const imageMachineSketch = (p) => {
                     console.log("No images ready. Creating colors...");
                     useColorMode = true;
                     currentImageKey = 'color-0';
-                    animationState = 'rebuild';
+                    animationState = 'rebuild'; // Important: Transition state immediately
 
                     // Try to load default image silently
                     const defaultPath = imageFileNames[0];
@@ -1101,6 +1101,7 @@ export const imageMachineSketch = (p) => {
                         if (res.success) {
                             currentImageKey = res.img.filePath;
                             useColorMode = false;
+                            // Don't force state change here, just update key for next cycle
                         }
                     });
                 }
