@@ -1,6 +1,7 @@
 // ==================== IMAGE MACHINE ====================
 import { CONFIG } from '../config/config.js';
 import { AI_DIALOGUE } from '../data/dialogue.js';
+import { playAmbientMusic, stopAmbientMusic } from './sound-machine.js';
 
 export const imageMachineSketch = (p) => {
     const imageCount = CONFIG.IMAGE_MACHINE.TOTAL_IMAGES;
@@ -1146,6 +1147,8 @@ export const imageMachineSketch = (p) => {
     p.triggerSecret = (code) => {
         if (code === 'void' || code === 'ai') {
             console.log("AI TERMINAL ACTIVATED");
+            playAmbientMusic(); // Start background music
+
             // Start with noise
             animationState = 'pre_terminal_noise';
             animationFrame = 0;
@@ -1158,6 +1161,8 @@ export const imageMachineSketch = (p) => {
             charIndex = 0;
         } else if (code === 'exit') {
             console.log("EXITING TERMINAL");
+            stopAmbientMusic(); // Stop background music
+
             animationState = 'rebuild';
 
             // Restore Image

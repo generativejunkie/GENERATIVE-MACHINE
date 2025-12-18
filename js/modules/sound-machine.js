@@ -27,6 +27,33 @@ let playerState = {
     gainNode: null
 };
 
+export async function playAmbientMusic() {
+    console.log("Playing ambient music...");
+    try {
+        await initAudioContext();
+        const response = await fetch('/sound/ambient-loop.mp3');
+        const arrayBuffer = await response.arrayBuffer();
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+        // Stop current if any
+        stopPlayback();
+
+        playerState.mode = 'buffer';
+        playerState.buffer = audioBuffer;
+        playerState.duration = audioBuffer.duration;
+        playerState.isPlaying = true;
+
+        // Loop it
+        playBuffer(true);
+    } catch (e) {
+        console.error("Failed to play ambient music:", e);
+    }
+}
+
+export function stopAmbientMusic() {
+    stopPlayback();
+}
+
 export function initSoundMachine() {
     const container = document.getElementById('soundCanvas-container');
     if (!container) return;
@@ -437,10 +464,11 @@ async function togglePlayback(play) {
     }
 }
 
-function playBuffer() {
+function playBuffer(shouldLoop = false) {
     // Re-create source node (they are one-time use)
     const source = audioContext.createBufferSource();
     source.buffer = playerState.buffer;
+    source.loop = shouldLoop;
     source.connect(analyser);
 
     playerState.sourceNode = source;
