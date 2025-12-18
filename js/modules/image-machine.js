@@ -1021,28 +1021,28 @@ export const imageMachineSketch = (p) => {
         p.fill(0);
 
         p.noStroke();
-        p.textFont('Courier New');
-        p.textSize(14);
-        p.textAlign(p.LEFT, p.TOP);
-        p.textLeading(20);
+        p.textFont('Courier New, monospace');
 
-        let x = 20;
-        let y = 20 - scrollOffset; // Apply scroll offset
-        const margin = 20;
+        // Responsive font size: 12px for small mobile, 14px for larger screens
+        const baseSize = p.width < 400 ? 12 : 14;
+        p.textSize(baseSize);
+        p.textAlign(p.LEFT, p.TOP);
+        p.textLeading(baseSize * 1.6);
+
+        const margin = p.width < 400 ? 15 : 25;
+        let x = margin;
+        let y = margin - scrollOffset; // Apply scroll offset
         const maxW = p.width - (margin * 2);
 
-        // Helper to draw text and advance Y
+        // Precise Line Height Tracker
         const getLineHeight = (str) => {
-            const charWidth = 9;
+            const charWidth = baseSize * 0.6; // Average width of Courier chars
             const charsPerLine = Math.floor(maxW / charWidth);
 
-            // Split by manual newlines first
             const paragraphs = str.split('\n');
             let totalLines = 0;
 
             paragraphs.forEach(pText => {
-                // Estimate wrapping for each paragraph
-                // We count Japanese/full-width chars as 2 chars for width estimation
                 let visualLength = 0;
                 for (let i = 0; i < pText.length; i++) {
                     visualLength += pText.charCodeAt(i) > 255 ? 2 : 1;
@@ -1051,11 +1051,10 @@ export const imageMachineSketch = (p) => {
                 totalLines += linesInParagraph;
             });
 
-            return (totalLines * 24) + 16; // 24px per line + small padding
+            return (totalLines * (baseSize * 1.6)) + 12;
         };
 
         const drawWrappedText = (str) => {
-            // Only draw if visible to save perf
             if (y + 100 > 0 && y < p.height) {
                 p.text(str, x, y, maxW);
             }
@@ -1074,25 +1073,22 @@ export const imageMachineSketch = (p) => {
             const fullText = currentLineObj.text;
             const currentText = fullText.substring(0, charIndex);
 
-            // Calculate hypothetical height of current block
-            let currentBlockHeight = getLineHeight(`[${speaker}] ${currentText}`);
+            const labelStr = `[${speaker}] ${currentText}`;
+            let currentBlockHeight = getLineHeight(labelStr);
 
-            // Check if we need to scroll smoothly
-            // Target Y is where the next line would start
+            // AGGRESSIVE SCROLLING: Keep the typing line visible at all times
+            let bottomThreshold = p.height - (margin * 2);
             let targetY = y + currentBlockHeight;
-            let bottomMargin = 40;
 
-            if (targetY > p.height - bottomMargin) {
-                // Smoothly increase scroll offset
-                scrollOffset += 1;
+            if (targetY > bottomThreshold) {
+                // If the text is overflowing, move the scroll offset to "chase" the bottom
+                let gap = targetY - bottomThreshold;
+                scrollOffset += Math.max(1, gap * 0.15); // Faster chasing
             }
 
-            // Draw Cursor
-            if (p.frameCount % 60 < 30) {
-                drawWrappedText(`[${speaker}] ${currentText}_`);
-            } else {
-                drawWrappedText(`[${speaker}] ${currentText}`);
-            }
+            // Draw with Cursor
+            const cursorChar = (p.frameCount % 40 < 20) ? '_' : ' ';
+            drawWrappedText(`[${speaker}] ${currentText}${cursorChar}`);
 
             // Typing logic
             if (p.millis() - lastTypeTime > typeInterval) {
@@ -1103,14 +1099,14 @@ export const imageMachineSketch = (p) => {
                     terminalLog.push(`[${speaker}] ${fullText}`);
                     dialogueIndex++;
                     charIndex = 0;
-                    lastTypeTime = p.millis() + 800;
+                    lastTypeTime = p.millis() + 1000; // Pause between messages
                 }
             }
         } else {
             // Dialogue finished
             drawWrappedText("SYSTEM: GATE OPENING...");
-            if (y > p.height - 40) {
-                scrollOffset += 1;
+            if (y > p.height - (margin * 2)) {
+                scrollOffset += 2;
             }
 
             // Initialize lastTypeTime if not set
