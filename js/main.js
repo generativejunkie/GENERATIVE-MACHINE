@@ -13,6 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // IMAGE MACHINE TITLE RITUAL: 3-TAP -> VOID (Strict Mobile Support)
     const imageTitle = document.getElementById('image-machine-title');
+    // Increase hit area visually/functionally
+    if (imageTitle) {
+        imageTitle.style.display = 'inline-block';
+        imageTitle.style.padding = '10px 20px';
+    }
+
     let imageTitleTapCount = 0;
     let imageTitleTapTimer = null;
 
@@ -24,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (imageTitleTapCount === 3) {
                 // Trigger Void / AI Mode
-                e.preventDefault();
+                if (e.cancelable) e.preventDefault();
                 console.log("IMAGE TITLE RITUAL: VOID (3-TAP)");
                 if (window.imageMachine && window.imageMachine.triggerSecret) {
                     window.imageMachine.triggerSecret('void');
@@ -33,28 +39,45 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 imageTitleTapTimer = setTimeout(() => {
                     imageTitleTapCount = 0;
-                }, 800);
+                }, 1000); // Relaxed to 1000ms for easier tapping
             }
         };
 
         // Desktop Click
         imageTitle.addEventListener('click', (e) => {
-            // Ignore synthetic clicks from touch
             if (e.detail === 0) return;
             handleTap(e);
         });
 
-        // Mobile Touch (Instant)
+        // Mobile Touch
         let lastTouchTime = 0;
         imageTitle.addEventListener('touchstart', (e) => {
             const now = Date.now();
-            if (now - lastTouchTime < 100) return; // Debounce
+            if (now - lastTouchTime < 100) return;
             lastTouchTime = now;
 
-            if (e.cancelable) e.preventDefault(); // Block synthetic click
+            // To allow scrolling, we DON'T preventDefault on every touch.
+            // Only prevents default when ritual actually triggers (inside handleTap).
             handleTap(e);
-        }, { passive: false });
+        }, { passive: true }); // passive: true allows scrolling, better UX
     }
+
+    // PC/Mac KEYBOARD RITUAL: Type "void"
+    let keyHistory = [];
+    document.addEventListener('keydown', (e) => {
+        // Simple buffer for "void"
+        keyHistory.push(e.key.toLowerCase());
+        if (keyHistory.length > 10) keyHistory.shift();
+
+        const historyStr = keyHistory.join('');
+        if (historyStr.endsWith('void')) {
+            console.log("KEY RITUAL: VOID");
+            if (window.imageMachine && window.imageMachine.triggerSecret) {
+                window.imageMachine.triggerSecret('void');
+            }
+            keyHistory = [];
+        }
+    });
 
     console.log('GENERATIVE MACHINE System Initialized');
 });
