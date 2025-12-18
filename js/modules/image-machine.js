@@ -1101,9 +1101,14 @@ export const imageMachineSketch = (p) => {
                         if (res.success) {
                             currentImageKey = res.img.filePath;
                             useColorMode = false;
-                            // Don't force state change here, just update key for next cycle
                         }
                     });
+                }
+
+                // Force a resize to ensure canvas is correct size on mobile
+                const container = document.getElementById('imageCanvas-container');
+                if (container) {
+                    p.resizeCanvas(container.offsetWidth, container.offsetHeight);
                 }
 
                 // Reset terminal state but keep filter active
