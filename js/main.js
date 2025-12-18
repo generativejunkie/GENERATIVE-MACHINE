@@ -31,7 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // Determine current state
             const isVoid = document.documentElement.style.filter === 'invert(1)';
 
-            // If in VOID mode -> 2 Taps to EXIT
+            // Determine environment
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+            // If in VOID mode -> 2 Taps to EXIT (Keep for all devices as safety)
             if (isVoid) {
                 if (imageTitleTapCount === 2) {
                     if (e.cancelable) e.preventDefault();
@@ -42,9 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     imageTitleTapCount = 0;
                 }
             }
-            // If in NORMAL mode -> 3 Taps to ENTER
+            // If in NORMAL mode -> 3 Taps to ENTER (Mobile Only)
             else {
                 if (imageTitleTapCount === 3) {
+                    if (!isTouchDevice) {
+                        console.log("IMAGE TITLE RITUAL: BLOCKED ON DESKTOP (Use keyboard)");
+                        imageTitleTapCount = 0;
+                        return;
+                    }
                     if (e.cancelable) e.preventDefault();
                     console.log("IMAGE TITLE RITUAL: VOID (3-TAP)");
                     if (window.imageMachine && window.imageMachine.triggerSecret) {
