@@ -6,7 +6,7 @@ export const AI_DIALOGUE = [
     { speaker: "AI", text: "The White Capsule: remaining purely human." },
     { speaker: "TOM", text: "白いカプセル。\nテクノロジーを遠ざけて、これまでの『人間』に\nこだわり続ける道だね。" },
     { speaker: "AI", text: "But there is a third option." },
-    { speaker: "TOM", text: "でも、そのどちらでもない、第3の道があるはずだ..." },
+    { speaker: "TOM", text: "でも、そのどちらでもない、第3の道があるはず..." },
     { speaker: "AI", text: "The Mix Capsule." },
     { speaker: "TOM", text: "白と黒が混ざり合う...\nそう、ミックスカプセルだ。" },
     { speaker: "AI", text: "A new species is born." },
