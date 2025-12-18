@@ -15,6 +15,6 @@ export const AI_DIALOGUE = [
     { speaker: "HUMAN", text: "身を委ねるか、それとも自ら立ち上がるか。" },
     { speaker: "AI", text: "The machine is waiting." },
     { speaker: "HUMAN", text: "機械は静かに、あなたの決断を待っている。" },
-    { speaker: "AI", text: "Here is your destiny." },
-    { speaker: "HUMAN", text: "さあ、運命のステッカーを受け取れ。" }
+    { speaker: "AI", text: "Here is your capsule." },
+    { speaker: "HUMAN", text: "さあ、運命のカプセルを受け取れ。" }
 ];
