@@ -113,20 +113,22 @@ export const imageMachineSketch = (p) => {
             }
 
             switch (animationState) {
-                case 'terminal':
-                    drawTerminal();
-                    break;
                 case 'pre_terminal_noise':
                     drawPreTerminalNoise();
                     animationFrame++;
-                    if (animationFrame > 60) { // 1 second of noise
+                    // 60fps * 5s = 300 frames
+                    if (animationFrame > 300) {
                         animationFrame = 0;
                         animationState = 'terminal';
 
-                        // Set black background for terminal
+                        // Invert the entire site for Terminal Mode
+                        document.documentElement.style.filter = 'invert(1)';
                         document.documentElement.style.backgroundColor = 'black';
                         document.body.style.backgroundColor = 'black';
                     }
+                    break;
+                case 'terminal':
+                    drawTerminal();
                     break;
                 case 'decay':
                     runTransition(currentContent, animationFrame / transitionDuration, true);
@@ -1050,8 +1052,9 @@ export const imageMachineSketch = (p) => {
             animationState = 'pre_terminal_noise';
             animationFrame = 0;
 
-            // Prepare styles
+            // Start with normal colors (noise handles visuals)
             document.documentElement.style.filter = 'none';
+
             terminalLog = [];
             dialogueIndex = 0;
             charIndex = 0;
