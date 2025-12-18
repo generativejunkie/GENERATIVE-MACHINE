@@ -122,9 +122,15 @@ export const imageMachineSketch = (p) => {
                         animationState = 'terminal';
 
                         // Invert the entire site for Terminal Mode
+                        // Invert the entire site for Terminal Mode
                         document.documentElement.style.filter = 'invert(1)';
-                        document.documentElement.style.backgroundColor = 'black';
-                        document.body.style.backgroundColor = 'black';
+                        // To get BLACK background with invert(1), we must set the actual background to WHITE
+                        document.documentElement.style.backgroundColor = '#ffffff';
+                        document.body.style.backgroundColor = '#ffffff';
+
+                        // Force all secondary backgrounds to white so they invert to pure black
+                        document.documentElement.style.setProperty('--color-bg-secondary', '#ffffff');
+                        document.documentElement.style.setProperty('--color-bg-tertiary', '#ffffff');
                     }
                     break;
                 case 'terminal':
@@ -1125,6 +1131,10 @@ p.triggerSecret = (code) => {
         document.documentElement.style.filter = 'none';
         document.documentElement.style.backgroundColor = '';
         document.body.style.backgroundColor = '';
+
+        // Restore original background colors
+        document.documentElement.style.removeProperty('--color-bg-secondary');
+        document.documentElement.style.removeProperty('--color-bg-tertiary');
     }
 };
 
