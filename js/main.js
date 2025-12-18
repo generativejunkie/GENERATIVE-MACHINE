@@ -53,7 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let lastTouchTime = 0;
         imageTitle.addEventListener('touchstart', (e) => {
             const now = Date.now();
-            if (now - lastTouchTime < 100) return;
+            // Increase debounce to 200ms to be absolutely sure we don't double count
+            if (now - lastTouchTime < 200) return;
             lastTouchTime = now;
 
             // To allow scrolling, we DON'T preventDefault on every touch.

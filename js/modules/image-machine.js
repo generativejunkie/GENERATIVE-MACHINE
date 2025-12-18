@@ -116,6 +116,18 @@ export const imageMachineSketch = (p) => {
                 case 'terminal':
                     drawTerminal();
                     break;
+                case 'pre_terminal_noise':
+                    drawPreTerminalNoise();
+                    animationFrame++;
+                    if (animationFrame > 60) { // 1 second of noise
+                        animationFrame = 0;
+                        animationState = 'terminal';
+
+                        // Set black background for terminal
+                        document.documentElement.style.backgroundColor = 'black';
+                        document.body.style.backgroundColor = 'black';
+                    }
+                    break;
                 case 'decay':
                     runTransition(currentContent, animationFrame / transitionDuration, true);
                     animationFrame++;
@@ -1034,18 +1046,29 @@ export const imageMachineSketch = (p) => {
     p.triggerSecret = (code) => {
         if (code === 'void' || code === 'ai') {
             console.log("AI TERMINAL ACTIVATED");
-            animationState = 'terminal';
+            // Start with noise
+            animationState = 'pre_terminal_noise';
+            animationFrame = 0;
 
-            // Force styles for VOID mode
-            document.documentElement.style.filter = 'none'; // No invert for terminal
-            document.documentElement.style.backgroundColor = 'black';
-            document.body.style.backgroundColor = 'black';
-
+            // Prepare styles
+            document.documentElement.style.filter = 'none';
             terminalLog = [];
             dialogueIndex = 0;
             charIndex = 0;
         }
     };
+
+    function drawPreTerminalNoise() {
+        p.loadPixels();
+        for (let i = 0; i < p.pixels.length; i += 4) {
+            let val = p.random(255) > 128 ? 255 : 0; // Black and White only
+            p.pixels[i] = val;
+            p.pixels[i + 1] = val;
+            p.pixels[i + 2] = val;
+            p.pixels[i + 3] = 255;
+        }
+        p.updatePixels();
+    }
 };
 
 export function initImageMachine() {
