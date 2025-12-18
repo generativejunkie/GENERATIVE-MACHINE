@@ -1096,59 +1096,59 @@ export const imageMachineSketch = (p) => {
             }
         }
     }
-}
 
-p.triggerSecret = (code) => {
-    if (code === 'void' || code === 'ai') {
-        console.log("AI TERMINAL ACTIVATED");
-        // Start with noise
-        animationState = 'pre_terminal_noise';
-        animationFrame = 0;
 
-        // Start with normal colors (noise handles visuals)
-        document.documentElement.style.filter = 'none';
+    p.triggerSecret = (code) => {
+        if (code === 'void' || code === 'ai') {
+            console.log("AI TERMINAL ACTIVATED");
+            // Start with noise
+            animationState = 'pre_terminal_noise';
+            animationFrame = 0;
 
-        terminalLog = [];
-        dialogueIndex = 0;
-        charIndex = 0;
-    } else if (code === 'exit') {
-        console.log("EXITING TERMINAL");
-        animationState = 'rebuild';
+            // Start with normal colors (noise handles visuals)
+            document.documentElement.style.filter = 'none';
 
-        // Restore Image
-        // We need to pick a valid key to rebuild TO
-        let keys = Object.keys(allImages);
-        if (keys.length > 0) {
-            currentImageKey = keys[0];
-        } else {
-            // Determine based on config if image or color
-            const initialIndex = CONFIG.IMAGE_MACHINE.INITIAL_IMAGE_INDEX;
-            const fName = `${CONFIG.IMAGE_MACHINE.PATH_PREFIX}${(initialIndex + 1).toString().padStart(3, '0')}${CONFIG.IMAGE_MACHINE.FILE_EXTENSION}`;
-            currentImageKey = fName;
+            terminalLog = [];
+            dialogueIndex = 0;
+            charIndex = 0;
+        } else if (code === 'exit') {
+            console.log("EXITING TERMINAL");
+            animationState = 'rebuild';
+
+            // Restore Image
+            // We need to pick a valid key to rebuild TO
+            let keys = Object.keys(allImages);
+            if (keys.length > 0) {
+                currentImageKey = keys[0];
+            } else {
+                // Determine based on config if image or color
+                const initialIndex = CONFIG.IMAGE_MACHINE.INITIAL_IMAGE_INDEX;
+                const fName = `${CONFIG.IMAGE_MACHINE.PATH_PREFIX}${(initialIndex + 1).toString().padStart(3, '0')}${CONFIG.IMAGE_MACHINE.FILE_EXTENSION}`;
+                currentImageKey = fName;
+            }
+
+            // RESET VISUALS
+            document.documentElement.style.filter = 'none';
+            document.documentElement.style.backgroundColor = '';
+            document.body.style.backgroundColor = '';
+
+            // Restore original background colors
+            document.documentElement.style.removeProperty('--color-bg-secondary');
+            document.documentElement.style.removeProperty('--color-bg-tertiary');
         }
+    };
 
-        // RESET VISUALS
-        document.documentElement.style.filter = 'none';
-        document.documentElement.style.backgroundColor = '';
-        document.body.style.backgroundColor = '';
-
-        // Restore original background colors
-        document.documentElement.style.removeProperty('--color-bg-secondary');
-        document.documentElement.style.removeProperty('--color-bg-tertiary');
-    }
-};
-
-function drawPreTerminalNoise() {
-    const blockSize = 10; // Smaller mosaic blocks
-    p.noStroke();
-    for (let x = 0; x < p.width; x += blockSize) {
-        for (let y = 0; y < p.height; y += blockSize) {
-            // Randomly Black or White
-            p.fill(p.random() > 0.5 ? 255 : 0);
-            p.rect(x, y, blockSize, blockSize);
+    function drawPreTerminalNoise() {
+        const blockSize = 10; // Smaller mosaic blocks
+        p.noStroke();
+        for (let x = 0; x < p.width; x += blockSize) {
+            for (let y = 0; y < p.height; y += blockSize) {
+                // Randomly Black or White
+                p.fill(p.random() > 0.5 ? 255 : 0);
+                p.rect(x, y, blockSize, blockSize);
+            }
         }
     }
-}
 };
 
 export function initImageMachine() {
