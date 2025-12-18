@@ -1012,7 +1012,7 @@ export const imageMachineSketch = (p) => {
             const charWidth = 9; // Approx for courier 14
             const charsPerLine = Math.floor(maxW / charWidth);
             const lineCount = Math.ceil(str.length / charsPerLine) || 1;
-            y += (lineCount * 20) + 10; // Extra padding
+            y += (lineCount * 24) + 20; // Increased spacing for better readability
         };
 
         // Draw historic log
@@ -1052,7 +1052,7 @@ export const imageMachineSketch = (p) => {
 
                     // Auto-scroll logic based on array length not enough if lines wrap...
                     // Let's being aggressive with removal to keep screen clean
-                    if (terminalLog.length > 6) { // Reduce from 15 to 6 to fit mobile screens with wrapping
+                    if (terminalLog.length > 5) { // Reduce from 15 to 6 to fit mobile screens with wrapping
                         terminalLog.shift();
                     }
 
@@ -1073,6 +1073,7 @@ export const imageMachineSketch = (p) => {
     p.triggerSecret = (code) => {
         if (code === 'void' || code === 'ai') {
             console.log("AI TERMINAL ACTIVATED");
+            // Start with noise
             animationState = 'pre_terminal_noise';
             animationFrame = 0;
 
@@ -1085,7 +1086,18 @@ export const imageMachineSketch = (p) => {
         } else if (code === 'exit') {
             console.log("EXITING TERMINAL");
             animationState = 'rebuild';
-            currentImageKey = imageFileNames[0]; // Reset to initial or random?
+
+            // Restore Image
+            // We need to pick a valid key to rebuild TO
+            let keys = Object.keys(allImages);
+            if (keys.length > 0) {
+                currentImageKey = keys[0];
+            } else {
+                // Determine based on config if image or color
+                const initialIndex = CONFIG.IMAGE_MACHINE.INITIAL_IMAGE_INDEX;
+                const fName = `${CONFIG.IMAGE_MACHINE.PATH_PREFIX}${(initialIndex + 1).toString().padStart(3, '0')}${CONFIG.IMAGE_MACHINE.FILE_EXTENSION}`;
+                currentImageKey = fName;
+            }
 
             // RESET VISUALS
             document.documentElement.style.filter = 'none';
