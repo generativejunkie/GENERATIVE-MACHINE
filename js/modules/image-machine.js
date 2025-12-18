@@ -1053,7 +1053,12 @@ export const imageMachineSketch = (p) => {
                 scrollOffset += 1;
             }
 
-            drawWrappedText(`[${speaker}] ${currentText}`);
+            // Draw Cursor
+            if (p.frameCount % 60 < 30) {
+                drawWrappedText(`[${speaker}] ${currentText}_`);
+            } else {
+                drawWrappedText(`[${speaker}] ${currentText}`);
+            }
 
             // Typing logic
             if (p.millis() - lastTypeTime > typeInterval) {
@@ -1078,14 +1083,26 @@ export const imageMachineSketch = (p) => {
                 console.log("ENTERING HIDDEN IMAGE MACHINE");
                 animationState = 'rebuild';
 
-                // Ensure we have a valid image to start with
+                // Robust image recovery
                 let keys = Object.keys(allImages);
                 if (keys.length > 0) {
                     currentImageKey = keys[0];
+                    animationState = 'rebuild';
                 } else {
-                    const initialIndex = CONFIG.IMAGE_MACHINE.INITIAL_IMAGE_INDEX;
-                    const fName = `${CONFIG.IMAGE_MACHINE.PATH_PREFIX}${(initialIndex + 1).toString().padStart(3, '0')}${CONFIG.IMAGE_MACHINE.FILE_EXTENSION}`;
-                    currentImageKey = fName;
+                    // Fallback to Color Mode + Background Load
+                    console.log("No images ready. Creating colors...");
+                    useColorMode = true;
+                    currentImageKey = 'color-0';
+                    animationState = 'rebuild';
+
+                    // Try to load default image silently
+                    const defaultPath = imageFileNames[0];
+                    loadImageDynamically(defaultPath, (res) => {
+                        if (res.success) {
+                            currentImageKey = res.img.filePath;
+                            useColorMode = false;
+                        }
+                    });
                 }
 
                 // Reset terminal state but keep filter active
