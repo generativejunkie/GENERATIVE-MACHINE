@@ -985,6 +985,9 @@ export const imageMachineSketch = (p) => {
         p.resizeCanvas(container.offsetWidth, container.offsetHeight);
     };
 
+    // Scroll state
+    let scrollOffset = 0;
+
     function drawTerminal() {
         // Because the site is GLOBALLY INVERTED, we must draw:
         // Background: WHITE (255) -> appears BLACK
@@ -999,20 +1002,24 @@ export const imageMachineSketch = (p) => {
         p.textLeading(20);
 
         let x = 20;
-        let y = 20;
+        let y = 20 - scrollOffset; // Apply scroll offset
         const margin = 20;
         const maxW = p.width - (margin * 2);
 
         // Helper to draw text and advance Y
-        const drawWrappedText = (str) => {
-            p.text(str, x, y, maxW);
-            // Rough estimation of height: count chars or P5 textAscent?
-            // Since p.text wraps, we need to know how many lines it took.
-            // Simplified approximation:
-            const charWidth = 9; // Approx for courier 14
+        const getLineHeight = (str) => {
+            const charWidth = 9;
             const charsPerLine = Math.floor(maxW / charWidth);
             const lineCount = Math.ceil(str.length / charsPerLine) || 1;
-            y += (lineCount * 24) + 20; // Increased spacing for better readability
+            return (lineCount * 24) + 20;
+        };
+
+        const drawWrappedText = (str) => {
+            // Only draw if visible to save perf
+            if (y + 100 > 0 && y < p.height) {
+                p.text(str, x, y, maxW);
+            }
+            y += getLineHeight(str);
         };
 
         // Draw historic log
@@ -1020,21 +1027,24 @@ export const imageMachineSketch = (p) => {
             drawWrappedText(line);
         });
 
-        // Current typing line
+        // Current typing line logic
         if (dialogueIndex < AI_DIALOGUE.length) {
             const currentLineObj = AI_DIALOGUE[dialogueIndex];
             const speaker = currentLineObj.speaker;
             const fullText = currentLineObj.text;
-
-            // Add current typing progress
             const currentText = fullText.substring(0, charIndex);
 
-            // Allow auto-typing
-            // To ensure the text stays on screen, we might need to scroll?
-            // Check if Y is too low?
-            if (y > p.height - 50) {
-                // Simple auto-scroll strategy: clear log if too full?
-                // Or we rely on the shift() logic below.
+            // Calculate hypothetical height of current block
+            let currentBlockHeight = getLineHeight(`[${speaker}] ${currentText}`);
+
+            // Check if we need to scroll smoothly
+            // Target Y is where the next line would start
+            let targetY = y + currentBlockHeight;
+            let bottomMargin = 40;
+
+            if (targetY > p.height - bottomMargin) {
+                // Smoothly increase scroll offset
+                scrollOffset += 1;
             }
 
             drawWrappedText(`[${speaker}] ${currentText}`);
@@ -1045,27 +1055,24 @@ export const imageMachineSketch = (p) => {
                 lastTypeTime = p.millis();
 
                 if (charIndex > fullText.length) {
-                    // Line complete, move to next
                     terminalLog.push(`[${speaker}] ${fullText}`);
                     dialogueIndex++;
                     charIndex = 0;
-
-                    // Auto-scroll logic based on array length not enough if lines wrap...
-                    // Let's being aggressive with removal to keep screen clean
-                    if (terminalLog.length > 5) { // Reduce from 15 to 6 to fit mobile screens with wrapping
-                        terminalLog.shift();
-                    }
-
-                    // Pause between lines
                     lastTypeTime = p.millis() + 800;
                 }
             }
         } else {
             drawWrappedText("SYSTEM: RE-INITIALIZING...");
+            // Final scroll adjustment
+            if (y > p.height - 40) {
+                scrollOffset += 1;
+            }
+
             if (p.millis() - lastTypeTime > 3000) {
                 terminalLog = [];
                 dialogueIndex = 0;
                 charIndex = 0;
+                scrollOffset = 0;
             }
         }
     }

@@ -57,6 +57,7 @@ html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    min-height: 100%;
 }
 
 body {
@@ -67,6 +68,7 @@ body {
     background-color: var(--color-bg-primary);
     min-height: 100vh;
     position: relative;
+    transition: filter 0.5s ease, background-color 0.5s ease;
 }
 
 /* ==================== Typography ==================== */
