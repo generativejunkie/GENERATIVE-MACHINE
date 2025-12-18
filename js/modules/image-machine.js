@@ -160,7 +160,25 @@ export const imageMachineSketch = (p) => {
                     const rebuildContent = useColorMode ?
                         getColorPattern(currentImageKey) :
                         allImages[currentImageKey];
-                    runTransition(rebuildContent, animationFrame / transitionDuration, false);
+
+                    // Mobile safety: if content is missing, force color mode
+                    if (!rebuildContent && !useColorMode) {
+                        console.log("Rebuild content missing, switching to color mode");
+                        useColorMode = true;
+                        currentImageKey = 'color-0';
+                    }
+
+                    const safeContent = useColorMode ?
+                        getColorPattern(currentImageKey) :
+                        rebuildContent;
+
+                    if (safeContent) {
+                        runTransition(safeContent, animationFrame / transitionDuration, false);
+                    } else {
+                        // Ultimate fallback: draw solid color
+                        p.background(0);
+                    }
+
                     animationFrame++;
                     if (animationFrame > transitionDuration) {
                         animationFrame = 0;
