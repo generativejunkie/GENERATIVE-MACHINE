@@ -123,9 +123,8 @@ export const imageMachineSketch = (p) => {
                         animationFrame = 0;
                         animationState = 'terminal';
 
-                        // Invert the entire site for Terminal Mode
-                        // Invert the entire site for Terminal Mode
-                        document.documentElement.style.filter = 'invert(1)';
+                        // Invert and grayscale the entire site for Terminal Mode
+                        document.documentElement.style.filter = 'invert(1) grayscale(1)';
                         // To get BLACK background with invert(1), we must set the actual background to WHITE
                         document.documentElement.style.backgroundColor = '#ffffff';
                         document.body.style.backgroundColor = '#ffffff';
