@@ -986,21 +986,38 @@ export const imageMachineSketch = (p) => {
     };
 
     function drawTerminal() {
-        p.background(0); // Black background
-        p.fill(255);     // White text
+        // Because the site is GLOBALLY INVERTED, we must draw:
+        // Background: WHITE (255) -> appears BLACK
+        // Text: BLACK (0) -> appears WHITE
+        p.background(255);
+        p.fill(0);
+
         p.noStroke();
         p.textFont('Courier New');
         p.textSize(14);
         p.textAlign(p.LEFT, p.TOP);
+        p.textLeading(20);
 
+        let x = 20;
         let y = 20;
-        const lineHeight = 20;
-        const x = 20;
+        const margin = 20;
+        const maxW = p.width - (margin * 2);
+
+        // Helper to draw text and advance Y
+        const drawWrappedText = (str) => {
+            p.text(str, x, y, maxW);
+            // Rough estimation of height: count chars or P5 textAscent?
+            // Since p.text wraps, we need to know how many lines it took.
+            // Simplified approximation:
+            const charWidth = 9; // Approx for courier 14
+            const charsPerLine = Math.floor(maxW / charWidth);
+            const lineCount = Math.ceil(str.length / charsPerLine) || 1;
+            y += (lineCount * 20) + 10; // Extra padding
+        };
 
         // Draw historic log
         terminalLog.forEach(line => {
-            p.text(line, x, y);
-            y += lineHeight;
+            drawWrappedText(line);
         });
 
         // Current typing line
@@ -1011,7 +1028,16 @@ export const imageMachineSketch = (p) => {
 
             // Add current typing progress
             const currentText = fullText.substring(0, charIndex);
-            p.text(`[${speaker}] ${currentText}`, x, y);
+
+            // Allow auto-typing
+            // To ensure the text stays on screen, we might need to scroll?
+            // Check if Y is too low?
+            if (y > p.height - 50) {
+                // Simple auto-scroll strategy: clear log if too full?
+                // Or we rely on the shift() logic below.
+            }
+
+            drawWrappedText(`[${speaker}] ${currentText}`);
 
             // Typing logic
             if (p.millis() - lastTypeTime > typeInterval) {
@@ -1024,8 +1050,9 @@ export const imageMachineSketch = (p) => {
                     dialogueIndex++;
                     charIndex = 0;
 
-                    // Auto-scroll logic (keep last 15 lines)
-                    if (terminalLog.length > 15) {
+                    // Auto-scroll logic based on array length not enough if lines wrap...
+                    // Let's being aggressive with removal to keep screen clean
+                    if (terminalLog.length > 6) { // Reduce from 15 to 6 to fit mobile screens with wrapping
                         terminalLog.shift();
                     }
 
@@ -1034,9 +1061,7 @@ export const imageMachineSketch = (p) => {
                 }
             }
         } else {
-            // End of dialogue - Loop or stop?
-            // Let's loop for infinite generation feeling
-            p.text("SYSTEM: RE-INITIALIZING SEQUENCE...", x, y);
+            drawWrappedText("SYSTEM: RE-INITIALIZING...");
             if (p.millis() - lastTypeTime > 3000) {
                 terminalLog = [];
                 dialogueIndex = 0;
@@ -1048,7 +1073,6 @@ export const imageMachineSketch = (p) => {
     p.triggerSecret = (code) => {
         if (code === 'void' || code === 'ai') {
             console.log("AI TERMINAL ACTIVATED");
-            // Start with noise
             animationState = 'pre_terminal_noise';
             animationFrame = 0;
 
@@ -1058,11 +1082,20 @@ export const imageMachineSketch = (p) => {
             terminalLog = [];
             dialogueIndex = 0;
             charIndex = 0;
+        } else if (code === 'exit') {
+            console.log("EXITING TERMINAL");
+            animationState = 'rebuild';
+            currentImageKey = imageFileNames[0]; // Reset to initial or random?
+
+            // RESET VISUALS
+            document.documentElement.style.filter = 'none';
+            document.documentElement.style.backgroundColor = '';
+            document.body.style.backgroundColor = '';
         }
     };
 
     function drawPreTerminalNoise() {
-        const blockSize = 40; // Large mosaic blocks
+        const blockSize = 10; // Smaller mosaic blocks
         p.noStroke();
         for (let x = 0; x < p.width; x += blockSize) {
             for (let y = 0; y < p.height; y += blockSize) {

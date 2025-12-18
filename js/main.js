@@ -28,19 +28,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (imageTitleTapTimer) clearTimeout(imageTitleTapTimer);
 
-            if (imageTitleTapCount === 3) {
-                // Trigger Void / AI Mode
-                if (e.cancelable) e.preventDefault();
-                console.log("IMAGE TITLE RITUAL: VOID (3-TAP)");
-                if (window.imageMachine && window.imageMachine.triggerSecret) {
-                    window.imageMachine.triggerSecret('void');
-                }
-                imageTitleTapCount = 0;
-            } else {
-                imageTitleTapTimer = setTimeout(() => {
+            // Determine current state
+            const isVoid = document.documentElement.style.filter === 'invert(1)';
+
+            // If in VOID mode -> 2 Taps to EXIT
+            if (isVoid) {
+                if (imageTitleTapCount === 2) {
+                    if (e.cancelable) e.preventDefault();
+                    console.log("IMAGE TITLE RITUAL: EXIT (2-TAP)");
+                    if (window.imageMachine && window.imageMachine.triggerSecret) {
+                        window.imageMachine.triggerSecret('exit');
+                    }
                     imageTitleTapCount = 0;
-                }, 1000); // Relaxed to 1000ms for easier tapping
+                }
             }
+            // If in NORMAL mode -> 3 Taps to ENTER
+            else {
+                if (imageTitleTapCount === 3) {
+                    if (e.cancelable) e.preventDefault();
+                    console.log("IMAGE TITLE RITUAL: VOID (3-TAP)");
+                    if (window.imageMachine && window.imageMachine.triggerSecret) {
+                        window.imageMachine.triggerSecret('void');
+                    }
+                    imageTitleTapCount = 0;
+                }
+            }
+
+            // Reset timer logic
+            // We use the same timeout but rely on the state check above to fire early for exit
+            if (imageTitleTapTimer) clearTimeout(imageTitleTapTimer);
+            imageTitleTapTimer = setTimeout(() => {
+                imageTitleTapCount = 0;
+            }, 1000); // Relaxed to 1000ms for easier tapping
         };
 
         // Desktop Click
