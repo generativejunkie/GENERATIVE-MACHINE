@@ -4,6 +4,7 @@ import { AI_DIALOGUE } from '../data/dialogue.js';
 import { playAmbientMusic, stopAmbientMusic } from './sound-machine.js';
 
 export const imageMachineSketch = (p) => {
+    const isTouch = () => 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     const imageCount = CONFIG.IMAGE_MACHINE.TOTAL_IMAGES;
     const imageFileNames = [];
 
@@ -1104,40 +1105,40 @@ export const imageMachineSketch = (p) => {
             }
 
             if (p.millis() - lastTypeTime > 3000) {
-                console.log("ENTERING HIDDEN IMAGE MACHINE (REBUILD)");
+                console.log("CRITICAL: EXITING TERMINAL -> REBUILD (Mobile Optimized)");
 
-                // Reset frames and state
+                // 1. Force state reset
                 animationFrame = 0;
+                terminalLog = []; // Immediate cleanup
 
-                // Determine the most reliable content to show FIRST
+                // 2. Select initial content (Be extremely safe)
                 let keys = Object.keys(allImages);
-                if (keys.length > 0 && allImages[keys[0]]) {
+                if (!isTouch() && keys.length > 0 && allImages[keys[0]]) {
+                    // Desktop with loaded images
                     currentImageKey = keys[0];
                     useColorMode = false;
                 } else {
-                    // Fallback: Use colors immediately to avoid black screen on mobile
-                    console.warn("Images not ready for mobile rebuild, using fallback.");
+                    // Mobile or No Images: Start with Colors (FASTEST)
                     useColorMode = true;
-                    currentImageKey = 'color-0';
+                    currentImageKey = 'color-' + Math.floor(Math.random() * colorPatterns.length);
                 }
 
-                // Change state
                 animationState = 'rebuild';
 
-                // Force layout/canvas synchronization
+                // 3. Forced UI Sync
                 const container = document.getElementById('imageCanvas-container');
                 if (container) {
                     p.resizeCanvas(container.offsetWidth, container.offsetHeight);
                 }
 
-                // Final state cleanup
-                terminalLog = [];
+                // 4. Final state cleanup
                 dialogueIndex = 0;
                 charIndex = 0;
                 scrollOffset = 0;
                 lastTypeTime = 0;
 
-                // Force p5 loop to wake up if stalled
+                // 5. Wake up engine
+                p.background(255); // Flash white to reset pixels
                 p.loop();
             }
         }
