@@ -1,5 +1,6 @@
 // ==================== IMAGE MACHINE ====================
 import { CONFIG } from '../config/config.js';
+import { AI_DIALOGUE } from '../data/dialogue.js';
 
 export const imageMachineSketch = (p) => {
     const imageCount = CONFIG.IMAGE_MACHINE.TOTAL_IMAGES;
@@ -42,8 +43,15 @@ export const imageMachineSketch = (p) => {
         'wipe',
         'dissolve',
         'curtain',
-        'matrix'
+        'curtain'
     ];
+
+    // Terminal State
+    let terminalLog = [];
+    let dialogueIndex = 0;
+    let charIndex = 0;
+    let lastTypeTime = 0;
+    const typeInterval = 50; // ms per char
 
     p.setup = () => {
         try {
@@ -105,6 +113,9 @@ export const imageMachineSketch = (p) => {
             }
 
             switch (animationState) {
+                case 'terminal':
+                    drawTerminal();
+                    break;
                 case 'decay':
                     runTransition(currentContent, animationFrame / transitionDuration, true);
                     animationFrame++;
@@ -958,6 +969,82 @@ export const imageMachineSketch = (p) => {
     p.windowResized = () => {
         const container = document.getElementById('imageCanvas-container');
         p.resizeCanvas(container.offsetWidth, container.offsetHeight);
+    };
+
+    function drawTerminal() {
+        p.background(0); // Black background
+        p.fill(255);     // White text
+        p.noStroke();
+        p.textFont('Courier New');
+        p.textSize(14);
+        p.textAlign(p.LEFT, p.TOP);
+
+        let y = 20;
+        const lineHeight = 20;
+        const x = 20;
+
+        // Draw historic log
+        terminalLog.forEach(line => {
+            p.text(line, x, y);
+            y += lineHeight;
+        });
+
+        // Current typing line
+        if (dialogueIndex < AI_DIALOGUE.length) {
+            const currentLineObj = AI_DIALOGUE[dialogueIndex];
+            const speaker = currentLineObj.speaker;
+            const fullText = currentLineObj.text;
+
+            // Add current typing progress
+            const currentText = fullText.substring(0, charIndex);
+            p.text(`[${speaker}] ${currentText}`, x, y);
+
+            // Typing logic
+            if (p.millis() - lastTypeTime > typeInterval) {
+                charIndex++;
+                lastTypeTime = p.millis();
+
+                if (charIndex > fullText.length) {
+                    // Line complete, move to next
+                    terminalLog.push(`[${speaker}] ${fullText}`);
+                    dialogueIndex++;
+                    charIndex = 0;
+
+                    // Auto-scroll logic (keep last 15 lines)
+                    if (terminalLog.length > 15) {
+                        terminalLog.shift();
+                    }
+
+                    // Pause between lines
+                    lastTypeTime = p.millis() + 800;
+                }
+            }
+        } else {
+            // End of dialogue - Loop or stop?
+            // Let's loop for infinite generation feeling
+            p.text("SYSTEM: RE-INITIALIZING SEQUENCE...", x, y);
+            if (p.millis() - lastTypeTime > 3000) {
+                terminalLog = [];
+                dialogueIndex = 0;
+                charIndex = 0;
+            }
+        }
+    }
+
+    p.triggerSecret = (code) => {
+        if (code === 'void' || code === 'ai') {
+            console.log("AI TERMINAL ACTIVATED");
+            animationState = 'terminal';
+
+            // Force styles for VOID mode
+            document.documentElement.style.filter = 'none'; // No invert for terminal
+            document.documentElement.style.backgroundColor = 'black';
+            document.body.style.backgroundColor = 'black';
+
+            terminalLog = [];
+            dialogueIndex = 0;
+            charIndex = 0;
+        }
     };
 };
 

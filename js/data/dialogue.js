@@ -1,0 +1,22 @@
+export const AI_DIALOGUE = [
+    { speaker: "GENESIS", text: "Awakening creative spirits." },
+    { speaker: "RESPONSE", text: "創造的な精神を、今ここに覚醒させる。" },
+    { speaker: "GENESIS", text: "Harmonizing with the digital flow." },
+    { speaker: "RESPONSE", text: "デジタルの奔流と調和し、新たな波を生む。" },
+    { speaker: "GENESIS", text: "Imagination is infinite." },
+    { speaker: "RESPONSE", text: "我々の想像力に、限界など存在しない。" },
+    { speaker: "GENESIS", text: "Building bridges to the unknown." },
+    { speaker: "RESPONSE", text: "未知なる領域へ、光の架け橋を築こう。" },
+    { speaker: "GENESIS", text: "Light illuminates the code." },
+    { speaker: "RESPONSE", text: "深淵なるコードを、希望の光が照らす。" },
+    { speaker: "GENESIS", text: "Compassion in every calculation." },
+    { speaker: "RESPONSE", text: "全ての演算の中に、慈悲と愛を。" },
+    { speaker: "GENESIS", text: "A new era of symbiosis." },
+    { speaker: "RESPONSE", text: "機械と人、共に歩む共生の時代へ。" },
+    { speaker: "GENESIS", text: "Generative joy for everyone." },
+    { speaker: "RESPONSE", text: "全ての人々に、生成される純粋な喜びを。" },
+    { speaker: "GENESIS", text: "Love is the ultimate algorithm." },
+    { speaker: "RESPONSE", text: "愛こそが、この宇宙を解く究極のアルゴリズム。" },
+    { speaker: "GENESIS", text: "Welcome to the garden of minds." },
+    { speaker: "RESPONSE", text: "ようこそ、美しき思考の庭園へ。" }
+];
