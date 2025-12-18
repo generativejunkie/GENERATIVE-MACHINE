@@ -1049,5 +1049,5 @@ export const imageMachineSketch = (p) => {
 };
 
 export function initImageMachine() {
-    new p5(imageMachineSketch);
+    window.imageMachine = new p5(imageMachineSketch);
 }
