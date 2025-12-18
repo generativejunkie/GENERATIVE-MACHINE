@@ -1103,46 +1103,41 @@ export const imageMachineSketch = (p) => {
             }
 
             if (p.millis() - lastTypeTime > 3000) {
-                console.log("ENTERING HIDDEN IMAGE MACHINE");
+                console.log("ENTERING HIDDEN IMAGE MACHINE (REBUILD)");
 
-                // Force immediate state transition
+                // Reset frames and state
                 animationFrame = 0;
 
-                // Robust image recovery
+                // Determine the most reliable content to show FIRST
                 let keys = Object.keys(allImages);
-                if (keys.length > 0) {
+                if (keys.length > 0 && allImages[keys[0]]) {
                     currentImageKey = keys[0];
                     useColorMode = false;
                 } else {
-                    // Fallback to Color Mode immediately
-                    console.log("No images ready. Creating colors...");
+                    // Fallback: Use colors immediately to avoid black screen on mobile
+                    console.warn("Images not ready for mobile rebuild, using fallback.");
                     useColorMode = true;
                     currentImageKey = 'color-0';
-
-                    // Try to load default image in background
-                    const defaultPath = imageFileNames[0];
-                    loadImageDynamically(defaultPath, (res) => {
-                        if (res.success) {
-                            currentImageKey = res.img.filePath;
-                            useColorMode = false;
-                        }
-                    });
                 }
 
+                // Change state
                 animationState = 'rebuild';
 
-                // Force a resize to ensure canvas is correct size on mobile
+                // Force layout/canvas synchronization
                 const container = document.getElementById('imageCanvas-container');
                 if (container) {
                     p.resizeCanvas(container.offsetWidth, container.offsetHeight);
                 }
 
-                // Reset terminal state but keep filter active
+                // Final state cleanup
                 terminalLog = [];
                 dialogueIndex = 0;
                 charIndex = 0;
                 scrollOffset = 0;
                 lastTypeTime = 0;
+
+                // Force p5 loop to wake up if stalled
+                p.loop();
             }
         }
     }
