@@ -1071,7 +1071,6 @@ export const imageMachineSketch = (p) => {
 
         // Precise Line Height Tracker
         const getLineHeight = (str) => {
-            // BAKUSOKU: Conservative character estimation for absolute safety
             const charWidth = baseSize * 0.55;
             const charsPerLine = Math.floor(maxW / charWidth);
 
@@ -1082,22 +1081,22 @@ export const imageMachineSketch = (p) => {
                 let visualLength = 0;
                 for (let i = 0; i < pText.length; i++) {
                     const code = pText.charCodeAt(i);
-                    // Standard Japanese chars + full-width punctuation
                     visualLength += (code > 255 || code === 0x3000) ? 2.1 : 1;
                 }
-                // Strong safety buffer for auto-wrap: charsPerLine - 0.5
                 const linesInParagraph = Math.ceil(visualLength / (charsPerLine - 0.5)) || 1;
                 totalLines += linesInParagraph;
             });
 
-            return (totalLines * (baseSize * 1.6)) + 12;
+            return (totalLines * (baseSize * 1.6)); // Just the text height
         };
+
+        const paragraphSpacing = baseSize * 2.0; // Clear, consistent gap between blocks
 
         const drawWrappedText = (str) => {
             if (y + 100 > 0 && y < p.height) {
                 p.text(str, x, y, maxW);
             }
-            y += getLineHeight(str);
+            y += getLineHeight(str) + paragraphSpacing;
         };
 
         // Draw historic log
