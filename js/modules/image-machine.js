@@ -1073,29 +1073,35 @@ export const imageMachineSketch = (p) => {
                 }
             }
         } else {
+            // Dialogue finished
             drawWrappedText("SYSTEM: GATE OPENING...");
-            // Final scroll adjustment
             if (y > p.height - 40) {
                 scrollOffset += 1;
             }
 
+            // Initialize lastTypeTime if not set
+            if (lastTypeTime === 0 || p.millis() - lastTypeTime < 0) {
+                lastTypeTime = p.millis();
+            }
+
             if (p.millis() - lastTypeTime > 3000) {
                 console.log("ENTERING HIDDEN IMAGE MACHINE");
-                animationState = 'rebuild';
+
+                // Force immediate state transition
+                animationFrame = 0;
 
                 // Robust image recovery
                 let keys = Object.keys(allImages);
                 if (keys.length > 0) {
                     currentImageKey = keys[0];
-                    animationState = 'rebuild';
+                    useColorMode = false;
                 } else {
-                    // Fallback to Color Mode + Background Load
+                    // Fallback to Color Mode immediately
                     console.log("No images ready. Creating colors...");
                     useColorMode = true;
                     currentImageKey = 'color-0';
-                    animationState = 'rebuild'; // Important: Transition state immediately
 
-                    // Try to load default image silently
+                    // Try to load default image in background
                     const defaultPath = imageFileNames[0];
                     loadImageDynamically(defaultPath, (res) => {
                         if (res.success) {
@@ -1104,6 +1110,8 @@ export const imageMachineSketch = (p) => {
                         }
                     });
                 }
+
+                animationState = 'rebuild';
 
                 // Force a resize to ensure canvas is correct size on mobile
                 const container = document.getElementById('imageCanvas-container');
@@ -1116,6 +1124,7 @@ export const imageMachineSketch = (p) => {
                 dialogueIndex = 0;
                 charIndex = 0;
                 scrollOffset = 0;
+                lastTypeTime = 0;
             }
         }
     }
