@@ -1059,15 +1059,15 @@ export const imageMachineSketch = (p) => {
     };
 
     function drawPreTerminalNoise() {
-        p.loadPixels();
-        for (let i = 0; i < p.pixels.length; i += 4) {
-            let val = p.random(255) > 128 ? 255 : 0; // Black and White only
-            p.pixels[i] = val;
-            p.pixels[i + 1] = val;
-            p.pixels[i + 2] = val;
-            p.pixels[i + 3] = 255;
+        const blockSize = 40; // Large mosaic blocks
+        p.noStroke();
+        for (let x = 0; x < p.width; x += blockSize) {
+            for (let y = 0; y < p.height; y += blockSize) {
+                // Randomly Black or White
+                p.fill(p.random() > 0.5 ? 255 : 0);
+                p.rect(x, y, blockSize, blockSize);
+            }
         }
-        p.updatePixels();
     }
 };
 
