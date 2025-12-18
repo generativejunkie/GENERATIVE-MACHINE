@@ -65,6 +65,13 @@ export const imageMachineSketch = (p) => {
             const w = container.offsetWidth || 300; // Fallback width
             const h = container.offsetHeight || 300; // Fallback height
             p.createCanvas(w, h).parent(container);
+
+            // BAKUSOKU MODE: Performance optimizations for mobile
+            if (isTouch()) {
+                p.pixelDensity(1);
+                p.frameRate(30); // Cap mobile to 30fps for stability
+            }
+
             p.background(255);
 
             // Load photo080.webp as default
@@ -248,6 +255,13 @@ export const imageMachineSketch = (p) => {
         const loadNext = () => {
             if (preloadIndex >= shuffledAttributes.length) return;
 
+            // BAKUSOKU MODE: Limit preloading on touch devices to avoid memory lag
+            const maxPreloadCount = isTouch() ? 15 : 100;
+            if (Object.keys(allImages).length > maxPreloadCount) {
+                console.log("Bakusoku Phase: Reached preloading limit for mobile.");
+                return;
+            }
+
             const filePath = shuffledAttributes[preloadIndex];
             if (!allImages[filePath]) {
                 p.loadImage(filePath, (img) => {
@@ -258,16 +272,15 @@ export const imageMachineSketch = (p) => {
 
             preloadIndex++;
 
-            // Use requestIdleCallback if available, otherwise setTimeout
             if ('requestIdleCallback' in window) {
-                requestIdleCallback(loadNext, { timeout: 1000 });
+                requestIdleCallback(loadNext, { timeout: 2000 });
             } else {
-                setTimeout(loadNext, 200);
+                setTimeout(loadNext, 1000); // Slower interval for better performance
             }
         };
 
-        // Start preloading after a short delay to allow initial render
-        setTimeout(loadNext, 2000);
+        // Delay preloading further to let primary tasks finish
+        setTimeout(loadNext, 5000);
     }
 
     function runTransition(content, progress, isDecay) {
@@ -820,15 +833,19 @@ export const imageMachineSketch = (p) => {
         p.textFont('monospace');
 
         // Draw falling matrix code
+        const maxColumns = isTouch() ? Math.floor(columns / 1.5) : columns;
         for (let i = 0; i < columns; i++) {
+            if (isTouch() && i % 2 !== 0) continue; // Skip half columns on mobile for SPEED
+
             const x = i * fontSize;
             const speed = p.random(0.5, 2);
             const yOffset = (p.frameCount * speed + i * 50) % (p.height + 100);
 
-            for (let j = 0; j < 30; j++) {
+            const trailLength = isTouch() ? 15 : 30; // Shorter trails on mobile
+            for (let j = 0; j < trailLength; j++) {
                 const y = yOffset - j * fontSize;
                 if (y > 0 && y < p.height) {
-                    const alpha = p.map(j, 0, 30, 255, 0);
+                    const alpha = p.map(j, 0, trailLength, 255, 0);
                     p.fill(255, 255, 255, alpha * matrixProgress);
                     const char = chars.charAt(Math.floor(p.random(chars.length)));
                     p.text(char, x, y);
@@ -842,23 +859,34 @@ export const imageMachineSketch = (p) => {
             if (revealHeight > 0) {
                 p.push();
                 p.tint(255, 255 * (1 - matrixProgress));
-                const blockSize = 10;
 
-                content.loadPixels();
+                // BAKUSOKU MODE: Increase block size on mobile, skip heavy pixel load
+                const blockSize = isTouch() ? 20 : 10;
+
+                if (!isTouch()) {
+                    content.loadPixels();
+                }
 
                 for (let y = 0; y < revealHeight; y += blockSize) {
                     for (let x = 0; x < p.width; x += blockSize) {
                         if (p.random() < (1 - matrixProgress)) {
-                            const srcX = Math.floor((x / p.width) * content.width);
-                            const srcY = Math.floor((y / p.height) * content.height);
+                            if (!isTouch()) {
+                                const srcX = Math.floor((x / p.width) * content.width);
+                                const srcY = Math.floor((y / p.height) * content.height);
 
-                            if (srcX < content.width && srcY < content.height) {
-                                const index = (srcX + srcY * content.width) * 4;
-                                const r = content.pixels[index];
-                                const g = content.pixels[index + 1];
-                                const b = content.pixels[index + 2];
+                                if (srcX < content.width && srcY < content.height) {
+                                    const index = (srcX + srcY * content.width) * 4;
+                                    const r = content.pixels[index];
+                                    const g = content.pixels[index + 1];
+                                    const b = content.pixels[index + 2];
 
-                                p.fill(r, g, b);
+                                    p.fill(r, g, b);
+                                    p.noStroke();
+                                    p.rect(x, y, blockSize, blockSize);
+                                }
+                            } else {
+                                // Fast Mobile Path: Just use white/black blocks based on random
+                                p.fill(p.random(255));
                                 p.noStroke();
                                 p.rect(x, y, blockSize, blockSize);
                             }
@@ -920,9 +948,16 @@ export const imageMachineSketch = (p) => {
 
     function drawColorPattern(colors) {
         if (!colors) return;
+
+        // BAKUSOKU: Optimization - only recalculate random every few frames on mobile
+        if (isTouch() && p.frameCount % 2 !== 0) return;
+
         const colorArray = Array.isArray(colors) ? colors : colorPatterns[0];
         p.background(255);
-        const gridSize = 40;
+
+        // Larger grid for mobile
+        const gridSize = isTouch() ? 60 : 40;
+
         for (let y = 0; y < p.height; y += gridSize) {
             for (let x = 0; x < p.width; x += gridSize) {
                 const colorIndex = p.floor(p.random(colorArray.length));
@@ -1036,7 +1071,8 @@ export const imageMachineSketch = (p) => {
 
         // Precise Line Height Tracker
         const getLineHeight = (str) => {
-            const charWidth = baseSize * 0.6; // Average width of Courier chars
+            // BAKUSOKU: Conservative character estimation for absolute safety
+            const charWidth = baseSize * 0.55;
             const charsPerLine = Math.floor(maxW / charWidth);
 
             const paragraphs = str.split('\n');
@@ -1045,9 +1081,12 @@ export const imageMachineSketch = (p) => {
             paragraphs.forEach(pText => {
                 let visualLength = 0;
                 for (let i = 0; i < pText.length; i++) {
-                    visualLength += pText.charCodeAt(i) > 255 ? 2 : 1;
+                    const code = pText.charCodeAt(i);
+                    // Standard Japanese chars + full-width punctuation
+                    visualLength += (code > 255 || code === 0x3000) ? 2.1 : 1;
                 }
-                const linesInParagraph = Math.ceil(visualLength / charsPerLine) || 1;
+                // Strong safety buffer for auto-wrap: charsPerLine - 0.5
+                const linesInParagraph = Math.ceil(visualLength / (charsPerLine - 0.5)) || 1;
                 totalLines += linesInParagraph;
             });
 
