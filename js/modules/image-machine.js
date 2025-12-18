@@ -1036,8 +1036,23 @@ export const imageMachineSketch = (p) => {
         const getLineHeight = (str) => {
             const charWidth = 9;
             const charsPerLine = Math.floor(maxW / charWidth);
-            const lineCount = Math.ceil(str.length / charsPerLine) || 1;
-            return (lineCount * 24) + 20;
+
+            // Split by manual newlines first
+            const paragraphs = str.split('\n');
+            let totalLines = 0;
+
+            paragraphs.forEach(pText => {
+                // Estimate wrapping for each paragraph
+                // We count Japanese/full-width chars as 2 chars for width estimation
+                let visualLength = 0;
+                for (let i = 0; i < pText.length; i++) {
+                    visualLength += pText.charCodeAt(i) > 255 ? 2 : 1;
+                }
+                const linesInParagraph = Math.ceil(visualLength / charsPerLine) || 1;
+                totalLines += linesInParagraph;
+            });
+
+            return (totalLines * 24) + 16; // 24px per line + small padding
         };
 
         const drawWrappedText = (str) => {
