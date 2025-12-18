@@ -27,11 +27,11 @@ let playerState = {
     gainNode: null
 };
 
-export async function playAmbientMusic() {
-    console.log("Playing ambient music...");
+export async function playAmbientMusic(filename = 'ambient-loop.mp3') {
+    console.log(`Playing ambient music: ${filename}...`);
     try {
         await initAudioContext();
-        const response = await fetch('/sound/ambient-loop.mp3');
+        const response = await fetch(`/sound/${filename}`);
         const arrayBuffer = await response.arrayBuffer();
         const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 

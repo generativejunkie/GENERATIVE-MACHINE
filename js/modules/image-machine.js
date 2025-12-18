@@ -1147,7 +1147,11 @@ export const imageMachineSketch = (p) => {
     p.triggerSecret = (code) => {
         if (code === 'void' || code === 'ai') {
             console.log("AI TERMINAL ACTIVATED");
-            playAmbientMusic(); // Start background music
+
+            // Play different music for desktop/mobile
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const ritualMusic = isTouchDevice ? 'ambient-loop.mp3' : 'desktop-ritual.mp3';
+            playAmbientMusic(ritualMusic);
 
             // Start with noise
             animationState = 'pre_terminal_noise';
