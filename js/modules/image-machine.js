@@ -1197,10 +1197,9 @@ export const imageMachineSketch = (p) => {
         if (code === 'void' || code === 'ai') {
             console.log("AI TERMINAL ACTIVATED");
 
-            // Play different music for desktop/mobile
-            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-            const ritualMusic = isTouchDevice ? 'ambient-loop.mp3' : 'desktop-ritual.mp3';
-            playAmbientMusic(ritualMusic);
+            // Play music (Fallback to ambient-loop if desktop-ritual is not available)
+            // For now using ambient-loop.mp3 for all to avoid 404
+            playAmbientMusic('ambient-loop.mp3');
 
             // Start with noise
             animationState = 'pre_terminal_noise';
