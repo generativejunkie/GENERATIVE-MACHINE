@@ -1159,11 +1159,14 @@ export const imageMachineSketch = (p) => {
                 animationFrame = 0;
                 terminalLog = []; // Immediate cleanup
 
-                // 2. Select initial content (Be extremely safe)
-                let keys = Object.keys(allImages);
                 // BAKUSOKU: Removed !isTouch() restriction. Mobile can now handle images thanks to optimizations.
-                if (keys.length > 0 && allImages[keys[0]]) {
-                    // Desktop & Mobile with loaded images
+                // UPDATED: Prioritize the mix capsule render if available
+                const mixCapsuleKey = "photos/mix-capsule-render.png";
+                if (allImages[mixCapsuleKey]) {
+                    currentImageKey = mixCapsuleKey;
+                    useColorMode = false;
+                } else if (keys.length > 0 && allImages[keys[0]]) {
+                    // Fallback to first available image
                     currentImageKey = keys[0];
                     useColorMode = false;
                 } else {
@@ -1171,6 +1174,12 @@ export const imageMachineSketch = (p) => {
                     useColorMode = true;
                     currentImageKey = 'color-' + Math.floor(Math.random() * colorPatterns.length);
                 }
+
+                // IMPORTANT: explicit clear to prevent logic locking
+                nextImageKey = null;
+
+                // IMPORTANT: explicit clear to prevent logic locking
+                nextImageKey = null;
 
                 animationState = 'rebuild';
 
@@ -1212,6 +1221,9 @@ export const imageMachineSketch = (p) => {
             terminalLog = [];
             dialogueIndex = 0;
             charIndex = 0;
+
+            // IMPORTANT: explicit clear to prevent logic locking
+            nextImageKey = null;
         } else if (code === 'exit') {
             console.log("EXITING TERMINAL");
             stopAmbientMusic(); // Stop background music
