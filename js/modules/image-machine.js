@@ -1161,12 +1161,13 @@ export const imageMachineSketch = (p) => {
 
                 // 2. Select initial content (Be extremely safe)
                 let keys = Object.keys(allImages);
-                if (!isTouch() && keys.length > 0 && allImages[keys[0]]) {
-                    // Desktop with loaded images
+                // BAKUSOKU: Removed !isTouch() restriction. Mobile can now handle images thanks to optimizations.
+                if (keys.length > 0 && allImages[keys[0]]) {
+                    // Desktop & Mobile with loaded images
                     currentImageKey = keys[0];
                     useColorMode = false;
                 } else {
-                    // Mobile or No Images: Start with Colors (FASTEST)
+                    // Fallback only if no images loaded
                     useColorMode = true;
                     currentImageKey = 'color-' + Math.floor(Math.random() * colorPatterns.length);
                 }
