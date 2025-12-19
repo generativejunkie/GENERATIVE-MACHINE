@@ -8,9 +8,19 @@ export const imageMachineSketch = (p) => {
     const imageCount = CONFIG.IMAGE_MACHINE.TOTAL_IMAGES;
     const imageFileNames = [];
 
-    // Generate image file names
+    // Generate image file names (with mixed extensions)
+    const mixedExtensions = {
+        384: '.png',
+        385: '.png',
+        386: '.png',
+        387: '.jpg',
+        388: '.jpg',
+        389: '.png'  // mix-capsule-render
+    };
+
     for (let i = 1; i <= imageCount; i++) {
-        imageFileNames.push(`${CONFIG.IMAGE_MACHINE.PATH_PREFIX}${i.toString().padStart(3, '0')}${CONFIG.IMAGE_MACHINE.FILE_EXTENSION}`);
+        const ext = mixedExtensions[i] || CONFIG.IMAGE_MACHINE.FILE_EXTENSION;
+        imageFileNames.push(`${CONFIG.IMAGE_MACHINE.PATH_PREFIX}${i.toString().padStart(3, '0')}${ext}`);
     }
 
     // Fallback color patterns if images not available
@@ -1160,8 +1170,9 @@ export const imageMachineSketch = (p) => {
                 terminalLog = []; // Immediate cleanup
 
                 // BAKUSOKU: Removed !isTouch() restriction. Mobile can now handle images thanks to optimizations.
-                // UPDATED: Prioritize the mix capsule render if available
-                const mixCapsuleKey = "photos/mix-capsule-render.png";
+                // UPDATED: Prioritize the mix capsule (photo389) if available
+                const mixCapsuleKey = "photos/photo389.png";
+                let keys = Object.keys(allImages);
                 if (allImages[mixCapsuleKey]) {
                     currentImageKey = mixCapsuleKey;
                     useColorMode = false;

@@ -2,7 +2,7 @@
 export const CONFIG = {
     // Image Machine Settings
     IMAGE_MACHINE: {
-        TOTAL_IMAGES: 383,
+        TOTAL_IMAGES: 389,
         PATH_PREFIX: '/photos/photo',
         FILE_EXTENSION: '.webp',
         INITIAL_IMAGE_INDEX: 79, // photo080.webp
