@@ -994,55 +994,59 @@ export const imageMachineSketch = (p) => {
 
     const handleInteraction = () => {
         if (animationState === 'display' && !nextImageKey) {
+            // Immediate UI feedback (no blocking)
             document.getElementById('imagePrompt').classList.add('hidden');
             clearTimeout(promptTimer);
 
-            // Randomly select transition effect
-            transitionType = p.random(transitionEffects);
+            // Defer heavy processing to avoid blocking
+            requestAnimationFrame(() => {
+                // Randomly select transition effect
+                transitionType = p.random(transitionEffects);
 
-            if (useColorMode) {
-                // Color mode - select different color pattern
-                let newIndex = p.floor(p.random(colorPatterns.length));
-                const currentIndex = parseInt(currentImageKey.replace('color-', ''));
-                while (newIndex === currentIndex) {
-                    newIndex = p.floor(p.random(colorPatterns.length));
-                }
-                nextImageKey = `color-${newIndex}`;
-                animationFrame = 0;
-                animationState = 'decay';
-            } else {
-                // Image mode - try to load new image
-                let newIndex = p.floor(p.random(imageFileNames.length));
-                while (imageFileNames[newIndex] === currentImageKey) {
-                    newIndex = p.floor(p.random(imageFileNames.length));
-                }
-
-                // Add timeout to prevent infinite waiting
-                let loadTimeout = setTimeout(() => {
-                    console.warn(`Image load timeout: ${imageFileNames[newIndex]}`);
-                    // Fallback to color mode
-                    useColorMode = true;
-                    nextImageKey = `color-${p.floor(p.random(colorPatterns.length))}`;
+                if (useColorMode) {
+                    // Color mode - select different color pattern
+                    let newIndex = p.floor(p.random(colorPatterns.length));
+                    const currentIndex = parseInt(currentImageKey.replace('color-', ''));
+                    while (newIndex === currentIndex) {
+                        newIndex = p.floor(p.random(colorPatterns.length));
+                    }
+                    nextImageKey = `color-${newIndex}`;
                     animationFrame = 0;
                     animationState = 'decay';
-                }, 3000); // 3 second timeout
+                } else {
+                    // Image mode - try to load new image
+                    let newIndex = p.floor(p.random(imageFileNames.length));
+                    while (imageFileNames[newIndex] === currentImageKey) {
+                        newIndex = p.floor(p.random(imageFileNames.length));
+                    }
 
-                loadImageDynamically(imageFileNames[newIndex], (result) => {
-                    clearTimeout(loadTimeout); // Clear timeout on successful or failed load
-
-                    if (result.success) {
-                        nextImageKey = result.img.filePath;
-                        console.log(`Loaded: ${result.img.filePath}`);
-                    } else {
-                        // Switch to color mode
-                        console.warn(`Failed to load image, switching to color mode`);
+                    // Add timeout to prevent infinite waiting
+                    let loadTimeout = setTimeout(() => {
+                        console.warn(`Image load timeout: ${imageFileNames[newIndex]}`);
+                        // Fallback to color mode
                         useColorMode = true;
                         nextImageKey = `color-${p.floor(p.random(colorPatterns.length))}`;
-                    }
-                    animationFrame = 0;
-                    animationState = 'decay';
-                });
-            }
+                        animationFrame = 0;
+                        animationState = 'decay';
+                    }, 3000); // 3 second timeout
+
+                    loadImageDynamically(imageFileNames[newIndex], (result) => {
+                        clearTimeout(loadTimeout); // Clear timeout on successful or failed load
+
+                        if (result.success) {
+                            nextImageKey = result.img.filePath;
+                            console.log(`Loaded: ${result.img.filePath}`);
+                        } else {
+                            // Switch to color mode
+                            console.warn(`Failed to load image, switching to color mode`);
+                            useColorMode = true;
+                            nextImageKey = `color-${p.floor(p.random(colorPatterns.length))}`;
+                        }
+                        animationFrame = 0;
+                        animationState = 'decay';
+                    });
+                }
+            });
         }
     };
 
