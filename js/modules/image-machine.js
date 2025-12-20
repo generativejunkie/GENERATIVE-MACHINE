@@ -61,7 +61,7 @@ export const imageMachineSketch = (p) => {
     let dialogueIndex = 0;
     let charIndex = 0;
     let lastTypeTime = 0;
-    const typeInterval = 50; // ms per char
+    const typeInterval = 80; // ms per char (slower for mobile readability)
 
     p.setup = () => {
         try {
@@ -1343,20 +1343,20 @@ export const imageMachineSketch = (p) => {
         p.noStroke();
         p.textFont('Courier New, monospace');
 
-        // Responsive font size: 12px for small mobile, 14px for larger screens
-        const baseSize = p.width < 400 ? 12 : 14;
+        // MOBILE READABILITY: Larger font size for better visibility
+        const baseSize = p.width < 400 ? 16 : 14; // Increased from 12 to 16 for mobile
         p.textSize(baseSize);
         p.textAlign(p.LEFT, p.TOP);
-        p.textLeading(baseSize * 1.6);
+        p.textLeading(baseSize * 1.8); // Increased line spacing
 
-        const margin = p.width < 400 ? 15 : 25;
+        const margin = p.width < 400 ? 20 : 25; // More margin on mobile
         let x = margin;
         let y = margin - scrollOffset; // Apply scroll offset
         const maxW = p.width - (margin * 2);
 
-        // Precise Line Height Tracker
+        // Precise Line Height Tracker with better mobile support
         const getLineHeight = (str) => {
-            const charWidth = baseSize * 0.55;
+            const charWidth = baseSize * 0.5; // Tighter estimate for better wrapping
             const charsPerLine = Math.floor(maxW / charWidth);
 
             const paragraphs = str.split('\n');
@@ -1366,13 +1366,14 @@ export const imageMachineSketch = (p) => {
                 let visualLength = 0;
                 for (let i = 0; i < pText.length; i++) {
                     const code = pText.charCodeAt(i);
-                    visualLength += (code > 255 || code === 0x3000) ? 2.1 : 1;
+                    // More accurate Japanese character width
+                    visualLength += (code > 255 || code === 0x3000) ? 2.0 : 1;
                 }
-                const linesInParagraph = Math.ceil(visualLength / (charsPerLine - 0.5)) || 1;
+                const linesInParagraph = Math.ceil(visualLength / (charsPerLine - 1)) || 1;
                 totalLines += linesInParagraph;
             });
 
-            return (totalLines * (baseSize * 1.6)); // Just the text height
+            return (totalLines * (baseSize * 1.8)); // Increased line spacing
         };
 
         const paragraphSpacing = baseSize * 2.0; // Clear, consistent gap between blocks
