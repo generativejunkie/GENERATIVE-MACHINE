@@ -48,7 +48,14 @@ export const imageMachineSketch = (p) => {
         'curtain',
         'curtain',
         'noise',
-        'mosaic'
+        'mosaic',
+        // GOD-tier effects
+        'kaleidoscope',
+        'vortex',
+        'shatter',
+        'chromatic',
+        'ripple',
+        'particles'
     ];
 
     // Terminal State
@@ -341,6 +348,24 @@ export const imageMachineSketch = (p) => {
                 break;
             case 'mosaic':
                 drawMosaic(content, progress, isDecay);
+                break;
+            case 'kaleidoscope':
+                drawKaleidoscope(content, progress, isDecay);
+                break;
+            case 'vortex':
+                drawVortex(content, progress, isDecay);
+                break;
+            case 'shatter':
+                drawShatter(content, progress, isDecay);
+                break;
+            case 'chromatic':
+                drawChromatic(content, progress, isDecay);
+                break;
+            case 'ripple':
+                drawRipple(content, progress, isDecay);
+                break;
+            case 'particles':
+                drawParticles(content, progress, isDecay);
                 break;
         }
     }
@@ -1048,6 +1073,215 @@ export const imageMachineSketch = (p) => {
                 }
             }
             p.pop();
+        }
+    }
+
+    // ========== GOD-TIER EFFECTS ==========
+
+    function drawKaleidoscope(content, progress, isDecay) {
+        p.background(0);
+        const segments = 8;
+        const angle = p.TWO_PI / segments;
+        const rotation = isDecay ? progress * p.TWO_PI : (1 - progress) * p.TWO_PI;
+
+        p.push();
+        p.translate(p.width / 2, p.height / 2);
+
+        for (let i = 0; i < segments; i++) {
+            p.push();
+            p.rotate(angle * i + rotation);
+
+            if (useColorMode) {
+                const colors = Array.isArray(content) ? content : colorPatterns[0];
+                const size = p.min(p.width, p.height) / 4;
+                for (let j = 0; j < 5; j++) {
+                    const colorIndex = (i + j) % colors.length;
+                    p.fill(colors[colorIndex]);
+                    p.noStroke();
+                    p.triangle(0, 0, size * (j + 1) / 5, -size / 2, size * (j + 1) / 5, size / 2);
+                }
+            } else if (content) {
+                p.scale(1, i % 2 === 0 ? 1 : -1);
+                p.image(content, 0, -p.height / 4, p.width / 4, p.height / 2);
+            }
+
+            p.pop();
+        }
+        p.pop();
+    }
+
+    function drawVortex(content, progress, isDecay) {
+        p.background(0);
+        const vortexStrength = isDecay ? progress * 2 : (1 - progress) * 2;
+
+        if (useColorMode) {
+            const colors = Array.isArray(content) ? content : colorPatterns[0];
+            const spirals = 5;
+            for (let s = 0; s < spirals; s++) {
+                const colorIndex = s % colors.length;
+                p.fill(colors[colorIndex]);
+                p.noStroke();
+                p.beginShape();
+                for (let a = 0; a < p.TWO_PI * 3; a += 0.1) {
+                    const r = p.map(a, 0, p.TWO_PI * 3, 0, p.width / 2) * vortexStrength;
+                    const x = p.width / 2 + p.cos(a + s) * r;
+                    const y = p.height / 2 + p.sin(a + s) * r;
+                    p.vertex(x, y);
+                }
+                p.endShape();
+            }
+        } else if (content) {
+            const gridSize = 20;
+            for (let y = 0; y < p.height; y += gridSize) {
+                for (let x = 0; x < p.width; x += gridSize) {
+                    const dx = x - p.width / 2;
+                    const dy = y - p.height / 2;
+                    const distance = p.sqrt(dx * dx + dy * dy);
+                    const angle = p.atan2(dy, dx);
+                    const twist = distance * 0.01 * vortexStrength;
+
+                    const newAngle = angle + twist;
+                    const imgX = p.floor(p.width / 2 + p.cos(newAngle) * distance);
+                    const imgY = p.floor(p.height / 2 + p.sin(newAngle) * distance);
+
+                    if (imgX >= 0 && imgX < content.width && imgY >= 0 && imgY < content.height) {
+                        const c = content.get(imgX, imgY);
+                        p.fill(c);
+                        p.noStroke();
+                        p.rect(x, y, gridSize, gridSize);
+                    }
+                }
+            }
+        }
+    }
+
+    function drawShatter(content, progress, isDecay) {
+        p.background(255);
+        const shatterAmount = isDecay ? progress : (1 - progress);
+        const fragments = 30;
+
+        p.push();
+        for (let i = 0; i < fragments; i++) {
+            const centerX = p.random(p.width);
+            const centerY = p.random(p.height);
+            const size = p.random(50, 150);
+            const offsetX = (centerX - p.width / 2) * shatterAmount * 0.5;
+            const offsetY = (centerY - p.height / 2) * shatterAmount * 0.5;
+
+            if (useColorMode) {
+                const colors = Array.isArray(content) ? content : colorPatterns[0];
+                const colorIndex = i % colors.length;
+                p.fill(colors[colorIndex]);
+            } else if (content) {
+                const imgX = p.constrain(p.floor(centerX), 0, content.width - 1);
+                const imgY = p.constrain(p.floor(centerY), 0, content.height - 1);
+                const c = content.get(imgX, imgY);
+                p.fill(c);
+            }
+
+            p.noStroke();
+            p.triangle(
+                centerX + offsetX, centerY + offsetY - size / 2,
+                centerX + offsetX - size / 2, centerY + offsetY + size / 2,
+                centerX + offsetX + size / 2, centerY + offsetY + size / 2
+            );
+        }
+        p.pop();
+    }
+
+    function drawChromatic(content, progress, isDecay) {
+        p.background(0);
+        const offset = isDecay ? progress * 20 : (1 - progress) * 20;
+
+        if (useColorMode) {
+            const colors = Array.isArray(content) ? content : colorPatterns[0];
+            const gridSize = 30;
+            for (let y = 0; y < p.height; y += gridSize) {
+                for (let x = 0; x < p.width; x += gridSize) {
+                    const colorIndex = p.floor((x + y) / gridSize) % colors.length;
+                    p.fill(colors[colorIndex]);
+                    p.noStroke();
+                    p.rect(x + offset, y, gridSize, gridSize);
+                    p.rect(x - offset, y, gridSize, gridSize);
+                    p.rect(x, y, gridSize, gridSize);
+                }
+            }
+        } else if (content) {
+            p.tint(255, 0, 0);
+            p.image(content, offset, 0, p.width, p.height);
+            p.tint(0, 255, 0);
+            p.image(content, 0, 0, p.width, p.height);
+            p.tint(0, 0, 255);
+            p.image(content, -offset, 0, p.width, p.height);
+            p.noTint();
+        }
+    }
+
+    function drawRipple(content, progress, isDecay) {
+        p.background(0);
+        const rippleStrength = isDecay ? (1 - progress) * 30 : progress * 30;
+        const frequency = 0.05;
+
+        if (useColorMode) {
+            const colors = Array.isArray(content) ? content : colorPatterns[0];
+            const gridSize = 15;
+            for (let y = 0; y < p.height; y += gridSize) {
+                for (let x = 0; x < p.width; x += gridSize) {
+                    const dx = x - p.width / 2;
+                    const dy = y - p.height / 2;
+                    const distance = p.sqrt(dx * dx + dy * dy);
+                    const wave = p.sin(distance * frequency + p.frameCount * 0.1) * rippleStrength;
+                    const colorIndex = p.floor((distance + wave) / 50) % colors.length;
+                    p.fill(colors[colorIndex]);
+                    p.noStroke();
+                    p.rect(x + wave, y + wave, gridSize, gridSize);
+                }
+            }
+        } else if (content) {
+            const gridSize = 10;
+            for (let y = 0; y < p.height; y += gridSize) {
+                for (let x = 0; x < p.width; x += gridSize) {
+                    const dx = x - p.width / 2;
+                    const dy = y - p.height / 2;
+                    const distance = p.sqrt(dx * dx + dy * dy);
+                    const wave = p.sin(distance * frequency + p.frameCount * 0.1) * rippleStrength;
+
+                    const imgX = p.constrain(p.floor(x), 0, content.width - 1);
+                    const imgY = p.constrain(p.floor(y), 0, content.height - 1);
+                    const c = content.get(imgX, imgY);
+                    p.fill(c);
+                    p.noStroke();
+                    p.rect(x + wave, y + wave, gridSize, gridSize);
+                }
+            }
+        }
+    }
+
+    function drawParticles(content, progress, isDecay) {
+        p.background(0);
+        const particleCount = isTouch() ? 500 : 1000;
+        const spread = isDecay ? progress * 200 : (1 - progress) * 200;
+
+        for (let i = 0; i < particleCount; i++) {
+            const x = p.random(p.width);
+            const y = p.random(p.height);
+            const dx = (x - p.width / 2) * spread / 100;
+            const dy = (y - p.height / 2) * spread / 100;
+
+            if (useColorMode) {
+                const colors = Array.isArray(content) ? content : colorPatterns[0];
+                const colorIndex = i % colors.length;
+                p.fill(colors[colorIndex]);
+            } else if (content) {
+                const imgX = p.constrain(p.floor(x), 0, content.width - 1);
+                const imgY = p.constrain(p.floor(y), 0, content.height - 1);
+                const c = content.get(imgX, imgY);
+                p.fill(c);
+            }
+
+            p.noStroke();
+            const size = isTouch() ? 3 : 2;
+            p.ellipse(x + dx, y + dy, size, size);
         }
     }
 
