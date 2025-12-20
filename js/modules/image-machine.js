@@ -1017,11 +1017,25 @@ export const imageMachineSketch = (p) => {
                     newIndex = p.floor(p.random(imageFileNames.length));
                 }
 
+                // Add timeout to prevent infinite waiting
+                let loadTimeout = setTimeout(() => {
+                    console.warn(`Image load timeout: ${imageFileNames[newIndex]}`);
+                    // Fallback to color mode
+                    useColorMode = true;
+                    nextImageKey = `color-${p.floor(p.random(colorPatterns.length))}`;
+                    animationFrame = 0;
+                    animationState = 'decay';
+                }, 3000); // 3 second timeout
+
                 loadImageDynamically(imageFileNames[newIndex], (result) => {
+                    clearTimeout(loadTimeout); // Clear timeout on successful or failed load
+
                     if (result.success) {
                         nextImageKey = result.img.filePath;
+                        console.log(`Loaded: ${result.img.filePath}`);
                     } else {
                         // Switch to color mode
+                        console.warn(`Failed to load image, switching to color mode`);
                         useColorMode = true;
                         nextImageKey = `color-${p.floor(p.random(colorPatterns.length))}`;
                     }
