@@ -2,6 +2,7 @@
 import { CONFIG } from '../config/config.js';
 import { getDialogue } from '../data/dialogue.js';
 import { playAmbientMusic, stopAmbientMusic } from './sound-machine.js';
+import { initVoidKeyboard, showInputKeyboard, setDialogueInputCallback, handleCapsuleChoice } from './void-input.js';
 
 export const imageMachineSketch = (p) => {
     const isTouch = () => 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -110,6 +111,12 @@ export const imageMachineSketch = (p) => {
             currentImageKey = `color-0`;
             animationState = 'display';
         }
+
+        // Initialize VOID dialogue input system
+        initVoidKeyboard();
+        setDialogueInputCallback((key) => {
+            handleDialogueInputKey(key);
+        });
     };
 
     p.draw = () => {
@@ -1321,12 +1328,67 @@ export const imageMachineSketch = (p) => {
     };
 
     p.keyPressed = () => {
+        // Handle VOID dialogue input
+        if (waitingForInput && currentInputType) {
+            const key = p.key.toLowerCase();
+
+            if (currentInputType === 'yn' && (key === 'y' || key === 'n')) {
+                handleDialogueInputKey(key);
+                return false;
+            } else if (currentInputType === 'capsule' && (key === '1' || key === '2' || key === '3')) {
+                handleDialogueInputKey(key);
+                return false;
+            }
+        }
+
         // Handle spacebar for image switching
         if (p.key === ' ' || p.keyCode === 32) {
             handleInteraction();
             return false; // Prevent page scroll
         }
     };
+
+    // Handle dialogue input from keyboard or touch
+    function handleDialogueInputKey(key) {
+        if (!waitingForInput || !currentInputType) return;
+
+        console.log(`Input received: ${key}`);
+
+        if (currentInputType === 'yn') {
+            // Y/N input - just acknowledge and continue
+            userInput = key;
+            waitingForInput = false;
+            showInputKeyboard(null); // Hide keyboard
+
+            // Continue to next dialogue line
+            if (dialogueIndex < AI_DIALOGUE.length - 1) {
+                dialogueIndex++;
+                charIndex = 0;
+            }
+        } else if (currentInputType === 'capsule') {
+            // Capsule choice - handle redirect
+            userInput = key;
+            const result = handleCapsuleChoice(key);
+
+            if (result === 'mix') {
+                // MIX capsule chosen - continue to VOID mode
+                waitingForInput = false;
+                showInputKeyboard(null);
+
+                // Continue dialogue/transition to VOID
+                if (dialogueIndex < AI_DIALOGUE.length - 1) {
+                    dialogueIndex++;
+                    charIndex = 0;
+                } else {
+                    //Already at end, transition out of terminal
+                    animationState = 'display';
+                }
+            }
+            // For WHITE/BLACK, redirect happens in handleCapsuleChoice
+        }
+
+        currentInputType = null;
+    }
 
     p.windowResized = () => {
         const container = document.getElementById('imageCanvas-container');
@@ -1424,9 +1486,26 @@ export const imageMachineSketch = (p) => {
 
                 if (charIndex > fullText.length) {
                     terminalLog.push(`[${speaker}] ${fullText}`);
-                    dialogueIndex++;
-                    charIndex = 0;
-                    lastTypeTime = p.millis() + 1000; // Pause between messages
+
+                    // Check if this line requires input
+                    const currentDialogue = AI_DIALOGUE[dialogueIndex];
+                    if (currentDialogue.waitForInput) {
+                        waitingForInput = true;
+                        currentInputType = currentDialogue.inputType; // 'yn' or 'capsule'
+
+                        // Show appropriate keyboard for mobile
+                        if (isTouch()) {
+                            showInputKeyboard(currentInputType);
+                        }
+                        // Desktop users will use keyboard Y/N or 1/2/3
+                    } else {
+                        // No input required, continue to next line
+                        dialogueIndex++;
+                        charIndex = 0;
+                        lastTypeTime = p.millis() + 1000; // Pause between messages
+                    }
+                } else {
+                    // Input was required, already handled elsewhere
                 }
             }
         } else {
