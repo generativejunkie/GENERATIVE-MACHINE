@@ -1098,51 +1098,6 @@ export const imageMachineSketch = (p) => {
         p.pop();
     }
 
-    function drawVortex(content, progress, isDecay) {
-        p.background(0);
-        const vortexStrength = isDecay ? progress * 2 : (1 - progress) * 2;
-
-        if (useColorMode) {
-            const colors = Array.isArray(content) ? content : colorPatterns[0];
-            const spirals = 5;
-            for (let s = 0; s < spirals; s++) {
-                const colorIndex = s % colors.length;
-                p.fill(colors[colorIndex]);
-                p.noStroke();
-                p.beginShape();
-                for (let a = 0; a < p.TWO_PI * 3; a += 0.1) {
-                    const r = p.map(a, 0, p.TWO_PI * 3, 0, p.width / 2) * vortexStrength;
-                    const x = p.width / 2 + p.cos(a + s) * r;
-                    const y = p.height / 2 + p.sin(a + s) * r;
-                    p.vertex(x, y);
-                }
-                p.endShape();
-            }
-        } else if (content) {
-            const gridSize = 20;
-            for (let y = 0; y < p.height; y += gridSize) {
-                for (let x = 0; x < p.width; x += gridSize) {
-                    const dx = x - p.width / 2;
-                    const dy = y - p.height / 2;
-                    const distance = p.sqrt(dx * dx + dy * dy);
-                    const angle = p.atan2(dy, dx);
-                    const twist = distance * 0.01 * vortexStrength;
-
-                    const newAngle = angle + twist;
-                    const imgX = p.floor(p.width / 2 + p.cos(newAngle) * distance);
-                    const imgY = p.floor(p.height / 2 + p.sin(newAngle) * distance);
-
-                    if (imgX >= 0 && imgX < content.width && imgY >= 0 && imgY < content.height) {
-                        const c = content.get(imgX, imgY);
-                        p.fill(c);
-                        p.noStroke();
-                        p.rect(x, y, gridSize, gridSize);
-                    }
-                }
-            }
-        }
-    }
-
     function drawShatter(content, progress, isDecay) {
         p.background(255);
         const shatterAmount = isDecay ? progress : (1 - progress);
