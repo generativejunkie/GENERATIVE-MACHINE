@@ -61,7 +61,10 @@ export const imageMachineSketch = (p) => {
     let dialogueIndex = 0;
     let charIndex = 0;
     let lastTypeTime = 0;
-    const typeInterval = 80; // ms per char (slower for mobile readability)
+    const typeInterval = 40; // ms per char (fast hacker typing)
+    let waitingForInput = false; // Track if waiting for user input
+    let currentInputType = null; // 'yn' or 'capsule'
+    let userInput = ''; // Store user's input choice
 
     p.setup = () => {
         try {

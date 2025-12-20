@@ -182,6 +182,22 @@
                     aria-label="Interactive image generator with transition effects">
                     <div id="imageCanvas-container" aria-label="Generative image canvas"></div>
                     <div id="imagePrompt" class="canvas-prompt" aria-hidden="true">CLICK / TAP</div>
+
+                    <!-- Mobile Touch Keyboard for VOID Dialogue -->
+                    <div id="voidKeyboard" class="void-keyboard hidden" role="group"
+                        aria-label="Dialogue input keyboard">
+                        <!-- Y/N Buttons -->
+                        <div id="ynButtons" class="void-keyboard-section hidden">
+                            <button class="void-key" data-key="y">Y</button>
+                            <button class="void-key" data-key="n">N</button>
+                        </div>
+                        <!-- Capsule Choice Buttons -->
+                        <div id="capsuleButtons" class="void-keyboard-section hidden">
+                            <button class="void-key" data-key="1">1</button>
+                            <button class="void-key" data-key="2">2</button>
+                            <button class="void-key" data-key="3">3</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="machine-controls">
