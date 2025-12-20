@@ -46,7 +46,9 @@ export const imageMachineSketch = (p) => {
         'wipe',
         'dissolve',
         'curtain',
-        'curtain'
+        'curtain',
+        'noise',
+        'mosaic'
     ];
 
     // Terminal State
@@ -333,6 +335,12 @@ export const imageMachineSketch = (p) => {
                 break;
             case 'matrix':
                 drawMatrix(content, progress, isDecay);
+                break;
+            case 'noise':
+                drawNoise(content, progress, isDecay);
+                break;
+            case 'mosaic':
+                drawMosaic(content, progress, isDecay);
                 break;
         }
     }
@@ -967,6 +975,79 @@ export const imageMachineSketch = (p) => {
                 p.noStroke();
                 p.rect(x, y, gridSize, gridSize);
             }
+        }
+    }
+
+    function drawNoise(content, progress, isDecay) {
+        p.background(0);
+
+        // Draw base content first
+        if (useColorMode) {
+            drawColorPattern(content);
+        } else if (content) {
+            drawImageFullscreen(content);
+        }
+
+        // Apply noise overlay
+        const noiseIntensity = isDecay ? progress : (1 - progress);
+        const noiseAmount = p.floor(p.width * p.height * noiseIntensity * 0.3);
+
+        for (let i = 0; i < noiseAmount; i++) {
+            const x = p.floor(p.random(p.width));
+            const y = p.floor(p.random(p.height));
+            const brightness = p.random(255);
+            p.stroke(brightness);
+            p.point(x, y);
+        }
+    }
+
+    function drawMosaic(content, progress, isDecay) {
+        p.background(255);
+
+        // Calculate mosaic size - goes from small to large during decay, large to small during build
+        const minSize = 4;
+        const maxSize = 50;
+        const mosaicSize = isDecay ?
+            p.map(progress, 0, 1, minSize, maxSize) :
+            p.map(progress, 0, 1, maxSize, minSize);
+
+        if (useColorMode) {
+            // Color pattern mosaic
+            const colors = Array.isArray(content) ? content : colorPatterns[0];
+            for (let y = 0; y < p.height; y += mosaicSize) {
+                for (let x = 0; x < p.width; x += mosaicSize) {
+                    const colorIndex = p.floor(p.random(colors.length));
+                    p.fill(colors[colorIndex]);
+                    p.noStroke();
+                    // Draw circle mosaic
+                    p.ellipse(x + mosaicSize / 2, y + mosaicSize / 2, mosaicSize, mosaicSize);
+                }
+            }
+        } else if (content) {
+            // Image mosaic
+            p.push();
+            const scale = p.min(p.width / content.width, p.height / content.height);
+            const scaledW = content.width * scale;
+            const scaledH = content.height * scale;
+            const offsetX = (p.width - scaledW) / 2;
+            const offsetY = (p.height - scaledH) / 2;
+
+            for (let y = 0; y < p.height; y += mosaicSize) {
+                for (let x = 0; x < p.width; x += mosaicSize) {
+                    // Sample color from original image
+                    const imgX = p.floor((x - offsetX) / scale);
+                    const imgY = p.floor((y - offsetY) / scale);
+
+                    if (imgX >= 0 && imgX < content.width && imgY >= 0 && imgY < content.height) {
+                        const c = content.get(imgX, imgY);
+                        p.fill(c);
+                        p.noStroke();
+                        // Draw circle mosaic
+                        p.ellipse(x + mosaicSize / 2, y + mosaicSize / 2, mosaicSize, mosaicSize);
+                    }
+                }
+            }
+            p.pop();
         }
     }
 
