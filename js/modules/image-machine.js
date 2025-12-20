@@ -1,6 +1,6 @@
 // ==================== IMAGE MACHINE ====================
 import { CONFIG } from '../config/config.js';
-import { AI_DIALOGUE } from '../data/dialogue.js';
+import { getDialogue } from '../data/dialogue.js';
 import { playAmbientMusic, stopAmbientMusic } from './sound-machine.js';
 
 export const imageMachineSketch = (p) => {
@@ -59,6 +59,7 @@ export const imageMachineSketch = (p) => {
     ];
 
     // Terminal State
+    const AI_DIALOGUE = getDialogue(); // Get dialogue based on browser language
     let terminalLog = [];
     let dialogueIndex = 0;
     let charIndex = 0;
