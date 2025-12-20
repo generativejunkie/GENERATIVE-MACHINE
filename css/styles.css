@@ -435,9 +435,9 @@ h3 {
     font-family: 'Courier New', monospace;
     font-size: 20px;
     font-weight: bold;
-    color: #00ff00;
+    color: #ffffff;
     background: rgba(0, 0, 0, 0.8);
-    border: 2px solid #00ff00;
+    border: 2px solid #ffffff;
     padding: 15px 25px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -447,14 +447,14 @@ h3 {
 
 .void-key:hover,
 .void-key:focus {
-    background: rgba(0, 255, 0, 0.2);
-    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
     transform: scale(1.05);
 }
 
 .void-key:active {
     transform: scale(0.95);
-    box-shadow: 0 0 25px rgba(0, 255, 0, 0.8);
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.8);
 }
 
 /* Mobile adjustments */
