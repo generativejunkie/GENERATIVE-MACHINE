@@ -443,6 +443,8 @@ h3 {
     transition: all 0.2s ease;
     text-transform: uppercase;
     min-width: 60px;
+    outline: none;
+    /* Remove browser focus outline */
 }
 
 .void-key:hover,
@@ -450,11 +452,17 @@ h3 {
     background: rgba(255, 255, 255, 0.2);
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
     transform: scale(1.05);
+    outline: none;
 }
 
 .void-key:active {
     transform: scale(0.95);
     box-shadow: 0 0 25px rgba(255, 255, 255, 0.8);
+}
+
+.void-key:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* Mobile adjustments */
