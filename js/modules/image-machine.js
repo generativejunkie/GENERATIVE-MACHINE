@@ -1445,20 +1445,24 @@ export const imageMachineSketch = (p) => {
                 animationFrame = 0;
                 terminalLog = []; // Immediate cleanup
 
-                // BAKUSOKU: Removed !isTouch() restriction. Mobile can now handle images thanks to optimizations.
-                let keys = Object.keys(allImages);
-                if (keys.length > 0 && allImages[keys[0]]) {
-                    // Use first available image
-                    currentImageKey = keys[0];
+                // VOID MODE: Show photo332.webp after terminal
+                const voidImageKey = 'photos/photo332.webp';
+                if (allImages[voidImageKey]) {
+                    currentImageKey = voidImageKey;
                     useColorMode = false;
                 } else {
-                    // Fallback only if no images loaded
-                    useColorMode = true;
-                    currentImageKey = 'color-' + Math.floor(Math.random() * colorPatterns.length);
+                    // Fallback: try to load it
+                    loadImageDynamically(voidImageKey, (result) => {
+                        if (result.success) {
+                            currentImageKey = result.img.filePath;
+                            useColorMode = false;
+                        } else {
+                            // Final fallback to color mode
+                            useColorMode = true;
+                            currentImageKey = 'color-' + Math.floor(Math.random() * colorPatterns.length);
+                        }
+                    });
                 }
-
-                // IMPORTANT: explicit clear to prevent logic locking
-                nextImageKey = null;
 
                 // IMPORTANT: explicit clear to prevent logic locking
                 nextImageKey = null;

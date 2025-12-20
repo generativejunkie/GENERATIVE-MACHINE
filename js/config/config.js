@@ -5,7 +5,7 @@ export const CONFIG = {
         TOTAL_IMAGES: 332,
         PATH_PREFIX: '/photos/photo',
         FILE_EXTENSION: '.webp',
-        INITIAL_IMAGE_INDEX: 0, // photo001.webp (black/white capsule)
+        INITIAL_IMAGE_INDEX: 139, // photo140.webp (0-indexed)
         CHAOS_DURATION: 10,
         TRANSITION_DURATION: 10 // GOD SPEED
     },
