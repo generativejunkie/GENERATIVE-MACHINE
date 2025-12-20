@@ -30,7 +30,7 @@ export const imageMachineSketch = (p) => {
     let imageLoadAttempts = 0;
     const maxLoadAttempts = 3;
 
-    // Available transition effects
+    // Available transition effects (GOD SPEED - removed heavy effects)
     const transitionEffects = [
         'blocks',
         'slide',
@@ -49,13 +49,10 @@ export const imageMachineSketch = (p) => {
         'curtain',
         'noise',
         'mosaic',
-        // GOD-tier effects
+        // Lightweight GOD-tier effects only
         'kaleidoscope',
-        'vortex',
         'shatter',
-        'chromatic',
-        'ripple',
-        'particles'
+        'chromatic'
     ];
 
     // Terminal State
@@ -352,20 +349,11 @@ export const imageMachineSketch = (p) => {
             case 'kaleidoscope':
                 drawKaleidoscope(content, progress, isDecay);
                 break;
-            case 'vortex':
-                drawVortex(content, progress, isDecay);
-                break;
             case 'shatter':
                 drawShatter(content, progress, isDecay);
                 break;
             case 'chromatic':
                 drawChromatic(content, progress, isDecay);
-                break;
-            case 'ripple':
-                drawRipple(content, progress, isDecay);
-                break;
-            case 'particles':
-                drawParticles(content, progress, isDecay);
                 break;
         }
     }

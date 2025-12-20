@@ -5,9 +5,9 @@ export const CONFIG = {
         TOTAL_IMAGES: 332,
         PATH_PREFIX: '/photos/photo',
         FILE_EXTENSION: '.webp',
-        INITIAL_IMAGE_INDEX: 79, // photo080.webp
-        CHAOS_DURATION: 15,
-        TRANSITION_DURATION: 20
+        INITIAL_IMAGE_INDEX: 0, // photo001.webp (black/white capsule)
+        CHAOS_DURATION: 10,
+        TRANSITION_DURATION: 10 // GOD SPEED
     },
 
     // Sound Machine Settings
