@@ -3,8 +3,12 @@ import { initImageMachine } from './modules/image-machine.js';
 import { initSoundMachine } from './modules/sound-machine.js';
 import { initUI } from './modules/ui.js';
 import { initHero } from './modules/hero.js';
+import { initLanguage } from './modules/language-switcher.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize language system first
+    initLanguage();
+
     // Initialize standard modules
     initHero();
     initImageMachine();
