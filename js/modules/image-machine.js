@@ -1269,18 +1269,25 @@ export const imageMachineSketch = (p) => {
                         newIndex = p.floor(p.random(imageFileNames.length));
                     }
 
-                    // Add timeout to prevent infinite waiting
+                    let hasResponded = false; // Track if callback has been called
+
+                    // MOBILE FIX: Guaranteed fallback to prevent freeze
                     let loadTimeout = setTimeout(() => {
-                        console.warn(`Image load timeout: ${imageFileNames[newIndex]}`);
-                        // Fallback to color mode
-                        useColorMode = true;
-                        nextImageKey = `color-${p.floor(p.random(colorPatterns.length))}`;
-                        animationFrame = 0;
-                        animationState = 'decay';
+                        if (!hasResponded) {
+                            console.warn(`Image load timeout (mobile freeze prevention): ${imageFileNames[newIndex]}`);
+                            hasResponded = true;
+                            // Fallback to color mode
+                            useColorMode = true;
+                            nextImageKey = `color-${p.floor(p.random(colorPatterns.length))}`;
+                            animationFrame = 0;
+                            animationState = 'decay';
+                        }
                     }, 3000); // 3 second timeout
 
                     loadImageDynamically(imageFileNames[newIndex], (result) => {
-                        clearTimeout(loadTimeout); // Clear timeout on successful or failed load
+                        if (hasResponded) return; // Prevent double execution
+                        hasResponded = true;
+                        clearTimeout(loadTimeout);
 
                         if (result.success) {
                             nextImageKey = result.img.filePath;
