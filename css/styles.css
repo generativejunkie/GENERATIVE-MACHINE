@@ -1961,17 +1961,35 @@ body.mix-mode {
     background-color: #000;
 }
 
-body.mix-mode .site-header,
-body.mix-mode .section-header,
-body.mix-mode .machine-controls,
-body.mix-mode .site-footer,
-body.mix-mode .skip-link,
+/* Hide everything by default */
+body.mix-mode>header,
+body.mix-mode>footer,
+body.mix-mode>main>section,
+body.mix-mode .skip-link {
+    display: none !important;
+}
+
+/* Show only Image Machine section wrapper (but hide its normal contents) */
+body.mix-mode>main,
+body.mix-mode>main>section#image-machine {
+    display: block !important;
+    position: static !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+}
+
+/* Hide inner UI elements of Image Machine */
+body.mix-mode #image-machine .section-header,
+body.mix-mode #image-machine .machine-controls,
 body.mix-mode #imagePrompt,
 body.mix-mode .void-keyboard {
     display: none !important;
 }
 
-body.mix-mode .machine-canvas-wrapper {
+/* Position the canvas wrapper strictly */
+body.mix-mode #image-machine .machine-canvas-wrapper {
     position: fixed;
     top: 0;
     left: 0;
@@ -1982,6 +2000,7 @@ body.mix-mode .machine-canvas-wrapper {
     margin: 0;
     border: none;
     border-radius: 0;
+    display: block !important;
 }
 
 body.mix-mode #imageCanvas-container {
