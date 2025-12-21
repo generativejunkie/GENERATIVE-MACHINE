@@ -1630,8 +1630,9 @@ export const imageMachineSketch = (p) => {
             animationState = 'terminal';
             animationFrame = 0;
 
-            // Start with normal colors (noise handles visuals)
-            document.documentElement.style.filter = 'none';
+            // GOD SPEED: Invert colors to create BLACK terminal world
+            document.documentElement.style.filter = 'invert(1)';
+            document.body.style.backgroundColor = '#000000'; // Force backdrop color
 
             terminalLog = [];
             dialogueIndex = 0;
