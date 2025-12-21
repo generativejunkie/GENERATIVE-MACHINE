@@ -70,10 +70,11 @@ export function initSoundMachine() {
     camera.position.set(0, 0, 5);
 
     renderer = new THREE.WebGLRenderer({
-        antialias: true,
+        antialias: false, // GOD SPEED: Disable antialias for performance
         powerPreference: 'high-performance',
         stencil: false,
-        depth: true
+        depth: true,
+        precision: 'mediump' // GOD SPEED: Lower precision for speed
     });
     renderer.setSize(container.offsetWidth, container.offsetHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));

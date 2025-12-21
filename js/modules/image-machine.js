@@ -5,6 +5,9 @@ import { playAmbientMusic, stopAmbientMusic } from './sound-machine.js';
 import { initVoidKeyboard, showInputKeyboard, setDialogueInputCallback, handleCapsuleChoice } from './void-input.js';
 
 export const imageMachineSketch = (p) => {
+    // GOD SPEED: Disable friendly errors for max performance
+    p.disableFriendlyErrors = true;
+
     const isTouch = () => 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     const imageCount = CONFIG.IMAGE_MACHINE.TOTAL_IMAGES;
     const imageFileNames = [];
