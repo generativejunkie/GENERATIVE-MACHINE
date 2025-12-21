@@ -31,29 +31,21 @@ export const imageMachineSketch = (p) => {
     let imageLoadAttempts = 0;
     const maxLoadAttempts = 3;
 
-    // Available transition effects (GOD SPEED - removed heavy effects)
+    // Available transition effects (GOD SPEED - removed heavy particle/noise effects)
     const transitionEffects = [
         'blocks',
         'slide',
         'pixelate',
-        'spiral',
-        'zoom',
-        'rgb-split',
-        'scan',
-        'reveal',
         'stripe',
-        'fade',
         'grid',
         'wipe',
-        'dissolve',
         'curtain',
-        'curtain',
-        'noise',
-        'mosaic',
-        // Lightweight GOD-tier effects only
-        'kaleidoscope',
-        'shatter',
-        'chromatic'
+        'rgb-split',
+        'scan',
+        'glitch',  // Simple glitch
+        'shatter', // Optimised fragments
+        'chromatic' // Lightweight color offset
+        // Removed: 'noise', 'particles', 'kaleidoscope', 'ripple' for performance
     ];
 
     // Terminal State
