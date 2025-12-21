@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Science of Generation - GENERATIVE JUNKIE</title>
+    <meta name="description"
+        content="Scientific foundations of generative art: physics of sound, chemistry of visual transformation, and mathematical algorithms behind the GENERATIVE MACHINE.">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/png" href="favicon.png">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="site-header">
+            <h1 class="site-title">
+                <a href="index.html" class="title-link">GENERATIVE JUNKIE</a>
+            </h1>
+            <nav class="site-nav" aria-label="Main navigation">
+                <a href="index.html#image-machine">Image</a>
+                <a href="index.html#sound-machine">Sound</a>
+                <a href="index.html#store">Store</a>
+                <a href="index.html#about">About</a>
+                <a href="architecture.html">System</a>
+                <a href="science.html" aria-current="page">Science</a>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Hero Section -->
+            <section class="section">
+                <header class="section-header">
+                    <h2 class="section-title">Science of Generation</h2>
+                    <p class="section-description">
+                        The rigorous physics, chemistry, and mathematics underlying algorithmic creativity
+                    </p>
+                </header>
+            </section>
+
+            <!-- Physics of Sound -->
+            <section class="section">
+                <header class="section-header">
+                    <h3 class="subsection-title">01 / Physics of Sound</h3>
+                </header>
+                <div class="content-block">
+                    <h4>Fast Fourier Transform (FFT)</h4>
+                    <p>
+                        The Sound Machine employs real-time <strong>Fast Fourier Transform</strong> analysis to
+                        decompose complex audio waveforms into constituent frequency components. Based on the work of
+                        Cooley and Tukey (1965), FFT reduces computational complexity from O(n²) to O(n log n), enabling
+                        real-time audio analysis at 60fps.
+                    </p>
+
+                    <div class="formula-block">
+                        <code>
+                            X[k] = Σ(n=0 to N-1) x[n] · e^(-i2πkn/N)
+                        </code>
+                        <p class="formula-caption">Discrete Fourier Transform</p>
+                    </div>
+
+                    <p>
+                        Each frequency bin k represents a discrete frequency band, mapped to visual parameters:
+                    </p>
+                    <ul>
+                        <li><strong>Bass (20-250 Hz)</strong> → Capsule scale and position perturbation</li>
+                        <li><strong>Midrange (250-2000 Hz)</strong> → Rotation velocity</li>
+                        <li><strong>Treble (2000-20000 Hz)</strong> → Color modulation and emission intensity</li>
+                    </ul>
+
+                    <h4>Wave Interference and Superposition</h4>
+                    <p>
+                        Multiple audio sources create <strong>constructive and destructive interference
+                            patterns</strong>,
+                        analogous to Young's double-slit experiment. The resulting amplitude modulation drives the
+                        dynamic behavior of generative capsules through:
+                    </p>
+
+                    <div class="formula-block">
+                        <code>
+                            A_total = √(A₁² + A₂² + 2A₁A₂cos(Δφ))
+                        </code>
+                        <p class="formula-caption">Wave superposition amplitude</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chemistry of Visual Transformation -->
+            <section class="section">
+                <header class="section-header">
+                    <h3 class="subsection-title">02 / Chemistry of Visual Transformation</h3>
+                </header>
+                <div class="content-block">
+                    <h4>Molecular Diffusion and Perlin Noise</h4>
+                    <p>
+                        Image transitions employ <strong>Perlin noise algorithms</strong> (Ken Perlin, 1983) that
+                        mathematically mirror <strong>molecular diffusion processes</strong> observed in chemistry. The
+                        stochastic nature of particle movement in Brownian motion finds direct analogy in noise-based
+                        image distortion.
+                    </p>
+
+                    <p>
+                        Perlin noise generates smooth, continuous gradients through interpolation of random vectors on a
+                        lattice grid—similar to how molecules drift along concentration gradients in Fick's laws of
+                        diffusion:
+                    </p>
+
+                    <div class="formula-block">
+                        <code>
+                            J = -D · ∇C
+                        </code>
+                        <p class="formula-caption">Fick's First Law of Diffusion</p>
+                    </div>
+
+                    <p>
+                        where J is diffusion flux, D is diffusion coefficient, and ∇C is concentration gradient.
+                    </p>
+
+                    <h4>Parametric Distortion as Reaction Pathways</h4>
+                    <p>
+                        The 20 generative effects can be conceptualized as <strong>chemical reaction pathways</strong>,
+                        where the initial image state transforms through energy barriers (transition frames) to reach a
+                        target state. Each effect has distinct "activation energy":
+                    </p>
+
+                    <ul>
+                        <li><strong>Low barrier</strong> (Fade, Wipe) → Direct transitions, minimal computation</li>
+                        <li><strong>Medium barrier</strong> (Pixelate, Mosaic) → Spatial quantization, moderate
+                            complexity</li>
+                        <li><strong>High barrier</strong> (Kaleidoscope, Chromatic Aberration) → Multi-dimensional
+                            transformations, high computational cost</li>
+                    </ul>
+
+                    <h4>Thermodynamic Creativity: Entropy and Noise</h4>
+                    <p>
+                        Noise injection increases system entropy (disorder), expanding the exploration space—analogous
+                        to
+                        raising temperature in chemical systems to overcome reaction barriers. This controlled
+                        randomness
+                        enables discovery of novel visual states.
+                    </p>
+
+                    <div class="formula-block">
+                        <code>
+                            S = k · ln(Ω)
+                        </code>
+                        <p class="formula-caption">Boltzmann Entropy Formula</p>
+                    </div>
+
+                    <p>
+                        where S is entropy, k is Boltzmann constant, and Ω represents the number of microstates (visual
+                        possibilities).
+                    </p>
+                </div>
+            </section>
+
+            <!-- Mathematical Foundations -->
+            <section class="section">
+                <header class="section-header">
+                    <h3 class="subsection-title">03 / Mathematical Foundations</h3>
+                </header>
+                <div class="content-block">
+                    <h4>Noise Functions and Gradient Vectors</h4>
+                    <p>
+                        Perlin noise is constructed through:
+                    </p>
+                    <ol>
+                        <li>Generating random gradient vectors at lattice points</li>
+                        <li>Computing dot products with distance vectors</li>
+                        <li>Interpolating using smoothstep function: <code>3t² - 2t³</code></li>
+                    </ol>
+
+                    <div class="formula-block">
+                        <code>
+                            noise(x, y) = lerp(lerp(g₀₀·d₀₀, g₁₀·d₁₀, sx), lerp(g₀₁·d₀₁, g₁₁·d₁₁, sx), sy)
+                        </code>
+                        <p class="formula-caption">2D Perlin Noise Interpolation</p>
+                    </div>
+
+                    <h4>Parametric Equations for Effects</h4>
+                    <p>
+                        Effects like <strong>Spiral</strong> and <strong>Vortex</strong> use polar coordinate
+                        transformations:
+                    </p>
+
+                    <div class="formula-block">
+                        <code>
+                            r' = r · (1 + 0.5 · sin(θ + t))<br>
+                            θ' = θ + k · r
+                        </code>
+                        <p class="formula-caption">Spiral distortion parameters</p>
+                    </div>
+
+                    <h4>Frequency-to-Visual Mapping</h4>
+                    <p>
+                        Audio frequencies are logarithmically mapped to human perception (mel scale), then linearly
+                        mapped to visual parameters:
+                    </p>
+
+                    <div class="formula-block">
+                        <code>
+                            visual_param = lerp(min, max, normalized_amplitude)
+                        </code>
+                        <p class="formula-caption">Linear interpolation for visual mapping</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- References -->
+            <section class="section">
+                <header class="section-header">
+                    <h3 class="subsection-title">References</h3>
+                </header>
+                <div class="content-block">
+                    <ul class="references-list">
+                        <li>Cooley, J. W., & Tukey, J. W. (1965). "An algorithm for the machine calculation of complex
+                            Fourier series." <em>Mathematics of Computation</em>, 19(90), 297-301.</li>
+                        <li>Perlin, K. (1985). "An image synthesizer." <em>ACM SIGGRAPH Computer Graphics</em>, 19(3),
+                            287-296.</li>
+                        <li>Fick, A. (1855). "Über Diffusion." <em>Annalen der Physik</em>, 170(1), 59-86.</li>
+                        <li>Boltzmann, L. (1877). "Über die Beziehung zwischen dem zweiten Hauptsatze der mechanischen
+                            Wärmetheorie und der Wahrscheinlichkeitsrechnung." <em>Wiener Berichte</em>, 76, 373-435.
+                        </li>
+                        <li>Young, T. (1804). "The Bakerian Lecture: Experiments and calculations relative to physical
+                            optics." <em>Philosophical Transactions of the Royal Society</em>, 94, 1-16.</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="site-footer">
+            <p>
+                <span class="flash">⚡︎</span> ALL WAYS SUPER HIGH <span class="flash">⚡︎</span>
+            </p>
+            <p class="footer-links">
+                <a href="https://stores.jp/generativejunkie" target="_blank" rel="noopener">Official Store</a>
+                <span class="separator">|</span>
+                <a href="mailto:contact@generativejunkie.net">Contact</a>
+            </p>
+        </footer>
+    </div>
+
+    <!-- Add formula styling -->
+    <style>
+        .formula-block {
+            background: rgba(0, 0, 0, 0.05);
+            border-left: 3px solid var(--color-text-primary);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .formula-block code {
+            display: block;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--color-text-primary);
+        }
+
+        .formula-caption {
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            font-style: italic;
+            color: var(--color-text-secondary);
+        }
+
+        .references-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .references-list li {
+            margin-bottom: 1.25rem;
+            padding-left: 1.5rem;
+            text-indent: -1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .subsection-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+        }
+
+        .content-block {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .content-block h4 {
+            font-size: 1.25rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 400;
+        }
+
+        .content-block ul {
+            margin: 1.5rem 0;
+            padding-left: 2rem;
+        }
+
+        .content-block li {
+            margin-bottom: 0.75rem;
+            line-height: 1.7;
+        }
+
+        .content-block p {
+            margin-bottom: 1.25rem;
+            line-height: 1.8;
+        }
+
+        .content-block strong {
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+    </style>
+</body>
+
+</html>
