@@ -1626,8 +1626,8 @@ export const imageMachineSketch = (p) => {
             // For now using ambient-loop.mp3 for all to avoid 404
             playAmbientMusic('ambient-loop.mp3');
 
-            // Start with noise
-            animationState = 'pre_terminal_noise';
+            // GOD SPEED: Skip noise, jump straight to terminal
+            animationState = 'terminal';
             animationFrame = 0;
 
             // Start with normal colors (noise handles visuals)
