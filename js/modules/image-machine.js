@@ -142,13 +142,23 @@ export const imageMachineSketch = (p) => {
 
                         // Invert and grayscale the entire site for Terminal Mode
                         document.documentElement.style.filter = 'invert(1) grayscale(1)';
+
+                        // FORCE PURITY: Set all backgrounds to PURE WHITE so they invert to PURE BLACK
+                        const r = document.documentElement.style;
+                        r.setProperty('--color-bg-primary', '#ffffff');
+                        r.setProperty('--color-bg-secondary', '#ffffff');
+                        r.setProperty('--color-bg-tertiary', '#ffffff');
+                        r.setProperty('--color-text-primary', '#000000');
+                        r.setProperty('--color-text-secondary', '#000000');
+                        r.setProperty('--color-text-tertiary', '#000000');
+
+                        // Force header to pure white (remove transparency for solid black invert)
+                        const header = document.querySelector('.site-header');
+                        if (header) header.style.background = '#ffffff';
+
                         // To get BLACK background with invert(1), we must set the actual background to WHITE
                         document.documentElement.style.backgroundColor = '#ffffff';
                         document.body.style.backgroundColor = '#ffffff';
-
-                        // Force all secondary backgrounds to white so they invert to pure black
-                        document.documentElement.style.setProperty('--color-bg-secondary', '#ffffff');
-                        document.documentElement.style.setProperty('--color-bg-tertiary', '#ffffff');
                     }
                     break;
                 case 'terminal':
