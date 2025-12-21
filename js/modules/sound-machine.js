@@ -11,6 +11,7 @@ let pillSize = CONFIG.SOUND_MACHINE.DEFAULT_PARAMS.PILL_SIZE;
 let spreadWidth = CONFIG.SOUND_MACHINE.DEFAULT_PARAMS.SPREAD_WIDTH;
 let rotationSpeed = CONFIG.SOUND_MACHINE.DEFAULT_PARAMS.ROTATION_SPEED;
 let scaleIntensity = CONFIG.SOUND_MACHINE.DEFAULT_PARAMS.SCALE_INTENSITY;
+let autoMode = false; // Auto Mode State
 let wireframeMode = false, blockMode = false;
 
 // Player State
@@ -150,7 +151,7 @@ function initVisualController() {
                 break;
             case 'spread':
                 spreadWidth = val;
-                createPills(); // spread changes positions
+                // GOD SPEED: No need to recreate pills, animateSound handles position!
                 break;
             case 'rotation':
                 rotationSpeed = val;
@@ -219,6 +220,13 @@ function setupEventListeners() {
         });
     }
 
+    const autoModeInput = document.getElementById('autoMode');
+    if (autoModeInput) {
+        autoModeInput.addEventListener('change', (e) => {
+            autoMode = e.target.checked;
+        });
+    }
+
     const resetBtn = document.getElementById('resetBtn');
     if (resetBtn) {
         resetBtn.addEventListener('click', resetSettings);
@@ -241,6 +249,7 @@ function resetSettings() {
     scaleIntensity = 1;
     wireframeMode = false;
     blockMode = false;
+    autoMode = false;
 
     // Reset Visual Controller
     if (visualController) {
@@ -256,6 +265,9 @@ function resetSettings() {
 
     const blockModeInput = document.getElementById('blockMode');
     if (blockModeInput) blockModeInput.checked = false;
+
+    const autoModeInput = document.getElementById('autoMode');
+    if (autoModeInput) autoModeInput.checked = false;
 
     createPills();
 }
@@ -626,6 +638,15 @@ function createPills() {
 function animateSound() {
     if (!isAnimating) return;
     requestAnimationFrame(animateSound);
+
+    // Auto Mode Modulation (GOD SPEED)
+    if (autoMode && visualController) {
+        const time = Date.now() * 0.0005;
+        visualController.updateParam('rotation', 1.5 + Math.sin(time * 0.5) * 1.5);
+        visualController.updateParam('spread', 2.5 + Math.cos(time * 0.3) * 2.5);
+        visualController.updateParam('scale', 1.5 + Math.sin(time * 0.7) * 1.0);
+        visualController.updateParam('pillSize', 0.9 + Math.cos(time * 1.1) * 0.3);
+    }
 
     // Update time for buffer mode
     if (playerState.mode === 'buffer' && playerState.isPlaying) {
