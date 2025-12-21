@@ -85,14 +85,14 @@ export function initTyping() {
         }
 
         if (imageDescEl) {
-            imageDescEl.dataset.text = 'Click or tap to switch between random images with generative transition effects';
+            imageDescEl.dataset.text = 'Click or tap to switch between random images with \u003cspan data-tooltip="Uses Perlin noise algorithms and parametric distortions, similar to molecular diffusion patterns in chemistry"\u003egenerative transition effects\u003c/span\u003e';
             imageDescEl.dataset.loop = 'true';
             reserveHeight(imageDescEl, imageDescEl.dataset.text);
             typingObserver.observe(imageDescEl);
         }
 
         if (soundDescEl) {
-            soundDescEl.dataset.text = 'Upload audio to experience real-time sound visualization';
+            soundDescEl.dataset.text = 'Upload audio to experience \u003cspan data-tooltip="Real-time FFT (Fast Fourier Transform) decomposes audio into frequency components, mapping them to visual parameters through wave physics"\u003ereal-time sound visualization\u003c/span\u003e';
             soundDescEl.dataset.loop = 'true';
             reserveHeight(soundDescEl, soundDescEl.dataset.text);
             typingObserver.observe(soundDescEl);
