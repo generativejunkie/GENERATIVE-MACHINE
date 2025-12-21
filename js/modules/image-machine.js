@@ -1618,8 +1618,8 @@ export const imageMachineSketch = (p) => {
             // For now using ambient-loop.mp3 for all to avoid 404
             playAmbientMusic('ambient-loop.mp3');
 
-            // GOD SPEED: Skip noise, jump straight to terminal
-            animationState = 'terminal';
+            // Start with noise (Mosaic Feedback)
+            animationState = 'pre_terminal_noise';
             animationFrame = 0;
 
             // GOD SPEED: Invert colors to create BLACK terminal world
