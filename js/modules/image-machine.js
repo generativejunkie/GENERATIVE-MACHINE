@@ -1381,6 +1381,21 @@ export const imageMachineSketch = (p) => {
                     charIndex = 0;
                 } else {
                     //Already at end, transition out of terminal
+
+                    // FORCE SHOW PHOTO332 for MIX choice
+                    const mixImageKey = 'photos/photo332.webp';
+                    if (allImages[mixImageKey]) {
+                        currentImageKey = mixImageKey;
+                        useColorMode = false;
+                    } else {
+                        p.loadImage(mixImageKey, (img) => {
+                            img.filePath = mixImageKey;
+                            allImages[mixImageKey] = img;
+                            currentImageKey = mixImageKey;
+                            useColorMode = false;
+                        });
+                    }
+
                     animationState = 'display';
                 }
             }
