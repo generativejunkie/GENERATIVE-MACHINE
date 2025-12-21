@@ -1401,8 +1401,17 @@ export const imageMachineSketch = (p) => {
                         };
                         document.body.appendChild(btn);
 
-                        // Resize canvas to full screen matches
-                        p.resizeCanvas(window.innerWidth, window.innerHeight);
+                        // Resize canvas for forced landscape
+                        // On portrait mobile: create a landscape canvas (swap W/H)
+                        const isMobilePortrait = window.innerWidth <= 768 && window.innerHeight > window.innerWidth;
+
+                        if (isMobilePortrait) {
+                            // Create landscape canvas (width > height)
+                            p.resizeCanvas(window.innerHeight, window.innerWidth);
+                        } else {
+                            // Desktop or already landscape
+                            p.resizeCanvas(window.innerWidth, window.innerHeight);
+                        }
                     };
 
                     activateMixMode();
