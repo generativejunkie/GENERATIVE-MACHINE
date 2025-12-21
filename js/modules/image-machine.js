@@ -207,6 +207,58 @@ export const imageMachineSketch = (p) => {
                     }
                     break;
 
+                case 'mix_noise':
+                    drawPreTerminalNoise();
+                    animationFrame++;
+                    // Short noise burst (e.g. 60 frames = ~1-2 sec)
+                    if (animationFrame > 60) {
+                        animationFrame = 0;
+
+                        // Function to trigger the actual MIX mode logic
+                        const startMixDisplay = () => {
+                            // Activate MIX Mode (Fullscreen + Landscape Hack)
+                            document.body.classList.add('mix-mode');
+
+                            // Create Return Button
+                            const btn = document.createElement('button');
+                            btn.className = 'return-matrix-btn';
+                            btn.innerText = 'RETURN TO MATRIX';
+                            btn.onclick = () => {
+                                document.body.classList.remove('mix-mode');
+                                btn.remove();
+                                // Trigger resize to restore layout
+                                p.windowResized();
+                            };
+                            document.body.appendChild(btn);
+
+                            // Resize canvas for forced landscape
+                            const isMobilePortrait = window.innerWidth <= 768 && window.innerHeight > window.innerWidth;
+                            if (isMobilePortrait) {
+                                p.resizeCanvas(window.innerHeight, window.innerWidth);
+                            } else {
+                                p.resizeCanvas(window.innerWidth, window.innerHeight);
+                            }
+
+                            // Load Image
+                            const mixImageKey = 'photos/photo332.webp';
+                            if (allImages[mixImageKey]) {
+                                currentImageKey = mixImageKey;
+                                useColorMode = false;
+                            } else {
+                                p.loadImage(mixImageKey, (img) => {
+                                    img.filePath = mixImageKey;
+                                    allImages[mixImageKey] = img;
+                                    currentImageKey = mixImageKey;
+                                    useColorMode = false;
+                                });
+                            }
+                            animationState = 'display';
+                        };
+
+                        startMixDisplay();
+                    }
+                    break;
+
                 default:
                     if (useColorMode) {
                         drawColorPattern(currentContent);
@@ -1375,52 +1427,10 @@ export const imageMachineSketch = (p) => {
                     //Already at end, transition out of terminal
 
                     // FORCE SHOW PHOTO332 for MIX choice
-                    const mixImageKey = 'photos/photo332.webp';
 
-                    // Activate MIX Mode (Fullscreen + Landscape Hack)
-                    const activateMixMode = () => {
-                        document.body.classList.add('mix-mode');
-
-                        // Create Return Button
-                        const btn = document.createElement('button');
-                        btn.className = 'return-matrix-btn';
-                        btn.innerText = 'RETURN TO MATRIX';
-                        btn.onclick = () => {
-                            document.body.classList.remove('mix-mode');
-                            btn.remove();
-                            // Trigger resize to restore layout
-                            p.windowResized();
-                        };
-                        document.body.appendChild(btn);
-
-                        // Resize canvas for forced landscape
-                        // On portrait mobile: create a landscape canvas (swap W/H)
-                        const isMobilePortrait = window.innerWidth <= 768 && window.innerHeight > window.innerWidth;
-
-                        if (isMobilePortrait) {
-                            // Create landscape canvas (width > height)
-                            p.resizeCanvas(window.innerHeight, window.innerWidth);
-                        } else {
-                            // Desktop or already landscape
-                            p.resizeCanvas(window.innerWidth, window.innerHeight);
-                        }
-                    };
-
-                    activateMixMode();
-
-                    if (allImages[mixImageKey]) {
-                        currentImageKey = mixImageKey;
-                        useColorMode = false;
-                    } else {
-                        p.loadImage(mixImageKey, (img) => {
-                            img.filePath = mixImageKey;
-                            allImages[mixImageKey] = img;
-                            currentImageKey = mixImageKey;
-                            useColorMode = false;
-                        });
-                    }
-
-                    animationState = 'display';
+                    // Trigger MIX Noise transition -> leading to MIX Mode
+                    animationState = 'mix_noise';
+                    animationFrame = 0;
                 }
             }
             // For WHITE/BLACK, redirect happens in handleCapsuleChoice
