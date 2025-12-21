@@ -1384,6 +1384,29 @@ export const imageMachineSketch = (p) => {
 
                     // FORCE SHOW PHOTO332 for MIX choice
                     const mixImageKey = 'photos/photo332.webp';
+
+                    // Activate MIX Mode (Fullscreen + Landscape Hack)
+                    const activateMixMode = () => {
+                        document.body.classList.add('mix-mode');
+
+                        // Create Return Button
+                        const btn = document.createElement('button');
+                        btn.className = 'return-matrix-btn';
+                        btn.innerText = 'RETURN TO MATRIX';
+                        btn.onclick = () => {
+                            document.body.classList.remove('mix-mode');
+                            btn.remove();
+                            // Trigger resize to restore layout
+                            p.windowResized();
+                        };
+                        document.body.appendChild(btn);
+
+                        // Resize canvas to full screen matches
+                        p.resizeCanvas(window.innerWidth, window.innerHeight);
+                    };
+
+                    activateMixMode();
+
                     if (allImages[mixImageKey]) {
                         currentImageKey = mixImageKey;
                         useColorMode = false;
