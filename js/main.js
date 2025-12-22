@@ -24,50 +24,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (imageTitle) {
         const handleTap = (e) => {
+            // OPTIMIZED FOR INP: Minimal synchronous work
             imageTitleTapCount++;
 
             if (imageTitleTapTimer) clearTimeout(imageTitleTapTimer);
 
-            // Determine current state
-            const isVoid = document.documentElement.style.filter === 'invert(1)';
+            // Defer heavy logic/checks to next frame to unblock UI
+            requestAnimationFrame(() => {
+                // Determine current state (only check when necessary)
+                // Accessing style can force reflow, so we do it inside rAF
+                const isVoid = document.documentElement.style.filter === 'invert(1)';
+                const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-            // Determine environment
-            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-
-            // If in VOID mode -> 2 Taps to EXIT (Keep for all devices as safety)
-            if (isVoid) {
-                if (imageTitleTapCount === 2) {
-                    if (e.cancelable) e.preventDefault();
-                    console.log("IMAGE TITLE RITUAL: EXIT (2-TAP)");
-                    if (window.imageMachine && window.imageMachine.triggerSecret) {
-                        window.imageMachine.triggerSecret('exit');
-                    }
-                    imageTitleTapCount = 0;
-                }
-            }
-            // If in NORMAL mode -> 3 Taps to ENTER (Mobile Only)
-            else {
-                if (imageTitleTapCount === 3) {
-                    if (!isTouchDevice) {
-                        console.log("IMAGE TITLE RITUAL: BLOCKED ON DESKTOP (Use keyboard)");
+                // VOID MODE: 2 Taps to EXIT
+                if (isVoid) {
+                    if (imageTitleTapCount === 2) {
+                        console.log("IMAGE TITLE RITUAL: EXIT (2-TAP)");
+                        if (window.imageMachine && window.imageMachine.triggerSecret) {
+                            window.imageMachine.triggerSecret('exit');
+                        }
                         imageTitleTapCount = 0;
                         return;
                     }
-                    if (e.cancelable) e.preventDefault();
-                    console.log("IMAGE TITLE RITUAL: VOID (3-TAP)");
-                    if (window.imageMachine && window.imageMachine.triggerSecret) {
-                        window.imageMachine.triggerSecret('void');
-                    }
-                    imageTitleTapCount = 0;
                 }
-            }
+                // NORMAL MODE: 3 Taps to ENTER (Mobile Only)
+                else {
+                    if (imageTitleTapCount === 3) {
+                        if (!isTouchDevice) {
+                            console.log("IMAGE TITLE RITUAL: BLOCKED ON DESKTOP (Use keyboard)");
+                            imageTitleTapCount = 0;
+                            return;
+                        }
+                        console.log("IMAGE TITLE RITUAL: VOID (3-TAP)");
+                        if (window.imageMachine && window.imageMachine.triggerSecret) {
+                            window.imageMachine.triggerSecret('void');
+                        }
+                        imageTitleTapCount = 0;
+                        return;
+                    }
+                }
+            });
 
-            // Reset timer logic
-            // We use the same timeout but rely on the state check above to fire early for exit
-            if (imageTitleTapTimer) clearTimeout(imageTitleTapTimer);
+            // Reset timer logic (keep synchronous to ensure responsiveness of reset)
             imageTitleTapTimer = setTimeout(() => {
                 imageTitleTapCount = 0;
-            }, 1000); // Relaxed to 1000ms for easier tapping
+            }, 1000);
         };
 
         // Desktop Click
