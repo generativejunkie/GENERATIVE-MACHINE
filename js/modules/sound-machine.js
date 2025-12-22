@@ -12,6 +12,7 @@ let spreadWidth = CONFIG.SOUND_MACHINE.DEFAULT_PARAMS.SPREAD_WIDTH;
 let rotationSpeed = CONFIG.SOUND_MACHINE.DEFAULT_PARAMS.ROTATION_SPEED;
 let scaleIntensity = CONFIG.SOUND_MACHINE.DEFAULT_PARAMS.SCALE_INTENSITY;
 let autoMode = false; // Auto Mode State
+let autoModeLastUpdate = 0; // Auto Mode timer
 let wireframeMode = false, blockMode = false;
 
 // Player State
@@ -639,13 +640,27 @@ function animateSound() {
     if (!isAnimating) return;
     requestAnimationFrame(animateSound);
 
-    // Auto Mode Modulation (GOD SPEED)
+    // Auto Mode Modulation (GOD SPEED - Full Random)
     if (autoMode && visualController) {
-        const time = Date.now() * 0.0005;
-        visualController.updateParam('rotation', 1.5 + Math.sin(time * 0.5) * 1.5);
-        visualController.updateParam('spread', 2.5 + Math.cos(time * 0.3) * 2.5);
-        visualController.updateParam('scale', 1.5 + Math.sin(time * 0.7) * 1.0);
-        visualController.updateParam('pillSize', 0.9 + Math.cos(time * 1.1) * 0.3);
+        const now = Date.now();
+        // Update every 3 seconds with random values
+        if (now - autoModeLastUpdate > 3000) {
+            autoModeLastUpdate = now;
+
+            // Random values within valid ranges
+            const limits = CONFIG.SOUND_MACHINE.CONTROL_LIMITS;
+            const randomCapsules = Math.floor(Math.random() * (limits.PILL_COUNT.MAX - limits.PILL_COUNT.MIN + 1)) + limits.PILL_COUNT.MIN;
+            const randomSize = limits.PILL_SIZE.MIN + Math.random() * (limits.PILL_SIZE.MAX - limits.PILL_SIZE.MIN);
+            const randomSpread = limits.SPREAD.MIN + Math.random() * (limits.SPREAD.MAX - limits.SPREAD.MIN);
+            const randomRotation = limits.ROTATION.MIN + Math.random() * (limits.ROTATION.MAX - limits.ROTATION.MIN);
+            const randomScale = limits.SCALE.MIN + Math.random() * (limits.SCALE.MAX - limits.SCALE.MIN);
+
+            visualController.updateParam('pillCount', randomCapsules);
+            visualController.updateParam('pillSize', randomSize);
+            visualController.updateParam('spread', randomSpread);
+            visualController.updateParam('rotation', randomRotation);
+            visualController.updateParam('scale', randomScale);
+        }
     }
 
     // Update time for buffer mode
