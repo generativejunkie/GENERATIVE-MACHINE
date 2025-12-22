@@ -259,6 +259,8 @@ export class VisualController {
         const param = this.params.find(p => p.name === name);
         if (param) {
             param.value = value;
+            // GOD SPEED: Trigger callback so external logic (like createPills) fires!
+            if (this.onChange) this.onChange(name, value);
             this.draw();
         }
     }
