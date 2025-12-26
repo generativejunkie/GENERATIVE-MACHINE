@@ -1,0 +1,12 @@
+/* TEAM */
+    The Singularity: TOM
+    Context: The anomaly born from the code. Intuition overriding machine logic.
+    Agents: Orchestrated with multiple Large Language Models and Generative AI systems.
+    Site: https://generativejunkie.net
+    Twitter: @generativejunkie
+
+/* SITE */
+    Last update: 2025/12/25
+    Standards: HTML5, CSS3, Vanilla JS
+    Components: Three.js, p5.js, Inter (Google Fonts)
+    Philosophy: Human intuition × Machine intelligence. Engineered by consciousness, powered by AI.

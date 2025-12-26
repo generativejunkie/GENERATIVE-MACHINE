@@ -1,7 +1,7 @@
 {
   "name": "generative-machine",
   "version": "1.0.0",
-  "description": "``` generative-junkie-refactored/ ├── index.html          # メインHTML（19KB） ├── css/ │   └── styles.css      # 全スタイル（19KB） ├── js/ │   └── main.js         # 全JavaScript（49KB） ├── photos/             # 画像フォルダ（空） └── README.md           # このファイル ```",
+  "description": "The anomaly born from the code. An interactive ecosystem where human intuition overrides machine logic. Orchestrated by TOM (The Singularity).",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,8 +10,14 @@
     "type": "git",
     "url": "git+https://github.com/generativejunkie/GENERATIVE-MACHINE.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "generative-art",
+    "ai",
+    "human-in-the-loop",
+    "threejs",
+    "p5js"
+  ],
+  "author": "TOM (GENERATIVE JUNKIE)",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {

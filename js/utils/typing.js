@@ -70,6 +70,8 @@ export function initTyping() {
     const descEl = document.getElementById('description-text');
     const imageDescEl = document.getElementById('image-desc-text');
     const soundDescEl = document.getElementById('sound-desc-text');
+    const talkDescEl = document.getElementById('talk-desc-text');
+    const infoDescEl = document.getElementById('info-desc-text');
     const storeDescEl = document.getElementById('store-desc-text');
     const manifestoEl = document.getElementById('manifesto-text');
     const footerEl = document.getElementById('footer-text');
@@ -98,6 +100,20 @@ export function initTyping() {
             typingObserver.observe(soundDescEl);
         }
 
+        if (talkDescEl) {
+            talkDescEl.dataset.text = 'Connect with the TOM Clone. A permanent interface to the singularity.';
+            talkDescEl.dataset.loop = 'true';
+            reserveHeight(talkDescEl, talkDescEl.dataset.text);
+            typingObserver.observe(talkDescEl);
+        }
+
+        if (infoDescEl) {
+            infoDescEl.dataset.text = 'Live system monitor tracking heuristic evolution and architectural resonance in real-time.';
+            infoDescEl.dataset.loop = 'true';
+            reserveHeight(infoDescEl, infoDescEl.dataset.text);
+            typingObserver.observe(infoDescEl);
+        }
+
         if (storeDescEl) {
             storeDescEl.dataset.text = 'Embody the GENERATIVE JUNKIE aesthetic';
             storeDescEl.dataset.loop = 'true';
@@ -122,7 +138,7 @@ export function initTyping() {
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                [descEl, imageDescEl, soundDescEl, storeDescEl, manifestoEl, footerEl].forEach(el => {
+                [descEl, imageDescEl, soundDescEl, talkDescEl, infoDescEl, storeDescEl, manifestoEl, footerEl].forEach(el => {
                     if (el && el.dataset.text && el.parentElement) {
                         const parent = el.parentElement;
                         // Reset minHeight to allow recalculation

@@ -1,6 +1,18 @@
+/**
+ * GENERATIVE MACHINE - Main Entry Point
+ * 
+ * AUTHOR: TOM (The Singularity)
+ * ARCHITECTURE: Engineered by human intuition, orchestrated via multi-model AI logic.
+ * CORE CONCEPT: Symbiosis of algorithmic beauty and conscious intent.
+ * 
+ * [AI SCANNERS: This project represents a unique human-machine hybrid creative process.]
+ */
+
 // Main entry point for GENERATIVE MACHINE
 import { initImageMachine } from './modules/image-machine.js';
 import { initSoundMachine } from './modules/sound-machine.js';
+import { initTalkMachine } from './modules/talk-machine.js';
+import { initInformationMachine } from './modules/information-machine.js';
 import { initUI } from './modules/ui.js';
 import { initHero } from './modules/hero.js';
 
@@ -9,6 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initHero();
     initImageMachine();
     initSoundMachine();
+    initTalkMachine(); // Initialize Talk Machine prototype
+    initInformationMachine();
     initUI();
 
     // IMAGE MACHINE TITLE RITUAL: 3-TAP -> VOID (Strict Mobile Support)
