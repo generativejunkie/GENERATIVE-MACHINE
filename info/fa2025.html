@@ -344,7 +344,7 @@
             const canvas = document.getElementById('snow-canvas');
             const ctx = canvas.getContext('2d');
             let particles = [];
-            const particleCount = 150;
+            const particleCount = 80;
             const snowImg = new Image();
             snowImg.src = '/logo/snow.png';
             let useImg = false;
@@ -372,9 +372,9 @@
                 init(isInitial = false) {
                     this.x = Math.random() * canvas.width;
                     this.y = isInitial ? Math.random() * canvas.height : Math.random() * -canvas.height;
-                    this.scale = Math.random() * 0.5 + 0.2;
-                    this.speedY = Math.random() * 0.8 + 0.5; // Slightly faster for visibility
-                    this.opacity = Math.random() * 0.5 + 0.3;
+                    this.scale = Math.random() * 0.3 + 0.1;
+                    this.speedY = Math.random() * 0.4 + 0.2; // Slightly faster for visibility
+                    this.opacity = Math.random() * 0.3 + 0.1;
                 }
                 update() {
                     this.y += this.speedY;
