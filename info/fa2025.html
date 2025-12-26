@@ -379,7 +379,10 @@
                     ctx.translate(this.x, this.y);
                     ctx.globalAlpha = this.opacity;
                     if (useImg) {
-                        ctx.drawImage(snowImg, -this.size / 2, -this.size / 2, this.size, this.size);
+                        const ratio = snowImg.width / snowImg.height;
+                        const w = this.size * ratio;
+                        const h = this.size;
+                        ctx.drawImage(snowImg, -w / 2, -h / 2, w, h);
                     } else {
                         ctx.fillStyle = '#fff';
                         ctx.beginPath();
