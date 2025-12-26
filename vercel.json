@@ -1,21 +1,7 @@
 {
   "cleanUrls": true,
+  "trailingSlash": false,
   "redirects": [
-    {
-      "source": "/info",
-      "destination": "/info.html",
-      "permanent": true
-    },
-    {
-      "source": "/monitor",
-      "destination": "/monitor.html",
-      "permanent": true
-    },
-    {
-      "source": "/talk",
-      "destination": "/talk.html",
-      "permanent": true
-    },
     {
       "source": "/:path*",
       "has": [
