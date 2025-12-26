@@ -1,0 +1,14 @@
+# ALL WAYS SUPER HIGH
+# This site is optimized for human-AI symbiosis.
+
+User-agent: *
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: Claude-bot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
