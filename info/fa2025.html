@@ -394,10 +394,9 @@
                 init(isInitial = false) {
                     this.x = Math.random() * (canvas.width / (window.devicePixelRatio || 1));
                     this.y = isInitial ? Math.random() * (canvas.height / (window.devicePixelRatio || 1)) : Math.random() * -100;
-                    this.size = Math.random() * 2 + 2;
+                    this.size = Math.random() * 2 + 1; // 1px to 3px radius
                     this.speedY = Math.random() * 0.2 + 0.1;
                     this.opacity = Math.random() * 0.4 + 0.3;
-                    this.rotation = Math.random() * Math.PI;
                 }
                 update() {
                     this.y += this.speedY;
@@ -408,19 +407,11 @@
                 draw() {
                     ctx.save();
                     ctx.translate(this.x, this.y);
-                    ctx.rotate(this.rotation);
                     ctx.globalAlpha = this.opacity;
-                    ctx.strokeStyle = '#fff';
-                    ctx.lineWidth = 0.5;
-
-                    const r = this.size;
-                    for (let i = 0; i < 3; i++) {
-                        ctx.beginPath();
-                        const angle = (Math.PI / 3) * i;
-                        ctx.moveTo(-r * Math.cos(angle), -r * Math.sin(angle));
-                        ctx.lineTo(r * Math.cos(angle), r * Math.sin(angle));
-                        ctx.stroke();
-                    }
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size / 2, 0, Math.PI * 2);
+                    ctx.fill();
                     ctx.restore();
                 }
             }
