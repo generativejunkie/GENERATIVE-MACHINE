@@ -362,15 +362,13 @@
                 init(isInitial = false) {
                     this.x = Math.random() * canvas.width;
                     this.y = isInitial ? Math.random() * canvas.height : Math.random() * -canvas.height;
-                    this.size = Math.random() * 8 + 4;
+                    this.scale = Math.random() * 0.5 + 0.2; // Use scale instead of fixed size
                     this.speedY = Math.random() * 0.4 + 0.2;
-                    this.speedX = Math.random() * 0.3 - 0.15;
                     this.opacity = Math.random() * 0.4 + 0.3;
                 }
                 update() {
                     this.y += this.speedY;
-                    this.x += this.speedX;
-                    if (this.y > canvas.height + 20) {
+                    if (this.y > canvas.height + 100) {
                         this.init(false);
                     }
                 }
@@ -379,14 +377,14 @@
                     ctx.translate(this.x, this.y);
                     ctx.globalAlpha = this.opacity;
                     if (useImg) {
-                        const ratio = snowImg.width / snowImg.height;
-                        const w = this.size * ratio;
-                        const h = this.size;
+                        const w = snowImg.width * this.scale;
+                        const h = snowImg.height * this.scale;
                         ctx.drawImage(snowImg, -w / 2, -h / 2, w, h);
                     } else {
+                        const s = 10 * this.scale;
                         ctx.fillStyle = '#fff';
                         ctx.beginPath();
-                        ctx.arc(0, 0, this.size / 2, 0, Math.PI * 2);
+                        ctx.arc(0, 0, s / 2, 0, Math.PI * 2);
                         ctx.fill();
                     }
                     ctx.restore();
