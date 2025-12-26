@@ -392,9 +392,9 @@
                 init(isInitial = false) {
                     this.x = Math.random() * canvas.width;
                     this.y = isInitial ? Math.random() * canvas.height : Math.random() * -canvas.height;
-                    this.size = Math.random() * 1 + 1; // 1px to 2px
+                    this.size = Math.random() * 3 + 2; // 2px to 5px
                     this.speedY = Math.random() * 0.2 + 0.1;
-                    this.opacity = Math.random() * 0.5 + 0.4;
+                    this.opacity = Math.random() * 0.4 + 0.3;
                 }
                 update() {
                     this.y += this.speedY;
@@ -406,10 +406,19 @@
                     ctx.save();
                     ctx.translate(this.x, this.y);
                     ctx.globalAlpha = this.opacity;
-                    ctx.fillStyle = '#fff';
-                    ctx.beginPath();
-                    ctx.arc(0, 0, this.size / 2, 0, Math.PI * 2);
-                    ctx.fill();
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 1;
+
+                    const r = this.size;
+                    // Draw a simple 6-pointed star (snowflake motif)
+                    for (let i = 0; i < 3; i++) {
+                        ctx.beginPath();
+                        ctx.rotate(Math.PI / 3);
+                        ctx.moveTo(-r, 0);
+                        ctx.lineTo(r, 0);
+                        ctx.stroke();
+                    }
+
                     ctx.restore();
                 }
             }
