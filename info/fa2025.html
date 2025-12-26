@@ -407,8 +407,9 @@
                     ctx.translate(this.x, this.y);
                     ctx.globalAlpha = this.opacity;
                     ctx.fillStyle = '#fff';
-                    // 1px square dot for absolute sharpness
-                    ctx.fillRect(0, 0, this.size, this.size);
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size / 2, 0, Math.PI * 2);
+                    ctx.fill();
                     ctx.restore();
                 }
             }
