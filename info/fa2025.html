@@ -349,7 +349,9 @@
             snowImg.src = '/logo/snow.png';
             let useImg = false;
             snowImg.onload = () => {
-                console.log('Snow image loaded');
+                console.log('Snow image loaded successfully');
+                console.log('Natural dimensions:', snowImg.naturalWidth, 'x', snowImg.naturalHeight);
+                console.log('Aspect ratio:', snowImg.naturalWidth / snowImg.naturalHeight);
                 useImg = true;
             };
             snowImg.onerror = () => {
@@ -372,9 +374,9 @@
                 init(isInitial = false) {
                     this.x = Math.random() * canvas.width;
                     this.y = isInitial ? Math.random() * canvas.height : Math.random() * -canvas.height;
-                    this.scale = Math.random() * 0.3 + 0.1;
-                    this.speedY = Math.random() * 0.4 + 0.2; // Slightly faster for visibility
-                    this.opacity = Math.random() * 0.3 + 0.1;
+                    this.scale = Math.random() * 0.3 + 0.15;
+                    this.speedY = Math.random() * 0.5 + 0.3;
+                    this.opacity = Math.random() * 0.35 + 0.15;
                 }
                 update() {
                     this.y += this.speedY;
@@ -386,9 +388,25 @@
                     ctx.save();
                     ctx.translate(this.x, this.y);
                     ctx.globalAlpha = this.opacity;
-                    if (useImg) {
-                        const w = snowImg.width * this.scale;
-                        const h = snowImg.height * this.scale;
+                    if (useImg && snowImg.complete && snowImg.naturalWidth > 0) {
+                        // Use naturalWidth and naturalHeight to ensure original aspect ratio
+                        const baseSize = 40; // Base size in pixels
+                        const imgWidth = snowImg.naturalWidth;
+                        const imgHeight = snowImg.naturalHeight;
+                        const aspectRatio = imgWidth / imgHeight;
+
+                        // Calculate dimensions maintaining aspect ratio
+                        let w, h;
+                        if (aspectRatio > 1) {
+                            // Image is wider than tall
+                            w = baseSize * this.scale;
+                            h = w / aspectRatio;
+                        } else {
+                            // Image is taller than wide or square
+                            h = baseSize * this.scale;
+                            w = h * aspectRatio;
+                        }
+
                         ctx.drawImage(snowImg, -w / 2, -h / 2, w, h);
                     } else {
                         const s = 10 * this.scale;
