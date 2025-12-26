@@ -16,12 +16,13 @@
             background: #000;
             margin: 0;
             padding: 0;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: var(--font-family-mono);
+            font-family: var(--font-family-primary);
             color: #fff;
+            overflow-x: hidden;
         }
 
         #password-screen {
@@ -29,92 +30,255 @@
             max-width: 400px;
             width: 90%;
             transition: opacity 0.5s ease;
+            z-index: 10;
         }
 
         .secret-label {
             font-size: 10px;
-            letter-spacing: 0.3em;
+            letter-spacing: 0.5em;
             color: rgba(255, 255, 255, 0.4);
             margin-bottom: 20px;
             display: block;
+            font-family: var(--font-family-mono);
         }
 
         #pass-input {
             background: transparent;
             border: none;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             color: #fff;
             font-family: var(--font-family-mono);
-            font-size: 24px;
+            font-size: 32px;
             text-align: center;
             width: 100%;
-            padding: 10px 0;
+            padding: 15px 0;
             outline: none;
-            transition: border-color 0.3s ease;
+            transition: all 0.5s cubic-bezier(0.2, 0, 0.2, 1);
+            letter-spacing: 0.2em;
         }
 
         #pass-input:focus {
-            border-bottom-color: #fff;
+            border-bottom-color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 0.4em;
         }
 
         #content-screen {
             display: none;
-            width: 100%;
+            width: 90%;
             max-width: 800px;
-            padding: var(--space-md);
+            padding: 80px 0;
             text-align: left;
-            animation: fadeIn 1s ease forwards;
+            animation: fadeIn 1.5s cubic-bezier(0.2, 0, 0.2, 1) forwards;
         }
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(20px);
+                filter: blur(10px);
             }
 
             to {
                 opacity: 1;
                 transform: translateY(0);
+                filter: blur(0);
             }
         }
 
-        .party-title {
-            font-size: 24px;
-            letter-spacing: 0.1em;
-            margin-bottom: 30px;
-            border-left: 3px solid #fff;
-            padding-left: 20px;
+        .party-header {
+            margin-bottom: 60px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 40px;
         }
 
-        .party-info {
-            font-size: 16px;
-            line-height: 2;
+        .party-category {
+            font-family: var(--font-family-mono);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .party-title {
+            font-size: 42px;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin: 0;
+            color: #fff;
+        }
+
+        .party-subtitle {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 15px;
+            font-weight: 300;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .info-section h3 {
+            font-family: var(--font-family-mono);
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 0.2em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 10px;
+        }
+
+        .info-content {
+            font-size: 15px;
+            line-height: 1.8;
             color: rgba(255, 255, 255, 0.8);
+            font-weight: 300;
+        }
+
+        .info-content p {
+            margin-bottom: 15px;
+        }
+
+        .highlight {
+            color: #fff;
+            font-weight: 400;
+        }
+
+        .lineup-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .lineup-item {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-family-mono);
+            font-size: 13px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .lineup-time {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .link-button {
+            display: inline-block;
+            color: #fff;
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            font-size: 12px;
+            font-family: var(--font-family-mono);
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+
+        .link-button:hover {
+            background: #fff;
+            color: #000;
         }
 
         .error-msg {
-            color: #ff4d4d;
-            font-size: 12px;
-            margin-top: 15px;
+            color: #fff;
+            font-size: 10px;
+            font-family: var(--font-family-mono);
+            margin-top: 20px;
             height: 1em;
             opacity: 0;
+            letter-spacing: 0.2em;
             transition: opacity 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .party-title {
+                font-size: 32px;
+            }
+
+            .lineup-grid {
+                grid-template-columns: 1fr;
+            }
+
+            #content-screen {
+                padding: 40px 0;
+            }
         }
     </style>
 </head>
 
 <body>
     <div id="password-screen">
-        <span class="secret-label">ENTER ACCESS CODE</span>
-        <input type="password" id="pass-input" autofocus>
-        <div id="error-msg" class="error-msg">INVALID CODE</div>
+        <span class="secret-label">IDENTIFICATION REQUIRED</span>
+        <input type="password" id="pass-input" autofocus placeholder="••••">
+        <div id="error-msg" class="error-msg">ACCESS_DENIED</div>
     </div>
 
     <div id="content-screen">
-        <h1 class="party-title">PARTY_INFORMATION</h1>
-        <div class="party-info">
-            <!-- Party info will be placed here -->
-            <p>[ DATA_PENDING... ]</p>
+        <div class="party-header">
+            <span class="party-category">COUNTDOWN_SECRET_FREE_PARTY</span>
+            <h1 class="party-title">FANTASTIC ADVENTURE 2025</h1>
+            <p class="party-subtitle">LOCATION: SECRET [ Sano, Tochigi ] — Home Party Vibes</p>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-section">
+                <h3>ACCESS & LOCATION</h3>
+                <div class="info-content">
+                    <p>栃木県佐野市吉水に構えるKENTA氏の家で開催します。ホームパーティのVIBESでお越しください。</p>
+                    <p><span class="highlight">東武鉄道 吉水駅</span> より徒歩20分</p>
+                    <p>開催場所から徒歩5分に <span class="highlight">道の駅 どまんなか田沼</span>
+                        があります。こちらに車を停めていただき徒歩でお越しください。連絡いただければTOM氏かKENTA氏が迎えに行きます。</p>
+                    <a href="https://www.tobu.co.jp/railway/guide/station/info/2408/" target="_blank"
+                        class="link-button">吉水駅 INFO</a>
+                    <a href="https://domannaka.co.jp" target="_blank" class="link-button">どまんなか田沼</a>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>TIME TABLE [ 17:30 - ∞ ]</h3>
+                <div class="lineup-grid">
+                    <div class="lineup-item"><span class="lineup-time">17:30</span> <span>HIDE</span></div>
+                    <div class="lineup-item"><span class="lineup-time">18:30</span> <span>TOM</span></div>
+                    <div class="lineup-item"><span class="lineup-time">19:30</span> <span>KATO</span></div>
+                    <div class="lineup-item"><span class="lineup-time">20:30</span> <span>猫背</span></div>
+                    <div class="lineup-item"><span class="lineup-time">21:30</span> <span>て2</span></div>
+                    <div class="lineup-item"><span class="lineup-time">22:30</span> <span>shibo</span></div>
+                    <div class="lineup-item"><span class="lineup-time">23:30</span> <span>die10</span></div>
+                    <div class="lineup-item"><span class="lineup-time">24:30</span> <span>DAIY</span></div>
+                    <div class="lineup-item"><span class="lineup-time">01:30</span> <span>ラーチャン</span></div>
+                    <div class="lineup-item"><span class="lineup-time">02:30</span> <span>KENTA</span></div>
+                </div>
+                <p style="font-size: 11px; opacity: 0.4; margin-top: 15px; font-family: var(--font-family-mono);">※
+                    深夜2:00以降は近隣配慮のため音量が下がります</p>
+            </div>
+
+            <div class="info-section">
+                <h3>STAY & OTHERS</h3>
+                <div class="info-content">
+                    <p><span class="highlight">F&B:</span> 当日はDESK氏によるフード食べ放題（¥1,000）を予定しています。その他、お酒やフードなど各持参でお願いします。
+                    </p>
+                    <p><span class="highlight">STAY:</span> 車中泊かテント泊をご利用ください。テント泊希望の方は先着3張（要事前登録）。</p>
+                    <p><span class="highlight">BATH:</span> お風呂に入れますが、洗面用具をご持参ください。シャワーと洗面のみ利用可能です。</p>
+                    <p><span class="highlight">NOTE:</span> 必要な方はスリッパをご持参ください。</p>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>ACTS & CREW</h3>
+                <div class="info-content">
+                    <p><span class="highlight">GJ:</span> Mandala Machine</p>
+                    <p><span class="highlight">KITCHEN:</span> DESK (Food System)</p>
+                    <p><span class="highlight">SHOP:</span> GENERATIVE JUNKIE</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -131,6 +295,7 @@
                     setTimeout(() => {
                         passScreen.style.display = 'none';
                         contentScreen.style.display = 'block';
+                        document.body.style.overflowY = 'auto'; // Enable scrolling
                     }, 500);
                 } else {
                     errorMsg.style.opacity = '1';
