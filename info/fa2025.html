@@ -366,13 +366,10 @@
                     this.speedY = Math.random() * 0.4 + 0.2;
                     this.speedX = Math.random() * 0.3 - 0.15;
                     this.opacity = Math.random() * 0.4 + 0.3;
-                    this.rotation = Math.random() * Math.PI * 2;
-                    this.rotationSpeed = (Math.random() - 0.5) * 0.01;
                 }
                 update() {
                     this.y += this.speedY;
                     this.x += this.speedX;
-                    this.rotation += this.rotationSpeed;
                     if (this.y > canvas.height + 20) {
                         this.init(false);
                     }
@@ -380,7 +377,6 @@
                 draw() {
                     ctx.save();
                     ctx.translate(this.x, this.y);
-                    ctx.rotate(this.rotation);
                     ctx.globalAlpha = this.opacity;
                     if (useImg) {
                         ctx.drawImage(snowImg, -this.size / 2, -this.size / 2, this.size, this.size);
