@@ -344,20 +344,7 @@
             const canvas = document.getElementById('snow-canvas');
             const ctx = canvas.getContext('2d');
             let particles = [];
-            const particleCount = 120;
-            const snowImg = new Image();
-            snowImg.src = '/logo/snow.png';
-            let useImg = false;
-            snowImg.onload = () => {
-                console.log('Snow image loaded successfully');
-                console.log('Natural dimensions:', snowImg.naturalWidth, 'x', snowImg.naturalHeight);
-                console.log('Aspect ratio:', snowImg.naturalWidth / snowImg.naturalHeight);
-                useImg = true;
-            };
-            snowImg.onerror = () => {
-                console.log('Snow image failed to load, using fallback');
-                useImg = false;
-            };
+            const particleCount = 100;
 
             function resize() {
                 canvas.width = window.innerWidth;
@@ -374,13 +361,13 @@
                 init(isInitial = false) {
                     this.x = Math.random() * canvas.width;
                     this.y = isInitial ? Math.random() * canvas.height : Math.random() * -canvas.height;
-                    this.scale = Math.random() * 0.15 + 0.05; // Smaller scale for cleaner look
-                    this.speedY = Math.random() * 0.4 + 0.2;
-                    this.opacity = Math.random() * 0.4 + 0.2;
+                    this.size = Math.random() * 2 + 1; // Simple radius
+                    this.speedY = Math.random() * 0.5 + 0.3;
+                    this.opacity = Math.random() * 0.5 + 0.2;
                 }
                 update() {
                     this.y += this.speedY;
-                    if (this.y > canvas.height + 100) {
+                    if (this.y > canvas.height + 10) {
                         this.init(false);
                     }
                 }
@@ -388,17 +375,10 @@
                     ctx.save();
                     ctx.translate(this.x, this.y);
                     ctx.globalAlpha = this.opacity;
-                    if (useImg && snowImg.complete && snowImg.naturalWidth > 0) {
-                        const w = snowImg.naturalWidth * this.scale;
-                        const h = snowImg.naturalHeight * this.scale;
-                        ctx.drawImage(snowImg, -w / 2, -h / 2, w, h);
-                    } else {
-                        const s = 10 * this.scale;
-                        ctx.fillStyle = '#fff';
-                        ctx.beginPath();
-                        ctx.arc(0, 0, s / 2, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                    ctx.fill();
                     ctx.restore();
                 }
             }
