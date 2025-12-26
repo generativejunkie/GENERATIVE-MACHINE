@@ -22,6 +22,16 @@
             overflow-x: hidden;
         }
 
+        #snow-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
         #password-screen,
         #content-screen {
             position: relative;
@@ -327,7 +337,77 @@
             </div>
         </div>
 
+        <canvas id="snow-canvas"></canvas>
+
         <script>
+            // Snow Effect
+            const canvas = document.getElementById('snow-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            const particleCount = 100;
+            const snowImg = new Image();
+            snowImg.src = '/logo/snow.png';
+            let useImg = false;
+            snowImg.onload = () => { useImg = true; };
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            window.addEventListener('resize', resize);
+            resize();
+
+            class Particle {
+                constructor() {
+                    this.init(true);
+                }
+                init(isInitial = false) {
+                    this.x = Math.random() * canvas.width;
+                    this.y = isInitial ? Math.random() * canvas.height : Math.random() * -canvas.height;
+                    this.scale = Math.random() * 0.4 + 0.1;
+                    this.speedY = Math.random() * 0.4 + 0.2;
+                    this.opacity = Math.random() * 0.4 + 0.3;
+                }
+                update() {
+                    this.y += this.speedY;
+                    if (this.y > canvas.height + 100) {
+                        this.init(false);
+                    }
+                }
+                draw() {
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.globalAlpha = this.opacity;
+                    if (useImg) {
+                        const w = snowImg.width * this.scale;
+                        const h = snowImg.height * this.scale;
+                        ctx.drawImage(snowImg, -w / 2, -h / 2, w, h);
+                    } else {
+                        const s = 10 * this.scale;
+                        ctx.fillStyle = '#fff';
+                        ctx.beginPath();
+                        ctx.arc(0, 0, s / 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.restore();
+                }
+            }
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+
             const input = document.getElementById('pass-input');
             const passScreen = document.getElementById('password-screen');
             const contentScreen = document.getElementById('content-screen');
