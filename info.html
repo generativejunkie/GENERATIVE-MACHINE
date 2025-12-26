@@ -66,6 +66,7 @@
             display: none;
             width: 90%;
             max-width: 800px;
+            margin: 0 auto;
             padding: 40px 0 80px 0;
             text-align: left;
             animation: fadeIn 1.5s cubic-bezier(0.2, 0, 0.2, 1) forwards;
@@ -355,8 +356,8 @@
                         setTimeout(() => {
                             passScreen.style.display = 'none';
                             contentScreen.style.display = 'block';
+                            document.body.style.display = 'block'; // Switch to block for natural scrolling
                             document.body.style.overflowY = 'auto'; // Enable scrolling
-                            document.body.style.alignItems = 'flex-start'; // Align to top
                             window.scrollTo(0, 0); // Force scroll to top
                         }, 500);
                     } else {
