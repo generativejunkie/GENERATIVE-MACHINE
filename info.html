@@ -287,34 +287,41 @@
                     <p><span class="highlight">SHOP:</span> GENERATIVE JUNKIE</p>
                 </div>
             </div>
+            <div class="footer-logo"
+                style="text-align: center; margin-top: 80px; padding-bottom: 40px; border-top: 1px solid rgba(255, 255, 255, 0.05);">
+                <img src="logo/party_footer_logo.png" alt="GENERATIVE JUNKIE"
+                    style="width: 180px; opacity: 0.6; filter: grayscale(1);">
+                <p
+                    style="font-family: var(--font-family-mono); font-size: 10px; color: rgba(255, 255, 255, 0.2); letter-spacing: 0.3em; margin-top: 20px;">
+                    ALL WAYS SUPER HIGH</p>
+            </div>
         </div>
-    </div>
 
-    <script>
-        const input = document.getElementById('pass-input');
-        const passScreen = document.getElementById('password-screen');
-        const contentScreen = document.getElementById('content-screen');
-        const errorMsg = document.getElementById('error-msg');
+        <script>
+            const input = document.getElementById('pass-input');
+            const passScreen = document.getElementById('password-screen');
+            const contentScreen = document.getElementById('content-screen');
+            const errorMsg = document.getElementById('error-msg');
 
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                if (input.value.toLowerCase() === 'high') {
-                    passScreen.style.opacity = '0';
-                    setTimeout(() => {
-                        passScreen.style.display = 'none';
-                        contentScreen.style.display = 'block';
-                        document.body.style.overflowY = 'auto'; // Enable scrolling
-                    }, 500);
-                } else {
-                    errorMsg.style.opacity = '1';
-                    input.value = '';
-                    setTimeout(() => {
-                        errorMsg.style.opacity = '0';
-                    }, 2000);
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    if (input.value.toLowerCase() === 'high') {
+                        passScreen.style.opacity = '0';
+                        setTimeout(() => {
+                            passScreen.style.display = 'none';
+                            contentScreen.style.display = 'block';
+                            document.body.style.overflowY = 'auto'; // Enable scrolling
+                        }, 500);
+                    } else {
+                        errorMsg.style.opacity = '1';
+                        input.value = '';
+                        setTimeout(() => {
+                            errorMsg.style.opacity = '0';
+                        }, 2000);
+                    }
                 }
-            }
-        });
-    </script>
+            });
+        </script>
 </body>
 
 </html>
