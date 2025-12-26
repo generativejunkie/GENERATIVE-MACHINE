@@ -3,6 +3,11 @@
   "trailingSlash": false,
   "redirects": [
     {
+      "source": "/info",
+      "destination": "/info/fa2025",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [
         {
