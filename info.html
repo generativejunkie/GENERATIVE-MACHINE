@@ -280,6 +280,8 @@
                     <a href="https://www.tobu.co.jp/railway/guide/station/info/2408/" target="_blank"
                         class="link-button">吉水駅 INFO</a>
                     <a href="https://domannaka.co.jp" target="_blank" class="link-button">どまんなかたぬま</a>
+                    <a href="https://www.google.com/maps/dir/吉水駅/道の駅+どまんなかたぬま/" target="_blank" class="link-button"
+                        style="border-color: rgba(255,255,255,0.4);">Google Mapで歩く</a>
                 </div>
             </div>
 
@@ -348,6 +350,8 @@
                             passScreen.style.display = 'none';
                             contentScreen.style.display = 'block';
                             document.body.style.overflowY = 'auto'; // Enable scrolling
+                            document.body.style.alignItems = 'flex-start'; // Align to top
+                            window.scrollTo(0, 0); // Force scroll to top
                         }, 500);
                     } else {
                         errorMsg.style.opacity = '1';
