@@ -272,7 +272,7 @@
                         class="link-button">吉水駅</a>
                     <a href="https://domannaka.co.jp" target="_blank" class="link-button">どまんなかたぬま</a>
                     <a href="https://www.google.com/maps/dir/吉水駅/道の駅+どまんなかたぬま/" target="_blank" class="link-button"
-                        style="border-color: rgba(255,255,255,0.4);">Google Map</a>
+                        style="border-color: rgba(255,255,255,0.2);">Google Map</a>
                 </div>
             </div>
 
@@ -344,11 +344,18 @@
             const canvas = document.getElementById('snow-canvas');
             const ctx = canvas.getContext('2d');
             let particles = [];
-            const particleCount = 100;
+            const particleCount = 150;
             const snowImg = new Image();
             snowImg.src = '/logo/snow.png';
             let useImg = false;
-            snowImg.onload = () => { useImg = true; };
+            snowImg.onload = () => {
+                console.log('Snow image loaded');
+                useImg = true;
+            };
+            snowImg.onerror = () => {
+                console.log('Snow image failed to load, using fallback');
+                useImg = false;
+            };
 
             function resize() {
                 canvas.width = window.innerWidth;
@@ -365,9 +372,9 @@
                 init(isInitial = false) {
                     this.x = Math.random() * canvas.width;
                     this.y = isInitial ? Math.random() * canvas.height : Math.random() * -canvas.height;
-                    this.scale = Math.random() * 0.4 + 0.1;
-                    this.speedY = Math.random() * 0.4 + 0.2;
-                    this.opacity = Math.random() * 0.4 + 0.3;
+                    this.scale = Math.random() * 0.5 + 0.2;
+                    this.speedY = Math.random() * 0.8 + 0.5; // Slightly faster for visibility
+                    this.opacity = Math.random() * 0.5 + 0.3;
                 }
                 update() {
                     this.y += this.speedY;
