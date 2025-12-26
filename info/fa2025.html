@@ -378,10 +378,11 @@
             const particleCount = 180;
 
             function resize() {
-                const dpr = window.devicePixelRatio || 1;
-                canvas.width = window.innerWidth * dpr;
-                canvas.height = window.innerHeight * dpr;
-                ctx.scale(dpr, dpr);
+                // Force sync between internal resolution and CSS display size
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                canvas.style.width = window.innerWidth + 'px';
+                canvas.style.height = window.innerHeight + 'px';
             }
 
             window.addEventListener('resize', resize);
@@ -392,24 +393,20 @@
                     this.init(true);
                 }
                 init(isInitial = false) {
-                    const dpr = window.devicePixelRatio || 1;
-                    const w = canvas.width / dpr;
-                    const h = canvas.height / dpr;
-                    this.x = Math.random() * w;
-                    this.y = Math.random() * h;
-                    this.size = Math.random() * 2 + 1;
-                    // Zero gravity: random direction and very slow drift
-                    this.speedX = (Math.random() - 0.5) * 0.3;
-                    this.speedY = (Math.random() - 0.5) * 0.3;
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 1.5; // Slightly larger for better circle visibility
+                    // Lower speed for smoother drift
+                    this.speedX = (Math.random() - 0.5) * 0.2;
+                    this.speedY = (Math.random() - 0.5) * 0.2;
                     this.opacity = Math.random() * 0.4 + 0.3;
                 }
                 update() {
                     this.x += this.speedX;
                     this.y += this.speedY;
 
-                    const dpr = window.devicePixelRatio || 1;
-                    const w = canvas.width / dpr;
-                    const h = canvas.height / dpr;
+                    const w = canvas.width;
+                    const h = canvas.height;
 
                     // Wrap around screen for zero-gravity feel
                     if (this.x < -10) this.x = w + 10;
