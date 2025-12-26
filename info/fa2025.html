@@ -363,13 +363,13 @@
                 init(isInitial = false) {
                     this.x = Math.random() * canvas.width;
                     this.y = isInitial ? Math.random() * canvas.height : Math.random() * -canvas.height;
-                    this.size = Math.random() * 2 + 1; // Simple radius
-                    this.speedY = Math.random() * 0.5 + 0.3;
-                    this.opacity = Math.random() * 0.5 + 0.2;
+                    this.size = 1; // 1px dot
+                    this.speedY = Math.random() * 0.4 + 0.2;
+                    this.opacity = Math.random() * 0.4 + 0.2;
                 }
                 update() {
                     this.y += this.speedY;
-                    if (this.y > canvas.height + 10) {
+                    if (this.y > canvas.height + 5) {
                         this.init(false);
                     }
                 }
