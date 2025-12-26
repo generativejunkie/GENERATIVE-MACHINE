@@ -392,17 +392,30 @@
                     this.init(true);
                 }
                 init(isInitial = false) {
-                    this.x = Math.random() * (canvas.width / (window.devicePixelRatio || 1));
-                    this.y = isInitial ? Math.random() * (canvas.height / (window.devicePixelRatio || 1)) : Math.random() * -100;
-                    this.size = Math.random() * 2 + 1; // 1px to 3px radius
-                    this.speedY = Math.random() * 0.2 + 0.1;
+                    const dpr = window.devicePixelRatio || 1;
+                    const w = canvas.width / dpr;
+                    const h = canvas.height / dpr;
+                    this.x = Math.random() * w;
+                    this.y = Math.random() * h;
+                    this.size = Math.random() * 2 + 1;
+                    // Zero gravity: random direction and very slow drift
+                    this.speedX = (Math.random() - 0.5) * 0.3;
+                    this.speedY = (Math.random() - 0.5) * 0.3;
                     this.opacity = Math.random() * 0.4 + 0.3;
                 }
                 update() {
+                    this.x += this.speedX;
                     this.y += this.speedY;
-                    if (this.y > canvas.height + 5) {
-                        this.init(false);
-                    }
+
+                    const dpr = window.devicePixelRatio || 1;
+                    const w = canvas.width / dpr;
+                    const h = canvas.height / dpr;
+
+                    // Wrap around screen for zero-gravity feel
+                    if (this.x < -10) this.x = w + 10;
+                    if (this.x > w + 10) this.x = -10;
+                    if (this.y < -10) this.y = h + 10;
+                    if (this.y > h + 10) this.y = -10;
                 }
                 draw() {
                     ctx.save();
