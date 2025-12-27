@@ -376,7 +376,7 @@
             const canvas = document.getElementById('snow-canvas');
             const ctx = canvas.getContext('2d');
             let particles = [];
-            const particleCount = 180;
+            const particleCount = 400;
 
             function resize() {
                 // Force sync between internal resolution and CSS display size
@@ -396,7 +396,7 @@
                 init(isInitial = false) {
                     this.x = Math.random() * canvas.width;
                     this.y = Math.random() * canvas.height;
-                    this.size = Math.random() * 2 + 1.5; // Slightly larger for better circle visibility
+                    this.size = Math.random() * 1.5 + 0.5; // Small stars: 0.5px to 2px
                     // Lower speed for smoother drift
                     this.speedX = (Math.random() - 0.5) * 0.2;
                     this.speedY = (Math.random() - 0.5) * 0.2;
