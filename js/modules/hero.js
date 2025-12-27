@@ -121,7 +121,18 @@ export function initHero() {
             if (secretLink) {
                 secretLink.addEventListener('click', (e) => {
                     console.log("SECRET_ACCESS: ALL WAYS SUPER HIGH - Ritual Triggered");
+
+                    // Trigger Internal System Log
                     document.dispatchEvent(new CustomEvent('secret-ritual', { detail: { type: 'paper_access' } }));
+
+                    // Trigger Google Analytics Event
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'secret_archive_access', {
+                            'event_category': 'Engagement',
+                            'event_label': 'ALL WAYS SUPER HIGH Link',
+                            'value': 1
+                        });
+                    }
                 });
             }
         }
