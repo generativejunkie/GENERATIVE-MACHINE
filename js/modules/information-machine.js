@@ -107,7 +107,7 @@ export function initInformationMachine() {
             secretEntry.style.color = '#fff';
             secretEntry.style.textShadow = '0 0 5px #fff';
             const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            secretEntry.innerHTML = `<span class="log-time">[${timestamp}]</span> <span class="log-msg">CRITICAL: Secret Archive Accessed (GJ-TOM-001)</span>`;
+            secretEntry.innerHTML = `<span class="log-time">[${timestamp}]</span> <span class="log-msg">CRITICAL: Secret Archive Accessed (REF: GJ-X-001)</span>`;
 
             logContainer.appendChild(secretEntry);
             logContainer.scrollTop = logContainer.scrollHeight;
