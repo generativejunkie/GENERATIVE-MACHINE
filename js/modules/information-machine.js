@@ -99,5 +99,20 @@ export function initInformationMachine() {
         nodesContainer.appendChild(node);
     }
 
+    // --- SECRET RITUAL TRACKING ---
+    document.addEventListener('secret-ritual', (e) => {
+        if (e.detail.type === 'paper_access') {
+            const secretEntry = document.createElement('div');
+            secretEntry.className = 'log-entry';
+            secretEntry.style.color = '#fff';
+            secretEntry.style.textShadow = '0 0 5px #fff';
+            const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            secretEntry.innerHTML = `<span class="log-time">[${timestamp}]</span> <span class="log-msg">CRITICAL: Secret Archive Accessed (GJ-TOM-001)</span>`;
+
+            logContainer.appendChild(secretEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+    });
+
     console.log("INFORMATION MACHINE: SYSTEM MONITOR ACTIVE");
 }

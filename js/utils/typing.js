@@ -130,7 +130,18 @@ export function initTyping() {
 
         if (footerEl) {
             // Static text with flashing effect (No typing animation)
-            footerEl.innerHTML = '<span class="flash">⚡︎</span> ALL WAYS SUPER HIGH <span class="flash">⚡︎</span>';
+            // Updated: Secret link to singularity paper nested inside
+            footerEl.innerHTML = '<span class="flash">⚡︎</span> <a href="/singularity.html" id="secret-paper-link" style="color: inherit; text-decoration: none; cursor: default;">ALL WAYS SUPER HIGH</a> <span class="flash">⚡︎</span>';
+
+            const secretLink = document.getElementById('secret-paper-link');
+            if (secretLink) {
+                secretLink.addEventListener('click', (e) => {
+                    console.log("SECRET_ACCESS: ALL WAYS SUPER HIGH - Ritual Triggered");
+                    // We let the link work naturally, but we could add a ritual effect here if needed.
+                    // For tracking, we can fire a custom event or just log it.
+                    document.dispatchEvent(new CustomEvent('secret-ritual', { detail: { type: 'paper_access' } }));
+                });
+            }
         }
 
         // Handle resize to update heights (debounced)
