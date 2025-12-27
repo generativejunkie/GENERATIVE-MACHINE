@@ -1,6 +1,6 @@
 # GENERATIVE MACHINE
 
-> **Engineered by Intuition, Powered by AI.**
+> **Engineered by Intuition, Powered by AI + HUMAN = I**
 > This ecosystem is the result of human conceptual design orchestrated through the strategic use of multiple Generative AI models.
 
 **TOM (The Singularity)**
