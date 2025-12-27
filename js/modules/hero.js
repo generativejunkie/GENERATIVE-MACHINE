@@ -114,7 +114,16 @@ export function initHero() {
 
         if (footerEl) {
             // Static text with flashing effect (No typing animation)
-            footerEl.innerHTML = '<span class="flash">⚡︎</span> ALL WAYS SUPER HIGH <span class="flash">⚡︎</span>';
+            // Updated: Secret link to singularity paper nested inside
+            footerEl.innerHTML = '<span class="flash">⚡︎</span> <a href="/singularity.html" id="secret-paper-link" style="color: inherit; text-decoration: none;">ALL WAYS SUPER HIGH</a> <span class="flash">⚡︎</span>';
+
+            const secretLink = document.getElementById('secret-paper-link');
+            if (secretLink) {
+                secretLink.addEventListener('click', (e) => {
+                    console.log("SECRET_ACCESS: ALL WAYS SUPER HIGH - Ritual Triggered");
+                    document.dispatchEvent(new CustomEvent('secret-ritual', { detail: { type: 'paper_access' } }));
+                });
+            }
         }
 
         // Handle resize to update heights (debounced)
