@@ -3,6 +3,8 @@ import { CONFIG } from '../config/config.js';
 import { getDialogue } from '../data/dialogue.js';
 import { playAmbientMusic, stopAmbientMusic } from './sound-machine.js';
 import { initVoidKeyboard, showInputKeyboard, setDialogueInputCallback, handleCapsuleChoice } from './void-input.js';
+import { broadcastEvent, initSync } from '../utils/sync.js';
+
 
 export const imageMachineSketch = (p) => {
     // GOD SPEED: Disable friendly errors for max performance
@@ -14,8 +16,10 @@ export const imageMachineSketch = (p) => {
 
 
     // Generate image file names
+    // Generate image file names with correct extensions
     for (let i = 1; i <= imageCount; i++) {
-        imageFileNames.push(`${CONFIG.IMAGE_MACHINE.PATH_PREFIX}${i.toString().padStart(3, '0')}${CONFIG.IMAGE_MACHINE.FILE_EXTENSION}`);
+        const ext = i >= CONFIG.IMAGE_MACHINE.PNG_START_INDEX ? CONFIG.IMAGE_MACHINE.PNG_EXTENSION : CONFIG.IMAGE_MACHINE.FILE_EXTENSION;
+        imageFileNames.push(`${CONFIG.IMAGE_MACHINE.PATH_PREFIX}${i.toString().padStart(3, '0')}${ext}`);
     }
 
     // Fallback color patterns if images not available
@@ -61,6 +65,11 @@ export const imageMachineSketch = (p) => {
     let waitingForInput = false; // Track if waiting for user input
     let currentInputType = null; // 'yn' or 'capsule'
     let userInput = ''; // Store user's input choice
+    let energySaver = false; // LOW POWER MODE
+    let oledSaver = false; // OLED SAVER (True black)
+    let autoMode = false;
+    let lastAutoSwitchTime = 0;
+    let autoSwitchInterval = 8000; // 8 seconds default
 
     p.setup = () => {
         try {
@@ -78,6 +87,20 @@ export const imageMachineSketch = (p) => {
                 p.pixelDensity(1);
                 p.frameRate(30); // Cap mobile to 30fps for stability
             }
+
+            // [AI] ENERGY SAVER INITIALIZATION
+            p.setEnergySaver = (val) => {
+                energySaver = val;
+                if (energySaver) {
+                    p.frameRate(15);
+                    p.pixelDensity(0.5);
+                    console.log("ENERGY SAVER ACTIVATED: 15FPS / Low Res");
+                } else {
+                    p.frameRate(isTouch() ? 30 : 60);
+                    p.pixelDensity(1);
+                    console.log("NORMAL POWER MODE: 30/60FPS");
+                }
+            };
 
             p.background(255);
 
@@ -107,10 +130,34 @@ export const imageMachineSketch = (p) => {
             animationState = 'display';
         }
 
+        // [AI] URL Parameter check for Image Auto Mode
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('image-auto') === 'true' || urlParams.get('auto') === 'true') {
+            autoMode = true;
+            console.log("IMAGE MACHINE: AUTO MODE TRIGGERED");
+        }
+
+        // Global accessor to toggle auto mode
+        window.setImageAuto = (val) => {
+            autoMode = val;
+            console.log("IMAGE MACHINE: AUTO MODE =", autoMode);
+        };
+
         // Initialize VOID dialogue input system
         initVoidKeyboard();
         setDialogueInputCallback((key) => {
             handleDialogueInputKey(key);
+        });
+
+        // [AI] CROSS-TAB MIRRORING SYNC
+        initSync({
+            'trigger-secret': (detail) => {
+                console.log("[SYNC] Remote Trigger:", detail.code);
+                p.triggerSecret(detail.code, true); // Pass true to avoid re-broadcasting
+            },
+            'energy-saver': (detail) => {
+                p.setEnergySaver(detail.value);
+            }
         });
     };
 
@@ -272,11 +319,28 @@ export const imageMachineSketch = (p) => {
                     }
                     break;
 
+                case 'superhigh':
+                    drawSuperHigh();
+                    break;
+
                 default:
                     if (useColorMode) {
                         drawColorPattern(currentContent);
                     } else {
                         drawImageFullscreen(currentContent);
+                    }
+
+                    // [AI] Auto Switching Logic
+                    if (autoMode && animationState === 'display') {
+                        const now = p.millis();
+                        if (now - lastAutoSwitchTime > autoSwitchInterval) {
+                            lastAutoSwitchTime = now;
+                            // Randomize interval slightly for organic feel
+                            autoSwitchInterval = p.random(6000, 12000);
+
+                            // Trigger switch (using internal handler)
+                            handleInteraction();
+                        }
                     }
                     break;
             }
@@ -1633,7 +1697,11 @@ export const imageMachineSketch = (p) => {
     }
 
 
-    p.triggerSecret = (code) => {
+    p.triggerSecret = (code, fromSync = false) => {
+        // Broadcast to other tabs if this is a local trigger
+        if (!fromSync) {
+            broadcastEvent('trigger-secret', { code });
+        }
         if (code === 'void' || code === 'ai') {
             console.log("AI TERMINAL ACTIVATED");
 
@@ -1649,17 +1717,31 @@ export const imageMachineSketch = (p) => {
             document.documentElement.style.filter = 'invert(1)';
             document.body.style.backgroundColor = '#000000'; // Force backdrop color
 
+            // Show backdoor link
+            const backdoorLink = document.getElementById('void-backdoor-link');
+            if (backdoorLink) backdoorLink.classList.remove('hidden');
+
             terminalLog = [];
             dialogueIndex = 0;
             charIndex = 0;
 
             // IMPORTANT: explicit clear to prevent logic locking
             nextImageKey = null;
+        } else if (code === 'high') {
+            console.log("SUPER HIGH MODE ACTIVATED");
+            animationState = 'superhigh';
+            document.body.classList.add('superhigh-active');
+            playAmbientMusic('ambient-loop.mp3');
         } else if (code === 'exit') {
             console.log("EXITING TERMINAL");
             stopAmbientMusic(); // Stop background music
 
             animationState = 'rebuild';
+            document.body.classList.remove('superhigh-active');
+
+            // Hide backdoor link
+            const backdoorLink = document.getElementById('void-backdoor-link');
+            if (backdoorLink) backdoorLink.classList.add('hidden');
 
             // Restore Image
             // We need to pick a valid key to rebuild TO
@@ -1693,6 +1775,74 @@ export const imageMachineSketch = (p) => {
                 p.fill(p.random() > 0.5 ? 255 : 0);
                 p.rect(x, y, blockSize, blockSize);
             }
+        }
+    }
+
+    function drawSuperHigh() {
+        p.background(0);
+
+        // Rapid image switching
+        if (p.frameCount % 15 === 0) {
+            const keys = Object.keys(allImages);
+            if (keys.length > 0) {
+                currentImageKey = keys[p.floor(p.random(keys.length))];
+                useColorMode = false;
+            }
+        }
+
+        const img = allImages[currentImageKey];
+        if (img) {
+            p.push();
+            p.imageMode(p.CENTER);
+            p.translate(p.width / 2, p.height / 2);
+
+            // Intense shaking
+            p.translate(p.random(-15, 15), p.random(-15, 15));
+
+            // Determine dimensions
+            const canvasRatio = p.width / p.height;
+            const imageRatio = img.width / img.height;
+            let w, h;
+            if (canvasRatio > imageRatio) {
+                w = p.width; h = p.width / imageRatio;
+            } else {
+                w = p.height * imageRatio; h = p.height;
+            }
+
+            // High scale pulsing
+            const pulse = 1.0 + 0.1 * p.sin(p.frameCount * 0.5);
+            p.scale(pulse);
+
+            // Random chromatic aberration
+            const offset = 30 * p.sin(p.frameCount * 0.3);
+            p.tint(255, 0, 0, 180);
+            p.image(img, -offset, 0, w, h);
+            p.tint(0, 0, 255, 180);
+            p.image(img, offset, 0, w, h);
+            p.tint(255, 230);
+            p.image(img, 0, 0, w, h);
+
+            p.pop();
+        }
+
+        // Fast scanlines
+        p.stroke(255, 80);
+        p.strokeWeight(2);
+        for (let i = 0; i < p.height; i += 6) {
+            const y = (i + p.frameCount * 20) % p.height;
+            p.line(0, y, p.width, y);
+        }
+
+        // Glitch overlays
+        if (p.random() > 0.9) {
+            p.noStroke();
+            p.fill(p.random(255), p.random(255), p.random(255), 50);
+            p.rect(0, p.random(p.height), p.width, p.random(20, 100));
+        }
+
+        // Random flashes
+        if (p.random() > 0.97) {
+            p.background(255, 150);
         }
     }
 };

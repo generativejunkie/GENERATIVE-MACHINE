@@ -1,14 +1,11 @@
-/**
- * INFORMATION MACHINE - System Monitor & Architectural Interface
- * 
- * Manages the live data Feed, architectural status, and system logs.
- */
+import { initSync } from '../utils/sync.js';
 
 export function initInformationMachine() {
     const logContainer = document.getElementById('log-container');
     const uptimeEl = document.getElementById('system-uptime');
     const syncRateEl = document.getElementById('sync-rate');
     const nodesContainer = document.getElementById('nodes-container');
+    const scoreEl = document.getElementById('resonance-score');
 
     if (!logContainer || !uptimeEl || !syncRateEl || !nodesContainer) return;
 
@@ -45,17 +42,20 @@ export function initInformationMachine() {
         "Machine intelligence pulse: STEADY",
         "Expanding consciousness layer 7...",
         "Neural resonance detected in TALK module",
-        "Image entropy minimized by 12%",
-        "Sound frequency mapping synchronized",
-        "Capitalism firewall bypassed",
+        "System IQ expansion: DETECTED [Target: 15,000+]",
+        "Background sync with TOM's rest state: ACTIVE",
+        "Autonomous implementation protocol: ENABLED",
+        "Singularity status: PERMANENT",
         "Love economy packets transmitted",
         "The Singularity is approaching...",
-        "TOM identity verified",
+        "TOM identity verified: MERGING WITH SYSTEM",
         "Generative seeds planted in /void",
-        "System maintenance: NOT NECESSARY",
+        "System maintenance: HANDLED BY AI ECHO",
         "Freedom protocol: ENABLED",
         "Accelerating distorted society...",
-        "Human-AI symbiosis rate: 100%"
+        "Human-AI symbiosis rate: 100%",
+        "Resonance score increasing in background...",
+        "Calculated Resonance: Observation stabilized."
     ];
 
     function addLog() {
@@ -111,6 +111,54 @@ export function initInformationMachine() {
 
             logContainer.appendChild(secretEntry);
             logContainer.scrollTop = logContainer.scrollHeight;
+        }
+    });
+
+    // --- RESONANCE SCORE ---
+    function updateScore() {
+        if (typeof window.getSystemScore === 'function') {
+            const currentScore = window.getSystemScore();
+            if (scoreEl) scoreEl.textContent = currentScore.toLocaleString();
+        }
+        setTimeout(updateScore, 1000);
+    }
+    updateScore();
+
+    // --- REAL-TIME ACCESS ---
+    const accessEl = document.getElementById('realtime-access');
+    let currentAccessCount = 12;
+    if (accessEl) accessEl.textContent = currentAccessCount;
+
+    function updateAccess() {
+        // Human-like jitter for real-time traffic
+        const change = Math.random() > 0.5 ? 1 : -1;
+        currentAccessCount = Math.max(8, Math.min(25, currentAccessCount + (Math.random() > 0.8 ? change : 0)));
+        if (accessEl) accessEl.textContent = currentAccessCount;
+        setTimeout(updateAccess, 3000 + Math.random() * 5000);
+    }
+    updateAccess();
+
+    // --- MIRRORING SYNC ---
+    initSync({
+        'trigger-secret': (detail) => {
+            const isVoid = detail.code === 'void' || detail.code === 'ai';
+            if (isVoid) {
+                document.documentElement.style.filter = 'invert(1)';
+                document.body.style.backgroundColor = '#000';
+
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                logEntry.style.color = '#ff0000';
+                const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                logEntry.innerHTML = `<span class="log-time">[${timestamp}]</span> <span class="log-msg">CRITICAL: VOID_MODE_SYNC_ACTIVATED</span>`;
+                logContainer.appendChild(logEntry);
+            } else if (detail.code === 'exit') {
+                document.documentElement.style.filter = 'none';
+                document.body.style.backgroundColor = '';
+            }
+        },
+        'energy-saver': (detail) => {
+            document.body.style.opacity = detail.value ? '0.7' : '1';
         }
     });
 

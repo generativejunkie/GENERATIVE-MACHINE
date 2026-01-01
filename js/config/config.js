@@ -3,8 +3,10 @@ export const CONFIG = {
     // Image Machine Settings
     IMAGE_MACHINE: {
         TOTAL_IMAGES: 363,
+        PNG_START_INDEX: 333,
         PATH_PREFIX: '/photos/photo',
         FILE_EXTENSION: '.webp',
+        PNG_EXTENSION: '.png',
         INITIAL_IMAGE_INDEX: 139, // photo140.webp (0-indexed)
         CHAOS_DURATION: 10,
         TRANSITION_DURATION: 10 // GOD SPEED

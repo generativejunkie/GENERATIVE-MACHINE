@@ -11,6 +11,7 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
+    <script src="/socket.io/socket.io.js"></script>
     <style>
         body {
             background: #000;
@@ -70,6 +71,11 @@
                         <div class="metric-line">SYNC_RATE <span class="metric-value" id="sync-rate">99.8%</span></div>
                         <div class="metric-line">UPTIME <span class="metric-value" id="system-uptime">00:00:00</span>
                         </div>
+                        <div class="metric-line">SCORE <span class="metric-value" id="resonance-score">--</span></div>
+                        <div class="metric-line">RT_ACCESS <span class="metric-value" id="realtime-access">12</span>
+                        </div>
+                        <div class="metric-line">CENTRAL_CMD <span class="metric-value"
+                                style="color: #00ffff; text-shadow: 0 0 5px #00ffff;">ACTIVE</span></div>
                     </div>
                     <div class="grid-item architecture">
                         <h3>ARCHITECTURE</h3>

@@ -23,5 +23,10 @@
   "bugs": {
     "url": "https://github.com/generativejunkie/GENERATIVE-MACHINE/issues"
   },
-  "homepage": "https://github.com/generativejunkie/GENERATIVE-MACHINE#readme"
+  "homepage": "https://github.com/generativejunkie/GENERATIVE-MACHINE#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3"
+  }
 }

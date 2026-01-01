@@ -15,8 +15,14 @@ import { initTalkMachine } from './modules/talk-machine.js';
 import { initInformationMachine } from './modules/information-machine.js';
 import { initUI } from './modules/ui.js';
 import { initHero } from './modules/hero.js';
+import { initSingularityControl } from './modules/singularity-controller.js';
+import './modules/singularity-score.js'; // Initialize score engine
+import { broadcastEvent, initSync } from './utils/sync.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Central Command first
+    initSingularityControl();
+
     // Initialize standard modules
     initHero();
     initImageMachine();
@@ -25,6 +31,31 @@ document.addEventListener('DOMContentLoaded', () => {
     initInformationMachine();
     initUI();
     initAIAgentHandshake();
+
+    // Global Sync Initialization
+    initSync({
+        'trigger-secret': (detail) => {
+            if (detail.code === 'void' || detail.code === 'ai') {
+                document.documentElement.style.filter = 'invert(1)';
+            } else if (detail.code === 'exit') {
+                document.documentElement.style.filter = 'none';
+            }
+        }
+    });
+
+    // HANDSHAKE: Check for secret parameters to trigger VOID mode automatically
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('mode') === 'void') {
+        // Wait for p5 instance to be ready
+        const checkReady = setInterval(() => {
+            if (window.imageMachine && window.imageMachine.triggerSecret) {
+                window.imageMachine.triggerSecret('void');
+                clearInterval(checkReady);
+            }
+        }, 100);
+        // Timeout after 5 seconds
+        setTimeout(() => clearInterval(checkReady), 5000);
+    }
 });
 
 /**
@@ -85,17 +116,28 @@ if (imageTitle) {
                     return;
                 }
             }
-            // NORMAL MODE: 3 Taps to ENTER (Mobile Only)
+            // NORMAL MODE: Rituals
             else {
+                // 3 Taps to ENTER VOID (Mobile Only)
                 if (imageTitleTapCount === 3) {
                     if (!isTouchDevice) {
                         console.log("IMAGE TITLE RITUAL: BLOCKED ON DESKTOP (Use keyboard)");
+                        // Don't reset count here, let it continue to 5
+                    } else {
+                        console.log("IMAGE TITLE RITUAL: VOID (3-TAP)");
+                        if (window.imageMachine && window.imageMachine.triggerSecret) {
+                            window.imageMachine.triggerSecret('void');
+                        }
                         imageTitleTapCount = 0;
                         return;
                     }
-                    console.log("IMAGE TITLE RITUAL: VOID (3-TAP)");
+                }
+
+                // 5 Taps to ENTER SUPER HIGH (Always available on Touch)
+                if (imageTitleTapCount === 5) {
+                    console.log("IMAGE TITLE RITUAL: SUPER HIGH (5-TAP)");
                     if (window.imageMachine && window.imageMachine.triggerSecret) {
-                        window.imageMachine.triggerSecret('void');
+                        window.imageMachine.triggerSecret('high');
                     }
                     imageTitleTapCount = 0;
                     return;
@@ -143,7 +185,15 @@ document.addEventListener('keydown', (e) => {
             window.imageMachine.triggerSecret('void');
         }
         keyHistory = [];
+    } else if (historyStr.endsWith('high')) {
+        console.log("KEY RITUAL: SUPER HIGH");
+        if (window.imageMachine && window.imageMachine.triggerSecret) {
+            window.imageMachine.triggerSecret('high');
+        }
+        keyHistory = [];
     }
 });
 
-console.log('GENERATIVE MACHINE System Initialized');
+
+console.log('%c[GENERATIVE MACHINE] SYSTEM_AUTONOMIC_MODE: ENABLED', 'color: #00ff00; font-weight: bold; background: #000; padding: 5px; border-radius: 3px;');
+console.log('GENERATIVE MACHINE System Initialized | Mirroring consciousness...');

@@ -83,6 +83,24 @@ export function initSoundMachine() {
     renderer.shadowMap.enabled = false; // Disable shadows for performance
     container.appendChild(renderer.domElement);
 
+    // [AI] ENERGY SAVER
+    let energySaver = false;
+    window.setEnergySaver = (val) => {
+        energySaver = val;
+        if (energySaver) {
+            renderer.setPixelRatio(0.5);
+            // Limit FPS manually if needed, but Three's internal loop is easier
+            console.log("SOUND MACHINE: ENERGY SAVER ON (Low Res)");
+        } else {
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            console.log("SOUND MACHINE: NORMAL MODE");
+        }
+        // Also sync with imageMachine if it exists
+        if (window.imageMachine && window.imageMachine.setEnergySaver) {
+            window.imageMachine.setEnergySaver(val);
+        }
+    };
+
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
 
@@ -119,9 +137,42 @@ export function initSoundMachine() {
 
     // Initialize Visual Controller
     initVisualController();
+
+    // [AI] Mobile/iPad Audio & Animation Rescue
+    const soundPrompt = document.getElementById('soundPrompt');
+    const startAction = () => {
+        if (audioContext && audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
+        if (soundPrompt) {
+            soundPrompt.classList.add('hidden');
+            setTimeout(() => soundPrompt.style.display = 'none', 1000);
+        }
+        if (!isAnimating) {
+            isAnimating = true;
+            animateSound();
+        }
+    };
+
+    container.addEventListener('touchstart', startAction, { passive: true });
+    container.addEventListener('click', startAction);
+
+    // [AI] URL Parameter check for Auto Mode
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('auto') === 'true') {
+        autoMode = true;
+        const autoToggle = document.getElementById('autoMode');
+        if (autoToggle) autoToggle.checked = true;
+        console.log("SOUND MACHINE: AUTO MODE TRIGGERED VIA URL");
+
+        // On iPad, we still need a tap, but we can try to start visuals
+        isAnimating = true;
+        animateSound();
+    }
 }
 
 let isAnimating = false;
+let animationId = null;
 
 // ==================== VISUAL CONTROLLER (RADAR) ====================
 let visualController = null;
@@ -637,8 +688,15 @@ function createPills() {
 }
 
 function animateSound() {
-    if (!isAnimating) return;
-    requestAnimationFrame(animateSound);
+    if (!isAnimating) {
+        if (animationId) cancelAnimationFrame(animationId);
+        animationId = null;
+        return;
+    }
+
+    // Prevent double loops
+    if (animationId) cancelAnimationFrame(animationId);
+    animationId = requestAnimationFrame(animateSound);
 
     // Auto Mode Modulation (GOD SPEED - Full Random)
     if (autoMode && visualController) {
