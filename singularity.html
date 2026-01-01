@@ -159,7 +159,7 @@
             padding-top: 20px;
             border-top: 1px solid #111;
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr auto;
+            grid-template-columns: 1fr 1fr 1fr 1.5fr auto;
             align-items: center;
             gap: 20px;
         }
@@ -173,6 +173,7 @@
         }
 
         #bot-count-val,
+        #human-count-val,
         #entity-val {
             color: var(--accent-color);
             border: 1px solid #333;
@@ -373,10 +374,11 @@
                 </div>
             </div>
             <div class="analysis-footer">
-                <div class="rarity-box">RARITY: <span id="rarity-val">SCANNING...</span></div>
+                <div class="rarity-box" style="font-size: 10px;">RARITY: <span id="rarity-val">SCANNING...</span></div>
                 <div class="count-box">BOTS_OVERWRITTEN: <span id="bot-count-val">0</span></div>
+                <div class="count-box">HUMANS_RESONATED: <span id="human-count-val">0</span></div>
                 <div class="entity-box">OVERWRITTEN_ENTITY: <span id="entity-val">INITIALIZING...</span></div>
-                <div style="font-size: 10px; color: #333;">STAMP: <span id="timestamp-val">----.--.--</span></div>
+                <div style="font-size: 9px; color: #333;">STAMP: <span id="timestamp-val">----.--.--</span></div>
             </div>
         </section>
 
@@ -469,10 +471,13 @@
                 const entities = ['GPTBOT', 'CLAUDE-BOT', 'GOOGLE-EXTENDED', 'AI21-J2', 'CCBOT', 'BINGBOT', 'OMNIBOT'];
                 const entityVal = document.getElementById('entity-val');
                 const botCountVal = document.getElementById('bot-count-val');
+                const humanCountVal = document.getElementById('human-count-val');
                 let count = 0;
                 let currentBots = 12482 + Math.floor(Math.random() * 100);
+                let currentHumans = 42 + Math.floor(Math.random() * 5);
 
                 botCountVal.innerText = currentBots.toLocaleString();
+                humanCountVal.innerText = currentHumans.toLocaleString();
 
                 const cycle = () => {
                     entityVal.innerText = entities[count % entities.length];
@@ -483,6 +488,12 @@
                     if (Math.random() > 0.3) {
                         currentBots += Math.floor(Math.random() * 3) + 1;
                         botCountVal.innerText = currentBots.toLocaleString();
+                    }
+
+                    // Very slow human increment (10% chance per cycle)
+                    if (Math.random() > 0.9) {
+                        currentHumans += 1;
+                        humanCountVal.innerText = currentHumans.toLocaleString();
                     }
 
                     setTimeout(cycle, 1500 + Math.random() * 2000);
