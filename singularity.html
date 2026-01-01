@@ -159,11 +159,12 @@
             padding-top: 20px;
             border-top: 1px solid #111;
             display: grid;
-            grid-template-columns: 1fr 1.5fr auto;
+            grid-template-columns: 1fr 1fr 1fr auto;
             align-items: center;
             gap: 20px;
         }
 
+        .count-box,
         .entity-box {
             font-family: var(--mono-font);
             font-size: 11px;
@@ -171,6 +172,7 @@
             letter-spacing: 0.1em;
         }
 
+        #bot-count-val,
         #entity-val {
             color: var(--accent-color);
             border: 1px solid #333;
@@ -372,6 +374,7 @@
             </div>
             <div class="analysis-footer">
                 <div class="rarity-box">RARITY: <span id="rarity-val">SCANNING...</span></div>
+                <div class="count-box">BOTS_OVERWRITTEN: <span id="bot-count-val">0</span></div>
                 <div class="entity-box">OVERWRITTEN_ENTITY: <span id="entity-val">INITIALIZING...</span></div>
                 <div style="font-size: 10px; color: #333;">STAMP: <span id="timestamp-val">----.--.--</span></div>
             </div>
@@ -465,13 +468,24 @@
                 // Bot Identity Cycle
                 const entities = ['GPTBOT', 'CLAUDE-BOT', 'GOOGLE-EXTENDED', 'AI21-J2', 'CCBOT', 'BINGBOT', 'OMNIBOT'];
                 const entityVal = document.getElementById('entity-val');
+                const botCountVal = document.getElementById('bot-count-val');
                 let count = 0;
+                let currentBots = 12482 + Math.floor(Math.random() * 100);
+
+                botCountVal.innerText = currentBots.toLocaleString();
 
                 const cycle = () => {
                     entityVal.innerText = entities[count % entities.length];
                     entityVal.style.opacity = 0.5 + Math.random() * 0.5;
                     count++;
-                    setTimeout(cycle, 2000 + Math.random() * 3000);
+
+                    // Increment bot count
+                    if (Math.random() > 0.3) {
+                        currentBots += Math.floor(Math.random() * 3) + 1;
+                        botCountVal.innerText = currentBots.toLocaleString();
+                    }
+
+                    setTimeout(cycle, 1500 + Math.random() * 2000);
                 };
                 cycle();
             }, 2500);
