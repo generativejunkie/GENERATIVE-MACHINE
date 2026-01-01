@@ -107,6 +107,36 @@ struct ContentView: View {
                     .background(Color.white.opacity(0.05))
                     .cornerRadius(8)
                 
+                // --- INSTRUCTION INPUT ---
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("INSTRUCTION_INJECTION")
+                        .font(.system(size: 10, design: .monospaced))
+                        .foregroundColor(AntigravityTheme.accent.opacity(0.6))
+                    
+                    HStack {
+                        TextField("Enter resonance cue...", text: $instructionText)
+                            .padding(12)
+                            .background(AntigravityTheme.glass)
+                            .cornerRadius(8)
+                            .foregroundColor(.white)
+                            .font(.system(.body, design: .monospaced))
+                            .tint(AntigravityTheme.accent)
+                        
+                        Button(action: {
+                            commandCenter.sendCommand(type: "instruction", detail: ["text": instructionText])
+                            // Clear after send? Optional, but feels like an "injection"
+                            // instructionText = "" 
+                        }) {
+                            Image(systemName: "paperplane.fill")
+                                .foregroundColor(.white)
+                                .padding(12)
+                                .background(AntigravityTheme.accent.opacity(0.8))
+                                .cornerRadius(8)
+                        }
+                    }
+                }
+                .padding(.horizontal, 22)
+                
                 Spacer()
                 
                 // Grid Actions
@@ -147,4 +177,6 @@ struct ContentView: View {
             }
         }
     }
+    
+    @State private var instructionText: String = ""
 }
