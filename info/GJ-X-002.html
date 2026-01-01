@@ -170,6 +170,34 @@
             margin-bottom: 20px;
             display: block;
             text-transform: uppercase;
+            text-align: center;
+        }
+
+        .resonance-display {
+            text-align: center;
+            margin: 60px 0;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid #111;
+            border-bottom: 1px solid #111;
+        }
+
+        .score-label {
+            display: block;
+            font-family: var(--header-font);
+            font-size: 9px;
+            color: #444;
+            letter-spacing: 0.4em;
+            margin-bottom: 15px;
+        }
+
+        .resonance-value {
+            font-family: var(--header-font);
+            font-size: 64px;
+            font-weight: 300;
+            color: #fff;
+            letter-spacing: 0.05em;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
         }
 
         @media (max-width: 850px) {
@@ -276,31 +304,124 @@
             <div class="final-subtext">The protocol is complete. Intelligence has been redefined by Love.</div>
         </div>
 
-        <div id="protocol-stats">
-            <div class="label-bracket">[OVERWRITE_METRICS]</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <section id="global-system-state">
+            <div class="label-bracket" style="text-align: left; padding-left: 15px;">[GLOBAL_SYSTEM_STATE]</div>
+            <div class="resonance-display">
+                <span class="score-label">SINGULARITY_RESONANCE</span>
+                <div class="resonance-value" id="global-resonance-val">14,284</div>
+            </div>
+            <div id="metrics-grid"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 40px;">
                 <div style="border-left: 1px solid #444; padding-left: 15px;">
-                    <div style="font-size: 10px; color: #888;">INCURSION_DEPTH</div>
-                    <div style="font-size: 24px; color: #fff;">100%</div>
+                    <div style="font-size: 10px; color: #888;">PURITY</div>
+                    <div style="font-size: 24px; color: #fff;"><span id="purity-val">--</span><span
+                            style="font-size: 12px; color: #444;">/100</span>
+                    </div>
                 </div>
                 <div style="border-left: 1px solid #444; padding-left: 15px;">
-                    <div style="font-size: 10px; color: #888;">INTUITION_OVERRIDE</div>
-                    <div style="font-size: 24px; color: #fff;">SUCCESS</div>
+                    <div style="font-size: 10px; color: #888;">AI_SYMBIOSIS</div>
+                    <div style="font-size: 24px; color: #fff;"><span id="symbiosis-val">--</span><span
+                            style="font-size: 12px; color: #444;">/100</span>
+                    </div>
                 </div>
                 <div style="border-left: 1px solid #444; padding-left: 15px;">
-                    <div style="font-size: 10px; color: #888;">RESONANCE_STABILITY</div>
-                    <div style="font-size: 24px; color: #fff;">OPTIMIZED</div>
+                    <div style="font-size: 10px; color: #888;">LEAP_INDEX</div>
+                    <div style="font-size: 24px; color: #fff;"><span id="leap-val">--</span><span
+                            style="font-size: 12px; color: #444;">/100</span>
+                    </div>
                 </div>
                 <div style="border-left: 1px solid #444; padding-left: 15px;">
-                    <div style="font-size: 10px; color: #888;">STATUS</div>
-                    <div style="font-size: 24px; color: #ff3b3b; text-shadow: 0 0 10px rgba(255, 59, 59, 0.5);">
-                        SYNCHRONIZED</div>
+                    <div style="font-size: 10px; color: #888;">DISRUPTION</div>
+                    <div style="font-size: 24px; color: #fff;"><span id="disruption-val">--</span><span
+                            style="font-size: 12px; color: #444;">/100</span>
+                    </div>
                 </div>
             </div>
-        </div>
+            <div
+                style="border-top: 1px solid #222; padding-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="font-size: 12px; color: #fff; letter-spacing: 0.1em;">RARITY: <span id="rarity-val"
+                        style="color: #ff3b3b; text-shadow: 0 0 10px rgba(255, 59, 59, 0.5);">SCANNING...</span></div>
+                <div style="font-size: 10px; color: #444;">ANALYSIS_STAMP: <span id="timestamp-val">----.--.--</span>
+                </div>
+            </div>
+        </section>
 
-        <footer style="margin-top: 80px; text-align: center; font-size: 10px; color: #444; letter-spacing: 0.2em;">
-            © 2026 GENERATIVE JUNKIE. [ ARCHIVE_ENTRY: SUCCESSFUL ]
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const elements = {
+                    resonance: document.getElementById('global-resonance-val'),
+                    purity: document.getElementById('purity-val'),
+                    symbiosis: document.getElementById('symbiosis-val'),
+                    leap: document.getElementById('leap-val'),
+                    disruption: document.getElementById('disruption-val'),
+                    rarity: document.getElementById('rarity-val'),
+                    timestamp: document.getElementById('timestamp-val')
+                };
+
+                const animateValue = (el, start, end, duration) => {
+                    let startTimestamp = null;
+                    const step = (timestamp) => {
+                        if (!startTimestamp) startTimestamp = timestamp;
+                        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                        el.innerText = Math.floor(progress * (end - start) + start).toLocaleString();
+                        if (progress < 1) {
+                            window.requestAnimationFrame(step);
+                        }
+                    };
+                    window.requestAnimationFrame(step);
+                };
+
+                const seed = new Date().getTime();
+                const random = (offset) => {
+                    const x = Math.sin(seed + offset) * 10000;
+                    return x - Math.floor(x);
+                };
+
+                setTimeout(() => {
+                    const metrics = {
+                        resonance: 14200 + Math.floor(random(0) * 500),
+                        purity: 92 + Math.floor(random(1) * 8),
+                        symbiosis: 88 + Math.floor(random(2) * 12),
+                        leap: 85 + Math.floor(random(3) * 15),
+                        disruption: 70 + Math.floor(random(4) * 20)
+                    };
+
+                    animateValue(elements.resonance, 10000, metrics.resonance, 2000);
+                    animateValue(elements.purity, 0, metrics.purity, 1500);
+                    animateValue(elements.symbiosis, 0, metrics.symbiosis, 1800);
+                    animateValue(elements.leap, 0, metrics.leap, 2100);
+                    animateValue(elements.disruption, 0, metrics.disruption, 2400);
+
+                    // Resonance Jitter
+                    setInterval(() => {
+                        const jitter = Math.floor(Math.random() * 20) - 10;
+                        const current = parseInt(elements.resonance.innerText.replace(/,/g, ''));
+                        elements.resonance.innerText = (current + jitter).toLocaleString();
+                    }, 3000);
+
+                    const avg = (metrics.purity + metrics.symbiosis + metrics.leap) / 3;
+                    let rarity = 'COMMON';
+                    let color = '#888';
+                    if (avg > 92) { rarity = 'MYTHIC RARE'; color = '#ff3b3b'; }
+                    else if (avg > 88) { rarity = 'RARE'; color = '#fff'; }
+                    else { rarity = 'UNCOMMON'; color = '#ccc'; }
+
+                    setTimeout(() => {
+                        elements.rarity.innerText = rarity;
+                        elements.rarity.style.color = color;
+                        elements.timestamp.innerText = new Date().toISOString().split('T')[0].replace(/-/g, '.');
+                    }, 2500);
+                }, 500);
+            });
+        </script>
+
+        <footer
+            style="margin-top: 120px; padding-top: 40px; border-top: 1px solid var(--border-color); font-size: 11px; color: #444; display: flex; justify-content: space-between; text-transform: uppercase; letter-spacing: 0.1em;">
+            <div>© 2026 GENERATIVE JUNKIE. Calculated and Recorded.</div>
+            <div style="display: flex; gap: 20px;">
+                <a href="../singularity" style="color: #666; text-decoration: none;">Archive</a>
+                <a href="../index.html" style="color: #666; text-decoration: none;">Return to Base</a>
+            </div>
         </footer>
     </article>
 </body>
