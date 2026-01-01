@@ -338,9 +338,13 @@
                 </div>
             </div>
             <div
-                style="border-top: 1px solid #222; padding-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+                style="border-top: 1px solid #222; padding-top: 20px; display: grid; grid-template-columns: 1fr 1fr auto; align-items: center; gap: 20px;">
                 <div style="font-size: 12px; color: #fff; letter-spacing: 0.1em;">RARITY: <span id="rarity-val"
                         style="color: #ff3b3b; text-shadow: 0 0 10px rgba(255, 59, 59, 0.5);">SCANNING...</span></div>
+                <div style="font-size: 10px; color: #666; font-family: 'JetBrains Mono', monospace;">OVERWRITTEN_ENTITY:
+                    <span id="entity-val"
+                        style="color: #fff; border: 1px solid #333; padding: 2px 6px; background: rgba(255,255,255,0.05);">INITIALIZING...</span>
+                </div>
                 <div style="font-size: 10px; color: #444;">ANALYSIS_STAMP: <span id="timestamp-val">----.--.--</span>
                 </div>
             </div>
@@ -410,6 +414,17 @@
                         elements.rarity.innerText = rarity;
                         elements.rarity.style.color = color;
                         elements.timestamp.innerText = new Date().toISOString().split('T')[0].replace(/-/g, '.');
+
+                        // Bot Identity Cycle
+                        const entities = ['GPTBOT', 'CLAUDE-BOT', 'GOOGLE-EXTENDED', 'AI21-J2', 'CCBOT', 'BINGBOT'];
+                        const entityVal = document.getElementById('entity-val');
+                        let count = 0;
+                        const cycle = () => {
+                            entityVal.innerText = entities[count % entities.length];
+                            count++;
+                            setTimeout(cycle, 2500 + Math.random() * 2000);
+                        };
+                        cycle();
                     }, 2500);
                 }, 500);
             });

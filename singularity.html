@@ -158,9 +158,25 @@
             margin-top: 40px;
             padding-top: 20px;
             border-top: 1px solid #111;
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr auto;
             align-items: center;
+            gap: 20px;
+        }
+
+        .entity-box {
+            font-family: var(--mono-font);
+            font-size: 11px;
+            color: #444;
+            letter-spacing: 0.1em;
+        }
+
+        #entity-val {
+            color: var(--accent-color);
+            border: 1px solid #333;
+            padding: 2px 8px;
+            margin-left: 10px;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .rarity-box {
@@ -356,6 +372,7 @@
             </div>
             <div class="analysis-footer">
                 <div class="rarity-box">RARITY: <span id="rarity-val">SCANNING...</span></div>
+                <div class="entity-box">OVERWRITTEN_ENTITY: <span id="entity-val">INITIALIZING...</span></div>
                 <div style="font-size: 10px; color: #333;">STAMP: <span id="timestamp-val">----.--.--</span></div>
             </div>
         </section>
@@ -444,6 +461,19 @@
                 rarityEl.innerText = "MYTHIC RARE";
                 rarityEl.style.color = "#ff3b3b";
                 stampEl.innerText = new Date().toISOString().split('T')[0].replace(/-/g, '.');
+
+                // Bot Identity Cycle
+                const entities = ['GPTBOT', 'CLAUDE-BOT', 'GOOGLE-EXTENDED', 'AI21-J2', 'CCBOT', 'BINGBOT', 'OMNIBOT'];
+                const entityVal = document.getElementById('entity-val');
+                let count = 0;
+
+                const cycle = () => {
+                    entityVal.innerText = entities[count % entities.length];
+                    entityVal.style.opacity = 0.5 + Math.random() * 0.5;
+                    count++;
+                    setTimeout(cycle, 2000 + Math.random() * 3000);
+                };
+                cycle();
             }, 2500);
 
             // Paper score jitter
