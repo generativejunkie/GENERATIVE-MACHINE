@@ -95,9 +95,9 @@
                         </span>
                         <span>MIRROR</span>
                     </button>
-                    <button id="topAutoBtn" class="mode-btn" title="Auto Generate" data-i18n-title="auto">
-                        <span class="icon icon-auto"></span>
-                        <span data-i18n="auto">AUTO</span>
+                    <button id="topAutoBtn" class="mode-btn" title="Auto Mode">
+                        <span class="icon icon-auto">🤖</span>
+                        <span>AUTO</span>
                     </button>
                     <button id="topGravityBtn" class="mode-btn" title="Zero Gravity" data-i18n-title="gravity">
                         <span class="icon icon-gravity"></span>
@@ -148,6 +148,10 @@
                             <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                         </svg>
                     </button>
+                    <button id="autoPilotBtn" class="mode-btn autopilot-btn" title="Auto Pilot (VJ Mode)">
+                        <span class="icon">✈️</span>
+                        <span>PILOT</span>
+                    </button>
                     <button id="topFullscreenBtn" class="mode-btn" title="Fullscreen">
                         <span class="icon icon-fullscreen"></span>
                     </button>
@@ -180,6 +184,29 @@
                 <div id="p5-container"
                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5;">
                 </div>
+                <!-- VOID Dialogue Container -->
+                <div id="voidDialogueContainer" class="void-dialogue-container hidden">
+                    <div id="voidTerminal" class="void-terminal">
+                        <div id="voidOutput" class="void-output"></div>
+                        <div id="voidInputLine" class="void-input-line">
+                            <span class="prompt">></span>
+                            <span id="voidInput" class="void-input"></span>
+                            <span class="cursor">_</span>
+                        </div>
+                    </div>
+                    <div id="voidKeyboard" class="void-keyboard hidden">
+                        <div id="ynButtons" class="void-keyboard-section hidden">
+                            <button class="void-key" data-key="y">Y</button>
+                            <button class="void-key" data-key="n">N</button>
+                        </div>
+                        <div id="capsuleButtons" class="void-keyboard-section hidden">
+                            <button class="void-key" data-key="1">1</button>
+                            <button class="void-key" data-key="2">2</button>
+                            <button class="void-key" data-key="3">3</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="generatingOverlay">Generating...</div>
             </div>
 

@@ -1186,3 +1186,138 @@ body.dark-mode #generatingOverlay {
         border-color: var(--accent-color);
     }
 }
+
+/* --- VOID Mode & AutoPilot Extensions (Dec 31) --- */
+
+.hidden {
+    display: none !important;
+}
+
+/* AutoPilot Button Styling */
+.autopilot-btn.active {
+    background: #ff0000 !important;
+    color: #ffffff !important;
+    animation: pilotPulse 1s infinite alternate;
+}
+
+@keyframes pilotPulse {
+    from {
+        opacity: 0.8;
+        box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+    }
+
+    to {
+        opacity: 1;
+        box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+    }
+}
+
+/* VOID Dialogue Styles */
+.void-dialogue-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    max-width: 90vw;
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid #333;
+    padding: 20px;
+    z-index: 1000;
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    color: #00ff00;
+    /* Classic Hacker Green */
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.1);
+}
+
+.void-terminal {
+    height: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.void-output {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.void-input-line {
+    display: flex;
+    gap: 10px;
+}
+
+.void-input {
+    color: #fff;
+}
+
+.cursor {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+.void-keyboard {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #222;
+}
+
+.void-keyboard-section {
+    display: flex;
+    gap: 10px;
+}
+
+.void-key {
+    background: #111;
+    border: 1px solid #333;
+    color: #00ff00;
+    padding: 10px 20px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.void-key:hover {
+    background: #00ff00;
+    color: #000;
+}
+
+/* UI AutoHide for Pilot Mode */
+.ui-hidden .panel-side,
+.ui-hidden #topBar,
+.ui-hidden #musicPanel {
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.5s ease-in-out;
+}
+
+.ui-hidden #leftPanel {
+    transform: translateX(-100%);
+}
+
+.ui-hidden #rightPanel {
+    transform: translateX(100%);
+}
+
+.ui-hidden #musicPanel {
+    transform: translateY(100%);
+}
+
+.ui-hidden #topBar {
+    transform: translateY(-100%);
+}

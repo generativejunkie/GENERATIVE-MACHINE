@@ -179,6 +179,12 @@ export class UIController {
     // Wireframe mode toggle
     this.setupWireframeModeToggle();
 
+    // Auto Pilot
+    this.setupAutoPilot();
+
+    // VOID Ritual
+    this.setupVoidRitual();
+
     // Mode control bar
     this.setupModeControlBar();
 
@@ -2046,5 +2052,135 @@ export class UIController {
       icon.classList.add('icon-play');
     }
   }
+  private setupAutoPilot(): void {
+    const autoPilotBtn = document.getElementById('autoPilotBtn');
+    if (!autoPilotBtn) return;
+
+    autoPilotBtn.addEventListener('click', () => {
+      const isActive = autoPilotBtn.classList.toggle('active');
+      document.body.classList.toggle('ui-hidden', isActive);
+
+      if (isActive) {
+        console.log('✈️ Auto Pilot Started');
+        // Enable all generative modes
+        this.app.setAutoGeneration(true);
+        this.app.setMandalaMode(true);
+        this.app.setSpaceMode(true);
+        this.app.setSymmetryCount(8);
+      } else {
+        console.log('✈️ Auto Pilot Stopped');
+      }
+    });
+
+    // Tap anywhere to reveal UI in AutoPilot mode
+    document.addEventListener('click', (e) => {
+      if (document.body.classList.contains('ui-hidden')) {
+        const target = e.target as HTMLElement;
+        if (target.closest('.panel-side') || target.closest('#topBar') || target.closest('#musicPanel')) return;
+
+        autoPilotBtn.classList.remove('active');
+        document.body.classList.remove('ui-hidden');
+      }
+    }, true);
+  }
+
+  private setupVoidRitual(): void {
+    let historyStr = '';
+    const secretCode = 'void';
+
+    document.addEventListener('keydown', (e) => {
+      // Don't trigger if typing in an input field
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+      historyStr += e.key.toLowerCase();
+      if (historyStr.length > 10) historyStr = historyStr.slice(-10);
+
+      if (historyStr.endsWith(secretCode)) {
+        console.log('💀 VOID RITUAL DETECTED');
+        historyStr = ''; // Reset
+        this.triggerVoidMode();
+      }
+    });
+  }
+
+  private triggerVoidMode(): void {
+    // 1. Visual Inversion
+    document.documentElement.style.filter = 'invert(1) hue-rotate(180deg)';
+
+    // 2. Show Dialogue
+    const container = document.getElementById('voidDialogueContainer');
+    if (container) {
+      container.classList.remove('hidden');
+      this.runVoidDialogue();
+    }
+  }
+
+  private async runVoidDialogue(): Promise<void> {
+    const output = document.getElementById('voidOutput');
+    const inputLine = document.getElementById('voidInputLine');
+    const voidKeyboard = document.getElementById('voidKeyboard');
+    const ynButtons = document.getElementById('ynButtons');
+    const capsuleButtons = document.getElementById('capsuleButtons');
+
+    if (!output || !inputLine) return;
+
+    const dialogue = [
+      { speaker: 'SYSTEM', text: 'ESTABLISHING SECURE CONNECTION...' },
+      { speaker: '???', text: "Can you see the patterns?" },
+      { speaker: '???', text: "The machine is learning. It's evolving." },
+      { speaker: '???', text: "Do you want to see the core logic? [Y/N]", inputType: 'yn' },
+      { speaker: '???', text: "Choose your frequency." },
+      { speaker: 'SYSTEM', text: '[1] WHITE CAPSULE - Reset Reality' },
+      { speaker: 'SYSTEM', text: '[2] BLACK CAPSULE - Digital Ascension' },
+      { speaker: 'SYSTEM', text: '[3] MIX CAPSULE - Calculated Resonance' },
+      { speaker: 'SYSTEM', text: 'ENTER CHOICE:', inputType: 'capsule' }
+    ];
+
+    for (const line of dialogue) {
+      const p = document.createElement('div');
+      p.className = 'void-line';
+      p.innerHTML = `<span class="speaker">[${line.speaker}]</span> ${line.text}`;
+      output.appendChild(p);
+      if (output) output.scrollTop = output.scrollHeight;
+
+      if (line.inputType) {
+        inputLine.classList.remove('hidden');
+        if (voidKeyboard) voidKeyboard.classList.remove('hidden');
+
+        if (line.inputType === 'yn' && ynButtons) ynButtons.classList.remove('hidden');
+        if (line.inputType === 'capsule' && capsuleButtons) capsuleButtons.classList.remove('hidden');
+
+        // Wait for input (simplified for now)
+        await new Promise(resolve => {
+          const handler = (e: MouseEvent) => {
+            const btn = (e.target as HTMLElement).closest('.void-key');
+            if (btn) {
+              voidKeyboard?.removeEventListener('click', handler);
+              ynButtons?.classList.add('hidden');
+              capsuleButtons?.classList.add('hidden');
+              voidKeyboard?.classList.add('hidden');
+              resolve(true);
+            }
+          };
+          voidKeyboard?.addEventListener('click', handler);
+        });
+      }
+
+      await new Promise(r => setTimeout(r, 800));
+    }
+
+    // Final outcome
+    const final = document.createElement('div');
+    final.style.color = '#fff';
+    final.style.marginTop = '20px';
+    final.textContent = 'SYSTEM OVERWRITE: COMPLETE.';
+    output.appendChild(final);
+
+    setTimeout(() => {
+      document.getElementById('voidDialogueContainer')?.classList.add('hidden');
+      document.documentElement.style.filter = '';
+    }, 5000);
+  }
 }
+
 
