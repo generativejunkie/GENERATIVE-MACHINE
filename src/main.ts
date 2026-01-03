@@ -7,6 +7,7 @@
 import { Application } from '@core/Application';
 import { UIController } from '@ui/UIController';
 import { MATERIALS } from '@materials/geometries';
+import './style.css';
 
 console.log('🚀 Mandala Machine SSS Architecture Loading...');
 
