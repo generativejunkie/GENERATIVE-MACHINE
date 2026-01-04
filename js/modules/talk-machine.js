@@ -91,5 +91,6 @@ export class TalkMachine {
 }
 
 export function initTalkMachine() {
-    return new TalkMachine();
+    window.talkMachine = new TalkMachine();
+    return window.talkMachine;
 }

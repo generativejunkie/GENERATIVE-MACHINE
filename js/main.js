@@ -16,6 +16,8 @@ import { initInformationMachine } from './modules/information-machine.js';
 import { initUI } from './modules/ui.js';
 import { initHero } from './modules/hero.js';
 import { initSingularityControl } from './modules/singularity-controller.js';
+import { initGJMode } from './modules/gj-mode.js';
+import { initOrchestrator } from './modules/orchestrator.js';
 import './modules/singularity-score.js'; // Initialize score engine
 import { broadcastEvent, initSync } from './utils/sync.js';
 
@@ -29,17 +31,67 @@ document.addEventListener('DOMContentLoaded', () => {
     initSoundMachine();
     initTalkMachine(); // Initialize Talk Machine prototype
     initInformationMachine();
+    initGJMode();
+    initOrchestrator();
     initUI();
     initAIAgentHandshake();
 
     // Global Sync Initialization
     initSync({
         'trigger-secret': (detail) => {
+            console.log("[SYNC] Trigger Secret:", detail.code);
             if (detail.code === 'void' || detail.code === 'ai') {
                 document.documentElement.style.filter = 'invert(1)';
             } else if (detail.code === 'exit') {
                 document.documentElement.style.filter = 'none';
             }
+        },
+        'sync-pulse': () => {
+            console.log("[SYNC] Pulse Received - Syncing all modules");
+            // Visual feedback: brief flash of the border
+            document.body.style.boxShadow = 'inset 0 0 50px rgba(0, 255, 255, 0.5)';
+            setTimeout(() => {
+                document.body.style.boxShadow = 'none';
+            }, 500);
+        },
+        'next-image': () => {
+            console.log("[SYNC] Remote Next Image Requested");
+            if (window.imageMachine && window.imageMachine.nextImage) {
+                window.imageMachine.nextImage(true);
+            }
+        },
+        'glitch': (detail) => {
+            console.log("[SYNC] Remote Glitch Burst");
+            if (window.imageMachine && window.imageMachine.triggerSecret) {
+                window.imageMachine.triggerSecret('glitch', true);
+            }
+        },
+        'remote-talk': (detail) => {
+            console.log("[SYNC] Remote Talk Message:", detail.text);
+            if (window.talkMachine && window.talkMachine.addMessage) {
+                window.talkMachine.addMessage('Remote Operator', detail.text || 'Command Pulse Received.');
+            }
+        },
+        'auth-response': (detail) => {
+            console.log("[SYNC] Auth Response Received:", detail);
+            if (detail && detail.approved === "true") {
+                // Visual feedback: Green flash for success
+                document.body.style.boxShadow = 'inset 0 0 100px rgba(0, 255, 0, 0.8)';
+
+                // Show a toast or logs
+                console.log("%c[SYSTEM] PERMISSION GRANTED by " + detail.user, "color: #00ff00; font-size: 16px; font-weight: bold;");
+
+                setTimeout(() => {
+                    document.body.style.boxShadow = 'none';
+                }, 1000);
+            }
+        }
+    });
+
+    // Handle extra secret exit command from iOS
+    document.addEventListener('sync-trigger-secret-exit', () => {
+        if (window.broadcastEvent) {
+            window.broadcastEvent('trigger-secret', { code: 'exit' });
         }
     });
 
@@ -181,19 +233,37 @@ document.addEventListener('keydown', (e) => {
     const historyStr = keyHistory.join('');
     if (historyStr.endsWith('void')) {
         console.log("KEY RITUAL: VOID");
-        if (window.imageMachine && window.imageMachine.triggerSecret) {
-            window.imageMachine.triggerSecret('void');
+        if (window.broadcastEvent) {
+            window.broadcastEvent('trigger-secret', { code: 'void' });
         }
         keyHistory = [];
     } else if (historyStr.endsWith('high')) {
         console.log("KEY RITUAL: SUPER HIGH");
-        if (window.imageMachine && window.imageMachine.triggerSecret) {
-            window.imageMachine.triggerSecret('high');
+        if (window.broadcastEvent) {
+            window.broadcastEvent('trigger-secret', { code: 'high' });
+        }
+        keyHistory = [];
+    } else if (historyStr.endsWith('gjmode') || historyStr.endsWith('gj')) {
+        console.log("KEY RITUAL: GJ MODE");
+        if (window.broadcastEvent) {
+            window.broadcastEvent('gj-mode', { active: true });
         }
         keyHistory = [];
     }
 });
 
+// Stealth Mode Toggle for DJ Performance
+document.addEventListener('DOMContentLoaded', () => {
+    const stealthToggle = document.getElementById('stealth-toggle');
+    if (stealthToggle) {
+        stealthToggle.addEventListener('click', () => {
+            document.body.classList.toggle('stealth-mode');
+            const isActive = document.body.classList.contains('stealth-mode');
+            stealthToggle.textContent = isActive ? 'STEALTH: ON' : 'STEALTH: OFF';
+            console.log(`[SYSTEM] Stealth Mode: ${isActive ? 'ENABLED' : 'DISABLED'}`);
+        });
+    }
+});
 
 console.log('%c[GENERATIVE MACHINE] SYSTEM_AUTONOMIC_MODE: ENABLED', 'color: #00ff00; font-weight: bold; background: #000; padding: 5px; border-radius: 3px;');
 console.log('GENERATIVE MACHINE System Initialized | Mirroring consciousness...');

@@ -1423,6 +1423,10 @@ export const imageMachineSketch = (p) => {
                         if (result.success) {
                             nextImageKey = result.img.filePath;
                             console.log(`Loaded: ${result.img.filePath}`);
+                            // Broadcast for Nebula Sync
+                            if (window.broadcastEvent) {
+                                window.broadcastEvent('image-update', { index: newIndex });
+                            }
                         } else {
                             // Switch to color mode
                             console.warn(`Failed to load image, switching to color mode`);
@@ -1696,6 +1700,12 @@ export const imageMachineSketch = (p) => {
         }
     }
 
+
+    p.nextImage = (fromSync = false) => {
+        console.log("[IMAGE] Remote Switch Triggered");
+        if (!fromSync) broadcastEvent('next-image');
+        handleInteraction();
+    };
 
     p.triggerSecret = (code, fromSync = false) => {
         // Broadcast to other tabs if this is a local trigger
