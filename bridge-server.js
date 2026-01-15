@@ -100,6 +100,18 @@ app.post('/api/respond-auth', (req, res) => {
 });
 // --- AUTH SYSTEM END ---
 
+// --- GESTURE SYSTEM (Vision Watcher) ---
+app.post('/gesture', (req, res) => {
+    const { command } = req.body;
+    console.log(`[VISION_WATCHER] Gesture Command: ${command}`);
+
+    // Broadcast to all connected web clients
+    io.emit('gesture-command', { command, timestamp: Date.now() });
+
+    res.status(200).json({ status: 'success', command });
+});
+// --- GESTURE SYSTEM END ---
+
 // --- PROJECT DASHBOARD API START ---
 let activeProjects = [
     { id: 'img01', name: 'IMAGE_MACHINE', status: 'ACTIVE', description: 'Generative Visual Synthesis', resonance: 98 },
