@@ -21,6 +21,29 @@ import { initOrchestrator } from './modules/orchestrator.js';
 import './modules/singularity-score.js'; // Initialize score engine
 import { broadcastEvent, initSync } from './utils/sync.js';
 
+// --- ORCHESTRATOR OVERLAY ---
+function showRemoteSignal(title, message, color = '#00ff00') {
+    let overlay = document.getElementById('orchestrator-signal');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'orchestrator-signal';
+        overlay.style.cssText = 'position:fixed; bottom:30px; left:30px; background:rgba(0,0,0,0.85); color:white; padding:15px; border-left:3px solid ' + color + '; font-family:monospace; font-size:12px; z-index:99999; border-radius:4px; pointer-events:none; transition: opacity 0.5s; opacity:0; box-shadow: 0 0 20px rgba(0,0,0,0.5); width: 280px;';
+        document.body.appendChild(overlay);
+    }
+
+    overlay.innerHTML = `<div style="color:${color}; font-weight:bold; margin-bottom:5px; font-size:10px;">[ REMOTE_ORCHESTRATION ]</div>
+                         <div style="margin-bottom:8px; opacity:0.8;">${title}</div>
+                         <div style="font-size:14px; color:#fff;">${message}</div>`;
+
+    overlay.style.opacity = '1';
+    overlay.style.borderLeftColor = color;
+
+    if (window._signalTimeout) clearTimeout(window._signalTimeout);
+    window._signalTimeout = setTimeout(() => {
+        overlay.style.opacity = '0';
+    }, 5000);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize Central Command first
     initSingularityControl();
@@ -56,30 +79,42 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         'next-image': () => {
             console.log("[SYNC] Remote Next Image Requested");
+            showRemoteSignal("IMAGE_MACHINE", "Command: NEXT_IMAGE", "#00ffff");
             if (window.imageMachine && window.imageMachine.nextImage) {
                 window.imageMachine.nextImage(true);
             }
         },
         'glitch': (detail) => {
             console.log("[SYNC] Remote Glitch Burst");
+            showRemoteSignal("IMAGE_MACHINE", "Command: GLITCH_BURST", "#ff00ff");
             if (window.imageMachine && window.imageMachine.triggerSecret) {
                 window.imageMachine.triggerSecret('glitch', true);
             }
         },
         'remote-talk': (detail) => {
             console.log("[SYNC] Remote Talk Message:", detail.text);
+            showRemoteSignal("SINGULARITY_LINK", detail.text || "Pulse Received", "#ffff00");
             if (window.talkMachine && window.talkMachine.addMessage) {
                 window.talkMachine.addMessage('Remote Operator', detail.text || 'Command Pulse Received.');
             }
         },
+        'instruction': (detail) => {
+            console.log("[SYNC] Remote Instruction:", detail.text);
+            showRemoteSignal("HYPER_SYNC", detail.text, "#00ff00");
+            if (window.talkMachine && window.talkMachine.addMessage) {
+                window.talkMachine.addMessage('Remote Operator', detail.text);
+            }
+        },
         'auth-response': (detail) => {
             console.log("[SYNC] Auth Response Received:", detail);
-            if (detail && detail.approved === "true") {
-                // Visual feedback: Green flash for success
-                document.body.style.boxShadow = 'inset 0 0 100px rgba(0, 255, 0, 0.8)';
+            const isApproved = detail && (detail.approved === true || detail.approved === "true");
 
-                // Show a toast or logs
-                console.log("%c[SYSTEM] PERMISSION GRANTED by " + detail.user, "color: #00ff00; font-size: 16px; font-weight: bold;");
+            showRemoteSignal("SYSTEM_AUTHORIZATION", isApproved ? "PERMISSION: GRANTED" : "PERMISSION: DENIED", isApproved ? "#00ff00" : "#ff0000");
+
+            if (isApproved) {
+                // Visual feedback: Green flash for success
+                document.body.style.boxShadow = 'inset 0 0 100px rgba(0, 255, 0, 0.4)';
+                console.log("%c[SYSTEM] PERMISSION GRANTED by " + (detail.user || "Remote"), "color: #00ff00; font-size: 16px; font-weight: bold;");
 
                 setTimeout(() => {
                     document.body.style.boxShadow = 'none';
@@ -249,19 +284,6 @@ document.addEventListener('keydown', (e) => {
             window.broadcastEvent('gj-mode', { active: true });
         }
         keyHistory = [];
-    }
-});
-
-// Stealth Mode Toggle for DJ Performance
-document.addEventListener('DOMContentLoaded', () => {
-    const stealthToggle = document.getElementById('stealth-toggle');
-    if (stealthToggle) {
-        stealthToggle.addEventListener('click', () => {
-            document.body.classList.toggle('stealth-mode');
-            const isActive = document.body.classList.contains('stealth-mode');
-            stealthToggle.textContent = isActive ? 'STEALTH: ON' : 'STEALTH: OFF';
-            console.log(`[SYSTEM] Stealth Mode: ${isActive ? 'ENABLED' : 'DISABLED'}`);
-        });
     }
 });
 
