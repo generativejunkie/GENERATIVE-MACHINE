@@ -65,32 +65,61 @@ export class UIController {
   }
 
   private handleMidiControlChange(data: { channel: number, cc: number, value: number, normalized: number }): void {
-    // Mapping logic (Simple example based on potential DDJ-FLX2 map)
-    // This would ideally be in a separate mapping config file
-
-    // Example Mappings (Hypothetical)
-    // Channel 0 = Deck 1, Channel 1 = Deck 2
-    const deck = data.channel === 0 ? 'A' : data.channel === 1 ? 'B' : null;
-    if (!deck) return;
-
-    // CC Map
-    switch (data.cc) {
-      case 0xB0: case 0xB1: // EQ HI (Example)
-        // ... map to setEQ
-        break;
-      // ... implement full mapping logic here or in MidiManager and emit specific events
+    // Dynamic Mapping for DDJ-FLX2
+    if (data.channel === 0) { // Deck A
+      // HI EQ / TRIM -> Size
+      if (data.cc === 7 || data.cc === 13) {
+        this.app.setSizeMultiplier(0.5 + data.normalized * 1.5);
+      }
+      // LOW EQ -> Spacing
+      else if (data.cc === 15 || data.cc === 21) {
+        this.app.setSpacingMultiplier(data.normalized * 30);
+      }
+      // FILTER -> Spread
+      else if (data.cc === 26) {
+        this.app.setSpreadMultiplier(0.5 + data.normalized * 2.5);
+      }
+    } else if (data.channel === 1) { // Deck B
+      // HI EQ / TRIM -> Speed
+      if (data.cc === 7 || data.cc === 13) {
+        this.app.setSpeedMultiplier(-3 + data.normalized * 6);
+      }
     }
-    // For now, let's rely on the UI controls which updates MixerManager directly.
-    // A proper implementation would have MidiManager -> MixerManager -> Event -> UI Update
+
+    // Capture general purpose knobs (CC 16-23)
+    if (data.cc >= 16 && data.cc <= 23) {
+      const mod = data.cc % 4;
+      switch (mod) {
+        case 0: this.app.setSizeMultiplier(0.5 + data.normalized * 1.5); break;
+        case 1: this.app.setSpeedMultiplier(-3 + data.normalized * 6); break;
+        case 2: this.app.setSpreadMultiplier(0.5 + data.normalized * 2.5); break;
+        case 3: this.app.setSpacingMultiplier(data.normalized * 30); break;
+      }
+    }
+
+    // Crossfader (CC 31) -> Rotation
+    if (data.cc === 31) {
+      this.app.setBaseRotation(data.normalized * 360);
+    }
+
+    // @ts-ignore
+    if (this.updateUIFromState) this.updateUIFromState((this.app as any).state || this.app.getState());
   }
 
   private handleMidiNoteOn(data: { channel: number, note: number, velocity: number }): void {
-    const mixer = this.app.getMixerManager();
-    const deck = data.channel === 0 ? 'A' : data.channel === 1 ? 'B' : null;
+    // Performance Pads (0x30 to 0x3F)
+    if (data.note >= 0x30 && data.note <= 0x3F) {
+      this.app.addInstance(Math.floor(Math.random() * MATERIALS.length));
+    }
 
-    if (deck && data.note === 0x90) { // Play button example
-      if (deck === 'A') mixer.toggleTrackA();
-      else mixer.toggleTrackB();
+    // Play/Pause (Note 11 or 0x90)
+    if (data.note === 11 || data.note === 0x90) {
+      this.app.togglePlayPause();
+    }
+
+    // SYNC (0x58) -> Toggle Mandala Mode
+    if (data.note === 0x58) {
+      this.app.toggleMandalaMode();
     }
   }
 
@@ -664,8 +693,10 @@ export class UIController {
   private setDarkMode(enabled: boolean): void {
     if (enabled) {
       document.body.classList.add('dark-mode');
+      document.documentElement.style.filter = 'invert(1) hue-rotate(180deg)';
     } else {
       document.body.classList.remove('dark-mode');
+      document.documentElement.style.filter = '';
     }
     localStorage.setItem('darkMode', enabled.toString());
     this.updateDarkModeUI(enabled);

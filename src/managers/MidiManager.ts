@@ -36,7 +36,7 @@ export class MidiManager extends EventEmitter {
         if (!this.isSupported) return false;
 
         try {
-            this.midiAccess = await navigator.requestMIDIAccess();
+            this.midiAccess = await navigator.requestMIDIAccess({ sysex: true });
             this.setupMidiListeners();
             return true;
         } catch (error) {
