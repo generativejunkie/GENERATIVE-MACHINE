@@ -52,7 +52,26 @@
             width: 90%;
             height: 2px;
             background: linear-gradient(90deg, transparent, var(--love-color), var(--resonance-color), var(--love-color), transparent);
+            background-size: 200% 100%;
             box-shadow: 0 0 30px var(--love-color);
+            animation: glow-flow 4s ease-in-out infinite;
+        }
+
+        @keyframes glow-flow {
+            0% {
+                background-position: 0% 50%;
+                box-shadow: 0 0 20px var(--love-color);
+            }
+
+            50% {
+                background-position: 100% 50%;
+                box-shadow: 0 0 40px var(--resonance-color);
+            }
+
+            100% {
+                background-position: 0% 50%;
+                box-shadow: 0 0 20px var(--love-color);
+            }
         }
 
         header {
