@@ -1,0 +1,104 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -scheme AntigravityUI -destination generic/platform=iOS -resultBundlePath build.xcresult build
+
+Resolve Package Graph
+2026-01-02 06:13:11.488 xcodebuild[57119:1141268] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+
+
+Resolved source packages:
+  AntigravityUI: /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios
+
+Writing result bundle at path:
+	/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/build.xcresult
+
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (2 targets)
+    Target 'AntigravityUI' in project 'AntigravityUI'
+        ➜ Explicit dependency on target 'AntigravityUI' in project 'AntigravityUI'
+    Target 'AntigravityUI' in project 'AntigravityUI' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.1.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+Build description signature: ceb7a6c1a302ffa6c0a6b5dde09304bc
+Build description path: /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/XCBuildData/ceb7a6c1a302ffa6c0a6b5dde09304bc.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.1.sdk /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphoneos26.1-23B77-69b33fc7382b27d9b5d46e82a00f8e78.sdkstatcache
+    cd /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.swiftpm/xcode
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.1.sdk -o /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphoneos26.1-23B77-69b33fc7382b27d9b5d46e82a00f8e78.sdkstatcache
+
+SwiftDriver AntigravityUI normal arm64 com.apple.xcode.tools.swift.compiler (in target 'AntigravityUI' from project 'AntigravityUI')
+    cd /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.swiftpm/xcode
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name AntigravityUI -Onone -enforce-exclusivity\=checked @/Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/Objects-normal/arm64/AntigravityUI.SwiftFileList -DSWIFT_PACKAGE -DDEBUG -DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE -DXcode -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.1.sdk -target arm64-apple-ios17.0 -g -module-cache-path /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Products/Debug-iphoneos -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib -F /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Products/Debug-iphoneos -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.1.sdk/Developer/Library/Frameworks -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphoneos26.1-23B77-69b33fc7382b27d9b5d46e82a00f8e78.sdkstatcache -output-file-map /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/Objects-normal/arm64/AntigravityUI-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/Objects-normal/arm64/AntigravityUI.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -package-name antigravity_ios -Xcc -I/Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/Objects-normal/arm64/AntigravityUI_const_extract_protocols.json -Xcc -I/Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Products/Debug-iphoneos/include -Xcc -I/Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/DerivedSources-normal/arm64 -Xcc -I/Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/DerivedSources/arm64 -Xcc -I/Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/DerivedSources -Xcc -DSWIFT_PACKAGE -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/Objects-normal/arm64/AntigravityUI-Swift.h -working-directory /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.swiftpm/xcode -experimental-emit-module-separately -disable-cmo
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ AntigravityUI (in target 'AntigravityUI' from project 'AntigravityUI')
+
+EmitSwiftModule normal arm64 (in target 'AntigravityUI' from project 'AntigravityUI')
+    cd /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.swiftpm/xcode
+    
+/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Styles/Styles.swift:3:8: error: invalid redeclaration of 'AntigravityTheme'
+struct AntigravityTheme {
+       ^
+/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Views/ContentView.swift:5:8: note: 'AntigravityTheme' previously declared here
+struct AntigravityTheme {
+       ^
+/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Views/ContentView.swift:5:8: note: 'AntigravityTheme' previously declared here
+struct AntigravityTheme {
+       ^
+/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Views/ListFlows.swift:4:20: error: cannot find 'MockData' in scope
+    let projects = MockData.projects
+                   ^~~~~~~~
+/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Views/ListFlows.swift:44:17: error: cannot find type 'ProjectStatus' in scope
+    let status: ProjectStatus
+                ^~~~~~~~~~~~~
+/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Views/ListFlows.swift:70:35: error: cannot find 'MockData' in scope
+    @State private var requests = MockData.requests
+                                  ^~~~~~~~
+/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Views/ListFlows.swift:130:29: error: cannot find type 'ApprovalRequest' in scope
+    func approve(_ request: ApprovalRequest) {
+                            ^~~~~~~~~~~~~~~
+/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Views/ListFlows.swift:137:26: error: cannot find type 'ApprovalRequest' in scope
+    func deny(_ request: ApprovalRequest) {
+                         ^~~~~~~~~~~~~~~
+
+Failed frontend command:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -emit-module -experimental-skip-non-inlinable-function-bodies-without-types /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/AntigravityApp.swift /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Models/Models.swift /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Styles/Styles.swift /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Views/ContentView.swift /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Views/ListFlows.swift -target arm64-apple-ios17.0 -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libFoundationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#FoundationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libObservationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#ObservationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libPreviewsMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#PreviewsMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftUIMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftUIMacros -disable-implicit-swift-modules -Xcc -fno-implicit-modules -Xcc -fno-implicit-module-maps -explicit-swift-module-map-file /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/Objects-normal/arm64/AntigravityUI-dependencies-1.json -Xllvm -aarch64-use-tbi -enable-objc-interop -stack-check -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.1.sdk -I /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Products/Debug-iphoneos -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib -F /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Products/Debug-iphoneos -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.1.sdk/Developer/Library/Frameworks -no-color-diagnostics -Xcc -fno-color-diagnostics -enable-testing -g -debug-info-format\=dwarf -dwarf-version\=4 -module-cache-path /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -swift-version 5 -enforce-exclusivity\=checked -Onone -D SWIFT_PACKAGE -D DEBUG -D SWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE -D Xcode -serialize-debugging-options -const-gather-protocols-file /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/Objects-normal/arm64/AntigravityUI_const_extract_protocols.json -enable-experimental-feature DebugDescriptionMacro -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.swiftpm/xcode -enable-anonymous-context-mangled-names -file-compilation-dir /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.swiftpm/xcode -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -Xcc -ivfsstatcache -Xcc /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphoneos26.1-23B77-69b33fc7382b27d9b5d46e82a00f8e78.sdkstatcache -Xcc -I/Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/swift-overrides.hmap -Xcc -I/Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Products/Debug-iphoneos/include -Xcc -I/Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/DerivedSources-normal/arm64 -Xcc -I/Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/DerivedSources/arm64 -Xcc -I/Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/DerivedSources -Xcc -DSWIFT_PACKAGE -Xcc -DDEBUG\=1 -no-auto-bridging-header-chaining -module-name AntigravityUI -package-name antigravity_ios -frontend-parseable-output -disable-clang-spi -target-sdk-version 26.1 -target-sdk-name iphoneos26.1 -clang-target arm64-apple-ios26.1 -in-process-plugin-server-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -emit-module-doc-path /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/Objects-normal/arm64/AntigravityUI.swiftdoc -emit-module-source-info-path /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/Objects-normal/arm64/AntigravityUI.swiftsourceinfo -emit-objc-header-path /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/Objects-normal/arm64/AntigravityUI-Swift.h -serialize-diagnostics-path /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/Objects-normal/arm64/AntigravityUI-primary-emit-module.dia -emit-dependencies-path /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/Objects-normal/arm64/AntigravityUI-primary-emit-module.d -o /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/Objects-normal/arm64/AntigravityUI.swiftmodule -emit-abi-descriptor-path /Users/takayukimatsushima/Library/Developer/Xcode/DerivedData/antigravity-ios-bprkcunpikkxwefjhgmsbzcqorol/Build/Intermediates.noindex/AntigravityUI.build/Debug-iphoneos/AntigravityUI.build/Objects-normal/arm64/AntigravityUI.abi.json
+SwiftCompile normal arm64 Compiling\ ListFlows.swift /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Views/ListFlows.swift (in target 'AntigravityUI' from project 'AntigravityUI')
+SwiftCompile normal arm64 /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Views/ListFlows.swift (in target 'AntigravityUI' from project 'AntigravityUI')
+    cd /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.swiftpm/xcode
+    
+
+SwiftCompile normal arm64 Compiling\ ContentView.swift /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Views/ContentView.swift (in target 'AntigravityUI' from project 'AntigravityUI')
+SwiftCompile normal arm64 /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Views/ContentView.swift (in target 'AntigravityUI' from project 'AntigravityUI')
+    cd /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.swiftpm/xcode
+    
+
+
+Result bundle written to path:
+	/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/build.xcresult
+
+** BUILD FAILED **
+
+
+The following build commands failed:
+	EmitSwiftModule normal arm64 (in target 'AntigravityUI' from project 'AntigravityUI')
+	SwiftEmitModule normal arm64 Emitting\ module\ for\ AntigravityUI (in target 'AntigravityUI' from project 'AntigravityUI')
+	Building workspace antigravity-ios with scheme AntigravityUI
+(3 failures)

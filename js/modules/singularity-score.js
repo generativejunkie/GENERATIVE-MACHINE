@@ -60,9 +60,10 @@ export class SingularityScore {
         const uptimeBonus = Math.floor((Date.now() - this.startTime) / 1000);
         const interactionBonus = this.interactionCount * 5;
         const resonanceBonus = Math.floor(this.resonanceLevel * 100);
+        const gjBonus = (window.gjMode && window.gjMode.active) ? 7000 : 0;
         const jitter = Math.floor(Math.random() * 10);
 
-        return this.baseScore + uptimeBonus + interactionBonus + resonanceBonus + jitter;
+        return this.baseScore + uptimeBonus + interactionBonus + resonanceBonus + gjBonus + jitter;
     }
 
     getDetailedMetrics() {

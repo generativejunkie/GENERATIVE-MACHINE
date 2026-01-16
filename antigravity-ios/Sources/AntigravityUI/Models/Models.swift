@@ -42,15 +42,7 @@ enum ProjectStatus: String, Codable, Sendable {
 typealias ApprovalRequest = AuthRequest
 
 // --- 3. THEME ---
-
-import SwiftUI
-
-struct AntigravityTheme {
-    static let accent = Color(red: 0, green: 0.9, blue: 1.0) // Neon Cyan
-    static let background = Color.black
-    static let glass = Color.white.opacity(0.05)
-    static let secondaryGlass = Color.white.opacity(0.1)
-}
+// Moved to Styles.swift to avoid duplicate declarations.
 
 struct MockData {
     static let projects: [Project] = []

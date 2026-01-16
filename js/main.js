@@ -120,6 +120,33 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.body.style.boxShadow = 'none';
                 }, 1000);
             }
+        },
+        'gesture-command': (detail) => {
+            console.log("[SYNC] Gesture Command Received:", detail.command);
+
+            if (detail.command === 'APPROVE') {
+                // Visual feedback: Green flash
+                showRemoteSignal("VISION_WATCHER", "👍 APPROVE", "#00ff00");
+                document.body.style.boxShadow = 'inset 0 0 100px rgba(0, 255, 0, 0.6)';
+
+                // Action: Next image
+                if (window.imageMachine && window.imageMachine.nextImage) {
+                    window.imageMachine.nextImage(true);
+                }
+
+                setTimeout(() => {
+                    document.body.style.boxShadow = 'none';
+                }, 800);
+            }
+            else if (detail.command === 'CANCEL') {
+                // Visual feedback: Red flash
+                showRemoteSignal("VISION_WATCHER", "✋ CANCEL", "#ff0000");
+                document.body.style.boxShadow = 'inset 0 0 100px rgba(255, 0, 0, 0.6)';
+
+                setTimeout(() => {
+                    document.body.style.boxShadow = 'none';
+                }, 800);
+            }
         }
     });
 

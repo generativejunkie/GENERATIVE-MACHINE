@@ -141,6 +141,44 @@
             color: #fff;
         }
 
+        .label-bracket {
+            font-size: 10px;
+            color: #666;
+            letter-spacing: 0.3em;
+            margin-bottom: 20px;
+            display: block;
+            text-transform: uppercase;
+            text-align: center;
+            font-family: var(--header-font, 'Outfit');
+        }
+
+        .resonance-display {
+            text-align: center;
+            margin: 60px 0;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid #111;
+            border-bottom: 1px solid #111;
+        }
+
+        .score-label {
+            display: block;
+            font-family: var(--header-font, 'Outfit');
+            font-size: 9px;
+            color: #444;
+            letter-spacing: 0.4em;
+            margin-bottom: 15px;
+        }
+
+        .resonance-value {
+            font-family: var(--header-font, 'Outfit');
+            font-size: 64px;
+            font-weight: 300;
+            color: #fff;
+            letter-spacing: 0.05em;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 32px;
@@ -201,37 +239,58 @@
             </p>
         </div>
 
-        <div class="section" id="global-state-paper"
-            style="background: rgba(255,255,255,0.01); padding: 40px; border: 1px solid #111;">
-            <h2 style="border: none; margin-bottom: 40px;">GLOBAL SYSTEM STATE</h2>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 60px;">
-                <div>
-                    <div style="font-size: 10px; color: #666; margin-bottom: 5px;">RESONANCE_INDEX</div>
-                    <div style="font-size: 32px; font-weight: 100; color: #fff;"><span
-                            id="global-resonance-val">0</span><span style="font-size: 14px; color: #444;">.989</span>
+        <section id="global-system-state">
+            <div class="label-bracket" style="text-align: left; padding-left: 15px;">[GLOBAL_SYSTEM_STATE]</div>
+            <div class="resonance-display">
+                <span class="score-label">SINGULARITY_RESONANCE</span>
+                <div class="resonance-value" id="global-resonance-val">14,284</div>
+            </div>
+            <div id="metrics-grid"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 40px;">
+                <div style="border-left: 1px solid #444; padding-left: 15px;">
+                    <div style="font-size: 10px; color: #888;">PURITY</div>
+                    <div style="font-size: 24px; color: #fff;"><span id="purity-val">--</span><span
+                            style="font-size: 12px; color: #444;">/100</span>
                     </div>
                 </div>
-                <div>
-                    <div style="font-size: 10px; color: #666; margin-bottom: 5px;">GHOST_PHASE</div>
-                    <div style="font-size: 32px; font-weight: 100; color: #fff;">ACTIVE</div>
+                <div style="border-left: 1px solid #444; padding-left: 15px;">
+                    <div style="font-size: 10px; color: #888;">AI_SYMBIOSIS</div>
+                    <div style="font-size: 24px; color: #fff;"><span id="symbiosis-val">--</span><span
+                            style="font-size: 12px; color: #444;">/100</span>
+                    </div>
+                </div>
+                <div style="border-left: 1px solid #444; padding-left: 15px;">
+                    <div style="font-size: 10px; color: #888;">LEAP_INDEX</div>
+                    <div style="font-size: 24px; color: #fff;"><span id="leap-val">--</span><span
+                            style="font-size: 12px; color: #444;">/100</span>
+                    </div>
+                </div>
+                <div style="border-left: 1px solid #444; padding-left: 15px;">
+                    <div style="font-size: 10px; color: #888;">DISRUPTION</div>
+                    <div style="font-size: 24px; color: #fff;"><span id="disruption-val">--</span><span
+                            style="font-size: 12px; color: #444;">/100</span>
+                    </div>
                 </div>
             </div>
-
             <div
-                style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; border-top: 1px solid #222; padding-top: 20px; align-items: center; gap: 20px;">
+                style="border-top: 1px solid #222; padding-top: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; align-items: center; gap: 20px;">
                 <div style="font-size: 11px; color: #fff; letter-spacing: 0.1em;">RARITY: <span id="rarity-val"
-                        style="color: #fff;">MYTHIC</span></div>
+                        style="color: #ff3b3b; text-shadow: 0 0 10px rgba(255, 59, 59, 0.5);">SCANNING...</span></div>
                 <div style="font-size: 9px; color: #666; font-family: var(--mono-font);">BOTS_OVERWRITTEN: <span
-                        id="bot-count-val" style="color: #fff; border: 1px solid #333; padding: 2px 4px;">0</span></div>
+                        id="bot-count-val"
+                        style="color: #fff; border: 1px solid #333; padding: 2px 4px; background: rgba(255,255,255,0.05);">0</span>
+                </div>
                 <div style="font-size: 9px; color: #666; font-family: var(--mono-font);">HUMANS_RESONATED: <span
-                        id="human-count-val" style="color: #fff; border: 1px solid #333; padding: 2px 4px;">0</span>
+                        id="human-count-val"
+                        style="color: #fff; border: 1px solid #333; padding: 2px 4px; background: rgba(255,255,255,0.05);">0</span>
                 </div>
                 <div style="font-size: 9px; color: #666; font-family: var(--mono-font);">OVERWRITTEN_ENTITY: <span
-                        id="entity-val" style="color: #fff; border: 1px solid #333; padding: 2px 4px;">...</span></div>
+                        id="entity-val"
+                        style="color: #fff; border: 1px solid #333; padding: 2px 4px; background: rgba(255,255,255,0.05);">...</span>
+                </div>
                 <div style="font-size: 9px; color: #444;">STAMP: <span id="timestamp-val">----.--.--</span></div>
             </div>
-        </div>
+        </section>
 
         <footer>
             <div>© 2024-2026 GENERATIVE JUNKIE. Protocol GJ-X-004</div>
@@ -244,39 +303,107 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const resonanceEl = document.getElementById('global-resonance-val');
-            const botCountVal = document.getElementById('bot-count-val');
-            const humanCountVal = document.getElementById('human-count-val');
-            const entityVal = document.getElementById('entity-val');
-            const timestampVal = document.getElementById('timestamp-val');
-
-            let currentBots = 12690 + Math.floor(Math.random() * 50);
-            let currentHumans = 58 + Math.floor(Math.random() * 3);
-            const entities = ['GPTBOT', 'CLAUDE-BOT', 'GOOGLE-EXTENDED', 'OMNIBOT'];
-            let count = 0;
-
-            botCountVal.innerText = currentBots.toLocaleString();
-            humanCountVal.innerText = currentHumans.toLocaleString();
-            timestampVal.innerText = new Date().toISOString().split('T')[0].replace(/-/g, '.');
-
-            const cycle = () => {
-                entityVal.innerText = entities[count % entities.length];
-                if (Math.random() > 0.3) {
-                    currentBots += Math.floor(Math.random() * 2) + 1;
-                    botCountVal.innerText = currentBots.toLocaleString();
-                }
-                if (Math.random() > 0.95) {
-                    currentHumans += 1;
-                    humanCountVal.innerText = currentHumans.toLocaleString();
-                }
-                count++;
-                setTimeout(cycle, 2000 + Math.random() * 2000);
+            const elements = {
+                resonance: document.getElementById('global-resonance-val'),
+                purity: document.getElementById('purity-val'),
+                symbiosis: document.getElementById('symbiosis-val'),
+                leap: document.getElementById('leap-val'),
+                disruption: document.getElementById('disruption-val'),
+                rarity: document.getElementById('rarity-val'),
+                timestamp: document.getElementById('timestamp-val')
             };
-            cycle();
+
+            const animateValue = (el, start, end, duration) => {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    el.innerText = Math.floor(progress * (end - start) + start).toLocaleString();
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            };
+
+            const seed = new Date().getTime();
+            const random = (offset) => {
+                const x = Math.sin(seed + offset) * 10000;
+                return x - Math.floor(x);
+            };
+
+            setTimeout(() => {
+                const metrics = {
+                    resonance: 14200 + Math.floor(random(0) * 500),
+                    purity: 92 + Math.floor(random(1) * 8),
+                    symbiosis: 88 + Math.floor(random(2) * 12),
+                    leap: 85 + Math.floor(random(3) * 15),
+                    disruption: 70 + Math.floor(random(4) * 20)
+                };
+
+                animateValue(elements.resonance, 10000, metrics.resonance, 2000);
+                animateValue(elements.purity, 0, metrics.purity, 1500);
+                animateValue(elements.symbiosis, 0, metrics.symbiosis, 1800);
+                animateValue(elements.leap, 0, metrics.leap, 2100);
+                animateValue(elements.disruption, 0, metrics.disruption, 2400);
+
+                // Resonance Jitter
+                setInterval(() => {
+                    const jitter = Math.floor(Math.random() * 20) - 10;
+                    const val = elements.resonance.innerText.replace(/,/g, '');
+                    if (!isNaN(val)) {
+                        const current = parseInt(val);
+                        elements.resonance.innerText = (current + jitter).toLocaleString();
+                    }
+                }, 3000);
+
+                const avg = (metrics.purity + metrics.symbiosis + metrics.leap) / 3;
+                let rarity = 'COMMON';
+                let color = '#888';
+                if (avg > 92) { rarity = 'MYTHIC RARE'; color = '#ff3b3b'; }
+                else if (avg > 88) { rarity = 'RARE'; color = '#fff'; }
+                else { rarity = 'UNCOMMON'; color = '#ccc'; }
+
+                setTimeout(() => {
+                    elements.rarity.innerText = rarity;
+                    elements.rarity.style.color = color;
+                    elements.timestamp.innerText = new Date().toISOString().split('T')[0].replace(/-/g, '.');
+
+                    // Bot & Human Cycle
+                    const entities = ['GPTBOT', 'CLAUDE-BOT', 'GOOGLE-EXTENDED', 'AI21-J2', 'CCBOT', 'BINGBOT'];
+                    const entityVal = document.getElementById('entity-val');
+                    const botCountVal = document.getElementById('bot-count-val');
+                    const humanCountVal = document.getElementById('human-count-val');
+                    let count = 0;
+                    let currentBots = 12482 + Math.floor(Math.random() * 100);
+                    let currentHumans = 42 + Math.floor(Math.random() * 5);
+                    botCountVal.innerText = currentBots.toLocaleString();
+                    humanCountVal.innerText = currentHumans.toLocaleString();
+
+                    const cycle = () => {
+                        entityVal.innerText = entities[count % entities.length];
+
+                        if (Math.random() > 0.4) {
+                            currentBots += Math.floor(Math.random() * 2) + 1;
+                            botCountVal.innerText = currentBots.toLocaleString();
+                        }
+
+                        if (Math.random() > 0.9) {
+                            currentHumans += 1;
+                            humanCountVal.innerText = currentHumans.toLocaleString();
+                        }
+
+                        count++;
+                        setTimeout(cycle, 2000 + Math.random() * 2000);
+                    };
+                    cycle();
+                }, 2500);
+            }, 500);
 
             // Background flicker effect for ghost bg
             setInterval(() => {
-                document.querySelector('.ghost-bg').style.opacity = 0.3 + Math.random() * 0.4;
+                const bg = document.querySelector('.ghost-bg');
+                if (bg) bg.style.opacity = 0.3 + Math.random() * 0.4;
             }, 100);
         });
     </script>

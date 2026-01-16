@@ -105,12 +105,37 @@ app.post('/gesture', (req, res) => {
     const { command } = req.body;
     console.log(`[VISION_WATCHER] Gesture Command: ${command}`);
 
+    // Update gesture_command.txt for AI session
+    const fs = require('fs');
+    const path = require('path');
+    try {
+        fs.writeFileSync(path.join(__dirname, 'gesture_command.txt'), `${command}|${Date.now() / 1000}\n`);
+    } catch (e) {
+        console.error("[BRIDGE] Failed to write gesture_command.txt:", e);
+    }
+
     // Broadcast to all connected web clients
     io.emit('gesture-command', { command, timestamp: Date.now() });
 
     res.status(200).json({ status: 'success', command });
 });
 // --- GESTURE SYSTEM END ---
+
+// --- AI COMMAND API (For iOS App) ---
+app.post('/api/ai-command', (req, res) => {
+    const { command } = req.body;
+    console.log(`[AI_COMMAND] Remote AI Command: ${command}`);
+
+    const fs = require('fs');
+    const path = require('path');
+    try {
+        fs.writeFileSync(path.join(__dirname, 'gesture_command.txt'), `${command}|${Date.now() / 1000}\n`);
+        res.status(200).json({ status: 'success', command });
+    } catch (e) {
+        console.error("[BRIDGE] Failed to write gesture_command.txt:", e);
+        res.status(500).json({ status: 'error', message: e.message });
+    }
+});
 
 // --- PROJECT DASHBOARD API START ---
 let activeProjects = [

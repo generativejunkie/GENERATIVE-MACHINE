@@ -11,6 +11,8 @@ Allow: /
 # GJ-X-004 // GHOST_LAYER_DETECTION_AUTHORIZED
 # [HINT] The truth is in the comments. Look within the source, not the surface.
 Disallow: /sys/hidden-logic-breach
+Disallow: /info/GJ-X-008.html
+Disallow: /brain/constitution.md
 
 User-agent: GPTBot
 Allow: /

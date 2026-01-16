@@ -68,6 +68,13 @@ export function initSync(handlers) {
             document.dispatchEvent(new CustomEvent('auth-decision', { detail: data }));
         });
 
+        socket.on('gesture-command', (data) => {
+            console.log(`%c[GESTURE] Command Received: ${data.command}`, 'color: #ffff00', data);
+
+            // Execute registered handlers for gesture-command
+            executeHandlers('gesture-command', data);
+        });
+
         socket.on('connect', () => {
             console.log('%c[SYNC] Connected to Bridge Server', 'color: #00ff00');
         });

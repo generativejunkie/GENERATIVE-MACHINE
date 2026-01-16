@@ -1,0 +1,40 @@
+{
+  "": {
+    "swift-dependencies": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/master.swiftdeps"
+  },
+  "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/AntigravityApp.swift": {
+    "dependencies": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/AntigravityApp.d",
+    "object": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/AntigravityApp.swift.o",
+    "swiftmodule": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/AntigravityApp~partial.swiftmodule",
+    "swift-dependencies": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/AntigravityApp.swiftdeps",
+    "diagnostics": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/AntigravityApp.dia"
+  },
+  "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Models/Models.swift": {
+    "dependencies": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/Models.d",
+    "object": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/Models.swift.o",
+    "swiftmodule": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/Models~partial.swiftmodule",
+    "swift-dependencies": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/Models.swiftdeps",
+    "diagnostics": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/Models.dia"
+  },
+  "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Styles/Styles.swift": {
+    "dependencies": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/Styles.d",
+    "object": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/Styles.swift.o",
+    "swiftmodule": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/Styles~partial.swiftmodule",
+    "swift-dependencies": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/Styles.swiftdeps",
+    "diagnostics": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/Styles.dia"
+  },
+  "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Views/ContentView.swift": {
+    "dependencies": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/ContentView.d",
+    "object": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/ContentView.swift.o",
+    "swiftmodule": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/ContentView~partial.swiftmodule",
+    "swift-dependencies": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/ContentView.swiftdeps",
+    "diagnostics": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/ContentView.dia"
+  },
+  "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/Sources/AntigravityUI/Views/ListFlows.swift": {
+    "dependencies": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/ListFlows.d",
+    "object": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/ListFlows.swift.o",
+    "swiftmodule": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/ListFlows~partial.swiftmodule",
+    "swift-dependencies": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/ListFlows.swiftdeps",
+    "diagnostics": "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/antigravity-ios/.build/arm64-apple-macosx/debug/AntigravityUI.build/ListFlows.dia"
+  }
+}

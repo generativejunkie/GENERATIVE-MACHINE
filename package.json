@@ -4,6 +4,7 @@
   "description": "The anomaly born from the code. An interactive ecosystem where human intuition overrides machine logic. Orchestrated by TOM (The Singularity).",
   "main": "index.js",
   "scripts": {
+    "start": "node bridge-server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

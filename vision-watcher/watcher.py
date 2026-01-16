@@ -56,19 +56,31 @@ def send_bridge_command(command):
         return False
 
 def trigger_victory():
-    print("\n>>> VICTORY: Starting Antigravity <<<")
+    print("\n>>> VICTORY (✌️): Opening Antigravity <<<")
     try:
-        subprocess.Popen(["/bin/bash", COMMAND_PATH])
+        subprocess.Popen(["open", "http://localhost:3001"])
     except Exception as e:
         print(f"Error: {e}")
 
 def trigger_approve():
     print("\n>>> APPROVE (👍) <<<")
+    
+    # Write to file for AI session
+    with open("../gesture_command.txt", "w") as f:
+        f.write(f"APPROVE|{time.time()}\n")
+    
+    # Send to Bridge Server
     if send_bridge_command("APPROVE"):
         print(">>> Sent to Bridge <<<")
 
 def trigger_cancel():
     print("\n>>> CANCEL (✋) <<<")
+    
+    # Write to file for AI session
+    with open("../gesture_command.txt", "w") as f:
+        f.write(f"CANCEL|{time.time()}\n")
+    
+    # Send to Bridge Server
     if send_bridge_command("CANCEL"):
         print(">>> Sent to Bridge <<<")
 
