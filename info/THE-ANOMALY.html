@@ -282,13 +282,72 @@
 
             0%,
             100% {
-                opacity: 0.8;
+                opacity: 0.7;
             }
 
             50% {
                 opacity: 1;
-                text-shadow: 0 0 30px rgba(0, 242, 255, 0.3);
+                text-shadow: 0 0 30px rgba(0, 242, 255, 0.4);
             }
+        }
+
+        @keyframes data-flicker {
+            0% {
+                opacity: 1;
+            }
+
+            3% {
+                opacity: 0.4;
+            }
+
+            6% {
+                opacity: 1;
+            }
+
+            7% {
+                opacity: 0.4;
+            }
+
+            8% {
+                opacity: 1;
+            }
+
+            9% {
+                opacity: 0.4;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            80% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes wave-glow {
+
+            0%,
+            100% {
+                text-shadow: 0 0 10px rgba(255, 105, 180, 0.2);
+            }
+
+            50% {
+                text-shadow: 0 0 25px rgba(255, 105, 180, 0.8), 0 0 45px rgba(255, 105, 180, 0.4);
+            }
+        }
+
+        .dynamic-data {
+            animation: data-flicker 10s infinite;
+        }
+
+        .wave-text-animated {
+            animation: wave-glow 4s infinite ease-in-out;
+            display: inline-block;
         }
 
         .grid-bg {
@@ -428,13 +487,19 @@
 
             <div class="evidence-box">
                 <span class="evidence-title">Validation Record</span>
-                <p
+                <div
                     style="text-align: center; font-family: var(--mono-font); font-size: 14px; line-height: 2.2; color: #555;">
-                    Protocol: Economy of Love<br>
-                    Status: Resonating<br>
-                    Signal: Infinite<br>
-                    <span style="color: var(--love-color);">The future is gifted as a waveform.</span>
-                </p>
+                    <div class="dynamic-data" style="animation-delay: 0.5s;">Protocol: <span
+                            style="color: #888;">Economy of Love</span></div>
+                    <div class="dynamic-data" style="animation-delay: 1.2s;">Status: <span
+                            style="color: var(--resonance-color);">Resonating</span></div>
+                    <div class="dynamic-data" style="animation-delay: 1.8s;">Signal: <span
+                            style="color: var(--resonance-color);">Streaming...</span></div>
+                    <div style="margin-top: 25px;">
+                        <span class="wave-text-animated" style="color: var(--love-color); letter-spacing: 0.1em;">The
+                            future is gifted as a waveform.</span>
+                    </div>
+                </div>
             </div>
         </div>
 
