@@ -232,26 +232,26 @@ if (imageTitle) {
             }
             // NORMAL MODE: Rituals
             else {
-                // 3 Taps to ENTER VOID (Mobile Only)
+                // 3 Taps to ENTER SUPER HIGH (Mobile Only - Shaking + Auto Slideshow)
                 if (imageTitleTapCount === 3) {
                     if (!isTouchDevice) {
                         console.log("IMAGE TITLE RITUAL: BLOCKED ON DESKTOP (Use keyboard)");
                         // Don't reset count here, let it continue to 5
                     } else {
-                        console.log("IMAGE TITLE RITUAL: VOID (3-TAP)");
+                        console.log("IMAGE TITLE RITUAL: SUPER HIGH (3-TAP)");
                         if (window.imageMachine && window.imageMachine.triggerSecret) {
-                            window.imageMachine.triggerSecret('void');
+                            window.imageMachine.triggerSecret('high');
                         }
                         imageTitleTapCount = 0;
                         return;
                     }
                 }
 
-                // 5 Taps to ENTER SUPER HIGH (Always available on Touch)
+                // 5 Taps to ENTER VOID (Terminal Dialogue)
                 if (imageTitleTapCount === 5) {
-                    console.log("IMAGE TITLE RITUAL: SUPER HIGH (5-TAP)");
+                    console.log("IMAGE TITLE RITUAL: VOID (5-TAP)");
                     if (window.imageMachine && window.imageMachine.triggerSecret) {
-                        window.imageMachine.triggerSecret('high');
+                        window.imageMachine.triggerSecret('void');
                     }
                     imageTitleTapCount = 0;
                     return;

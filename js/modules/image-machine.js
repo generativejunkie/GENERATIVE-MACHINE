@@ -286,6 +286,8 @@ export const imageMachineSketch = (p) => {
                             btn.onclick = () => {
                                 document.body.classList.remove('mix-mode');
                                 btn.remove();
+                                // Stop auto-switching when exiting MIX mode
+                                autoMode = false;
                                 // Trigger resize to restore layout
                                 p.windowResized();
                             };
@@ -312,6 +314,13 @@ export const imageMachineSketch = (p) => {
                                     useColorMode = false;
                                 });
                             }
+
+                            // [VOID MODE] Enable auto-switching after MIX capsule selection
+                            autoMode = true;
+                            lastAutoSwitchTime = p.millis();
+                            autoSwitchInterval = 5000; // Start with 5 seconds, then randomize
+                            console.log('[VOID] Auto-switch mode activated');
+
                             animationState = 'display';
                         };
 
