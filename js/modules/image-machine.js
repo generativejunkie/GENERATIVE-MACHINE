@@ -296,6 +296,11 @@ export const imageMachineSketch = (p) => {
                             autoMode = true;
                             lastAutoSwitchTime = p.millis();
                             autoSwitchInterval = 5000; // Start with 5 seconds, then randomize
+
+                            // Hide the CLICK/TAP prompt in VOID mode
+                            const prompt = document.getElementById('imagePrompt');
+                            if (prompt) prompt.classList.add('hidden');
+
                             console.log('[VOID] Auto-switch mode activated - 2-tap title to exit');
 
                             animationState = 'display';
