@@ -194,7 +194,7 @@ function initAIAgentHandshake() {
 
     updateSignals();
 }
-// IMAGE MACHINE TITLE RITUAL: 3-TAP -> VOID (Strict Mobile Support)
+// IMAGE MACHINE TITLE RITUAL: 3-TAP -> VOID, LONG PRESS -> SUPER HIGH
 const imageTitle = document.getElementById('image-machine-title');
 // Increase hit area visually/functionally
 if (imageTitle) {
@@ -204,6 +204,8 @@ if (imageTitle) {
 
 let imageTitleTapCount = 0;
 let imageTitleTapTimer = null;
+let longPressTimer = null;
+const LONG_PRESS_DURATION = 1500; // 1.5 seconds for long press
 
 if (imageTitle) {
     const handleTap = (e) => {
@@ -232,29 +234,18 @@ if (imageTitle) {
             }
             // NORMAL MODE: Rituals
             else {
-                // 3 Taps to ENTER SUPER HIGH (Mobile Only - Shaking + Auto Slideshow)
+                // 3 Taps to ENTER VOID (Terminal Dialogue)
                 if (imageTitleTapCount === 3) {
                     if (!isTouchDevice) {
                         console.log("IMAGE TITLE RITUAL: BLOCKED ON DESKTOP (Use keyboard)");
-                        // Don't reset count here, let it continue to 5
                     } else {
-                        console.log("IMAGE TITLE RITUAL: SUPER HIGH (3-TAP)");
+                        console.log("IMAGE TITLE RITUAL: VOID (3-TAP)");
                         if (window.imageMachine && window.imageMachine.triggerSecret) {
-                            window.imageMachine.triggerSecret('high');
+                            window.imageMachine.triggerSecret('void');
                         }
                         imageTitleTapCount = 0;
                         return;
                     }
-                }
-
-                // 5 Taps to ENTER VOID (Terminal Dialogue)
-                if (imageTitleTapCount === 5) {
-                    console.log("IMAGE TITLE RITUAL: VOID (5-TAP)");
-                    if (window.imageMachine && window.imageMachine.triggerSecret) {
-                        window.imageMachine.triggerSecret('void');
-                    }
-                    imageTitleTapCount = 0;
-                    return;
                 }
             }
         });
@@ -265,11 +256,42 @@ if (imageTitle) {
         }, 1000);
     };
 
+    // Long Press Handler for SUPER HIGH
+    const handleLongPressStart = (e) => {
+        if (longPressTimer) clearTimeout(longPressTimer);
+
+        longPressTimer = setTimeout(() => {
+            console.log("IMAGE TITLE RITUAL: SUPER HIGH (LONG PRESS)");
+            if (window.imageMachine && window.imageMachine.triggerSecret) {
+                window.imageMachine.triggerSecret('high');
+            }
+            // Reset tap count to prevent accidental trigger
+            imageTitleTapCount = 0;
+            // Visual feedback
+            imageTitle.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                imageTitle.style.transform = 'scale(1)';
+            }, 200);
+        }, LONG_PRESS_DURATION);
+    };
+
+    const handleLongPressEnd = () => {
+        if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+        }
+    };
+
     // Desktop Click
     imageTitle.addEventListener('click', (e) => {
         if (e.detail === 0) return;
         handleTap(e);
     });
+
+    // Desktop Long Press (mousedown/mouseup)
+    imageTitle.addEventListener('mousedown', handleLongPressStart);
+    imageTitle.addEventListener('mouseup', handleLongPressEnd);
+    imageTitle.addEventListener('mouseleave', handleLongPressEnd);
 
     // Mobile Touch
     let lastTouchTime = 0;
@@ -279,10 +301,16 @@ if (imageTitle) {
         if (now - lastTouchTime < 200) return;
         lastTouchTime = now;
 
+        // Start long press detection
+        handleLongPressStart(e);
+
         // To allow scrolling, we DON'T preventDefault on every touch.
         // Only prevents default when ritual actually triggers (inside handleTap).
         handleTap(e);
     }, { passive: true }); // passive: true allows scrolling, better UX
+
+    imageTitle.addEventListener('touchend', handleLongPressEnd, { passive: true });
+    imageTitle.addEventListener('touchcancel', handleLongPressEnd, { passive: true });
 }
 
 // PC/Mac KEYBOARD RITUAL: Type "void"
