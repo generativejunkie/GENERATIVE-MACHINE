@@ -288,32 +288,30 @@ if (imageTitle) {
             const isVoid = document.documentElement.style.filter === 'invert(1)';
             const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-            // VOID MODE: 2 Taps to EXIT
-            if (isVoid) {
-                if (imageTitleTapCount === 2) {
+            // SUPER HIGH MODE or VOID MODE: 2 Taps to EXIT
+            if (isVoid || isInSuperHighMode) {
+                if (imageTitleTapCount >= 2) {
                     console.log("IMAGE TITLE RITUAL: EXIT (2-TAP)");
                     if (window.imageMachine && window.imageMachine.triggerSecret) {
                         window.imageMachine.triggerSecret('exit');
                     }
+                    isInSuperHighMode = false; // Reset super high state
                     imageTitleTapCount = 0;
                     return;
                 }
             }
-            // NORMAL MODE: Rituals
-            else {
-                // 3 Taps to ENTER VOID (Terminal Dialogue)
-                if (imageTitleTapCount === 3) {
-                    if (!isTouchDevice) {
-                        console.log("IMAGE TITLE RITUAL: BLOCKED ON DESKTOP (Use keyboard)");
-                    } else {
-                        console.log("IMAGE TITLE RITUAL: VOID (3-TAP)");
-                        if (window.imageMachine && window.imageMachine.triggerSecret) {
-                            window.imageMachine.triggerSecret('void');
-                        }
-                        imageTitleTapCount = 0;
-                        return;
+            // NORMAL MODE: 3 Taps to ENTER VOID
+            else if (imageTitleTapCount >= 3) {
+                if (!isTouchDevice) {
+                    console.log("IMAGE TITLE RITUAL: BLOCKED ON DESKTOP (Use keyboard)");
+                } else {
+                    console.log("IMAGE TITLE RITUAL: VOID (3-TAP)");
+                    if (window.imageMachine && window.imageMachine.triggerSecret) {
+                        window.imageMachine.triggerSecret('void');
                     }
                 }
+                imageTitleTapCount = 0;
+                return;
             }
         });
 
