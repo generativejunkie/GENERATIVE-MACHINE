@@ -194,7 +194,7 @@ function initAIAgentHandshake() {
 
     updateSignals();
 }
-// IMAGE MACHINE TITLE RITUAL: 3-TAP -> VOID, LONG PRESS -> SUPER HIGH
+// IMAGE MACHINE TITLE RITUAL: 3-TAP -> VOID, SHAKE -> SUPER HIGH
 const imageTitle = document.getElementById('image-machine-title');
 // Increase hit area visually/functionally
 if (imageTitle) {
@@ -204,8 +204,75 @@ if (imageTitle) {
 
 let imageTitleTapCount = 0;
 let imageTitleTapTimer = null;
-let longPressTimer = null;
-const LONG_PRESS_DURATION = 1500; // 1.5 seconds for long press
+
+// SHAKE DETECTION for SUPER HIGH mode toggle
+let isInSuperHighMode = false;
+let lastShakeTime = 0;
+const SHAKE_THRESHOLD = 20; // Acceleration threshold
+const SHAKE_COOLDOWN = 1000; // 1 second cooldown between shakes
+
+function initShakeDetection() {
+    if (typeof DeviceMotionEvent !== 'undefined') {
+        // Request permission on iOS 13+
+        if (typeof DeviceMotionEvent.requestPermission === 'function') {
+            // iOS 13+ requires permission
+            document.body.addEventListener('click', () => {
+                DeviceMotionEvent.requestPermission()
+                    .then(response => {
+                        if (response === 'granted') {
+                            window.addEventListener('devicemotion', handleShake);
+                            console.log('[SHAKE] Motion permission granted');
+                        }
+                    })
+                    .catch(console.error);
+            }, { once: true });
+        } else {
+            // Non-iOS or older iOS
+            window.addEventListener('devicemotion', handleShake);
+            console.log('[SHAKE] Motion listener added');
+        }
+    }
+}
+
+function handleShake(event) {
+    const now = Date.now();
+    if (now - lastShakeTime < SHAKE_COOLDOWN) return;
+
+    const acc = event.accelerationIncludingGravity;
+    if (!acc) return;
+
+    const totalAcceleration = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
+
+    // Detect significant shake (above threshold, accounting for gravity ~9.8)
+    if (totalAcceleration > SHAKE_THRESHOLD) {
+        lastShakeTime = now;
+
+        if (isInSuperHighMode) {
+            // Exit SUPER HIGH mode
+            console.log('[SHAKE] Exiting SUPER HIGH mode');
+            if (window.imageMachine && window.imageMachine.triggerSecret) {
+                window.imageMachine.triggerSecret('exit');
+            }
+            isInSuperHighMode = false;
+        } else {
+            // Enter SUPER HIGH mode
+            console.log('[SHAKE] Entering SUPER HIGH mode');
+            if (window.imageMachine && window.imageMachine.triggerSecret) {
+                window.imageMachine.triggerSecret('high');
+            }
+            isInSuperHighMode = true;
+        }
+
+        // Visual feedback
+        document.body.style.boxShadow = 'inset 0 0 100px rgba(255, 0, 255, 0.5)';
+        setTimeout(() => {
+            document.body.style.boxShadow = 'none';
+        }, 300);
+    }
+}
+
+// Initialize shake detection on page load
+initShakeDetection();
 
 if (imageTitle) {
     const handleTap = (e) => {
@@ -256,42 +323,11 @@ if (imageTitle) {
         }, 1000);
     };
 
-    // Long Press Handler for SUPER HIGH
-    const handleLongPressStart = (e) => {
-        if (longPressTimer) clearTimeout(longPressTimer);
-
-        longPressTimer = setTimeout(() => {
-            console.log("IMAGE TITLE RITUAL: SUPER HIGH (LONG PRESS)");
-            if (window.imageMachine && window.imageMachine.triggerSecret) {
-                window.imageMachine.triggerSecret('high');
-            }
-            // Reset tap count to prevent accidental trigger
-            imageTitleTapCount = 0;
-            // Visual feedback
-            imageTitle.style.transform = 'scale(1.1)';
-            setTimeout(() => {
-                imageTitle.style.transform = 'scale(1)';
-            }, 200);
-        }, LONG_PRESS_DURATION);
-    };
-
-    const handleLongPressEnd = () => {
-        if (longPressTimer) {
-            clearTimeout(longPressTimer);
-            longPressTimer = null;
-        }
-    };
-
     // Desktop Click
     imageTitle.addEventListener('click', (e) => {
         if (e.detail === 0) return;
         handleTap(e);
     });
-
-    // Desktop Long Press (mousedown/mouseup)
-    imageTitle.addEventListener('mousedown', handleLongPressStart);
-    imageTitle.addEventListener('mouseup', handleLongPressEnd);
-    imageTitle.addEventListener('mouseleave', handleLongPressEnd);
 
     // Mobile Touch
     let lastTouchTime = 0;
@@ -301,16 +337,10 @@ if (imageTitle) {
         if (now - lastTouchTime < 200) return;
         lastTouchTime = now;
 
-        // Start long press detection
-        handleLongPressStart(e);
-
         // To allow scrolling, we DON'T preventDefault on every touch.
         // Only prevents default when ritual actually triggers (inside handleTap).
         handleTap(e);
     }, { passive: true }); // passive: true allows scrolling, better UX
-
-    imageTitle.addEventListener('touchend', handleLongPressEnd, { passive: true });
-    imageTitle.addEventListener('touchcancel', handleLongPressEnd, { passive: true });
 }
 
 // PC/Mac KEYBOARD RITUAL: Type "void"

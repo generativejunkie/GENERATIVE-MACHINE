@@ -276,50 +276,27 @@ export const imageMachineSketch = (p) => {
 
                         // Function to trigger the actual MIX mode logic
                         const startMixDisplay = () => {
-                            // Activate MIX Mode (Fullscreen + Landscape Hack)
-                            document.body.classList.add('mix-mode');
+                            // Keep the inverted visual style from VOID mode
+                            // No need for RETURN button - user can 2-tap title to exit
 
-                            // Create Return Button
-                            const btn = document.createElement('button');
-                            btn.className = 'return-matrix-btn';
-                            btn.innerText = 'RETURN TO MATRIX';
-                            btn.onclick = () => {
-                                document.body.classList.remove('mix-mode');
-                                btn.remove();
-                                // Stop auto-switching when exiting MIX mode
-                                autoMode = false;
-                                // Trigger resize to restore layout
-                                p.windowResized();
-                            };
-                            document.body.appendChild(btn);
-
-                            // Resize canvas for forced landscape
-                            const isMobilePortrait = window.innerWidth <= 768 && window.innerHeight > window.innerWidth;
-                            if (isMobilePortrait) {
-                                p.resizeCanvas(window.innerHeight, window.innerWidth);
-                            } else {
-                                p.resizeCanvas(window.innerWidth, window.innerHeight);
+                            // Resize canvas for fullscreen experience
+                            const container = document.getElementById('imageCanvas-container');
+                            if (container) {
+                                p.resizeCanvas(container.offsetWidth, container.offsetHeight);
                             }
 
-                            // Load Image
-                            const mixImageKey = 'photos/photo332.webp';
-                            if (allImages[mixImageKey]) {
-                                currentImageKey = mixImageKey;
+                            // Start with a random image from the collection
+                            const keys = Object.keys(allImages);
+                            if (keys.length > 0) {
+                                currentImageKey = keys[p.floor(p.random(keys.length))];
                                 useColorMode = false;
-                            } else {
-                                p.loadImage(mixImageKey, (img) => {
-                                    img.filePath = mixImageKey;
-                                    allImages[mixImageKey] = img;
-                                    currentImageKey = mixImageKey;
-                                    useColorMode = false;
-                                });
                             }
 
-                            // [VOID MODE] Enable auto-switching after MIX capsule selection
+                            // [VOID MODE] Enable auto-switching immediately
                             autoMode = true;
                             lastAutoSwitchTime = p.millis();
                             autoSwitchInterval = 5000; // Start with 5 seconds, then randomize
-                            console.log('[VOID] Auto-switch mode activated');
+                            console.log('[VOID] Auto-switch mode activated - 2-tap title to exit');
 
                             animationState = 'display';
                         };
