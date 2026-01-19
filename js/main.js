@@ -327,9 +327,17 @@ if (imageTitle) {
         }, 1000);
     };
 
-    // Desktop Click
+    // Track if last interaction was touch to prevent double-counting
+    let lastInteractionWasTouch = false;
+
+    // Desktop Click (only if not a touch device)
     imageTitle.addEventListener('click', (e) => {
         if (e.detail === 0) return;
+        // Skip if this click was triggered by a touch
+        if (lastInteractionWasTouch) {
+            lastInteractionWasTouch = false;
+            return;
+        }
         handleTap(e);
     });
 
@@ -337,6 +345,9 @@ if (imageTitle) {
     let lastTouchTime = 0;
     imageTitle.addEventListener('touchstart', (e) => {
         const now = Date.now();
+        // Mark that this is a touch interaction
+        lastInteractionWasTouch = true;
+
         // Request shake permission on first touch (iOS 13+)
         requestShakePermission();
 
