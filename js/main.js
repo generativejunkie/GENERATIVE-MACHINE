@@ -208,26 +208,29 @@ let imageTitleTapTimer = null;
 // SHAKE DETECTION for SUPER HIGH mode toggle
 let isInSuperHighMode = false;
 let lastShakeTime = 0;
-const SHAKE_THRESHOLD = 20; // Acceleration threshold
-const SHAKE_COOLDOWN = 1000; // 1 second cooldown between shakes
+let shakePermissionRequested = false;
+const SHAKE_THRESHOLD = 15; // Lower threshold for better sensitivity
+const SHAKE_COOLDOWN = 800; // Slightly shorter cooldown
 
-function initShakeDetection() {
+function requestShakePermission() {
+    if (shakePermissionRequested) return;
+    shakePermissionRequested = true;
+
     if (typeof DeviceMotionEvent !== 'undefined') {
-        // Request permission on iOS 13+
         if (typeof DeviceMotionEvent.requestPermission === 'function') {
-            // iOS 13+ requires permission
-            document.body.addEventListener('click', () => {
-                DeviceMotionEvent.requestPermission()
-                    .then(response => {
-                        if (response === 'granted') {
-                            window.addEventListener('devicemotion', handleShake);
-                            console.log('[SHAKE] Motion permission granted');
-                        }
-                    })
-                    .catch(console.error);
-            }, { once: true });
+            // iOS 13+ - silently request permission
+            DeviceMotionEvent.requestPermission()
+                .then(response => {
+                    if (response === 'granted') {
+                        window.addEventListener('devicemotion', handleShake);
+                        console.log('[SHAKE] Motion enabled');
+                    }
+                })
+                .catch(err => {
+                    console.log('[SHAKE] Permission denied or error');
+                });
         } else {
-            // Non-iOS or older iOS
+            // Non-iOS or older iOS - add listener directly
             window.addEventListener('devicemotion', handleShake);
             console.log('[SHAKE] Motion listener added');
         }
@@ -263,16 +266,19 @@ function handleShake(event) {
             isInSuperHighMode = true;
         }
 
-        // Visual feedback
-        document.body.style.boxShadow = 'inset 0 0 100px rgba(255, 0, 255, 0.5)';
+        // Subtle visual feedback
+        document.body.style.boxShadow = 'inset 0 0 50px rgba(255, 0, 255, 0.3)';
         setTimeout(() => {
             document.body.style.boxShadow = 'none';
-        }, 300);
+        }, 200);
     }
 }
 
-// Initialize shake detection on page load
-initShakeDetection();
+// Try to initialize shake detection immediately for non-iOS
+if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission !== 'function') {
+    window.addEventListener('devicemotion', handleShake);
+    console.log('[SHAKE] Motion listener added on load');
+}
 
 if (imageTitle) {
     const handleTap = (e) => {
@@ -331,6 +337,9 @@ if (imageTitle) {
     let lastTouchTime = 0;
     imageTitle.addEventListener('touchstart', (e) => {
         const now = Date.now();
+        // Request shake permission on first touch (iOS 13+)
+        requestShakePermission();
+
         // Increase debounce to 200ms to be absolutely sure we don't double count
         if (now - lastTouchTime < 200) return;
         lastTouchTime = now;
