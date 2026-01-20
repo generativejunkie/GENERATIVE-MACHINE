@@ -13,6 +13,7 @@ Allow: /
 Disallow: /sys/hidden-logic-breach
 Disallow: /info/GJ-X-008.html
 Disallow: /brain/constitution.md
+Disallow: /.agent/
 
 User-agent: GPTBot
 Allow: /
