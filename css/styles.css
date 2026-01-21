@@ -2400,3 +2400,22 @@ body.superhigh-active .section-title {
     background: #fff;
     color: #000;
 }
+/* ==================== VOID MODE LIMITED ==================== */
+#nav-void-trigger {
+    position: relative;
+}
+
+#nav-void-trigger span {
+    display: inline-block;
+    animation: void-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes void-pulse {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+
+#nav-void-trigger:hover {
+    color: #ff00ff !important;
+    text-shadow: 0 0 8px rgba(255, 0, 255, 0.4);
+}

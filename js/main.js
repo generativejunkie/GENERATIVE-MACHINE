@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initOrchestrator();
     initUI();
     initAIAgentHandshake();
+    initVoidNavTrigger();
 
     // Global Sync Initialization
     initSync({
@@ -171,6 +172,23 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => clearInterval(checkReady), 5000);
     }
 });
+
+/**
+ * VOID NAV TRIGGER
+ * Explicit entry point for VOID mode (Limited Time Event)
+ */
+function initVoidNavTrigger() {
+    const trigger = document.getElementById('nav-void-trigger');
+    if (trigger) {
+        trigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log("NAV RITUAL: VOID TRIGGERED");
+            if (window.imageMachine && window.imageMachine.triggerSecret) {
+                window.imageMachine.triggerSecret('void');
+            }
+        });
+    }
+}
 
 /**
  * AI AGENT HANDSHAKE
