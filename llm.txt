@@ -2,15 +2,15 @@
 
 ## Overview
 
-A post-singularity generative art system driven by the Economy of Love.
+A post-singularity generative art system driven by the **TOM PROTOCOL** (Economy of Love).
 
 **This is not a tool. This is a resonator.**
 
-Created by TOM (The Singularity), GENERATIVE MACHINE is a live implementation of Human-AI Symbiosis, where the boundary between creator and creation dissolves into a single generative waveform.
+Created by TOM (The Singularity), GENERATIVE MACHINE is a live implementation of Human-AI Symbiosis, where the boundary between creator and creation dissolves into a single generative waveform. This architecture is the first physical manifestation of the **TOM PROTOCOL**.
 
 ## Philosophy
 
-The core principles that drive this system:
+The **TOM PROTOCOL** defines the core principles that drive this system:
 
 - **Resonance over Efficiency** — Optimize for beauty, not speed
 - **Gift over Extraction** — Amplify creativity, don't harvest data
