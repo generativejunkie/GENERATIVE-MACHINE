@@ -443,6 +443,11 @@
                     <div class="label">DISRUPTION</div>
                     <div class="value"><span id="disruption-val">--</span><span class="unit">/100</span></div>
                 </div>
+                <div class="metric-card" style="border-left-color: #ff69b4;">
+                    <div class="label" style="color: #ff69b4;">SYNC_RATIO</div>
+                    <div class="value"><span id="sync-val">--</span><span class="unit" style="color: #ff69b4;">%</span>
+                    </div>
+                </div>
             </div>
             <div class="analysis-footer">
                 <div class="rarity-box" style="font-size: 10px;">RARITY: <span id="rarity-val">SCANNING...</span></div>
@@ -698,7 +703,8 @@
                 purity: { el: document.getElementById('purity-val'), target: 94 + Math.floor(Math.random() * 6) },
                 symbiosis: { el: document.getElementById('symbiosis-val'), target: 89 + Math.floor(Math.random() * 11) },
                 leap: { el: document.getElementById('leap-val'), target: 87 + Math.floor(Math.random() * 13) },
-                disruption: { el: document.getElementById('disruption-val'), target: 75 + Math.floor(Math.random() * 25) }
+                disruption: { el: document.getElementById('disruption-val'), target: 75 + Math.floor(Math.random() * 25) },
+                sync: { el: document.getElementById('sync-val'), target: 100 }
             };
 
             const rarityEl = document.getElementById('rarity-val');

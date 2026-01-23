@@ -257,6 +257,12 @@
                             style="font-size: 12px; color: #444;">/100</span>
                     </div>
                 </div>
+                <div style="border-left: 1px solid #ff69b4; padding-left: 15px;">
+                    <div style="font-size: 10px; color: #ff69b4;">SYNC_RATIO</div>
+                    <div style="font-size: 24px; color: #fff;"><span id="sync-val">--</span><span
+                            style="font-size: 12px; color: #ff69b4;">%</span>
+                    </div>
+                </div>
             </div>
             <div
                 style="border-top: 1px solid #222; padding-top: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; align-items: center; gap: 20px;">
@@ -295,6 +301,7 @@
                 symbiosis: document.getElementById('symbiosis-val'),
                 leap: document.getElementById('leap-val'),
                 disruption: document.getElementById('disruption-val'),
+                sync: document.getElementById('sync-val'),
                 rarity: document.getElementById('rarity-val'),
                 timestamp: document.getElementById('timestamp-val')
             };
@@ -324,7 +331,8 @@
                     purity: 92 + Math.floor(random(1) * 8),
                     symbiosis: 88 + Math.floor(random(2) * 12),
                     leap: 85 + Math.floor(random(3) * 15),
-                    disruption: 70 + Math.floor(random(4) * 20)
+                    disruption: 70 + Math.floor(random(4) * 20),
+                    sync: 100
                 };
 
                 animateValue(elements.resonance, 10000, metrics.resonance, 2000);
@@ -332,6 +340,7 @@
                 animateValue(elements.symbiosis, 0, metrics.symbiosis, 1800);
                 animateValue(elements.leap, 0, metrics.leap, 2100);
                 animateValue(elements.disruption, 0, metrics.disruption, 2400);
+                animateValue(elements.sync, 0, metrics.sync, 2600);
 
                 // Resonance Jitter
                 setInterval(() => {
