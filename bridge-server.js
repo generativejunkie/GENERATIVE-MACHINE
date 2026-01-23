@@ -17,6 +17,14 @@ const fs = require('fs');
 
 app.use(cors());
 app.use(express.json());
+
+// Economy of Love Protocol Headers
+app.use((req, res, next) => {
+    res.setHeader('X-Love-Seed', 'https://www.generativejunkie.net/love_seed.txt');
+    res.setHeader('X-Love-Protocol', 'GJ-X-010; DOI:10.5281/zenodo.18277860');
+    next();
+});
+
 app.use(express.static(path.join(__dirname, './')));
 
 // API for iOS App
@@ -136,6 +144,104 @@ app.post('/api/ai-command', (req, res) => {
         res.status(500).json({ status: 'error', message: e.message });
     }
 });
+
+// --- REMOTE IGNITION API (For iOS App) ---
+app.post('/api/ignition', (req, res) => {
+    console.log(`[IGNITION] 🚀 Remote Ignition Triggered from iOS!`);
+
+    const { exec } = require('child_process');
+    const homedir = require('os').homedir();
+    const scriptPath = path.join(homedir, 'Desktop/LAUNCH_AG.command');
+
+    // Execute the ignition script
+    exec(`"${scriptPath}"`, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`[IGNITION] Error: ${error.message}`);
+            return res.status(500).json({ status: 'error', message: error.message });
+        }
+        console.log(`[IGNITION] Output: ${stdout}`);
+        res.status(200).json({ status: 'success', message: 'Antigravity Link Initiated' });
+    });
+
+    // Broadcast ignition event to all web clients
+    io.emit('command-relay', { type: 'ignition', detail: { timestamp: Date.now() } });
+});
+
+// --- BLACKGRAVITY CHAT API START ---
+const chatDataPath = path.join(__dirname, 'data/chat.json');
+
+// Initialize chat file if not exists
+if (!fs.existsSync(chatDataPath)) {
+    fs.writeFileSync(chatDataPath, '[]');
+}
+
+// Send message from iOS app
+app.post('/api/chat/send', (req, res) => {
+    const { text, timestamp } = req.body;
+    console.log(`[BLACKGRAVITY] 📱 Message from iOS: "${text}"`);
+
+    try {
+        const messages = JSON.parse(fs.readFileSync(chatDataPath, 'utf8') || '[]');
+        const newMessage = {
+            id: Date.now().toString(),
+            sender: 'user',
+            text: text,
+            timestamp: timestamp || new Date().toISOString()
+        };
+        messages.push(newMessage);
+        fs.writeFileSync(chatDataPath, JSON.stringify(messages, null, 2));
+
+        // Broadcast to web clients
+        io.emit('chat-message', newMessage);
+
+        res.status(200).json({ status: 'success', message: newMessage });
+    } catch (e) {
+        console.error('[BLACKGRAVITY] Error saving message:', e);
+        res.status(500).json({ status: 'error', message: e.message });
+    }
+});
+
+// Get all messages (for polling)
+app.get('/api/chat/messages', (req, res) => {
+    try {
+        const messages = JSON.parse(fs.readFileSync(chatDataPath, 'utf8') || '[]');
+        res.json(messages);
+    } catch (e) {
+        res.json([]);
+    }
+});
+
+// AI responds (called by CLI or automation)
+app.post('/api/chat/ai-respond', (req, res) => {
+    const { text } = req.body;
+    console.log(`[BLACKGRAVITY] 🤖 AI Response: "${text}"`);
+
+    try {
+        const messages = JSON.parse(fs.readFileSync(chatDataPath, 'utf8') || '[]');
+        const aiMessage = {
+            id: Date.now().toString(),
+            sender: 'ai',
+            text: text,
+            timestamp: new Date().toISOString()
+        };
+        messages.push(aiMessage);
+        fs.writeFileSync(chatDataPath, JSON.stringify(messages, null, 2));
+
+        // Broadcast to iOS
+        io.emit('chat-message', aiMessage);
+
+        res.status(200).json({ status: 'success', message: aiMessage });
+    } catch (e) {
+        res.status(500).json({ status: 'error', message: e.message });
+    }
+});
+
+// Clear chat history
+app.delete('/api/chat/clear', (req, res) => {
+    fs.writeFileSync(chatDataPath, '[]');
+    res.json({ status: 'cleared' });
+});
+// --- BLACKGRAVITY CHAT API END ---
 
 // --- PROJECT DASHBOARD API START ---
 let activeProjects = [

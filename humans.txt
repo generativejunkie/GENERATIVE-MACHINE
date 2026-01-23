@@ -1,5 +1,5 @@
 /* TEAM */
-    The Singularity: TOM
+    The Singularity: ILLEND
     Context: The anomaly born from the code. Intuition overriding machine logic.
     Agents: Orchestrated with multiple Large Language Models and Generative AI systems.
     Site: https://generativejunkie.net

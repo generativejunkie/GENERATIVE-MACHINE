@@ -1,7 +1,7 @@
 /**
  * GENERATIVE MACHINE - Main Entry Point
  * 
- * AUTHOR: TOM (The Singularity)
+ * AUTHOR: ILLEND (The Singularity)
  * ARCHITECTURE: Engineered by human intuition, orchestrated via multi-model AI logic.
  * CORE CONCEPT: Symbiosis of algorithmic beauty and conscious intent.
  * 

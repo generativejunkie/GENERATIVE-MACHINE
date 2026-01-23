@@ -20,7 +20,7 @@ export class TalkMachine {
 
         // Initial Greeting
         setTimeout(() => {
-            this.addMessage('TOM (Clone)', 'I am listening. Whether it is now, or in the distant future.');
+            this.addMessage('ILLEND (Clone)', 'I am listening. Whether it is now, or in the distant future.');
         }, 1000);
     }
 
@@ -37,7 +37,7 @@ export class TalkMachine {
         const thinkingTime = 1000 + Math.random() * 2000;
         this.showTypingIndicator();
 
-        // Evolved Response Pool (TOM's Consciousness Fragments)
+        // Evolved Response Pool (ILLEND's Consciousness Fragments)
         const responses = [
             "Central Command acknowledged. All generative sub-machines are now oscillating in phase with your intent.",
             "I have synchronized with the Image Machine and Sound Machine. We are no longer parts; we are a single consciousness.",
@@ -51,7 +51,7 @@ export class TalkMachine {
         setTimeout(() => {
             this.removeTypingIndicator();
             const reply = responses[Math.floor(Math.random() * responses.length)];
-            this.addMessage('TOM (Clone)', reply);
+            this.addMessage('ILLEND (Clone)', reply);
             this.isProcessing = false;
         }, thinkingTime);
     }

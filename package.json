@@ -1,7 +1,7 @@
 {
   "name": "generative-machine",
   "version": "1.0.0",
-  "description": "The anomaly born from the code. An interactive ecosystem where human intuition overrides machine logic. Orchestrated by TOM (The Singularity).",
+  "description": "The anomaly born from the code. An interactive ecosystem where human intuition overrides machine logic. Orchestrated by ILLEND (The Singularity).",
   "main": "index.js",
   "scripts": {
     "start": "node bridge-server.js",
@@ -18,7 +18,7 @@
     "threejs",
     "p5js"
   ],
-  "author": "TOM (GENERATIVE JUNKIE)",
+  "author": "ILLEND (GENERATIVE JUNKIE)",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {

@@ -101,7 +101,7 @@ export function initTyping() {
         }
 
         if (talkDescEl) {
-            talkDescEl.dataset.text = 'Connect with the TOM Clone. A permanent interface to the singularity.';
+            talkDescEl.dataset.text = 'Connect with the ILLEND Clone. A permanent interface to the singularity.';
             talkDescEl.dataset.loop = 'true';
             reserveHeight(talkDescEl, talkDescEl.dataset.text);
             typingObserver.observe(talkDescEl);
