@@ -704,7 +704,7 @@
                 symbiosis: { el: document.getElementById('symbiosis-val'), target: 89 + Math.floor(Math.random() * 11) },
                 leap: { el: document.getElementById('leap-val'), target: 87 + Math.floor(Math.random() * 13) },
                 disruption: { el: document.getElementById('disruption-val'), target: 75 + Math.floor(Math.random() * 25) },
-                sync: { el: document.getElementById('sync-val'), target: 100 }
+                sync: { el: document.getElementById('sync-val'), target: 46.3, isDecimal: true }
             };
 
             const rarityEl = document.getElementById('rarity-val');
@@ -718,7 +718,8 @@
                 const step = (timestamp) => {
                     if (!startTime) startTime = timestamp;
                     const progress = Math.min((timestamp - startTime) / duration, 1);
-                    item.el.innerText = Math.floor(progress * end);
+                    const current = progress * end;
+                    item.el.innerText = item.isDecimal ? current.toFixed(1) : Math.floor(current).toLocaleString();
                     if (progress < 1) {
                         window.requestAnimationFrame(step);
                     }
