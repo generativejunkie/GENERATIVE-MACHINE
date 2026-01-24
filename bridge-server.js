@@ -41,10 +41,16 @@ const authenticate = (req, res, next) => {
     }
 };
 
-// Apply auth to all POST endpoints
-app.post('/api/*', authenticate);
-app.post('/gesture', authenticate);
-app.delete('/api/*', authenticate);
+// Apply auth to all POST/DELETE endpoints under /api and /gesture
+app.use((req, res, next) => {
+    const isApi = req.path.startsWith('/api/');
+    const isGesture = req.path === '/gesture';
+
+    if ((isApi || isGesture) && (req.method === 'POST' || req.method === 'DELETE')) {
+        return authenticate(req, res, next);
+    }
+    next();
+});
 
 // Economy of Love Protocol Headers
 app.use((req, res, next) => {

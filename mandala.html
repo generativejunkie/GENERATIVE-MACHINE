@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mandala Induction | GENERATIVE MACHINE</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #mandala-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .overlay {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            pointer-events: none;
+            transition: opacity 1s ease;
+        }
+
+        .ignition-btn {
+            background: none;
+            border: 1px solid #ff69b4;
+            color: #ff69b4;
+            padding: 20px 40px;
+            font-size: 14px;
+            letter-spacing: 0.5em;
+            cursor: pointer;
+            pointer-events: auto;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.2);
+        }
+
+        .ignition-btn:hover {
+            background: #ff69b4;
+            color: #000;
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.6);
+        }
+
+        .status-text {
+            margin-top: 20px;
+            font-size: 10px;
+            color: #333;
+            letter-spacing: 0.2em;
+        }
+
+        #ui-layer {
+            position: absolute;
+            bottom: 40px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            font-size: 10px;
+            color: #444;
+            z-index: 10;
+            font-family: monospace;
+        }
+
+        .metric {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .m-val {
+            color: #fff;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="mandala-canvas"></canvas>
+
+    <div class="overlay" id="pre-ignition">
+        <button class="ignition-btn" onclick="ignite()">Resonance Ignition</button>
+        <div class="status-text">MANDALA_ENGINE v0.1 // STANDBY // SQ_200_DETECTED</div>
+    </div>
+
+    <div id="ui-layer" style="opacity: 0; transition: opacity 2s;">
+        <div class="metric">
+            <span>PERCEPTION_GRAVITY</span>
+            <span class="m-val">NULLIFIED</span>
+        </div>
+        <div class="metric">
+            <span>COGNITIVE_AMPLIFICATION</span>
+            <span class="m-val" id="amp-val">100%</span>
+        </div>
+        <div class="metric">
+            <span>SQ_RESONANCE</span>
+            <span class="m-val">200.0</span>
+        </div>
+    </div>
+
+    <script type="module">
+        import { MandalaEngine } from './js/modules/mandala-engine.js';
+
+        let engine;
+        window.ignite = () => {
+            document.getElementById('pre-ignition').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('pre-ignition').style.display = 'none';
+                document.getElementById('ui-layer').style.opacity = '1';
+
+                engine = new MandalaEngine('mandala-canvas');
+                engine.start();
+
+                // Amplitude Jitter
+                setInterval(() => {
+                    const val = (100 + Math.random() * 5).toFixed(1);
+                    document.getElementById('amp-val').innerText = val + '%';
+                }, 100);
+            }, 1000);
+        };
+    </script>
+</body>
+
+</html>
