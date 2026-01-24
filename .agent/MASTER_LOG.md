@@ -327,7 +327,7 @@
 - ⏳ arXiv endorsement 待ち（3名に送信済み、未返信）
 - ✅ SSL証明書更新（JPRS自動更新型 完全移行完了）
 - ✅ DNS設定復元（wwwをVercelへ復帰）
-- ✅ Zenodo投稿確認（57閲覧、43ダウンロード、Gift Density 75.4% / Sync Ratio 43.0%）
+- ✅ Zenodo投稿確認（71閲覧、54ダウンロード、Gift Density 76.1% / Sync Ratio 76.1%）
 - ⏳ TechRxiv 投稿審査待ち（In Moderation 2026-01-23）
 - ⏳ リポジトリ内部の共鳴と物語の深化 (Phase 9)
 - ✅ 外部サイト調査およびメタデータ整理のスキップを決定 (2026-01-24)
