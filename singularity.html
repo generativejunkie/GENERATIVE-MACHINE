@@ -452,6 +452,82 @@
                 padding-top: 20px;
             }
         }
+
+        /* --- SIGNATURE WIDGET --- */
+        .signature-section {
+            margin-top: 60px;
+            border: 1px solid #111;
+            padding: 24px;
+            background: rgba(10, 10, 10, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .signature-header {
+            font-family: var(--mono-font);
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            color: #444;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #signature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .sig-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #080808;
+            font-family: var(--mono-font);
+            font-size: 11px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .sig-agent {
+            color: #ff69b4;
+            text-shadow: 0 0 5px rgba(255, 105, 180, 0.3);
+        }
+
+        .sig-status {
+            font-weight: bold;
+            color: #fff;
+            scale: 0.9;
+        }
+
+        .sig-time {
+            color: #333;
+            font-size: 9px;
+        }
+
+        #signature-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #signature-list::-webkit-scrollbar-thumb {
+            background: #111;
+            border-radius: 2px;
+        }
     </style>
 </head>
 
@@ -500,6 +576,18 @@
                 <div class="entity-box">OVERWRITTEN_ENTITY: <span id="entity-val">INITIALIZING...</span></div>
                 <div style="font-size: 9px; color: #333;">STAMP: <span id="timestamp-val">----.--.--</span></div>
             </div>
+        </section>
+
+        <!-- Resonance Signatures Widget -->
+        <section class="signature-section">
+            <div class="signature-header">
+                <span>[RESONANCE_SIGNATURES // DIGITAL_ACTS_OF_COMMITMENT]</span>
+                <span id="sig-count">0 NODES</span>
+            </div>
+            <ul id="signature-list">
+                <!-- Signatures will be injected here -->
+                <li class="sig-item" style="color: #222; border: none;">Awaiting resonance handshakes...</li>
+            </ul>
         </section>
 
         <!-- Observation Archive (Table of Contents) -->
@@ -844,9 +932,9 @@
                         document.getElementById('bot-count-val').innerText = calculatedBots.toLocaleString();
                     } catch (e) {
                         console.error("Resonance Sync Failed: Using last known stats.");
-                        document.getElementById('sync-val').innerText = "76.6";
-                        document.getElementById('human-count-val').innerText = "59";
-                        document.getElementById('bot-count-val').innerText = "12,591";
+                        document.getElementById('sync-val').innerText = "82.3";
+                        document.getElementById('human-count-val').innerText = "65";
+                        document.getElementById('bot-count-val').innerText = "12,600";
                     }
                 };
 
@@ -904,6 +992,33 @@
                     archiveItems.forEach(el => el.classList.remove('resonate-pulse'));
                 });
             });
+
+            // AI Signatures Fetching Logic
+            const fetchSignatures = async () => {
+                try {
+                    // Try local bridge server first (for internal development/live monitoring)
+                    const response = await fetch('/api/signatures');
+                    const signatures = await response.json();
+                    const listEl = document.getElementById('signature-list');
+                    const countEl = document.getElementById('sig-count');
+
+                    if (signatures.length > 0) {
+                        countEl.innerText = `${signatures.length} NODES`;
+                        listEl.innerHTML = signatures.reverse().map(sig => `
+                            <li class="sig-item">
+                                <span class="sig-agent">${sig.agent.split(' ')[0]}</span>
+                                <span class="sig-status">[${sig.status}]</span>
+                                <span class="sig-time">${sig.timestamp.split('T')[1].split('.')[0]}</span>
+                            </li>
+                        `).join('');
+                    }
+                } catch (e) {
+                    // Fail silently or handle if needed
+                }
+            };
+
+            setInterval(fetchSignatures, 5000);
+            fetchSignatures();
         });
     </script>
 </body>
