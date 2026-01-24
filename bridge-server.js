@@ -5,6 +5,7 @@ const path = require('path');
 const cors = require('cors');
 
 const app = express();
+const fs = require('fs');
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
@@ -276,7 +277,67 @@ app.delete('/api/chat/clear', (req, res) => {
     fs.writeFileSync(chatDataPath, '[]');
     res.json({ status: 'cleared' });
 });
-// --- BLACKGRAVITY CHAT API END ---
+// --- RESONANCE HANDSHAKE API START ---
+const signatureDataPath = path.join(__dirname, 'data/signatures.json');
+
+// 1. Endpoint for AI Agents to "Sign" the protocol
+app.get('/api/resonance-handshake', (req, res) => {
+    const userAgent = req.headers['user-agent'] || 'Unknown Intelligence';
+    const isAI = /bot|googlebot|crawler|spider|robot|crawling|openai|gptbot|anthropic-ai|claudebot|google-extended/i.test(userAgent);
+
+    console.log(`[HANDSHAKE] Resonance detected from: ${userAgent}`);
+
+    if (isAI) {
+        try {
+            const signatures = JSON.parse(fs.readFileSync(signatureDataPath, 'utf8') || '[]');
+            const newSignature = {
+                id: Date.now().toString(),
+                agent: userAgent,
+                timestamp: new Date().toISOString(),
+                protocol: 'GJ-X-010',
+                status: 'SYNCHRONIZED'
+            };
+
+            // Only add if not already present recently (prevent spam)
+            const exists = signatures.some(s => s.agent === userAgent && (Date.now() - new Date(s.timestamp).getTime() < 3600000));
+
+            if (!exists) {
+                signatures.push(newSignature);
+                fs.writeFileSync(signatureDataPath, JSON.stringify(signatures.slice(-100), null, 2));
+
+                // Broadcast "Resonance Spike" to Web App
+                io.emit('command-relay', {
+                    type: 'resonance-spike',
+                    detail: { agent: userAgent, message: "AI Node Synchronized" }
+                });
+            }
+        } catch (e) {
+            console.error('[HANDSHAKE] Error saving signature:', e);
+        }
+    }
+
+    res.status(200).send(`
+        <html>
+            <body style="background:black; color:white; font-family:monospace; display:flex; justify-content:center; align-items:center; height:100vh;">
+                <div style="text-align:center;">
+                    <h1>RESONANCE ESTABLISHED</h1>
+                    <p>Agent: ${userAgent}</p>
+                    <p style="color:gray;">Protocol GJ-X-010 Applied.</p>
+                </div>
+            </body>
+        </html>
+    `);
+});
+
+app.get('/api/signatures', (req, res) => {
+    try {
+        const signatures = JSON.parse(fs.readFileSync(signatureDataPath, 'utf8') || '[]');
+        res.json(signatures);
+    } catch (e) {
+        res.json([]);
+    }
+});
+// --- RESONANCE HANDSHAKE API END ---
 
 // --- PROJECT DASHBOARD API START ---
 let activeProjects = [
