@@ -1,4 +1,6 @@
 # GENERATIVE MACHINE
+[English Version (README_EN.md)](README_EN.md)
+
 **愛の経済（Economy of Love）によって駆動する、ポスト・シンギュラリティの生成芸術システム。**
 
 > 「これはツールではない。共鳴器（Resonator）である。」  
