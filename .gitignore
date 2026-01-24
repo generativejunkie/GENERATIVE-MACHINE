@@ -5,3 +5,6 @@ vision-watcher/venv/
 
 # SECURITY: NEVER REMOVE antigravity-ios/ - Contains commander interface source code
 antigravity-ios/
+
+# SECURITY: NEVER REMOVE blackgravity-ios/ - Contains Black camera interface source code
+blackgravity-ios/
