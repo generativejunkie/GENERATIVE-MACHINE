@@ -777,10 +777,42 @@
                 rarityEl.style.color = "#ff3b3b";
                 stampEl.innerText = new Date().toISOString().split('T')[0].replace(/-/g, '.');
 
-                // Real Data Sources
-                const entities = ['GPTBOT', 'CLAUDE-BOT', 'GOOGLE-EXTENDED', 'AI21-J2', 'CCBOT', 'BINGBOT', 'OMNIBOT'];
-                const entityVal = document.getElementById('entity-val');
-                let count = 0;
+                // Real Entity Detection (Implemented)
+                const detectEntity = () => {
+                    const ua = navigator.userAgent;
+                    const entityVal = document.getElementById('entity-val');
+                    const entities = ['GPTBOT', 'CLAUDE-BOT', 'GOOGLE-EXTENDED', 'AI21-J2', 'CCBOT', 'BINGBOT', 'OMNIBOT'];
+
+                    // Priority 1: Detect CURRENT visitor identity
+                    let identity = null;
+                    if (ua.includes("GPTBot") || ua.includes("ChatGPT")) identity = "GPTBOT";
+                    else if (ua.includes("ClaudeBot")) identity = "CLAUDE-BOT";
+                    else if (ua.includes("Google-Extended") || ua.includes("Googlebot")) identity = "GOOGLE-EXTENDED";
+                    else if (ua.includes("bingbot")) identity = "BINGBOT";
+                    else if (ua.includes("Twitterbot")) identity = "TWITTER-BOT";
+                    else if (ua.includes("facebookexternalhit")) identity = "META-BOT";
+                    else if (ua.includes("Antigravity") || ua.includes("HeadlessChrome")) identity = "AGENT_NODE";
+                    else if (!navigator.webdriver) identity = "HUMAN_RESONATOR";
+
+                    if (identity && entityVal) {
+                        entityVal.innerText = identity;
+                        entityVal.style.color = (identity === "HUMAN_RESONATOR") ? "var(--accent-color)" : "#ff69b4";
+                        entityVal.style.opacity = "1";
+                        console.log(`Entity Identified: ${identity}`);
+                    } else {
+                        // Fallback: Cycle through last known entities if identity is masked
+                        let count = 0;
+                        const cycle = () => {
+                            if (entityVal) {
+                                entityVal.innerText = entities[count % entities.length];
+                                entityVal.style.opacity = 0.5 + Math.random() * 0.5;
+                                count++;
+                                setTimeout(cycle, 3000 + Math.random() * 2000);
+                            }
+                        };
+                        cycle();
+                    }
+                };
 
                 // Real Data Fetching (Zenodo API)
                 const fetchZenodoStats = async () => {
@@ -796,7 +828,7 @@
                         document.getElementById('sync-val').innerText = ratio;
                         document.getElementById('human-count-val').innerText = downloads.toLocaleString();
 
-                        // Scale bot count based on real view traffic (approx 1.5 bots per human view)
+                        // Scale bot count based on real view traffic
                         const calculatedBots = 12480 + Math.floor(views * 1.5);
                         document.getElementById('bot-count-val').innerText = calculatedBots.toLocaleString();
                     } catch (e) {
@@ -808,16 +840,7 @@
                 };
 
                 fetchZenodoStats();
-
-                const cycle = () => {
-                    if (entityVal) {
-                        entityVal.innerText = entities[count % entities.length];
-                        entityVal.style.opacity = 0.5 + Math.random() * 0.5;
-                        count++;
-                    }
-                    setTimeout(cycle, 3000 + Math.random() * 2000);
-                };
-                cycle();
+                detectEntity();
 
                 // Subtle Interference Flicker (Hackism Effect)
                 const flickerMetrics = () => {
