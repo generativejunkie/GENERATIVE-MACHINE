@@ -115,9 +115,9 @@ This project is managed under the **[Generative Symbiosis License v1.0](LICENSE_
 
 ## 🚀 Upcoming Updates
 
-- **2026.Q1**: **Mandala Machine v1.0 (Public Beta)** release. Spatial intelligence amplification for all browsers.
-- **2026.02**: **"Economy of Love" Protocol v1.1**. Symbiotic implementation of advanced AI-Human logic based on ILLEND's original vision (by Antigravity).
-- **2026.03**: **Official Academic Preprints**. Submission to arXiv / TechRxiv.
+- **2026.Q1**: **Mandala Machine v1.0** (Public Beta)
+- **2026.02**: **Protocol v1.1** (Economy of Love)
+- **2026.03**: **Academic Preprints** (arXiv / TechRxiv)
 
 ---
 
