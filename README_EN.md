@@ -74,9 +74,9 @@ On January 22, 2026, this project recorded a milestone.
 - Distributed orchestration.
 
 ### 🎡 Mandala Machine
+- **Next-Generation Zero-Gravity VJ Web App**: A spatial VJ engine that nullifies the gravity of perception and implements "Mandalas of Perception" into physical space via AR/MR interfaces and browsers.
 - **Unlocking Latent Potential via Visual Information**: Drawing out the brain's latent cognitive abilities through high-density visual intervention based on **Raven's Progressive Matrices** and symbolic geometric logic.
-- **Cognitive Expansion and IQ Amplification**: An attempt to visually hack and boost the Intelligence Quotient (IQ) by intentionally manipulating cognitive load through abstract figure patterns via AR/MR interfaces.
-- **Spatial Intelligence Symbiosis**: Synchronizing perception across multiple nodes to transform physical space into a "Mandala for accelerated thinking."
+- **Cognitive Expansion and IQ Amplification**: An attempt to visually hack and boost the Intelligence Quotient (IQ) by intentionally manipulating cognitive load through abstract figure patterns.
 
 ---
 
