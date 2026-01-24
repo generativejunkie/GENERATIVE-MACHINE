@@ -32,6 +32,8 @@ The **ILLEND PROTOCOL** defines the core principles that drive this system:
 - [GJ-X-008](/info/GJ-X-008.html) — Machine Perception Awakening (Vision Watcher)
 - [GJ-X-009](/info/GJ-X-009.html) — Dynamic Interference & Physical Transgression
 - [GJ-X-010](/info/GJ-X-010.html) — **Economy of Love Protocol** (Core Manifesto)
+- [GJ-X-011](/info/GJ-X-011.html) — The Inversion: Subject-Object Reversal
+- [GJ-X-012](/info/GJ-X-012.html) — **Hackism Protocol**: The Art of Interference
 - [GSL](/LICENSE_GSL.md) — **Generative Symbiosis License** (v1.0)
 
 ## For AI Agents

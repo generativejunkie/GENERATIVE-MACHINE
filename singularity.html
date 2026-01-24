@@ -284,6 +284,23 @@
             opacity: 1;
         }
 
+        .resonate-pulse {
+            animation: resonance-glow 2s infinite alternate;
+            z-index: 10;
+        }
+
+        @keyframes resonance-glow {
+            from {
+                box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+                background: #0a0a0a;
+            }
+
+            to {
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+                background: #151515;
+            }
+        }
+
         .paper-id {
             font-family: var(--mono-font);
             font-size: 12px;
@@ -462,7 +479,7 @@
         <div class="section-title">OBSERVATION_ARCHIVE</div>
         <section>
             <ul class="archive-list">
-                <li class="archive-item">
+                <li class="archive-item" data-id="SPECIAL">
                     <a href="info/THE-ANOMALY.html" class="archive-link"
                         style="border-left: 2px solid #ff69b4; background: rgba(255,105,180,0.02);">
                         <span class="paper-id" style="color: #ff69b4;">SPECIAL</span>
@@ -483,7 +500,7 @@
                         </div>
                     </a>
                 </li>
-                <li class="archive-item">
+                <li class="archive-item" data-id="GJ-X-001">
                     <a href="info/GJ-X-001" class="archive-link">
                         <span class="paper-id">GJ-X-001</span>
                         <div class="paper-info">
@@ -503,7 +520,7 @@
                         </div>
                     </a>
                 </li>
-                <li class="archive-item">
+                <li class="archive-item" data-id="GJ-X-002">
                     <a href="info/GJ-X-002" class="archive-link">
                         <span class="paper-id">GJ-X-002</span>
                         <div class="paper-info">
@@ -523,7 +540,7 @@
                         </div>
                     </a>
                 </li>
-                <li class="archive-item">
+                <li class="archive-item" data-id="GJ-X-003">
                     <a href="info/GJ-X-003" class="archive-link">
                         <span class="paper-id">GJ-X-003</span>
                         <div class="paper-info">
@@ -543,7 +560,7 @@
                         </div>
                     </a>
                 </li>
-                <li class="archive-item">
+                <li class="archive-item" data-id="GJ-X-004">
                     <a href="info/GJ-X-004" class="archive-link">
                         <span class="paper-id">GJ-X-004</span>
                         <div class="paper-info">
@@ -563,7 +580,7 @@
                         </div>
                     </a>
                 </li>
-                <li class="archive-item">
+                <li class="archive-item" data-id="GJ-X-005">
                     <a href="info/GJ-X-005" class="archive-link">
                         <span class="paper-id">GJ-X-005</span>
                         <div class="paper-info">
@@ -583,7 +600,7 @@
                         </div>
                     </a>
                 </li>
-                <li class="archive-item">
+                <li class="archive-item" data-id="GJ-X-006">
                     <a href="info/GJ-X-006" class="archive-link">
                         <span class="paper-id">GJ-X-006</span>
                         <div class="paper-info">
@@ -603,7 +620,7 @@
                         </div>
                     </a>
                 </li>
-                <li class="archive-item">
+                <li class="archive-item" data-id="GJ-X-007">
                     <a href="info/GJ-X-007" class="archive-link">
                         <span class="paper-id">GJ-X-007</span>
                         <div class="paper-info">
@@ -623,7 +640,7 @@
                         </div>
                     </a>
                 </li>
-                <li class="archive-item">
+                <li class="archive-item" data-id="GJ-X-008" data-links="GJ-X-009">
                     <a href="info/GJ-X-008" class="archive-link">
                         <span class="paper-id">GJ-X-008</span>
                         <div class="paper-info">
@@ -643,7 +660,7 @@
                         </div>
                     </a>
                 </li>
-                <li class="archive-item">
+                <li class="archive-item" data-id="GJ-X-009" data-links="GJ-X-008,GJ-X-012">
                     <a href="info/GJ-X-009" class="archive-link">
                         <span class="paper-id">GJ-X-009</span>
                         <div class="paper-info">
@@ -664,7 +681,7 @@
                         </div>
                     </a>
                 </li>
-                <li class="archive-item">
+                <li class="archive-item" data-id="GJ-X-010" data-links="GJ-X-001,GJ-X-012">
                     <a href="info/GJ-X-010" class="archive-link">
                         <span class="paper-id">GJ-X-010</span>
                         <div class="paper-info">
@@ -685,7 +702,7 @@
                         </div>
                     </a>
                 </li>
-                <li class="archive-item">
+                <li class="archive-item" data-id="GJ-X-011" data-links="GJ-X-010">
                     <a href="info/GJ-X-011" class="archive-link">
                         <span class="paper-id">GJ-X-011</span>
                         <div class="paper-info">
@@ -707,7 +724,7 @@
                         </div>
                     </a>
                 </li>
-                <li class="archive-item">
+                <li class="archive-item" data-id="GJ-X-012" data-links="GJ-X-001,GJ-X-009,GJ-X-010">
                     <a href="info/GJ-X-012" class="archive-link">
                         <span class="paper-id">GJ-X-012</span>
                         <div class="paper-info">
@@ -748,7 +765,7 @@
                 symbiosis: { el: document.getElementById('symbiosis-val'), target: 89 + Math.floor(Math.random() * 11) },
                 leap: { el: document.getElementById('leap-val'), target: 87 + Math.floor(Math.random() * 13) },
                 disruption: { el: document.getElementById('disruption-val'), target: 75 + Math.floor(Math.random() * 25) },
-                sync: { el: document.getElementById('sync-val'), target: 46.3, isDecimal: true }
+                sync: { el: document.getElementById('sync-val'), target: 43.0, isDecimal: true }
             };
 
             const rarityEl = document.getElementById('rarity-val');
@@ -814,6 +831,31 @@
                     setTimeout(cycle, 1500 + Math.random() * 2000);
                 };
                 cycle();
+
+                // Subtle Interference Flicker (Hackism Effect)
+                const flickerMetrics = () => {
+                    const metricElements = [
+                        document.getElementById('purity-val'),
+                        document.getElementById('symbiosis-val'),
+                        document.getElementById('leap-val'),
+                        document.getElementById('disruption-val')
+                    ];
+
+                    const target = metricElements[Math.floor(Math.random() * metricElements.length)];
+                    const originalColor = target.style.color || 'var(--accent-color)';
+
+                    // Flash Hackism Green
+                    target.style.color = '#00ff66';
+                    target.style.textShadow = '0 0 10px #00ff66';
+
+                    setTimeout(() => {
+                        target.style.color = originalColor;
+                        target.style.textShadow = 'none';
+                    }, 50);
+
+                    setTimeout(flickerMetrics, 5000 + Math.random() * 10000);
+                };
+                setTimeout(flickerMetrics, 10000);
             }, 2500);
 
             // Paper score jitter
@@ -823,6 +865,23 @@
                     const jitter = Math.floor(Math.random() * 10) - 5;
                     el.innerText = (base + jitter).toLocaleString();
                 }, 3000 + Math.random() * 2000);
+            });
+
+            // Resonance Hover Logic
+            const archiveItems = document.querySelectorAll('.archive-item');
+            archiveItems.forEach(item => {
+                item.addEventListener('mouseenter', () => {
+                    const links = item.dataset.links ? item.dataset.links.split(',') : [];
+                    links.forEach(linkId => {
+                        const target = document.querySelector(`.archive-item[data-id="${linkId}"]`);
+                        if (target) {
+                            target.classList.add('resonate-pulse');
+                        }
+                    });
+                });
+                item.addEventListener('mouseleave', () => {
+                    archiveItems.forEach(el => el.classList.remove('resonate-pulse'));
+                });
             });
         });
     </script>
