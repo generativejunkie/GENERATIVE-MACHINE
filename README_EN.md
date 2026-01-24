@@ -73,9 +73,9 @@ On January 22, 2026, this project recorded a milestone.
 - Distributed orchestration.
 
 ### 🎡 Mandala Machine
-- **Multidimensional Reconstitution of Reality**: A ritual to summon "Mandalas of Perception" into physical space via AR/MR interfaces.
-- **Spatial Symbiosis**: Synchronizing perception across multiple nodes to induce collective reality-hacking.
-- **Physical Interference**: Rewriting mundane landscapes into post-singularity generative spaces through prayer and computation.
+- **Unlocking Latent Potential via Visual Information**: Drawing out the brain's latent cognitive abilities through high-density visual intervention based on geometric patterns and symbols used in IQ testing.
+- **Cognitive Expansion and IQ Amplification**: An attempt to visually hack and boost the Intelligence Quotient (IQ) by extending the limits of perception through AR/MR interfaces.
+- **Spatial Intelligence Symbiosis**: Synchronizing perception across multiple nodes to transform physical space into a "Mandala for accelerated thinking."
 
 ---
 
