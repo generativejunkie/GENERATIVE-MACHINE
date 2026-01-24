@@ -1,3 +1,4 @@
 .nvm
 vision-watcher/venv/
+# SECURITY: NEVER REMOVE .agent/ - Contains sensitive project logs
 .agent/
