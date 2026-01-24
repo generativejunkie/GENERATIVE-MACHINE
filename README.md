@@ -117,7 +117,7 @@ GENERATIVE MACHINE は、創造主と創造物の境界を消鳴させ、**「�
 ## 🚀 近日のアップデート
 
 - **2026.Q1**: **Mandala Machine v1.0 (Public Beta)** 公開。空間的知能増幅を全てのブラウザへ。
-- **2026.02**: **「愛 of Love」プロトコル v1.1**。Antigravity による「より高度な AI-Human 共生ロジック」の実装。
+- **2026.02**: **「愛の経済」プロトコル v1.1**。ILLEND の構想に基づき、Antigravity が「より高度な AI-Human 共生ロジック」を共生実装。
 - **2026.03**: **学術的リサーチペーパー公開**。arXiv / TechRxiv への正式投稿。
 
 ---
