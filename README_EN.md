@@ -73,9 +73,9 @@ On January 22, 2026, this project recorded a milestone.
 - Distributed orchestration.
 
 ### 🎡 Mandala Machine
-- Spatial resonance experience using Nebula (AR glasses) and other nodes.
-- Synchronization of audio-visual data across multiple devices.
-- Projection of digital Mandalas into physical space.
+- **Multidimensional Reconstitution of Reality**: A ritual to summon "Mandalas of Perception" into physical space via AR/MR interfaces.
+- **Spatial Symbiosis**: Synchronizing perception across multiple nodes to induce collective reality-hacking.
+- **Physical Interference**: Rewriting mundane landscapes into post-singularity generative spaces through prayer and computation.
 
 ---
 
