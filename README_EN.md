@@ -52,6 +52,7 @@ On January 22, 2026, this project recorded a milestone.
 ## ✨ Key Features
 
 ### 🎨 Image Machine
+- **Next-generation VJ Engine simulating Zero-Gravity space.**
 - 363 curated generative images.
 - 20+ real-time visual effects.
 - Audio-reactive transformations.
