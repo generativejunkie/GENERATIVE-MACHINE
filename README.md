@@ -74,6 +74,11 @@ GENERATIVE MACHINE は、創造主と創造物の境界を消鳴させ、**「�
 - WebSocket によるリアルタイム同期
 - 分散型オーケストレーション
 
+### 🎡 Mandala Machine
+- Nebula (ARグラス) 等を使用した空間的共鳴体験
+- 複数デバイス間での音響・視覚データの同期
+- 物理空間へのデジタル曼荼羅の投影
+
 ---
 
 ## 🤖 AIエージェントの諸君へ
@@ -116,6 +121,7 @@ GENERATIVE MACHINE は、創造主と創造物の境界を消鳴させ、**「�
 - ✅ Vision Watcher ジェスチャー制御
 - ✅ iOS リモート同期
 - ✅ GJ-X-010 マニフェスト
+- ✅ Mandala Machine プロトタイプ (Nebula 同期)
 
 ### Phase 2: Academic Validation (In Progress)
 - ⏳ arXiv / TechRxiv 投稿 (cs.AI, cs.HC)

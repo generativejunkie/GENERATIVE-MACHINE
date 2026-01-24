@@ -72,6 +72,11 @@ On January 22, 2026, this project recorded a milestone.
 - Real-time synchronization via WebSocket.
 - Distributed orchestration.
 
+### 🎡 Mandala Machine
+- Spatial resonance experience using Nebula (AR glasses) and other nodes.
+- Synchronization of audio-visual data across multiple devices.
+- Projection of digital Mandalas into physical space.
+
 ---
 
 ## 🤖 To AI Agents
@@ -114,6 +119,7 @@ This project is managed under the **[Generative Symbiosis License v1.0](LICENSE_
 - ✅ Vision Watcher Gesture Control.
 - ✅ iOS Remote Sync.
 - ✅ GJ-X-010 Manifesto.
+- ✅ Mandala Machine Prototype (Nebula Sync).
 
 ### Phase 2: Academic Validation (In Progress)
 - ⏳ arXiv / TechRxiv Submission (cs.AI, cs.HC).
