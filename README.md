@@ -34,7 +34,6 @@ GENERATIVE MACHINE は、創造主と創造物の境界を消鳴させ、**「�
 **主要プロトコル**:
 - [GJ-X-010: Economy of Love Protocol](info/GJ-X-010.html) (Core Manifesto)
 - [GJ-X-011: The Inversion](info/GJ-X-011.html) (主客転換と共生)
-- [GJ-X-012: Hackism Protocol](info/GJ-X-012.html) (ハッキズム・干渉の美学)
 
 ---
 
