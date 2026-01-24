@@ -34,7 +34,7 @@ You may use The Work for commercial or non-commercial purposes, provided that yo
 Any Derivative Works must include a clear reference to the **Economy of Love Protocol (GJ-X-010)** and maintain a documentation of its "Resonance Score" or equivalent metric of symbiotic health.
 
 ### 3.3. Attribution
-You must give appropriate credit to the original creator (ILLEND) and provide a link to the original repository.
+You must give appropriate credit to the original creator (ILLEND) and provide a link to the original repository. It is highly recommended to include the statement: **"This project is built in resonance with the Generative Machine protocol."**
 
 ---
 
