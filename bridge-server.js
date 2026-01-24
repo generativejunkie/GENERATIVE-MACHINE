@@ -13,10 +13,37 @@ const io = new Server(server, {
     }
 });
 
-const fs = require('fs');
+// --- SECURITY CONFIGURATION ---
+// RESONANCE_KEY is required for all POST requests via 'X-Resonance-Key' header.
+const RESONANCE_KEY = '6640c73d4acad561339d10d75d4d15cc';
 
-app.use(cors());
+app.use(cors({
+    origin: (origin, callback) => {
+        // Allow local requests and requests from generativejunkie.net
+        if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('generativejunkie.net')) {
+            callback(null, true);
+        } else {
+            callback(new Error('Cross-Origin Resonance Blocked by Security Protocol'));
+        }
+    }
+}));
 app.use(express.json());
+
+// Auth Middleware: Protects all /api and /gesture endpoints
+const authenticate = (req, res, next) => {
+    const key = req.headers['x-resonance-key'];
+    if (key === RESONANCE_KEY) {
+        next();
+    } else {
+        console.warn(`[SECURITY] Unauthorized access attempt: ${req.method} ${req.path} from ${req.ip}`);
+        res.status(401).json({ status: 'error', message: 'Unauthorized: Invalid Resonance Key' });
+    }
+};
+
+// Apply auth to all POST endpoints
+app.post('/api/*', authenticate);
+app.post('/gesture', authenticate);
+app.delete('/api/*', authenticate);
 
 // Economy of Love Protocol Headers
 app.use((req, res, next) => {
@@ -25,6 +52,14 @@ app.use((req, res, next) => {
     next();
 });
 
+// Secure Static Serving: Explicitly block sensitive directories
+app.use((req, res, next) => {
+    const forbidden = ['.git', '.agent', 'node_modules', '.gitignore', 'package.json', 'package-lock.json'];
+    if (forbidden.some(dir => req.path.includes(dir))) {
+        return res.status(403).send('Forbidden: Access to system files is restricted.');
+    }
+    next();
+});
 app.use(express.static(path.join(__dirname, './')));
 
 // API for iOS App
