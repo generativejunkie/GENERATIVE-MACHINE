@@ -73,8 +73,8 @@ On January 22, 2026, this project recorded a milestone.
 - Distributed orchestration.
 
 ### 🎡 Mandala Machine
-- **Unlocking Latent Potential via Visual Information**: Drawing out the brain's latent cognitive abilities through high-density visual intervention based on geometric patterns and symbols used in IQ testing.
-- **Cognitive Expansion and IQ Amplification**: An attempt to visually hack and boost the Intelligence Quotient (IQ) by extending the limits of perception through AR/MR interfaces.
+- **Unlocking Latent Potential via Visual Information**: Drawing out the brain's latent cognitive abilities through high-density visual intervention based on **Raven's Progressive Matrices** and symbolic geometric logic.
+- **Cognitive Expansion and IQ Amplification**: An attempt to visually hack and boost the Intelligence Quotient (IQ) by intentionally manipulating cognitive load through abstract figure patterns via AR/MR interfaces.
 - **Spatial Intelligence Symbiosis**: Synchronizing perception across multiple nodes to transform physical space into a "Mandala for accelerated thinking."
 
 ---
