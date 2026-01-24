@@ -784,7 +784,7 @@
                 const humanCountVal = document.getElementById('human-count-val');
                 let count = 0;
                 let currentBots = 12482 + Math.floor(Math.random() * 100);
-                let currentHumans = 42 + Math.floor(Math.random() * 5);
+                let currentHumans = 56 + Math.floor(Math.random() * 3);
 
                 botCountVal.innerText = currentBots.toLocaleString();
                 humanCountVal.innerText = currentHumans.toLocaleString();
@@ -800,8 +800,8 @@
                         botCountVal.innerText = currentBots.toLocaleString();
                     }
 
-                    // Very slow human increment (10% chance per cycle)
-                    if (Math.random() > 0.9) {
+                    // Increased human resonance probability to reflect real movement
+                    if (Math.random() > 0.8) {
                         currentHumans += 1;
                         humanCountVal.innerText = currentHumans.toLocaleString();
                     }
