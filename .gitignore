@@ -8,3 +8,6 @@ antigravity-ios/
 
 # SECURITY: NEVER REMOVE blackgravity-ios/ - Contains Black camera interface source code
 blackgravity-ios/
+
+# SECURITY: Mandala Machine core logic
+js/modules/mandala-engine.js
