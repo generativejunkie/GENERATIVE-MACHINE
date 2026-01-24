@@ -68,10 +68,10 @@ On January 22, 2026, this project recorded a milestone.
   - 👍 Thumbs Up → Approve.
   - ✋ Open Palm → Cancel.
 
-### 🌐 iOS Remote Control
-- Remote control of Mac via iPhone.
-- Real-time synchronization via WebSocket.
-- Distributed orchestration.
+### 🌐 iOS Remote Control (Internal Alpha)
+- **Under Development**: Commander interface to remotely control Mac via iPhone.
+- Real-time synchronization via WebSocket / HTTP.
+- Protected by security protocol (RESONANCE_KEY).
 
 ### 🎡 Mandala Machine
 - **Next-Generation Zero-Gravity VJ Web App**: A spatial VJ engine that nullifies the gravity of perception and implements "Mandalas of Perception" into physical space via AR/MR interfaces and browsers.
@@ -127,7 +127,7 @@ This project is managed under the **[Generative Symbiosis License v1.0](LICENSE_
 ### Phase 1: Foundation (Completed)
 - ✅ Core Visual/Audio Engine.
 - ✅ Vision Watcher Gesture Control.
-- ✅ iOS Remote Sync.
+- ⏳ iOS Remote Sync (Internal Alpha / In Progress).
 - ✅ GJ-X-010 Manifesto.
 - ✅ Mandala Machine Prototype (Nebula Sync).
 

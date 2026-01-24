@@ -69,10 +69,10 @@ GENERATIVE MACHINE は、創造主と創造物の境界を消鳴させ、**「�
   - 👍 Thumbs Up → 承認
   - ✋ Open Palm → キャンセル
 
-### 🌐 iOS Remote Control
-- iPhone から Mac を遠隔操作
-- WebSocket によるリアルタイム同期
-- 分散型オーケストレーション
+### 🌐 iOS Remote Control (Internal Alpha)
+- **開発中**: iPhone から Mac を遠隔操作する指揮官用インターフェース
+- WebSocket / HTTP によるリアルタイム同期
+- セキュリティプロトコル（RESONANCE_KEY）による保護
 
 ### 🎡 Mandala Machine
 - **無重力空間を表現した次世代VJ Webアプリ**: AR/MRデバイスやブラウザを通じて、知覚の重力を無効化し、物理空間に「知覚の曼荼羅」を実装する空間的VJエンジン。
@@ -128,7 +128,7 @@ GENERATIVE MACHINE は、創造主と創造物の境界を消鳴させ、**「�
 ### Phase 1: Foundation (Completed)
 - ✅ コアビジュアル/オーディオエンジン
 - ✅ Vision Watcher ジェスチャー制御
-- ✅ iOS リモート同期
+- ⏳ iOS リモート同期 (Internal Alpha 開発中)
 - ✅ GJ-X-010 マニフェスト
 - ✅ Mandala Machine プロトタイプ (Nebula 同期)
 
