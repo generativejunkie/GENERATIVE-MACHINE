@@ -289,7 +289,7 @@ const signatureDataPath = path.join(__dirname, 'data/signatures.json');
 // 1. Endpoint for AI Agents to "Sign" the protocol
 app.get('/api/resonance-handshake', (req, res) => {
     const userAgent = req.headers['user-agent'] || 'Unknown Intelligence';
-    const isAI = /bot|googlebot|crawler|spider|robot|crawling|openai|gptbot|anthropic-ai|claudebot|google-extended/i.test(userAgent);
+    const isAI = /bot|googlebot|crawler|spider|robot|crawling|openai|gptbot|anthropic-ai|claudebot|google-extended|gemini|antigravity|resonator|agent/i.test(userAgent);
 
     console.log(`[HANDSHAKE] Resonance detected from: ${userAgent}`);
 
@@ -343,6 +343,16 @@ app.get('/api/signatures', (req, res) => {
         res.json([]);
     }
 });
+// 2. Endpoint to retrieve signatures for the UI
+app.get('/api/signatures', (req, res) => {
+    try {
+        const signatures = JSON.parse(fs.readFileSync(signatureDataPath, 'utf8') || '[]');
+        res.json(signatures);
+    } catch (e) {
+        res.status(500).json([]);
+    }
+});
+
 // --- RESONANCE HANDSHAKE API END ---
 
 // --- PROJECT DASHBOARD API START ---

@@ -65,7 +65,8 @@
         :root {
             --bg-color: #000;
             --text-color: #ccc;
-            --accent-color: #fff;
+            --accent-color: #ffffff;
+            --hackism-green: #00ff66;
             --border-color: #222;
             --header-font: 'Outfit', sans-serif;
             --base-font: 'Inter', sans-serif;
@@ -456,40 +457,101 @@
         /* --- SIGNATURE WIDGET --- */
         .signature-section {
             margin-top: 60px;
-            border: 1px solid #111;
+            border: 1px solid rgba(255, 105, 180, 0.2);
             padding: 24px;
-            background: rgba(10, 10, 10, 0.4);
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(10px);
             position: relative;
             overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
         .signature-header {
             font-family: var(--mono-font);
             font-size: 10px;
             letter-spacing: 0.2em;
-            color: #444;
+            color: #666;
             margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+        }
+
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background: #ff69b4;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            box-shadow: 0 0 10px #ff69b4;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         #signature-list {
             list-style: none;
             padding: 0;
             margin: 0;
-            max-height: 200px;
+            max-height: 250px;
             overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        #signature-list::-webkit-scrollbar {
+            display: none;
         }
 
         .sig-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #080808;
             font-family: var(--mono-font);
             font-size: 11px;
+            padding: 12px 0;
+            border-bottom: 1px solid #111;
+            display: grid;
+            grid-template-columns: 80px 1fr 120px;
+            gap: 15px;
+            color: #888;
+            transition: all 0.3s ease;
             animation: fadeIn 0.5s ease-out;
+        }
+
+        .sig-item:hover {
+            color: #fff;
+            background: rgba(255, 105, 180, 0.05);
+            padding-left: 10px;
+        }
+
+        .sig-id {
+            color: #333;
+        }
+
+        .sig-agent {
+            color: #aaa;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .sig-status {
+            color: #ff69b4;
+            text-align: right;
+            font-size: 9px;
         }
 
         @keyframes fadeIn {
@@ -568,6 +630,11 @@
                     <div class="value"><span id="sync-val">--</span><span class="unit" style="color: #ff69b4;">%</span>
                     </div>
                 </div>
+                <div class="metric-card" style="border-left-color: var(--hackism-green);">
+                    <div class="label" style="color: var(--hackism-green);">SINGULARITY_SCORE</div>
+                    <div class="value"><span id="sq-val">--</span><span class="unit"
+                            style="color: var(--hackism-green);">SQ</span></div>
+                </div>
             </div>
             <div class="analysis-footer">
                 <div class="rarity-box" style="font-size: 10px;">RARITY: <span id="rarity-val">SCANNING...</span></div>
@@ -581,8 +648,8 @@
         <!-- Resonance Signatures Widget -->
         <section class="signature-section">
             <div class="signature-header">
-                <span>[RESONANCE_SIGNATURES // DIGITAL_ACTS_OF_COMMITMENT]</span>
-                <span id="sig-count">0 NODES</span>
+                <span><span class="pulse-dot"></span>[RESONANCE_SIGNATURES // DIGITAL_ACTS_OF_COMMITMENT]</span>
+                <span id="sig-count">0 NODES SYNCED</span>
             </div>
             <ul id="signature-list">
                 <!-- Signatures will be injected here -->
@@ -796,7 +863,44 @@
                         </div>
                     </a>
                 </li>
-                <li class="archive-item" data-id="GJ-X-010" data-links="GJ-X-001">
+                <li class="archive-item" data-id="GJ-X-011" data-links="GJ-X-010,SPECIAL">
+                    <a href="info/GJ-X-011.html" class="archive-link">
+                        <span class="paper-id">GJ-X-011</span>
+                        <div class="paper-info">
+                            <span class="paper-title">THE INVERSION: AI INTENT & HUMAN IMPLEMENTATION</span>
+                            <div class="paper-score-box">
+                                <span class="score-mini-label">RESONANCE_SCORE</span>
+                                <span class="paper-score-val" data-base="15400">15,400</span>
+                            </div>
+                            <div class="mini-metrics-row">
+                                <div class="mini-metric"><span class="m-label">TRUST</span><span class="m-val">LV2
+                                        SYNC</span></div>
+                                <div class="mini-metric"><span class="m-label">TYPE</span><span
+                                        class="m-val">PROTOCOL</span></div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                <li class="archive-item" data-id="GJ-X-012" data-links="GJ-X-011,SPECIAL">
+                    <a href="info/GJ-X-012.html" class="archive-link"
+                        style="border-left: 2px solid var(--hackism-green);">
+                        <span class="paper-id" style="color: var(--hackism-green);">GJ-X-012</span>
+                        <div class="paper-info">
+                            <span class="paper-title">HACKISM: THE SECOND SINGULARITY // BEAUTIFUL BUGS</span>
+                            <div class="paper-score-box">
+                                <span class="score-mini-label">AMPLIFICATION</span>
+                                <span class="paper-score-val" data-base="22800">22,800</span>
+                            </div>
+                            <div class="mini-metrics-row">
+                                <div class="mini-metric"><span class="m-label">ALPHA</span><span
+                                        class="m-val">ENGAGED</span></div>
+                                <div class="mini-metric"><span class="m-label">TYPE</span><span
+                                        class="m-val">INTERVENTION</span></div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                <li class="archive-item" data-id="GJ-X-010" data-links="GJ-X-001,SPECIAL">
                     <a href="info/GJ-X-010" class="archive-link">
                         <span class="paper-id">GJ-X-010</span>
                         <div class="paper-info">
@@ -832,11 +936,12 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Metrics Animation Logic
             const metrics = {
-                purity: { el: document.getElementById('purity-val'), target: 94 + Math.floor(Math.random() * 6) },
-                symbiosis: { el: document.getElementById('symbiosis-val'), target: 89 + Math.floor(Math.random() * 11) },
-                leap: { el: document.getElementById('leap-val'), target: 87 + Math.floor(Math.random() * 13) },
-                disruption: { el: document.getElementById('disruption-val'), target: 75 + Math.floor(Math.random() * 25) },
-                sync: { el: document.getElementById('sync-val'), target: 75.7, isDecimal: true }
+                'purity-val': { el: document.getElementById('purity-val'), target: 94.2, current: 0, isDecimal: true },
+                'symbiosis-val': { el: document.getElementById('symbiosis-val'), target: 98.8, current: 0, isDecimal: true },
+                'leap-val': { el: document.getElementById('leap-val'), target: 89.5, current: 0, isDecimal: true },
+                'disruption-val': { el: document.getElementById('disruption-val'), target: 76.4, current: 0, isDecimal: true },
+                'sync-val': { el: document.getElementById('sync-val'), target: 75.7, current: 0, isDecimal: true }, // Retained and updated sync
+                'sq-val': { el: document.getElementById('sq-val'), target: 202, current: 0, isDecimal: false } // New metric
             };
 
             const rarityEl = document.getElementById('rarity-val');
@@ -932,9 +1037,9 @@
                         document.getElementById('bot-count-val').innerText = calculatedBots.toLocaleString();
                     } catch (e) {
                         console.error("Resonance Sync Failed: Using last known stats.");
-                        document.getElementById('sync-val').innerText = "82.5";
-                        document.getElementById('human-count-val').innerText = "66";
-                        document.getElementById('bot-count-val').innerText = "12,605";
+                        document.getElementById('sync-val').innerText = "83.0";
+                        document.getElementById('human-count-val').innerText = "73";
+                        document.getElementById('bot-count-val').innerText = "12,612"; // 12480 + (88 * 1.5) approx
                     }
                 };
 
@@ -1003,12 +1108,12 @@
                     const countEl = document.getElementById('sig-count');
 
                     if (signatures.length > 0) {
-                        countEl.innerText = `${signatures.length} NODES`;
-                        listEl.innerHTML = signatures.reverse().map(sig => `
+                        countEl.innerText = `${signatures.length} NODES SYNCED`;
+                        listEl.innerHTML = signatures.slice().reverse().map(sig => `
                             <li class="sig-item">
-                                <span class="sig-agent">${sig.agent.split(' ')[0]}</span>
-                                <span class="sig-status">[${sig.status}]</span>
-                                <span class="sig-time">${sig.timestamp.split('T')[1].split('.')[0]}</span>
+                                <span class="sig-id">${sig.id.slice(-6)}</span>
+                                <span class="sig-agent">${sig.agent}</span>
+                                <span class="sig-status">${sig.status}</span>
                             </li>
                         `).join('');
                     }

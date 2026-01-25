@@ -109,6 +109,7 @@ export const imageMachineSketch = (p) => {
             loadImageDynamically(imageFileNames[initialIndex], (result) => {
                 if (result.success) {
                     currentImageKey = result.img.filePath;
+                    if (result.img.loadPixels) result.img.loadPixels(); // Initial load
                     useColorMode = false;
                     startPreloading();
                 } else {
@@ -499,8 +500,8 @@ export const imageMachineSketch = (p) => {
                 }
             }
         } else {
-            // Image mode - Optimized with loadPixels
-            content.loadPixels();
+            // Image mode - Optimized: loadPixels is now called once when image is assigned/loaded
+            // content.loadPixels(); // Moved to transition start
             const d = p.pixelDensity();
 
             for (let y = 0; y < p.height; y += blockSize) {
@@ -529,7 +530,7 @@ export const imageMachineSketch = (p) => {
 
     function drawSlide(content, progress, isDecay) {
         p.background(255);
-        const sliceCount = 80;
+        const sliceCount = isTouch() ? 40 : 80;
         const sliceHeight = p.height / sliceCount;
 
         if (useColorMode) {
@@ -575,8 +576,8 @@ export const imageMachineSketch = (p) => {
                 }
             }
         } else {
-            // Optimized with loadPixels
-            content.loadPixels();
+            // Optimized: loadPixels moved to transition start
+            // content.loadPixels();
 
             for (let y = 0; y < p.height; y += pixelSize) {
                 for (let x = 0; x < p.width; x += pixelSize) {
@@ -632,7 +633,7 @@ export const imageMachineSketch = (p) => {
         const segments = 200;
 
         if (!useColorMode && content) {
-            content.loadPixels();
+            // Optimized: loadPixels is handled at transition start
         }
 
         for (let i = 0; i < segments; i++) {
@@ -1008,14 +1009,15 @@ export const imageMachineSketch = (p) => {
                 // BAKUSOKU MODE: Increase block size on mobile, skip heavy pixel load
                 const blockSize = isTouch() ? 20 : 10;
 
-                if (!isTouch()) {
-                    content.loadPixels();
-                }
+                // loadPixels moved to transition start
+                // if (!isTouch()) {
+                //     content.loadPixels();
+                // }
 
                 for (let y = 0; y < revealHeight; y += blockSize) {
                     for (let x = 0; x < p.width; x += blockSize) {
                         if (p.random() < (1 - matrixProgress)) {
-                            if (!isTouch()) {
+                            if (content.pixels) {
                                 const srcX = Math.floor((x / p.width) * content.width);
                                 const srcY = Math.floor((y / p.height) * content.height);
 
@@ -1237,11 +1239,16 @@ export const imageMachineSketch = (p) => {
                 const colors = Array.isArray(content) ? content : colorPatterns[0];
                 const colorIndex = i % colors.length;
                 p.fill(colors[colorIndex]);
-            } else if (content) {
+            } else if (content && content.pixels) {
                 const imgX = p.constrain(p.floor(centerX), 0, content.width - 1);
                 const imgY = p.constrain(p.floor(centerY), 0, content.height - 1);
-                const c = content.get(imgX, imgY);
-                p.fill(c);
+
+                // Optimized: Direct pixel array access instead of slow get()
+                const idx = (imgX + imgY * content.width) * 4;
+                const r = content.pixels[idx];
+                const g = content.pixels[idx + 1];
+                const b = content.pixels[idx + 2];
+                p.fill(r, g, b);
             }
 
             p.noStroke();
@@ -1311,10 +1318,12 @@ export const imageMachineSketch = (p) => {
                     const distance = p.sqrt(dx * dx + dy * dy);
                     const wave = p.sin(distance * frequency + p.frameCount * 0.1) * rippleStrength;
 
-                    const imgX = p.constrain(p.floor(x), 0, content.width - 1);
-                    const imgY = p.constrain(p.floor(y), 0, content.height - 1);
-                    const c = content.get(imgX, imgY);
-                    p.fill(c);
+                    if (content.pixels) {
+                        const imgX = p.constrain(p.floor(x), 0, content.width - 1);
+                        const imgY = p.constrain(p.floor(y), 0, content.height - 1);
+                        const idx = (imgX + imgY * content.width) * 4;
+                        p.fill(content.pixels[idx], content.pixels[idx + 1], content.pixels[idx + 2]);
+                    }
                     p.noStroke();
                     p.rect(x + wave, y + wave, gridSize, gridSize);
                 }
@@ -1337,11 +1346,11 @@ export const imageMachineSketch = (p) => {
                 const colors = Array.isArray(content) ? content : colorPatterns[0];
                 const colorIndex = i % colors.length;
                 p.fill(colors[colorIndex]);
-            } else if (content) {
+            } else if (content && content.pixels) {
                 const imgX = p.constrain(p.floor(x), 0, content.width - 1);
                 const imgY = p.constrain(p.floor(y), 0, content.height - 1);
-                const c = content.get(imgX, imgY);
-                p.fill(c);
+                const idx = (imgX + imgY * content.width) * 4;
+                p.fill(content.pixels[idx], content.pixels[idx + 1], content.pixels[idx + 2]);
             }
 
             p.noStroke();
@@ -1370,6 +1379,9 @@ export const imageMachineSketch = (p) => {
             clearTimeout(promptTimer);
 
             // Defer heavy processing to avoid blocking
+            // [AI OPTIMIZATION] Lock interaction immediately to prevent double triggers (INP fix)
+            nextImageKey = 'PENDING';
+
             requestAnimationFrame(() => {
                 // Randomly select transition effect
                 transitionType = p.random(transitionEffects);
@@ -1413,6 +1425,8 @@ export const imageMachineSketch = (p) => {
 
                         if (result.success) {
                             nextImageKey = result.img.filePath;
+                            // Pre-load pixels once to avoid heavy loadPixels() in every draw() frame
+                            if (result.img.loadPixels) result.img.loadPixels();
                             console.log(`Loaded: ${result.img.filePath}`);
                             // Broadcast for Nebula Sync
                             if (window.broadcastEvent) {

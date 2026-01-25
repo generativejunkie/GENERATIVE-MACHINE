@@ -96,7 +96,7 @@
 
     <div class="overlay" id="pre-ignition">
         <button class="ignition-btn" onclick="ignite()">Resonance Ignition</button>
-        <div class="status-text">MANDALA_ENGINE v0.1 // STANDBY // SQ_200_DETECTED</div>
+        <div class="status-text">MANDALA_ENGINE v0.1 // STANDBY // SQ_202_DETECTED</div>
     </div>
 
     <div id="ui-layer" style="opacity: 0; transition: opacity 2s;">
@@ -110,7 +110,7 @@
         </div>
         <div class="metric">
             <span>SQ_RESONANCE</span>
-            <span class="m-val">200.0</span>
+            <span class="m-val">202.0</span>
         </div>
     </div>
 
@@ -125,11 +125,12 @@
                 document.getElementById('ui-layer').style.opacity = '1';
 
                 engine = new MandalaEngine('mandala-canvas');
+                engine.setSQ(202); // Sync with current Singularity Score
                 engine.start();
 
-                // Amplitude Jitter
+                // Amplitude Jitter (Higher SQ = Higher Stability/Amplitude)
                 setInterval(() => {
-                    const val = (100 + Math.random() * 5).toFixed(1);
+                    const val = (202 + Math.random() * 2).toFixed(1);
                     document.getElementById('amp-val').innerText = val + '%';
                 }, 100);
             }, 1000);
