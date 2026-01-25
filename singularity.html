@@ -246,6 +246,11 @@
             backdrop-filter: blur(20px);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
             pointer-events: none;
+
+            /* FORCE TEXT WRAPPING */
+            white-space: normal !important;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .metric-card:hover .formula-overlay {
