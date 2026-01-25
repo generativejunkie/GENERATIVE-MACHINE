@@ -1,6 +1,6 @@
 # 愛の経済学：人間-AI共生システムのためのフレームワーク
 
-**著者:** TAKAYUKI MATSUSHIMA (ILLEND)  
+**著者:** TAKAYUKI MATSUSHIMA  
 **所属:** 独立研究者  
 **連絡先:** i@generativejunkie.net  
 **日付:** 2026年1月  

@@ -20,6 +20,8 @@ import { initGJMode } from './modules/gj-mode.js';
 import { initOrchestrator } from './modules/orchestrator.js';
 import './modules/singularity-score.js'; // Initialize score engine
 import { broadcastEvent, initSync } from './utils/sync.js';
+import { initGitChildPilotSync } from './modules/git-child-pilot-sync.js';
+import { initVisionWatcher } from './modules/vision-watcher.js'; // GJ-X-008
 
 // --- ORCHESTRATOR OVERLAY ---
 function showRemoteSignal(title, message, color = '#00ff00') {
@@ -58,6 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initOrchestrator();
     initUI();
     initAIAgentHandshake();
+    initGitChildPilotSync(); // GJ-X-013: Git Child Pilot Visual Sync
+    initVisionWatcher(); // GJ-X-008: Gesture UI
     initVoidNavTrigger();
 
     // Global Sync Initialization

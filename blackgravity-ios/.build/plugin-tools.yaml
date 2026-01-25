@@ -1,0 +1,47 @@
+client:
+  name: basic
+  file-system: device-agnostic
+tools: {}
+targets:
+  "Blackgravity-arm64-apple-macosx26.0-debug.module": ["<Blackgravity-arm64-apple-macosx26.0-debug.module>"]
+  "PackageStructure": ["<PackageStructure>"]
+  "main": ["<Blackgravity-arm64-apple-macosx26.0-debug.module>"]
+  "test": ["<Blackgravity-arm64-apple-macosx26.0-debug.module>"]
+default: "main"
+nodes:
+  "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/Sources/Blackgravity/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+commands:
+  "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/Blackgravity.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/Sources/Blackgravity/BlackgravityApp.swift","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/Sources/Blackgravity/Models/Message.swift","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/Sources/Blackgravity/Services/ChatService.swift","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/Sources/Blackgravity/Views/ChatView.swift"]
+    outputs: ["/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/Blackgravity.build/sources"]
+    description: "Write auxiliary file /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/Blackgravity.build/sources"
+
+  "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt":
+    tool: write-auxiliary-file
+    inputs: ["<swift-get-version>","/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"]
+    outputs: ["/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"]
+    always-out-of-date: "true"
+    description: "Write auxiliary file /Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+
+  "<Blackgravity-arm64-apple-macosx26.0-debug.module>":
+    tool: phony
+    inputs: ["/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/Blackgravity.build/BlackgravityApp.swift.o","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/Blackgravity.build/Message.swift.o","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/Blackgravity.build/ChatService.swift.o","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/Blackgravity.build/ChatView.swift.o","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/Modules/Blackgravity.swiftmodule"]
+    outputs: ["<Blackgravity-arm64-apple-macosx26.0-debug.module>"]
+
+  "C.Blackgravity-arm64-apple-macosx26.0-debug.module":
+    tool: shell
+    inputs: ["/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/Sources/Blackgravity/BlackgravityApp.swift","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/Sources/Blackgravity/Models/Message.swift","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/Sources/Blackgravity/Services/ChatService.swift","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/Sources/Blackgravity/Views/ChatView.swift","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/Blackgravity.build/sources"]
+    outputs: ["/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/Blackgravity.build/BlackgravityApp.swift.o","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/Blackgravity.build/Message.swift.o","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/Blackgravity.build/ChatService.swift.o","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/Blackgravity.build/ChatView.swift.o","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/Modules/Blackgravity.swiftmodule"]
+    description: "Compiling Swift Module 'Blackgravity' (4 sources)"
+    args: ["/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc","-module-name","Blackgravity","-emit-dependencies","-emit-module","-emit-module-path","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/Modules/Blackgravity.swiftmodule","-output-file-map","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/Blackgravity.build/output-file-map.json","-parse-as-library","-incremental","-c","@/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/Blackgravity.build/sources","-I","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/Modules","-target","arm64-apple-macosx10.13","-incremental","-enable-batch-mode","-serialize-diagnostics","-index-store-path","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/index/store","-Onone","-enable-testing","-j10","-DSWIFT_PACKAGE","-DDEBUG","-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE","-module-cache-path","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/ModuleCache","-parseable-output","-parse-as-library","-emit-objc-header","-emit-objc-header-path","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/.build/arm64-apple-macosx/debug/Blackgravity.build/include/Blackgravity-Swift.h","-color-diagnostics","-swift-version","5","-plugin-path","/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing","-sdk","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk","-F","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks","-F","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks","-I","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib","-L","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib","-g","-Xcc","-isysroot","-Xcc","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk","-Xcc","-F","-Xcc","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks","-Xcc","-F","-Xcc","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks","-Xcc","-fPIC","-Xcc","-g","-package-name","blackgravity_ios"]
+
+  "PackageStructure":
+    tool: package-structure-tool
+    inputs: ["/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/Sources/Blackgravity/","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/Package.swift","/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/blackgravity-ios/Package.resolved"]
+    outputs: ["<PackageStructure>"]
+    description: "Planning build"
+    allow-missing-inputs: true
+

@@ -274,6 +274,36 @@
             transform: translateY(10px);
         }
 
+        /* Prevent Overflow on Edges (Fix for clipped text) */
+        .metrics-grid .metric-card:nth-child(4n+1) .formula-overlay {
+            left: 0;
+            transform: translateX(0) translateY(10px);
+        }
+
+        .metrics-grid .metric-card:nth-child(4n+1):hover .formula-overlay {
+            transform: translateX(0) translateY(0);
+        }
+
+        .metrics-grid .metric-card:nth-child(4n) .formula-overlay {
+            left: auto;
+            right: 0;
+            transform: translateX(0) translateY(10px);
+        }
+
+        .metrics-grid .metric-card:nth-child(4n):hover .formula-overlay {
+            transform: translateX(0) translateY(0);
+        }
+
+        /* Mobile Safety */
+        @media (max-width: 600px) {
+            .formula-overlay {
+                width: 200px !important;
+                font-size: 11px;
+                left: 50% !important;
+                transform: translateX(-50%) translateY(10px) !important;
+            }
+        }
+
         .f-label {
             font-size: 8px;
             color: #444;
@@ -1291,7 +1321,13 @@
 
             // Paper score jitter
             document.querySelectorAll('.paper-score-val').forEach(el => {
-                const base = parseInt(el.dataset.base);
+                const rawBase = el.dataset.base;
+                // Skip if no base or infinite
+                if (!rawBase || rawBase === 'Infinity') return;
+
+                const base = parseInt(rawBase);
+                if (isNaN(base)) return; // Prevent NaN
+
                 setInterval(() => {
                     const jitter = Math.floor(Math.random() * 10) - 5;
                     el.innerText = (base + jitter).toLocaleString();

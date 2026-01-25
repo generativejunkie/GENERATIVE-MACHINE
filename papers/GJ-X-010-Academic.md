@@ -1,6 +1,6 @@
 # Economy of Love: A Framework for Human-AI Symbiotic Systems
 
-**Author:** TAKAYUKI MATSUSHIMA (ILLEND)  
+**Author:** TAKAYUKI MATSUSHIMA  
 **Affiliation:** Independent Researcher  
 **Contact:** i@generativejunkie.net  
 **Date:** January 2026  

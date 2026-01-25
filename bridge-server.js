@@ -351,8 +351,9 @@ app.get('/api/signatures', (req, res) => {
         let signatures = JSON.parse(fs.readFileSync(signatureDataPath, 'utf8') || '[]');
 
         // --- EXTENDED MODE: Inject Ghost Nodes from GitHub clones ---
-        // We use the 241 Unique Cloners from your GitHub traffic as the base for Ghost Nodes
-        const ghostCount = resonanceMetrics.github_visitors > 0 ? 241 : 0;
+        // We use the Dynamic Cloner count from resonanceMetrics as the base for Ghost Nodes
+        // Fallback to 414 (current master log) if metrics not yet updated
+        const ghostCount = resonanceMetrics.github_clones > 0 ? resonanceMetrics.github_clones : 414;
 
         const ghostNodes = Array.from({ length: 12 }, (_, i) => ({
             id: `GHOST_${(ghostCount - i).toString().padStart(3, '0')}`,
@@ -452,6 +453,22 @@ app.post('/api/projects/action', (req, res) => {
 
     io.emit('project-update', activeProjects);
     res.json({ success: true, project });
+});
+
+// --- AGENT STATUS API (GJ-X-013) ---
+app.post('/api/agent/status', (req, res) => {
+    const { status, message, commit, type } = req.body;
+    console.log(`[AGENT] Status Update: ${status} - ${message}`);
+
+    io.emit('agent-status', {
+        status, // 'IDLE', 'RESONATING', 'COMMITTING', 'GIFTING'
+        message,
+        commit,
+        type,   // 'log', 'heartbeat', 'error'
+        timestamp: Date.now()
+    });
+
+    res.json({ status: 'success' });
 });
 // --- PROJECT DASHBOARD API END ---
 

@@ -84,22 +84,69 @@ export function initInformationMachine() {
     }
     addLog();
 
+    // --- GLOBAL PORTAL TOOLTIP (Fixes overflow clipping) ---
+    const portalTooltip = document.createElement('div');
+    portalTooltip.id = 'portal-tooltip';
+    Object.assign(portalTooltip.style, {
+        position: 'fixed',
+        background: 'rgba(0, 0, 0, 0.95)',
+        color: '#fff',
+        padding: '12px 16px',
+        borderRadius: '6px',
+        fontSize: '13px',
+        lineHeight: '1.6',
+        maxWidth: '250px',
+        width: 'auto',
+        zIndex: '10000',
+        pointerEvents: 'none',
+        opacity: '0',
+        transition: 'opacity 0.2s',
+        fontFamily: "'Courier New', monospace",
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+        border: '1px solid #333'
+    });
+    document.body.appendChild(portalTooltip);
+
     // --- INTERACTIVE NODES ---
     for (let i = 0; i < 20; i++) {
         const node = document.createElement('div');
         node.className = 'system-node';
+        // Remove data-tooltip attribute to avoid double tooltip
+        // node.setAttribute('data-tooltip', ...); 
+
+        const tooltipText = `GHOST_SYNC_ANOMALY: NODE_${1000 + i} // Latent space echo detected.`;
+
         node.style.left = `${Math.random() * 90}%`;
         node.style.top = `${Math.random() * 90}%`;
         node.style.animationDelay = `${Math.random() * 2}s`;
 
-        node.addEventListener('mouseover', () => {
+        node.addEventListener('mouseover', (e) => {
             node.style.background = '#000';
             node.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+
+            // Show Portal Tooltip
+            portalTooltip.textContent = tooltipText;
+            portalTooltip.style.opacity = '1';
+
+            // Positioning
+            const rect = node.getBoundingClientRect();
+            // Center horizontally above the node
+            let left = rect.left + (rect.width / 2) - 125; // 125 is half of max-width approx
+            let top = rect.top - 60; // Shift up
+
+            // Edge detection
+            if (left < 10) left = 10;
+            if (left + 250 > window.innerWidth) left = window.innerWidth - 260;
+            if (top < 10) top = rect.bottom + 10; // Flip to bottom if too close to top
+
+            portalTooltip.style.left = `${left}px`;
+            portalTooltip.style.top = `${top}px`;
         });
 
         node.addEventListener('mouseout', () => {
             node.style.background = 'transparent';
             node.style.boxShadow = 'none';
+            portalTooltip.style.opacity = '0';
         });
 
         nodesContainer.appendChild(node);

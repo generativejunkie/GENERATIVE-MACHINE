@@ -502,8 +502,8 @@ h3 {
     font-size: 13px;
     line-height: 1.6;
     white-space: normal;
-    max-width: 320px;
-    width: max-content;
+    max-width: 250px;
+    width: auto;
     z-index: 1000;
     font-family: 'Courier New', monospace;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -2543,5 +2543,115 @@ body.superhigh-active .section-title {
 @media (max-width: 768px) {
     .resonance-widget {
         display: none;
+    }
+}
+
+/* ==================== GJ-X-013: Visual Agent Widget ==================== */
+.agent-widget {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 9999;
+    font-family: var(--font-family-mono);
+    pointer-events: none;
+    /* Let clicks pass through */
+    transition: opacity 0.5s ease;
+}
+
+.agent-widget.hidden {
+    opacity: 0;
+}
+
+/* Heartbeat Core */
+.agent-heartbeat {
+    position: relative;
+    width: 20px;
+    height: 20px;
+}
+
+.heartbeat-core {
+    width: 8px;
+    height: 8px;
+    background: #00ffff;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px #00ffff;
+    animation: agentPulse var(--heartbeat-rate, 2s) infinite ease-in-out;
+}
+
+.heartbeat-ripple {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #00ffff;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    animation: agentRipple var(--heartbeat-rate, 2s) infinite ease-out;
+}
+
+/* Log Container */
+.agent-log-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.agent-status {
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    color: #555;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.agent-log {
+    font-size: 11px;
+    color: #888;
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.6);
+    padding: 2px 4px;
+    border-radius: 2px;
+}
+
+/* Animations */
+@keyframes agentPulse {
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.8;
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 1;
+    }
+}
+
+@keyframes agentRipple {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 1;
+        border-width: 2px;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(2.5);
+        opacity: 0;
+        border-width: 0px;
     }
 }

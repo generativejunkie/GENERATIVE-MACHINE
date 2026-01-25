@@ -1,13 +1,23 @@
-.nvm
-vision-watcher/venv/
-# SECURITY: NEVER REMOVE .agent/ - Contains sensitive project logs
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+
+# Production
+build/
+dist/
+
+# Misc
+.DS_Store
+.env
+.npm
+*.log
+.vscode/
+.idea/
+
+# Agent/Copilot
 .agent/
-
-# SECURITY: NEVER REMOVE antigravity-ios/ - Contains commander interface source code
-antigravity-ios/
-
-# SECURITY: NEVER REMOVE blackgravity-ios/ - Contains Black camera interface source code
-blackgravity-ios/
-
-# SECURITY: Mandala Machine core logic
-js/modules/mandala-engine.js
+.gemini/

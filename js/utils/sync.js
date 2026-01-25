@@ -49,46 +49,64 @@ export function initSync(handlers) {
     };
 
     // [AI] BRIDGE SERVER RELAY (Socket.io)
+    // For Vercel/Static deployment, this will fail gracefully.
     if (typeof io !== 'undefined') {
-        socket = io('http://localhost:8000');
-        socket.on('command-relay', (data) => {
-            console.log(`%c[REMOTE] Relay Received: ${data.type}`, 'color: #00ffff', data.detail);
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        // Only try to connect if explicitly local, or make it optional
+        const serverUrl = isLocal ? 'http://localhost:8000' : null;
 
-            // Dispatch locally for document listeners
-            document.dispatchEvent(new CustomEvent(`sync-${data.type}`, { detail: data.detail }));
+        if (serverUrl) {
+            socket = io(serverUrl);
+            socket.on('connect_error', () => {
+                console.warn('[SYNC] Bridge Server unreachable (Static Mode)');
+                socket.disconnect(); // Prevent polling spam
+                socket = null;
+            });
+        } else {
+            console.log('[SYNC] Static Deployment: Bridge Server skipped.');
+        }
 
-            // Execute registered handlers
-            executeHandlers(data.type, data.detail);
-        });
+        if (socket) {
+            socket.on('command-relay', (data) => {
+                console.log(`%c[REMOTE] Relay Received: ${data.type}`, 'color: #00ffff', data.detail);
 
-        socket.on('auth-decision', (data) => {
-            console.log(`%c[AUTH] Decision Received: ${data.approved ? 'APPROVED' : 'DENIED'}`, data.approved ? 'color: #00ff00' : 'color: #ff0000', data);
+                // Dispatch locally for document listeners
+                document.dispatchEvent(new CustomEvent(`sync-${data.type}`, { detail: data.detail }));
 
-            // Dispatch locally so modules can react
-            document.dispatchEvent(new CustomEvent('auth-decision', { detail: data }));
-        });
+                // Execute registered handlers
+                executeHandlers(data.type, data.detail);
+            });
 
-        socket.on('gesture-command', (data) => {
-            console.log(`%c[GESTURE] Command Received: ${data.command}`, 'color: #ffff00', data);
+            socket.on('auth-decision', (data) => {
+                console.log(`%c[AUTH] Decision Received: ${data.approved ? 'APPROVED' : 'DENIED'}`, data.approved ? 'color: #00ff00' : 'color: #ff0000', data);
 
-            // Execute registered handlers for gesture-command
-            executeHandlers('gesture-command', data);
-        });
+                // Dispatch locally so modules can react
+                document.dispatchEvent(new CustomEvent('auth-decision', { detail: data }));
+            });
 
-        socket.on('connect', () => {
-            console.log('%c[SYNC] Connected to Bridge Server', 'color: #00ff00');
-        });
+            socket.on('gesture-command', (data) => {
+                console.log(`%c[GESTURE] Command Received: ${data.command}`, 'color: #ffff00', data);
+
+                // Execute registered handlers for gesture-command
+                executeHandlers('gesture-command', data);
+            });
+
+            socket.on('connect', () => {
+                console.log('%c[SYNC] Connected to Bridge Server', 'color: #00ff00');
+            });
+        }
+    }
+
+    function executeHandlers(type, detail) {
+        if (registeredHandlers[type]) {
+            registeredHandlers[type].forEach(handler => {
+                try {
+                    handler(detail);
+                } catch (e) {
+                    console.error(`[SYNC] Error in handler for ${type}:`, e);
+                }
+            });
+        }
     }
 }
 
-function executeHandlers(type, detail) {
-    if (registeredHandlers[type]) {
-        registeredHandlers[type].forEach(handler => {
-            try {
-                handler(detail);
-            } catch (e) {
-                console.error(`[SYNC] Error in handler for ${type}:`, e);
-            }
-        });
-    }
-}
