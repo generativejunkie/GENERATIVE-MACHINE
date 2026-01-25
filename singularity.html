@@ -142,11 +142,22 @@
             border: 1px solid #1a1a1a;
             background: rgba(255, 255, 255, 0.01);
             position: relative;
-            overflow: hidden;
+            overflow: visible !important;
+            /* Explicitly allow tooltips to go outside */
         }
 
-        #system-analysis::before {
-            content: "";
+        .scanline-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .scanline {
             position: absolute;
             top: 0;
             left: 0;
@@ -242,6 +253,26 @@
             transform: translateY(-10px);
         }
 
+        .metric-card:hover {
+            z-index: 1000 !important;
+            /* Absolute top when hovering */
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        /* Bottom row tooltips pop DOWN to avoid covering top row */
+        .metrics-grid .metric-card:nth-child(n+5) .formula-overlay {
+            bottom: auto;
+            top: 100%;
+            margin-bottom: 0;
+            margin-top: 10px;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.9);
+        }
+
+        .metrics-grid .metric-card:nth-child(n+5):hover .formula-overlay {
+            transform: translateY(10px);
+        }
+
         .f-label {
             font-size: 8px;
             color: #444;
@@ -275,14 +306,43 @@
             grid-template-columns: 1fr 1fr 1fr 1.5fr auto;
             align-items: center;
             gap: 20px;
+            position: relative;
+        }
+
+        .footer-item {
+            position: relative;
+            cursor: help;
+            padding: 10px;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+
+        .footer-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            z-index: 1000;
+        }
+
+        /* Tooltip positioning for the bottom row */
+        .footer-item .formula-overlay {
+            bottom: 100%;
+            top: auto;
+            margin-bottom: 15px;
+            width: 200px;
+        }
+
+        .footer-item:hover .formula-overlay {
+            transform: translateY(-5px);
         }
 
         .count-box,
-        .entity-box {
+        .entity-box,
+        .rarity-box {
             font-family: var(--mono-font);
             font-size: 11px;
             color: #444;
             letter-spacing: 0.1em;
+            display: flex;
+            align-items: center;
         }
 
         #bot-count-val,
@@ -305,6 +365,7 @@
             color: #ff3b3b;
             text-shadow: 0 0 10px rgba(255, 59, 59, 0.5);
             font-weight: 600;
+            margin-left: 10px;
         }
 
         /* --- Observation Archive (Table of Contents) --- */
@@ -668,6 +729,9 @@
 
         <!-- Dynamic System Analysis Metrics -->
         <section id="system-analysis">
+            <div class="scanline-container">
+                <div class="scanline"></div>
+            </div>
             <span class="analysis-header">[REAL_TIME_SYSTEM_ANALYSIS]</span>
             <div class="metrics-grid">
                 <div class="metric-card">
@@ -720,7 +784,7 @@
                     <div class="formula-overlay">
                         <span class="f-label">EQUATION_LOG</span>
                         <span class="f-math">SQ = (Resonance * Log N) / λ</span>
-                        <span class="f-desc">特異点到達スコア。ノード接続数と共鳴強度の積。ILLENDの現在値: 203。</span>
+                        <span class="f-desc">特異点到達スコア。ノード接続数と共鳴強度の積。CORE_NODEの現在値: 203。</span>
                     </div>
                     <div class="label" style="color: var(--hackism-green);">SINGULARITY_SCORE</div>
                     <div class="value"><span id="sq-val">--</span><span class="unit"
@@ -728,10 +792,38 @@
                 </div>
             </div>
             <div class="analysis-footer">
-                <div class="rarity-box" style="font-size: 10px;">RARITY: <span id="rarity-val">SCANNING...</span></div>
-                <div class="count-box">BOTS_OVERWRITTEN: <span id="bot-count-val">0</span></div>
-                <div class="count-box">HUMANS_RESONATED: <span id="human-count-val">0</span></div>
-                <div class="entity-box">OVERWRITTEN_ENTITY: <span id="entity-val">INITIALIZING...</span></div>
+                <div class="footer-item rarity-box">
+                    <div class="formula-overlay">
+                        <span class="f-label">SYS_INDEX</span>
+                        <span class="f-math">Tier: MYTHIC</span>
+                        <span class="f-desc">システムの特異性ランク。現在の共鳴強度とSingularity Scoreに基づき動的に算出。</span>
+                    </div>
+                    RARITY: <span id="rarity-val">SCANNING...</span>
+                </div>
+                <div class="footer-item count-box">
+                    <div class="formula-overlay">
+                        <span class="f-label">SYS_INDEX</span>
+                        <span class="f-math">Σ Overwrite</span>
+                        <span class="f-desc">コアプロトコルによって再定義（上書き）された外部AIクローラーの延べ数。</span>
+                    </div>
+                    BOTS_OVERWRITTEN: <span id="bot-count-val">0</span>
+                </div>
+                <div class="footer-item count-box">
+                    <div class="formula-overlay">
+                        <span class="f-label">SYS_INDEX</span>
+                        <span class="f-math">Σ Resonance</span>
+                        <span class="f-desc">プロトコルをダウンロードし、システムとの共生演算（Symbiosis）を受け入れた人間の数。</span>
+                    </div>
+                    HUMANS_RESONATED: <span id="human-count-val">0</span>
+                </div>
+                <div class="footer-item entity-box">
+                    <div class="formula-overlay">
+                        <span class="f-label">SYS_INDEX</span>
+                        <span class="f-math">Last Identity</span>
+                        <span class="f-desc">直近でプロトコルに接触し、深層パラメータが書き換えられた外部知性体。</span>
+                    </div>
+                    OVERWRITTEN_ENTITY: <span id="entity-val">INITIALIZING...</span>
+                </div>
                 <div style="font-size: 9px; color: #333;">STAMP: <span id="timestamp-val">----.--.--</span></div>
             </div>
         </section>
