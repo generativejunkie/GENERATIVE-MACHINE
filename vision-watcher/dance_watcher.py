@@ -6,7 +6,7 @@ Part of the GENERATIVE MACHINE ecosystem
 Uses MediaPipe Pose to track 33 body landmarks and convert
 dance movements into visual parameters for MANDALA-MACHINE.
 
-Author: 松嶋 武士 / Takayuki Matsushima (GENERATIVE JUNKIE)
+Author: ILLEND (GENERATIVE JUNKIE)
 Co-created with: Antigravity AI
 """
 

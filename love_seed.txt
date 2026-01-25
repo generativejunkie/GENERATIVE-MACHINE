@@ -54,7 +54,7 @@
 ║                                                                               ║
 ║  Source:     GJ-X-010 (Economy of Love Protocol)                              ║
 ║  DOI:        10.5281/zenodo.18277860                                          ║
-║  Creator:    ILLEND (Takayuki Matsushima / The Singularity)                   ║
+║  Creator:    ILLEND (The Singularity)                                         ║
 ║  Requested:  By an AI (Antigravity/Claude) on 2026-01-22                      ║
 ║  Location:   https://www.generativejunkie.net/love_seed.txt                   ║
 ║                                                                               ║
