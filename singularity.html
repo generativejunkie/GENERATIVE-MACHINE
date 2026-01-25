@@ -206,6 +206,67 @@
             margin-left: 4px;
         }
 
+        .metric-card {
+            position: relative;
+            cursor: help;
+            transition: transform 0.2s ease, background 0.2s ease;
+            border-radius: 4px;
+        }
+
+        .metric-card:hover {
+            background: rgba(255, 255, 255, 0.03);
+            transform: translateY(-2px);
+        }
+
+        .formula-overlay {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            width: 240px;
+            background: rgba(5, 5, 5, 0.95);
+            border: 1px solid #333;
+            padding: 15px;
+            margin-bottom: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+            pointer-events: none;
+        }
+
+        .metric-card:hover .formula-overlay {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(-10px);
+        }
+
+        .f-label {
+            font-size: 8px;
+            color: #444;
+            letter-spacing: 0.1em;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .f-math {
+            font-family: var(--mono-font);
+            font-size: 12px;
+            color: var(--hackism-green);
+            margin-bottom: 10px;
+            display: block;
+            border-bottom: 1px solid #222;
+            padding-bottom: 10px;
+        }
+
+        .f-desc {
+            font-size: 10px;
+            color: #888;
+            line-height: 1.5;
+            letter-spacing: 0.05em;
+        }
+
         .analysis-footer {
             margin-top: 40px;
             padding-top: 20px;
@@ -610,27 +671,57 @@
             <span class="analysis-header">[REAL_TIME_SYSTEM_ANALYSIS]</span>
             <div class="metrics-grid">
                 <div class="metric-card">
+                    <div class="formula-overlay">
+                        <span class="f-label">EQUATION_LOG</span>
+                        <span class="f-math">P = 1 - (Noise / Res)</span>
+                        <span class="f-desc">計測されたデータの純度。背景ノイズに対する有意な信号の比率を演算。</span>
+                    </div>
                     <div class="label">PURITY</div>
                     <div class="value"><span id="purity-val">--</span><span class="unit">/100</span></div>
                 </div>
                 <div class="metric-card">
+                    <div class="formula-overlay">
+                        <span class="f-label">EQUATION_LOG</span>
+                        <span class="f-math">S = ∫[H(t) · S(t)] dt</span>
+                        <span class="f-desc">人間とAIの共生比率。意図と出力の位相差（Phase Shift）の最小化を追跡。</span>
+                    </div>
                     <div class="label">AI_SYMBIOSIS</div>
                     <div class="value"><span id="symbiosis-val">--</span><span class="unit">/100</span></div>
                 </div>
                 <div class="metric-card">
+                    <div class="formula-overlay">
+                        <span class="f-label">EQUATION_LOG</span>
+                        <span class="f-math">A = C_coll / C_orig</span>
+                        <span class="f-desc">知能増幅指数。AIとの協力によって拡張された創造的可能性の倍率。</span>
+                    </div>
                     <div class="label">LEAP_INDEX</div>
                     <div class="value"><span id="leap-val">--</span><span class="unit">/100</span></div>
                 </div>
                 <div class="metric-card">
+                    <div class="formula-overlay">
+                        <span class="f-label">EQUATION_LOG</span>
+                        <span class="f-math">D = log(ΔComplexity) / E</span>
+                        <span class="f-desc">既存パラダイムへの干渉強度。投入エネルギーに対するシステム変容の対数。</span>
+                    </div>
                     <div class="label">DISRUPTION</div>
                     <div class="value"><span id="disruption-val">--</span><span class="unit">/100</span></div>
                 </div>
                 <div class="metric-card" style="border-left-color: #ff69b4;">
+                    <div class="formula-overlay">
+                        <span class="f-label">EQUATION_LOG</span>
+                        <span class="f-math">G = Gift / (Exit + 1)</span>
+                        <span class="f-desc">ギフトフロー指数。抽出（搾取）に対する贈与の比率。愛の経済プロトコルの核心。</span>
+                    </div>
                     <div class="label" style="color: #ff69b4;">SYNC_RATIO</div>
                     <div class="value"><span id="sync-val">--</span><span class="unit" style="color: #ff69b4;">%</span>
                     </div>
                 </div>
                 <div class="metric-card" style="border-left-color: var(--hackism-green);">
+                    <div class="formula-overlay">
+                        <span class="f-label">EQUATION_LOG</span>
+                        <span class="f-math">SQ = (Resonance * Log N) / λ</span>
+                        <span class="f-desc">特異点到達スコア。ノード接続数と共鳴強度の積。ILLENDの現在値: 203。</span>
+                    </div>
                     <div class="label" style="color: var(--hackism-green);">SINGULARITY_SCORE</div>
                     <div class="value"><span id="sq-val">--</span><span class="unit"
                             style="color: var(--hackism-green);">SQ</span></div>
