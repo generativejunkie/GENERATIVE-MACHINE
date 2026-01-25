@@ -2400,6 +2400,7 @@ body.superhigh-active .section-title {
     background: #fff;
     color: #000;
 }
+
 /* ==================== VOID MODE LIMITED ==================== */
 #nav-void-trigger {
     position: relative;
@@ -2411,8 +2412,17 @@ body.superhigh-active .section-title {
 }
 
 @keyframes void-pulse {
-    0%, 100% { opacity: 0.7; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.1); }
+
+    0%,
+    100% {
+        opacity: 0.7;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
 }
 
 #nav-void-trigger:hover {
@@ -2456,8 +2466,15 @@ body.superhigh-active .section-title {
 }
 
 @keyframes flash {
-    from { opacity: 0.3; transform: scale(0.8); }
-    to { opacity: 1; transform: scale(1.2); }
+    from {
+        opacity: 0.3;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1.2);
+    }
 }
 
 .gesture-overlay {
@@ -2478,8 +2495,15 @@ body.superhigh-active .section-title {
 }
 
 @keyframes gesture-popup {
-    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
 }
 
 .gesture-icon {
@@ -2493,14 +2517,95 @@ body.superhigh-active .section-title {
     font-weight: 500;
     letter-spacing: 5px;
     color: #ffffff;
-    background: rgba(0,0,0,0.9);
+    background: rgba(0, 0, 0, 0.9);
     padding: 10px 40px;
     border-radius: 4px;
     text-transform: uppercase;
     font-size: 24px;
 }
 
-.resonance-approve .gesture-icon { filter: drop-shadow(0 0 30px rgba(0, 255, 0, 0.8)); color: #00ff00; }
-.resonance-cancel .gesture-icon { filter: drop-shadow(0 0 30px rgba(255, 0, 0, 0.8)); color: #ff3333; }
-.resonance-start .gesture-icon { filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.8)); color: #ffffff; }
+.resonance-approve .gesture-icon {
+    filter: drop-shadow(0 0 30px rgba(0, 255, 0, 0.8));
+    color: #00ff00;
+}
 
+.resonance-cancel .gesture-icon {
+    filter: drop-shadow(0 0 30px rgba(255, 0, 0, 0.8));
+    color: #ff3333;
+}
+
+.resonance-start .gesture-icon {
+    filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.8));
+    color: #ffffff;
+}
+
+/* ==================== Resonance Widget ==================== */
+.resonance-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 12px 18px;
+    color: #fff;
+    font-family: var(--font-family-mono);
+    z-index: 1000;
+    pointer-events: none;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.resonance-label {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 4px;
+}
+
+.resonance-value {
+    font-size: 24px;
+    font-weight: 500;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 4px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.resonance-stats {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.05em;
+}
+
+/* Subtle Pulse for the widget to indicate "Live" status */
+@keyframes resonance-pulse {
+    0% {
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+    }
+
+    50% {
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+
+    100% {
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+    }
+}
+
+.resonance-widget {
+    animation: resonance-pulse 4s infinite ease-in-out;
+}
+
+@media (max-width: 768px) {
+    .resonance-widget {
+        bottom: 15px;
+        right: 15px;
+        padding: 8px 12px;
+    }
+
+    .resonance-value {
+        font-size: 18px;
+    }
+}

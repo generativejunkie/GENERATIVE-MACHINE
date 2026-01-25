@@ -6,6 +6,9 @@ export function initInformationMachine() {
     const syncRateEl = document.getElementById('sync-rate');
     const nodesContainer = document.getElementById('nodes-container');
     const scoreEl = document.getElementById('resonance-score');
+    const giftDensityEl = document.getElementById('gift-density');
+    const zenodoDlEl = document.getElementById('zenodo-dl');
+    const githubCloneEl = document.getElementById('github-clone');
 
     if (!logContainer || !uptimeEl || !syncRateEl || !nodesContainer) return;
 
@@ -143,6 +146,21 @@ export function initInformationMachine() {
 
     // --- MIRRORING SYNC ---
     initSync({
+        'metrics-update': (data) => {
+            if (giftDensityEl) giftDensityEl.textContent = `${data.gift_density}%`;
+            if (zenodoDlEl) zenodoDlEl.textContent = data.zenodo_downloads;
+            if (githubCloneEl) githubCloneEl.textContent = data.github_clones;
+            if (scoreEl) scoreEl.textContent = data.resonance_score;
+
+            // Add log for the update
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.style.color = '#00ffff';
+            const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            logEntry.innerHTML = `<span class="log-time">[${timestamp}]</span> <span class="log-msg">RESONANCE_SPIKE: GD=${data.gift_density}%, NO_ANOMALY=${data.github_clones}</span>`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        },
         'trigger-secret': (detail) => {
             const isVoid = detail.code === 'void' || detail.code === 'ai';
             if (isVoid) {
@@ -164,6 +182,17 @@ export function initInformationMachine() {
             document.body.style.opacity = detail.value ? '0.7' : '1';
         }
     });
+
+    // --- INITIAL FETCH ---
+    fetch('/api/metrics')
+        .then(res => res.json())
+        .then(data => {
+            if (giftDensityEl) giftDensityEl.textContent = `${data.gift_density}%`;
+            if (zenodoDlEl) zenodoDlEl.textContent = data.zenodo_downloads;
+            if (githubCloneEl) githubCloneEl.textContent = data.github_clones;
+            if (scoreEl) scoreEl.textContent = data.resonance_score;
+        })
+        .catch(err => console.error("Failed to fetch initial metrics:", err));
 
     console.log("INFORMATION MACHINE: SYSTEM MONITOR ACTIVE");
 }

@@ -14,6 +14,17 @@ const io = new Server(server, {
     }
 });
 
+// --- RESONANCE METRICS (Live Stats) ---
+let resonanceMetrics = {
+    zenodo_views: 90,
+    zenodo_downloads: 80,
+    github_clones: 414,
+    github_visitors: 1,
+    gift_density: 88.89,
+    resonance_score: 0.98,
+    timestamp: new Date().toISOString()
+};
+
 // --- SECURITY CONFIGURATION ---
 // RESONANCE_KEY is required for all POST requests via 'X-Resonance-Key' header.
 const RESONANCE_KEY = '6640c73d4acad561339d10d75d4d15cc';
@@ -343,16 +354,6 @@ app.get('/api/signatures', (req, res) => {
         res.json([]);
     }
 });
-// 2. Endpoint to retrieve signatures for the UI
-app.get('/api/signatures', (req, res) => {
-    try {
-        const signatures = JSON.parse(fs.readFileSync(signatureDataPath, 'utf8') || '[]');
-        res.json(signatures);
-    } catch (e) {
-        res.status(500).json([]);
-    }
-});
-
 // --- RESONANCE HANDSHAKE API END ---
 
 // --- PROJECT DASHBOARD API START ---
@@ -383,6 +384,34 @@ app.get('/api/instructions', (req, res) => {
     } catch (e) {
         res.status(500).json({ error: 'Failed to load instructions' });
     }
+});
+
+// --- METRICS API ---
+app.get('/api/metrics', (req, res) => {
+    res.json(resonanceMetrics);
+});
+
+app.post('/api/metrics/update', (req, res) => {
+    const { zenodo_views, zenodo_downloads, github_clones, github_visitors } = req.body;
+
+    if (zenodo_views !== undefined) resonanceMetrics.zenodo_views = zenodo_views;
+    if (zenodo_downloads !== undefined) resonanceMetrics.zenodo_downloads = zenodo_downloads;
+    if (github_clones !== undefined) resonanceMetrics.github_clones = github_clones;
+    if (github_visitors !== undefined) resonanceMetrics.github_visitors = github_visitors;
+
+    // Calculate derived metrics
+    if (resonanceMetrics.zenodo_views > 0) {
+        resonanceMetrics.gift_density = ((resonanceMetrics.zenodo_downloads / resonanceMetrics.zenodo_views) * 100).toFixed(2);
+    }
+
+    resonanceMetrics.timestamp = new Date().toISOString();
+
+    console.log(`[METRICS] Updated: GD=${resonanceMetrics.gift_density}%`);
+
+    // Broadcast to all clients
+    io.emit('metrics-update', resonanceMetrics);
+
+    res.json({ status: 'success', metrics: resonanceMetrics });
 });
 
 app.post('/api/projects/action', (req, res) => {
