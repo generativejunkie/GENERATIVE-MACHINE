@@ -148,30 +148,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.body.style.boxShadow = 'none';
                 }, 800);
             }
-        },
-        'metrics-update': (data) => {
-            console.log("[SYNC] Metrics Update:", data);
-            const scoreVal = document.getElementById('resonance-score-val');
-            const gdVal = document.getElementById('widget-gd');
-            const clVal = document.getElementById('widget-cl');
-
-            if (scoreVal) scoreVal.textContent = data.resonance_score;
-            if (gdVal) gdVal.textContent = data.gift_density + '%';
-            if (clVal) clVal.textContent = data.github_clones;
         }
     });
-
-    // Initial Metrics Fetch for Widget
-    fetch('/api/metrics')
-        .then(res => res.json())
-        .then(data => {
-            const scoreVal = document.getElementById('resonance-score-val');
-            const gdVal = document.getElementById('widget-gd');
-            const clVal = document.getElementById('widget-cl');
-            if (scoreVal) scoreVal.textContent = data.resonance_score;
-            if (gdVal) gdVal.textContent = data.gift_density + '%';
-            if (clVal) clVal.textContent = data.github_clones;
-        }).catch(() => { });
 
     // Handle extra secret exit command from iOS
     document.addEventListener('sync-trigger-secret-exit', () => {

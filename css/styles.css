@@ -2539,90 +2539,9 @@ body.superhigh-active .section-title {
     color: #ffffff;
 }
 
-/* ==================== Resonance Widget ==================== */
-.resonance-widget {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: rgba(0, 0, 0, 0.4);
-    /* Subtle blend */
-    backdrop-filter: blur(12px);
-    border: none;
-    /* Disappear into background */
-    border-radius: 12px;
-    padding: 14px 22px;
-    color: rgba(255, 255, 255, 0.8);
-    font-family: var(--font-family-mono);
-    z-index: 1000;
-    pointer-events: none;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.resonance-label {
-    font-size: 7px;
-    letter-spacing: 0.3em;
-    color: rgba(255, 255, 255, 0.2);
-    /* Deeply subtle */
-    margin-bottom: 6px;
-    text-transform: uppercase;
-}
-
-.resonance-value {
-    font-size: 28px;
-    font-weight: 500;
-    color: #fff;
-    line-height: 1;
-    margin-bottom: 6px;
-    /* Optical Glow (Bloom) */
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
-        0 0 20px rgba(255, 255, 255, 0.4);
-    letter-spacing: -0.02em;
-}
-
-.resonance-stats {
-    font-size: 9px;
-    color: rgba(255, 255, 255, 0.3);
-    /* Subtle stats */
-    letter-spacing: 0.05em;
-    font-weight: 300;
-}
-
-.resonance-stats span {
-    color: rgba(255, 255, 255, 0.6);
-    /* Slightly more visible numbers */
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
-}
-
-/* Pulse only the glow to indicate life */
-@keyframes resonance-bloom {
-    0% {
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.6), 0 0 20px rgba(255, 255, 255, 0.3);
-        opacity: 0.9;
-    }
-
-    50% {
-        text-shadow: 0 0 15px rgba(255, 255, 255, 0.9), 0 0 30px rgba(255, 255, 255, 0.5);
-        opacity: 1;
-    }
-
-    100% {
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.6), 0 0 20px rgba(255, 255, 255, 0.3);
-        opacity: 0.9;
-    }
-}
-
-.resonance-value {
-    animation: resonance-bloom 3s infinite ease-in-out;
-}
 
 @media (max-width: 768px) {
     .resonance-widget {
-        bottom: 20px;
-        right: 20px;
-        padding: 10px 16px;
-    }
-
-    .resonance-value {
-        font-size: 20px;
+        display: none;
     }
 }
