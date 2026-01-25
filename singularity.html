@@ -232,17 +232,18 @@
         .formula-overlay {
             position: absolute;
             bottom: 100%;
-            left: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
             width: 240px;
-            background: rgba(5, 5, 5, 0.95);
+            background: rgba(5, 5, 5, 0.98);
             border: 1px solid #333;
             padding: 15px;
             margin-bottom: 10px;
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-            z-index: 100;
-            backdrop-filter: blur(10px);
+            z-index: 2000;
+            backdrop-filter: blur(20px);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
             pointer-events: none;
         }
@@ -250,7 +251,7 @@
         .metric-card:hover .formula-overlay {
             opacity: 1;
             visibility: visible;
-            transform: translateY(-10px);
+            transform: translateX(-50%) translateY(0);
         }
 
         .metric-card:hover {
@@ -325,16 +326,36 @@
 
         /* Tooltip positioning for the bottom row */
         .footer-item .formula-overlay {
-            bottom: 100%;
-            top: auto;
-            margin-bottom: 15px;
-            width: 200px;
+            bottom: calc(100% + 15px);
+            left: 50%;
+            transform: translateX(-50%) translateY(5px);
+            width: 220px;
+        }
+
+        /* Fix positioning for edge items in footer */
+        .footer-item:first-child .formula-overlay {
+            left: 0;
+            transform: translateX(0) translateY(5px);
+        }
+
+        .footer-item:last-child .formula-overlay {
+            left: auto;
+            right: 0;
+            transform: translateX(0) translateY(5px);
         }
 
         .footer-item:hover .formula-overlay {
             opacity: 1;
             visibility: visible;
-            transform: translateY(-5px);
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .footer-item:first-child:hover .formula-overlay {
+            transform: translateX(0) translateY(0);
+        }
+
+        .footer-item:last-child:hover .formula-overlay {
+            transform: translateX(0) translateY(0);
         }
 
         .count-box,
