@@ -14,7 +14,8 @@ export const ja: Locale = {
         transition: 'トランジション',
         wireframe: 'ワイヤーフレーム',
         upload: '+ メディア',
-        next: '次のビジュアル →'
+        next: '次のビジュアル →',
+        brainHack: '脳ハック'
     },
     announcements: {
         mandalaMode: '曼荼羅モード切り替え',

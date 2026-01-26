@@ -241,6 +241,8 @@ export interface ApplicationState {
   goldenRatioMode: boolean;
   antigravityMode: boolean;
   reflectMode: boolean; // Mirror reflection mode
+  brainHackMode: boolean;
+  brainHackModeIndex: number;
   isPlaying: boolean;
 }
 

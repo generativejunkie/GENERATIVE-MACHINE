@@ -421,17 +421,17 @@ export class SceneManager extends EventEmitter {
    */
   private updateMeshesForInstance(
     instance: ObjectInstance,
-    mandalaMode: boolean,
+    _mandalaMode: boolean,
     symmetryEnabled: boolean,
-    mirrorBallMode: boolean,
+    _mirrorBallMode: boolean,
     symmetryCount: number,
     sizeMultiplier: number,
     speedMultiplier: number,
     spreadMultiplier: number,
     spacingMultiplier: number,
     avgFrequency: number,
-    globalIndex: number,
-    totalCount: number,
+    _globalIndex: number,
+    _totalCount: number,
     _reflectMode: boolean
   ): void {
     const meshes = this.meshCache.get(instance.id);
@@ -712,7 +712,7 @@ export class SceneManager extends EventEmitter {
   /**
    * Apply antigravity effect to objects (gentle floating without rising)
    */
-  private applyAntigravity(instances: ObjectInstance[]): void {
+  private applyAntigravity(_instances: ObjectInstance[]): void {
     // Logic moved to updateMeshesForInstance for tighter integration with positioning
     // Kept empty or used for state management if needed
   }

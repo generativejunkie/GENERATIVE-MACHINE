@@ -229,6 +229,7 @@ export class UIController {
     this.setupFrequencySpawnControl();
     this.setupGoldenRatioControl();
     this.setupAntigravityControl();
+    this.setupBrainHackControl();
     this.setupMaxObjectsControl();
     this.setupColorControl();
     this.setupWireframeControl();
@@ -450,6 +451,58 @@ export class UIController {
         this.app.toggleAntigravityMode(enabled);
       });
     }
+  }
+
+  private setupBrainHackControl(): void {
+    const brainHackBtn = document.getElementById('topBrainHackBtn');
+    const brainHackCheckbox = document.getElementById('brainHackMode') as HTMLInputElement;
+    const brainHackSeekbarInput = document.getElementById('brainHackModeSeekbar') as HTMLInputElement;
+    const brainHackValue = document.getElementById('brainHackModeValue');
+
+    const modeButtons = document.querySelectorAll('.mode-tag-btn');
+    const colorA = document.getElementById('brainColorA') as HTMLInputElement;
+    const colorB = document.getElementById('brainColorB') as HTMLInputElement;
+    const colorC = document.getElementById('brainColorC') as HTMLInputElement;
+
+    const modeNames = ['Phantom', 'Boolean', 'Recursive', 'Neuro'];
+
+    if (brainHackBtn) {
+      brainHackBtn.addEventListener('click', () => {
+        const isActive = !brainHackBtn.classList.contains('active');
+        this.app.toggleBrainHackMode(isActive);
+      });
+    }
+
+    if (brainHackCheckbox) {
+      brainHackCheckbox.addEventListener('change', (e) => {
+        this.app.toggleBrainHackMode((e.target as HTMLInputElement).checked);
+      });
+    }
+
+    if (brainHackSeekbarInput && brainHackValue) {
+      brainHackSeekbarInput.addEventListener('input', (e) => {
+        const index = parseInt((e.target as HTMLInputElement).value);
+        brainHackValue.textContent = modeNames[index];
+        this.app.setBrainHackModeIndex(index);
+      });
+    }
+
+    modeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = parseInt(btn.getAttribute('data-mode') || '0');
+        this.app.setBrainHackModeIndex(mode);
+      });
+    });
+
+    const updateColors = () => {
+      if (colorA && colorB && colorC) {
+        this.app.setBrainHackColors(colorA.value, colorB.value, colorC.value);
+      }
+    };
+
+    if (colorA) colorA.addEventListener('input', updateColors);
+    if (colorB) colorB.addEventListener('input', updateColors);
+    if (colorC) colorC.addEventListener('input', updateColors);
   }
 
   private setupAIModeControl(): void {
@@ -730,8 +783,9 @@ export class UIController {
       const aiActive = document.getElementById('topAiBtn')?.classList.contains('active');
       const autoActive = document.getElementById('topAutoBtn')?.classList.contains('active');
       const gravityActive = document.getElementById('topGravityBtn')?.classList.contains('active');
+      const brainHackActive = document.getElementById('topBrainHackBtn')?.classList.contains('active');
 
-      const anyActive = mandalaActive || aiActive || autoActive || gravityActive;
+      const anyActive = mandalaActive || aiActive || autoActive || gravityActive || brainHackActive;
       modeSeekbars.style.display = anyActive ? 'flex' : 'none';
 
       const showItem = (id: string, visible: boolean) => {
@@ -743,6 +797,7 @@ export class UIController {
       showItem('aiSeekbar', !!aiActive);
       showItem('autoGenSeekbar', !!autoActive);
       showItem('antigravitySeekbar', !!gravityActive);
+      showItem('brainHackSeekbar', !!brainHackActive);
     };
 
     // Mandala Mode
@@ -797,6 +852,14 @@ export class UIController {
 
         updateSeekbarVisibility();
         console.log(`🤖 AUTO Mode: ${isActive ? 'ON' : 'OFF'}`);
+      });
+    }
+
+    // BrainHack Toggle
+    const topBrainHackBtn = document.getElementById('topBrainHackBtn');
+    if (topBrainHackBtn) {
+      topBrainHackBtn.addEventListener('click', () => {
+        updateSeekbarVisibility();
       });
     }
 
@@ -1789,6 +1852,9 @@ export class UIController {
     const topGravityBtn = document.getElementById('topGravityBtn');
     if (topGravityBtn) topGravityBtn.classList.toggle('active', state.antigravityMode);
 
+    const topBrainHackBtn = document.getElementById('topBrainHackBtn');
+    if (topBrainHackBtn) topBrainHackBtn.classList.toggle('active', state.brainHackMode);
+
     // Update Mode Seekbars Visibility
     const modeSeekbars = document.getElementById('modeSeekbars');
     if (modeSeekbars) {
@@ -1804,7 +1870,27 @@ export class UIController {
       showItem('aiSeekbar', !!state.spaceMode);
       showItem('autoGenSeekbar', !!state.autoMode);
       showItem('antigravitySeekbar', !!state.antigravityMode);
+      showItem('brainHackSeekbar', !!state.brainHackMode);
     }
+
+    // Update Sidebar
+    const brainHackCheckbox = document.getElementById('brainHackMode') as HTMLInputElement;
+    if (brainHackCheckbox) brainHackCheckbox.checked = !!state.brainHackMode;
+
+    const modeNames = ['Phantom', 'Boolean', 'Recursive', 'Neuro'];
+    const brainHackSeekbarInput = document.getElementById('brainHackModeSeekbar') as HTMLInputElement;
+    const brainHackValue = document.getElementById('brainHackModeValue');
+    if (brainHackSeekbarInput && brainHackValue) {
+      brainHackSeekbarInput.value = (state.brainHackModeIndex || 0).toString();
+      brainHackValue.textContent = modeNames[state.brainHackModeIndex || 0];
+      this.updateSliderVisual(brainHackSeekbarInput);
+    }
+
+    const modeButtons = document.querySelectorAll('.mode-tag-btn');
+    modeButtons.forEach(btn => {
+      const mode = parseInt(btn.getAttribute('data-mode') || '0');
+      btn.classList.toggle('active', mode === state.brainHackModeIndex);
+    });
 
     // Update Sidebar Checkboxes
     const mandalaCheckbox = document.getElementById('mandalaMode') as HTMLInputElement;

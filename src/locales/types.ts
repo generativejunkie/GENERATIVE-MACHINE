@@ -13,6 +13,7 @@ export interface Locale {
         wireframe: string;
         upload: string;
         next: string;
+        brainHack: string;
     };
     announcements: {
         mandalaMode: string;

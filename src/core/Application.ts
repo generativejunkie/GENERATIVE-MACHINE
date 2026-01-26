@@ -15,6 +15,7 @@ import { MATERIALS } from '@materials/geometries';
 // AI Features
 import { NeuralPatternLearner } from '@features/NeuralPatternLearner';
 import { ProcessingLayer } from '@features/ProcessingLayer';
+import { BrainHackMandala } from '@features/BrainHackMandala';
 
 // Reserved for future use
 // import { MULTIPLIER_DEFAULTS } from '@constants/config';
@@ -33,6 +34,7 @@ export class Application extends EventEmitter<ApplicationEventMap> {
   // AI Features
   private neuralLearner: NeuralPatternLearner;
   private processingLayer: ProcessingLayer;
+  private brainHack: BrainHackMandala;
 
 
   // State
@@ -90,6 +92,10 @@ export class Application extends EventEmitter<ApplicationEventMap> {
     // Initialize AI features
     this.neuralLearner = new NeuralPatternLearner();
     this.processingLayer = new ProcessingLayer('p5-container');
+    this.brainHack = new BrainHackMandala(
+      this.sceneManager.getRenderer(),
+      (this.sceneManager as any).scene // Need scene reference
+    );
 
     // Setup listener for BPM update
     this.on('audio:bpm', (bpm) => {
@@ -128,7 +134,9 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       frequencySpawnMode: false,
       goldenRatioMode: false,
       antigravityMode: false,
-      reflectMode: false
+      reflectMode: false,
+      brainHackMode: false,
+      brainHackModeIndex: 0
     };
 
     // Initialize InstanceManager with spacing multiplier
@@ -196,6 +204,28 @@ export class Application extends EventEmitter<ApplicationEventMap> {
         this.instanceManager.updateInstance(instanceId, { position });
       }
     });
+  }
+
+  /**
+   * Handle BrainHack Mode
+   */
+  public toggleBrainHackMode(enabled?: boolean): void {
+    const nextValue = enabled !== undefined ? enabled : !this.state.brainHackMode;
+    this.state.brainHackMode = nextValue;
+    this.brainHack.setVisible(nextValue);
+    this.emit('state:changed', this.state);
+
+    console.log(`🧠 BrainHack Mode: ${nextValue ? 'ON' : 'OFF'}`);
+  }
+
+  public setBrainHackModeIndex(index: number): void {
+    this.state.brainHackModeIndex = index;
+    this.brainHack.setMode(index);
+    this.emit('state:changed', this.state);
+  }
+
+  public setBrainHackColors(colorA: string, colorB: string, colorC: string): void {
+    this.brainHack.setColors(colorA, colorB, colorC);
   }
 
   /**
@@ -380,6 +410,19 @@ export class Application extends EventEmitter<ApplicationEventMap> {
     // Antigravity Mode: Meditative object cycling
     if (this.state.antigravityMode) {
       this.handleGravityMode();
+    }
+
+    // Update BrainHack shader
+    if (this.state.brainHackMode) {
+      const bands = this.getCurrentFrequencyBands();
+      const kick = bands.low / 255;
+
+      // Calculate beat progress (0.0 to 1.0)
+      const beatInterval = this.audioManager.getBeatInterval();
+      const timeSinceBeat = Date.now() - (this.audioManager as any).lastBeatTime;
+      const beatProgress = Math.min(1.0, timeSinceBeat / beatInterval);
+
+      this.brainHack.update(beatProgress, kick, this.state.brainHackModeIndex);
     }
 
     // Get all instances and update scene
@@ -1579,6 +1622,10 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       this.state.sizeMultiplier *= -1;
     }
     this.emit('state:changed', this.state);
+  }
+
+  public toggleReflectMode(): void {
+    this.setReflectMode(!this.state.reflectMode);
   }
 
 

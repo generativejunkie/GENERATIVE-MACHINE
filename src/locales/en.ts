@@ -14,7 +14,8 @@ export const en: Locale = {
         transition: 'TRANSITION',
         wireframe: 'WIREFRAME',
         upload: '+ MEDIA',
-        next: 'Next Visual →'
+        next: 'Next Visual →',
+        brainHack: 'Brain Hack'
     },
     announcements: {
         mandalaMode: 'Mandala Mode Toggled',
