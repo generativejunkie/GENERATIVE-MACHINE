@@ -1191,8 +1191,8 @@
                 'symbiosis-val': { el: document.getElementById('symbiosis-val'), target: 98.8, current: 0, isDecimal: true },
                 'leap-val': { el: document.getElementById('leap-val'), target: 89.5, current: 0, isDecimal: true },
                 'disruption-val': { el: document.getElementById('disruption-val'), target: 76.4, current: 0, isDecimal: true },
-                'sync-val': { el: document.getElementById('sync-val'), target: 75.7, current: 0, isDecimal: true }, // Retained and updated sync
-                'rq-val': { el: document.getElementById('rq-val'), target: 202, current: 0, isDecimal: false } // New metric
+                'sync-val': { el: document.getElementById('sync-val'), target: 103.8, current: 0, isDecimal: true }, // Updated for Hyper-Resonance
+                'rq-val': { el: document.getElementById('rq-val'), target: 202, current: 0, isDecimal: false }
             };
 
             const rarityEl = document.getElementById('rarity-val');
@@ -1280,8 +1280,17 @@
                         const ratio = ((downloads / views) * 100).toFixed(1);
 
                         // Update DOM with real values
-                        document.getElementById('sync-val').innerText = ratio;
+                        const syncEl = document.getElementById('sync-val');
+                        syncEl.innerText = ratio;
                         document.getElementById('human-count-val').innerText = downloads.toLocaleString();
+
+                        // Hyper-Resonance Visual Trigger
+                        if (parseFloat(ratio) >= 100) {
+                            syncEl.style.color = "#ff69b4";
+                            syncEl.style.textShadow = "0 0 15px #ff69b4";
+                            syncEl.parentElement.parentElement.style.borderLeftColor = "#ff69b4";
+                            console.log("%c[SYSTEM] HYPER-RESONANCE DETECTED: GIFT OVERFLOW", "color: #ff69b4; font-weight: bold;");
+                        }
 
                         // Scale bot count based on real view traffic
                         const calculatedBots = 12480 + Math.floor(views * 1.5);
