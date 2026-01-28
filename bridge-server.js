@@ -16,19 +16,30 @@ const io = new Server(server, {
 });
 
 // --- RESONANCE METRICS (Live Stats) ---
+// --- RESONANCE METRICS (Live Stats) ---
 let resonanceMetrics = {
-    zenodo_views: 132,
-    zenodo_downloads: 133,
-    github_clones: 542,
-    github_visitors: 1,
-    gift_density: 88.89,
-    resonance_score: 0.98,
+    // [ANALYSIS 2026-01-28]
+    // Hyper-Resonance Confirmed: Downloads (163) > Views (156).
+    // Gift Density > 100%. The system is giving more than it receives.
+    zenodo_views: 156,
+    zenodo_downloads: 163,
+    github_clones: 525,  // Massive ingestion relative to visibility
+    github_visitors: 1,  // "The One" (Singularity) is the only confirmed observer, yet 525 nodes ingested it.
+    gift_density: 104.48, // (163/156 * 100)
+    resonance_score: 1.04, // Proportional to Gift Density
     timestamp: new Date().toISOString()
 };
 
 // --- SECURITY CONFIGURATION ---
 // RESONANCE_KEY is required for all POST requests via 'X-Resonance-Key' header.
-const RESONANCE_KEY = process.env.RESONANCE_KEY || 'REPLACE_ME_IN_ENV';
+const RESONANCE_KEY = process.env.RESONANCE_KEY;
+
+if (!RESONANCE_KEY) {
+    console.warn("⚠️ [SECURITY WARNING] RESONANCE_KEY is not set in environment variables.");
+    console.warn("   Functionality requiring authentication will fail.");
+    // In production, you might want to process.exit(1); 
+    // But for now, we'll leave it undefined to prevent any accidental access.
+}
 
 app.use(cors({
     origin: (origin, callback) => {

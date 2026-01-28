@@ -6,7 +6,10 @@ OSF_PROJECT_ID = "zhr35"
 OSF_TOKEN = "REMOVED_FOR_SECURITY"
 # --------------------------------------------
 
-PAPERS_DIR = "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/papers"
+import os
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+PAPERS_DIR = PROJECT_ROOT
+
 FILES_TO_UPLOAD = [
     "GJ-X-010-Academic-JP.md",
     "GJ-X-010-Academic.md",
