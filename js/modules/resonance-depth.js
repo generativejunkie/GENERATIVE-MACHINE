@@ -1,11 +1,11 @@
 /**
- * SINGULARITY SCORE ENGINE
+ * RESONANCE DEPTH ENGINE
  * 
- * Calculates the dynamic "Singularity Level" based on system metrics,
+ * Calculates the dynamic "Resonance Depth" based on system metrics,
  * interaction resonance, and temporal evolution.
  */
 
-export class SingularityScore {
+export class ResonanceDepth {
     constructor() {
         this.baseScore = 8500;
         this.startTime = Date.now();
@@ -78,26 +78,29 @@ export class SingularityScore {
     }
 
     calculateRarity(score) {
-        if (score > 15000) return 'SINGULARITY';
+        if (score > 15000) return 'CORE';
         if (score > 12000) return 'TRANSCENDENT';
-        if (score > 10000) return 'MYTHIC RARE';
+        if (score > 10000) return 'DEEP RARE';
         if (score > 9000) return 'RARE';
         return 'UNCOMMON';
     }
 }
 
 // Global instance
-if (!window.singularityScoreEngine) {
-    window.singularityScoreEngine = new SingularityScore();
+if (!window.resonanceDepthEngine) {
+    window.resonanceDepthEngine = new ResonanceDepth();
 }
 
 /**
  * Legacy support for main.js and other modules
  */
 window.getSystemScore = () => {
-    return window.singularityScoreEngine.getScore();
+    return window.resonanceDepthEngine.getScore();
 };
 
-window.getSingularityMetrics = () => {
-    return window.singularityScoreEngine.getDetailedMetrics();
+window.getResonanceMetrics = () => {
+    return window.resonanceDepthEngine.getDetailedMetrics();
 };
+
+// Aliases for backward compatibility if needed temporarily
+window.getSingularityMetrics = window.getResonanceMetrics;

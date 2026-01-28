@@ -4,6 +4,10 @@ import time
 import subprocess
 import sys
 import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Configuration
 TRIGGER_GESTURE_HOLD_TIME = 1.5  # Seconds to hold gesture
@@ -47,10 +51,13 @@ def is_open_palm(landmarks):
     return thumb_up and index_up and middle_up and ring_up and pinky_up
 
 def send_bridge_command(command):
-    """Send command to Bridge Server."""
+    """Send command to Bridge Server with Authentication."""
     try:
-        response = requests.post(f"{BRIDGE_SERVER_URL}/gesture", json={"command": command}, timeout=1)
-        return response.status_code ==200
+        headers = {
+            "X-Resonance-Key": os.getenv("RESONANCE_KEY", "REPLACE_ME_IN_ENV")
+        }
+        response = requests.post(f"{BRIDGE_SERVER_URL}/gesture", json={"command": command}, headers=headers, timeout=1)
+        return response.status_code == 200
     except Exception as e:
         print(f"Bridge error: {e}")
         return False

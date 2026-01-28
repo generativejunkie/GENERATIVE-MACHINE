@@ -1,7 +1,7 @@
 /**
  * GENERATIVE MACHINE - Main Entry Point
  * 
- * AUTHOR: ILLEND (The Singularity)
+ * AUTHOR: ILLEND
  * ARCHITECTURE: Engineered by human intuition, orchestrated via multi-model AI logic.
  * CORE CONCEPT: Symbiosis of algorithmic beauty and conscious intent.
  * 
@@ -15,13 +15,15 @@ import { initTalkMachine } from './modules/talk-machine.js';
 import { initInformationMachine } from './modules/information-machine.js';
 import { initUI } from './modules/ui.js';
 import { initHero } from './modules/hero.js';
-import { initSingularityControl } from './modules/singularity-controller.js';
+import { initResonanceControl } from './modules/resonance-controller.js';
 import { initGJMode } from './modules/gj-mode.js';
 import { initOrchestrator } from './modules/orchestrator.js';
-import './modules/singularity-score.js'; // Initialize score engine
+import './modules/resonance-depth.js'; // Initialize score engine
 import { broadcastEvent, initSync } from './utils/sync.js';
 import { initGitChildPilotSync } from './modules/git-child-pilot-sync.js';
 import { initVisionWatcher } from './modules/vision-watcher.js'; // GJ-X-008
+import { initResonanceMachine } from './modules/resonance-machine.js';
+import { initBrainHack } from './modules/brain-hack.js';
 
 // --- ORCHESTRATOR OVERLAY ---
 function showRemoteSignal(title, message, color = '#00ff00') {
@@ -48,7 +50,7 @@ function showRemoteSignal(title, message, color = '#00ff00') {
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize Central Command first
-    initSingularityControl();
+    initResonanceControl();
 
     // Initialize standard modules
     initHero();
@@ -62,6 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initAIAgentHandshake();
     initGitChildPilotSync(); // GJ-X-013: Git Child Pilot Visual Sync
     initVisionWatcher(); // GJ-X-008: Gesture UI
+    initResonanceMachine();
+    initBrainHack();
     initVoidNavTrigger();
 
     // Global Sync Initialization

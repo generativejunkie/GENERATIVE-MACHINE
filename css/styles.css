@@ -2655,3 +2655,189 @@ body.superhigh-active .section-title {
         border-width: 0px;
     }
 }
+
+/* ==================== Resonance Machine (Mythic) ==================== */
+#resonance-machine {
+    background: #000000;
+    color: #ff00ff;
+    /* Mythic Pink */
+    padding: var(--space-xl) var(--space-md);
+}
+
+#resonance-machine .section-title {
+    color: #ff00ff;
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+    font-family: var(--font-family-mono);
+}
+
+.resonance-terminal {
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 30px;
+    font-family: var(--font-family-mono);
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 1);
+}
+
+.resonance-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #222;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+    font-size: 11px;
+    letter-spacing: 2px;
+}
+
+.res-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #ff00ff;
+    border-radius: 50%;
+    margin-right: 10px;
+    box-shadow: 0 0 8px #ff00ff;
+    animation: pulse-mythic 2s infinite;
+}
+
+@keyframes pulse-mythic {
+    0% {
+        opacity: 0.5;
+        transform: scale(0.9);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    100% {
+        opacity: 0.5;
+        transform: scale(0.9);
+    }
+}
+
+.resonance-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.resonance-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 120px;
+    font-size: 13px;
+    opacity: 0;
+    animation: slide-in-mythic 0.5s ease forwards;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255, 0, 255, 0.05);
+}
+
+@keyframes slide-in-mythic {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.res-col-id {
+    color: #666;
+}
+
+.res-col-name {
+    color: #ff00ff;
+    text-transform: uppercase;
+}
+
+.res-col-status {
+    text-align: right;
+    font-size: 11px;
+    letter-spacing: 1px;
+}
+
+.res-col-status.ghost {
+    opacity: 0.6;
+}
+
+.obs-archive {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 11px;
+    color: #444;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+}
+
+.glitch-spike {
+    animation: glitch-flash 0.3s ease;
+}
+
+@keyframes glitch-flash {
+    0% {
+        filter: brightness(1);
+    }
+
+    50% {
+        filter: brightness(3);
+        transform: scale(1.005);
+    }
+
+    100% {
+        filter: brightness(1);
+    }
+}
+
+@media (max-width: 768px) {
+    .resonance-row {
+        grid-template-columns: 60px 1fr 80px;
+        font-size: 11px;
+    }
+}
+
+/* ==================== Brain Hack Section ==================== */
+#brain-hack {
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+}
+
+#brain-hack .section-title {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+#brain-hack .section-description {
+    color: #888;
+}
+
+#brain-hack .machine-canvas-wrapper {
+    background: #050505;
+    border-color: #222;
+}
+
+#brain-hack-section-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+#brain-hack .machine-stat-item {
+    font-family: var(--font-family-mono);
+    color: #00ffcc;
+    text-shadow: 0 0 5px rgba(0, 255, 204, 0.4);
+}
+
+.gj-mode-active #brain-hack {
+    background: #fff;
+    color: #000;
+}

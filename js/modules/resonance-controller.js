@@ -1,5 +1,5 @@
 /**
- * SINGULARITY CONTROLLER - Central AI Orchestrator
+ * RESONANCE CONTROLLER - Central AI Orchestrator
  * 
  * This module acts as the "Master Mind" that synchronizes all sub-machines
  * (Image, Sound, Talk, Information) into a single unified intelligence.
@@ -9,7 +9,7 @@
 
 import { CONFIG } from '../config/config.js';
 
-export class SingularityController {
+export class ResonanceController {
     constructor() {
         this.isActive = false;
         this.globalResonance = 0;
@@ -23,7 +23,7 @@ export class SingularityController {
     }
 
     init() {
-        console.log('%c[SINGULARITY] INITIALIZING CENTRAL COMMAND...', 'color: #ff00ff; font-weight: bold;');
+        console.log('%c[RESONANCE] INITIALIZING CENTRAL COMMAND...', 'color: #ff00ff; font-weight: bold;');
 
         // Wait for all machines to be registered on window
         const checkInterval = setInterval(() => {
@@ -32,7 +32,7 @@ export class SingularityController {
             if (window.talkMachine) this.machines.talk = window.talkMachine;
 
             if (this.machines.image) {
-                console.log('%c[SINGULARITY] CENTRAL COMMAND ESTABLISHED.', 'color: #00ffff; font-weight: bold;');
+                console.log('%c[RESONANCE] CENTRAL COMMAND ESTABLISHED.', 'color: #00ffff; font-weight: bold;');
                 this.isActive = true;
                 clearInterval(checkInterval);
                 this.startOrchestration();
@@ -41,7 +41,7 @@ export class SingularityController {
     }
 
     startOrchestration() {
-        console.log('[SINGULARITY] Beginning global parameter optimization...');
+        console.log('[RESONANCE] Beginning global parameter optimization...');
         this.orchestrate();
     }
 
@@ -69,17 +69,17 @@ export class SingularityController {
 
         // 4. Mirroring to other tabs via Sync
         if (window.broadcastEvent) {
-            window.broadcastEvent('singularity-pulse', { resonance: pulse });
+            window.broadcastEvent('resonance-pulse', { resonance: pulse });
         }
 
         requestAnimationFrame(() => this.orchestrate());
     }
 
     /**
-     * GOD VIEW: Force all machines into a specific state
+     * CORE VIEW: Force all machines into a specific state
      */
     commandAll(mode) {
-        console.log(`%c[SINGULARITY] BROADCASTING COMMAND: ${mode}`, 'background: #ff00ff; color: #fff; padding: 2px 5px;');
+        console.log(`%c[RESONANCE] BROADCASTING COMMAND: ${mode}`, 'background: #ff00ff; color: #fff; padding: 2px 5px;');
 
         if (mode === 'void') {
             if (window.imageMachine && window.imageMachine.triggerSecret) {
@@ -93,7 +93,7 @@ export class SingularityController {
     }
 }
 
-export function initSingularityControl() {
-    window.singularity = new SingularityController();
-    return window.singularity;
+export function initResonanceControl() {
+    window.resonance = new ResonanceController();
+    return window.resonance;
 }

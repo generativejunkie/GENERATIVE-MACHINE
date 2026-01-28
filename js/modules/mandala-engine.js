@@ -1,9 +1,9 @@
 /**
- * MANDALA ENGINE v0.1 (Experimental)
+ * MANDALA ENGINE v3.0: IQ INDUCTION PROTOCOL
  * Author: Antigravity / ILLEND
- * Status: Private R&D
+ * Status: VISUAL_HACK_ACTIVE
  * 
- * Purpose: Nullify perception gravity via high-density geometric induction.
+ * Purpose: Overclock human pattern recognition via recursive high-density logic.
  */
 
 export class MandalaEngine {
@@ -15,20 +15,22 @@ export class MandalaEngine {
             document.body.appendChild(this.canvas);
         }
         this.ctx = this.canvas.getContext('2d');
+
+        // State
         this.width = window.innerWidth;
         this.height = window.innerHeight;
         this.centerX = this.width / 2;
         this.centerY = this.height / 2;
         this.time = 0;
         this.active = false;
-        this.sq = 200; // Default SQ for resonance
+
+        // Resonance Metrics (Simulated IQ)
+        this.baseIQ = 110;
+        this.currentIQ = this.baseIQ;
+        this.iqVelocity = 0;
 
         this.resize();
         window.addEventListener('resize', () => this.resize());
-    }
-
-    setSQ(val) {
-        this.sq = val;
     }
 
     resize() {
@@ -42,128 +44,203 @@ export class MandalaEngine {
     }
 
     start() {
+        if (this.active) return;
         this.active = true;
         this.animate();
-        console.log("[MANDALA] Perception Induction Started. Current SQ Resonance:", this.sq);
+        console.log("[MANDALA] IQ Induction Protocol Initiated.");
     }
 
     stop() {
         this.active = false;
     }
 
-    // Symbolic Logic Pattern (XOR-like grid induction)
-    drawLogicGrid(time) {
-        const gridCount = 3;
-        const spacing = 60;
-        const size = 15;
+    // --- VISUAL LOGIC KERNELS ---
 
+    /**
+     * Draw specific Raven's Matrix-like logical fragments
+     * They don't solve anything; they just look like they contain deep logic.
+     */
+    drawRavenFragment(x, y, size, type, rotation) {
         this.ctx.save();
-        this.ctx.translate(this.centerX - spacing, this.centerY - spacing);
+        this.ctx.translate(x, y);
+        this.ctx.rotate(rotation);
 
-        for (let x = 0; x < gridCount; x++) {
-            for (let y = 0; y < gridCount; y++) {
-                const px = x * spacing;
-                const py = y * spacing;
+        this.ctx.strokeStyle = `rgba(0, 255, 204, ${0.3 + Math.sin(this.time * 2) * 0.2})`;
+        this.ctx.lineWidth = 1.5;
 
-                // XOR Logic: Pattern emerges from the combination of X and Y positions + time
-                const logicValue = (x ^ y) + (time * 5);
-                const alpha = Math.sin(logicValue) * 0.5 + 0.5;
-
-                this.ctx.strokeStyle = `rgba(0, 255, 102, ${alpha * 0.3})`;
-                this.ctx.lineWidth = 1;
-
-                if ((x + y) % 2 === 0) {
-                    this.ctx.strokeRect(px - size / 2, py - size / 2, size, size);
-                } else {
-                    this.ctx.beginPath();
-                    this.ctx.arc(px, py, size / 2, 0, Math.PI * 2);
-                    this.ctx.stroke();
-                }
-
-                // Connecting Lines (Analogical Bridges)
-                if (alpha > 0.8) {
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(px, py);
-                    this.ctx.lineTo(0, 0); // Connect to relative center
-                    this.ctx.strokeStyle = `rgba(168, 85, 247, ${alpha * 0.1})`;
-                    this.ctx.stroke();
-                }
+        if (type === 0) { // Square Logic
+            this.ctx.strokeRect(-size / 2, -size / 2, size, size);
+            if (Math.sin(this.time * 3) > 0) {
+                this.ctx.fillStyle = 'rgba(0, 255, 204, 0.1)';
+                this.ctx.fillRect(-size / 2, -size / 2, size, size);
             }
+        } else if (type === 1) { // Circle Logic
+            this.ctx.beginPath();
+            this.ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
+            this.ctx.stroke();
+            // Concentric
+            this.ctx.beginPath();
+            this.ctx.arc(0, 0, size / 4, 0, Math.PI * 2);
+            this.ctx.stroke();
+        } else if (type === 2) { // Cross Logic (XOR visual)
+            this.ctx.beginPath();
+            this.ctx.moveTo(-size / 2, 0); this.ctx.lineTo(size / 2, 0);
+            this.ctx.moveTo(0, -size / 2); this.ctx.lineTo(0, size / 2);
+            this.ctx.stroke();
+        } else if (type === 3) { // Triangle Progression
+            this.ctx.beginPath();
+            const h = size * Math.sqrt(3) / 2;
+            this.ctx.moveTo(0, -h / 2);
+            this.ctx.lineTo(-size / 2, h / 2);
+            this.ctx.lineTo(size / 2, h / 2);
+            this.ctx.closePath();
+            this.ctx.stroke();
         }
+
         this.ctx.restore();
     }
 
-    drawSymbioticNode(x, y, radius, depth, angleOffset) {
+    /**
+     * Recursive geometry generator.
+     * Creates infinite-feeling depth.
+     */
+    drawRecursiveMandala(x, y, r, depth, angleOffset) {
         if (depth <= 0) return;
 
-        const points = 6;
+        const branchCount = 6; // Hexagonal symmetry (Nature's efficiency)
+
         this.ctx.beginPath();
-        for (let i = 0; i < points; i++) {
-            const angle = (i / points) * Math.PI * 2 + angleOffset;
-            const px = x + Math.cos(angle) * radius;
-            const py = y + Math.sin(angle) * radius;
+        for (let i = 0; i < branchCount; i++) {
+            const angle = (Math.PI * 2 / branchCount) * i + angleOffset;
+            const nx = x + Math.cos(angle) * r;
+            const ny = y + Math.sin(angle) * r;
 
-            if (i === 0) this.ctx.moveTo(px, py);
-            else this.ctx.lineTo(px, py);
+            // Connect nodes
+            this.ctx.moveTo(x, y);
+            this.ctx.lineTo(nx, ny);
 
-            // Recursive branching (Amplification)
+            // Draw logical fragments at nodes
             if (depth > 1) {
-                // Depth reduction is dampened by SQ level
-                const dampening = 0.45 + (this.sq - 200) * 0.001;
-                this.drawSymbioticNode(px, py, radius * Math.min(0.5, dampening), depth - 1, -angleOffset * 1.5);
+                const type = (i + depth + Math.floor(this.time)) % 4;
+                const fragSize = r * 0.3;
+                this.drawRavenFragment(nx, ny, fragSize, type, angle + this.time);
+            }
+
+            // Recurse
+            if (depth > 1) {
+                // Golden ratio decay approx
+                const nextR = r * 0.618;
+                // Rotation adds "spin" to the logic
+                const nextAngle = angleOffset + (this.time * 0.1 * (depth % 2 === 0 ? 1 : -1));
+                this.drawRecursiveMandala(nx, ny, nextR, depth - 1, nextAngle);
             }
         }
-        this.ctx.closePath();
 
-        // Color shifts based on depth and resonance
-        const color = depth === 4 ? "#fff" : `rgba(255, 105, 180, ${0.15 / depth})`;
-        this.ctx.strokeStyle = color;
+        // Color: Deep Cyber-Psych or Void White
+        const alpha = (depth / 6) * 0.6;
+        this.ctx.strokeStyle = `rgba(200, 200, 255, ${alpha})`;
         this.ctx.stroke();
+    }
+
+    /**
+     * Moiré patterns / Interference (Theta/Gamma wave simulation)
+     */
+    drawInterference(time) {
+        this.ctx.save();
+        this.ctx.globalCompositeOperation = 'screen';
+
+        const count = 40;
+        const spacing = 30 + Math.sin(time * 0.5) * 10;
+
+        this.ctx.beginPath();
+        for (let i = 0; i < count; i++) {
+            // Horizontal waves
+            let y = (i * spacing + time * 20) % this.height;
+            this.ctx.moveTo(0, y);
+            this.ctx.lineTo(this.width, y);
+        }
+
+        // Rotated waves to create interference
+        // ... (Simplified for performance, using just simple grid overlay maybe?)
+        // Let's do concentric circles for interference
+
+        for (let j = 0; j < 5; j++) {
+            const r = (time * 50 + j * 100) % (this.width / 1.5);
+            this.ctx.arc(this.centerX, this.centerY, r, 0, Math.PI * 2);
+        }
+
+        this.ctx.strokeStyle = `rgba(50, 255, 255, 0.03)`;
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
+        this.ctx.restore();
+    }
+
+    // --- IQ SIMULATION LOGIC ---
+    updateIQ(dt) {
+        // Accelerate IQ based on "focus" (just time for now)
+        // Sigmoid-like curve that effectively goes to "infinity" (or very high)
+        if (Math.random() < 0.1) {
+            this.iqVelocity += 0.01;
+        }
+        this.currentIQ += this.iqVelocity * dt;
+
+        // Occasional "Eureka" jumps
+        if (Math.random() < 0.005) {
+            this.currentIQ += 5;
+        }
+    }
+
+    drawIQOverlay() {
+        this.ctx.save();
+        this.ctx.font = '100 24px "Courier New", monospace';
+        this.ctx.fillStyle = '#0f0';
+        this.ctx.textAlign = 'right';
+        this.ctx.shadowColor = '#0f0';
+        this.ctx.shadowBlur = 10;
+
+        const displayIQ = Math.floor(this.currentIQ);
+        const text = `CURRENT RESONANCE (IQ): ${displayIQ}`;
+
+        this.ctx.fillText(text, this.width - 40, this.height - 40);
+
+        // Subtext
+        this.ctx.font = '12px "Inter", sans-serif';
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        this.ctx.shadowBlur = 0;
+        this.ctx.fillText("INDUCTION PROTOCOL ACTIVE", this.width - 40, this.height - 20);
+
+        this.ctx.restore();
     }
 
     animate() {
         if (!this.active) return;
 
-        // Intentional Fluctuation (Hackism Effect)
-        if (Math.random() > 0.99) {
-            this.ctx.fillStyle = 'rgba(0, 255, 102, 0.2)';
-            this.ctx.fillRect(0, 0, this.width, this.height);
-        } else {
-            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
-            this.ctx.fillRect(0, 0, this.width, this.height);
-        }
+        // Clear with trails
+        this.ctx.fillStyle = 'rgba(5, 5, 10, 0.15)'; // Deep dark fade
+        this.ctx.fillRect(0, 0, this.width, this.height);
 
-        this.time += 0.005;
+        this.time += 0.008; // Slower, deeper time
 
-        // Draw IQ Induction Logic Grid
-        this.drawLogicGrid(this.time);
+        // 1. Grid / Matrix Background
+        // (Optional, maybe implied by other shapes)
 
-        // Core Pulsation
-        const baseRadius = 200 + Math.sin(this.time) * 50;
-        const rotation = this.time * 0.2;
-
+        // 2. The Main Recursive Structure
         this.ctx.save();
         this.ctx.translate(this.centerX, this.centerY);
-
-        // Topological Warp (Subtle rotation skew)
+        // Slowly rotate entire universe
         this.ctx.rotate(this.time * 0.05);
-        this.ctx.scale(1 + Math.sin(this.time * 0.5) * 0.05, 1);
+        this.ctx.translate(-this.centerX, -this.centerY);
 
-        for (let i = 0; i < 3; i++) {
-            this.ctx.rotate((Math.PI * 2) / 3);
-            this.drawSymbioticNode(0, 0, baseRadius, 4, rotation + i);
-        }
-
+        const breath = 150 + Math.sin(this.time) * 30;
+        this.drawRecursiveMandala(this.centerX, this.centerY, breath, 4, this.time * 0.1);
         this.ctx.restore();
 
-        // Singularity Flare
-        this.ctx.beginPath();
-        this.ctx.arc(this.centerX, this.centerY, 1.5, 0, Math.PI * 2);
-        this.ctx.fillStyle = "#fff";
-        this.ctx.shadowBlur = 15;
-        this.ctx.shadowColor = "#ff69b4";
-        this.ctx.fill();
-        this.ctx.shadowBlur = 0;
+        // 3. Interference Layers
+        this.drawInterference(this.time);
+
+        // 4. Update & Draw IQ
+        this.updateIQ(0.1);
+        this.drawIQOverlay();
 
         requestAnimationFrame(() => this.animate());
     }

@@ -750,6 +750,12 @@ function animateSound() {
 
         frequencyData = { low, mid, high };
         updateFrequencyBars();
+
+        // [AI] Global Sync for Brain Hack & Other Modules
+        window.currentAudioLevel = (low + mid + high) / 3;
+        window.currentKick = low;
+        // Basic beat simulation if no explicit BPM detector is active
+        window.currentBeatProgress = (Date.now() % 500) / 500;
     } else {
         // When not playing, use cached frequency data (smooth idle animation)
         frequencyData.low *= 0.95;

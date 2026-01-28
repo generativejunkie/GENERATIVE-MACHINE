@@ -14,7 +14,7 @@ echo "GITHUB: $CLONES clones / $VISITORS visitors"
 
 curl -X POST http://localhost:8000/api/metrics/update \
      -H "Content-Type: application/json" \
-     -H "X-Resonance-Key: 6640c73d4acad561339d10d75d4d15cc" \
+     -H "X-Resonance-Key: REPLACED_BY_ENV" \
      -d "{
        \"zenodo_views\": $VIEWS,
        \"zenodo_downloads\": $DOWNLOADS,

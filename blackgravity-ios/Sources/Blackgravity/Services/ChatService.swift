@@ -10,7 +10,7 @@ class ChatService: ObservableObject {
     private let serverPort: String
     private var pollingTimer: Timer?
     
-    private let resonanceKey = "6640c73d4acad561339d10d75d4d15cc"
+    private let resonanceKey = "REPLACED_BY_ENV"
     
     init(host: String = "192.168.11.9", port: String = "8000") {
         self.serverHost = host

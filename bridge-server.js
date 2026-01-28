@@ -3,6 +3,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
 const cors = require('cors');
+require('dotenv').config();
 
 const app = express();
 const fs = require('fs');
@@ -16,9 +17,9 @@ const io = new Server(server, {
 
 // --- RESONANCE METRICS (Live Stats) ---
 let resonanceMetrics = {
-    zenodo_views: 90,
-    zenodo_downloads: 80,
-    github_clones: 414,
+    zenodo_views: 132,
+    zenodo_downloads: 133,
+    github_clones: 542,
     github_visitors: 1,
     gift_density: 88.89,
     resonance_score: 0.98,
@@ -27,14 +28,18 @@ let resonanceMetrics = {
 
 // --- SECURITY CONFIGURATION ---
 // RESONANCE_KEY is required for all POST requests via 'X-Resonance-Key' header.
-const RESONANCE_KEY = '6640c73d4acad561339d10d75d4d15cc';
+const RESONANCE_KEY = process.env.RESONANCE_KEY || 'REPLACE_ME_IN_ENV';
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow local requests and requests from generativejunkie.net
-        if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('generativejunkie.net')) {
+        // Allow local requests and requests from verified generativejunkie.net subdomains
+        const isLocal = !origin || origin.includes('localhost') || origin.includes('127.0.0.1');
+        const isVerifiedDomain = origin && (origin === 'https://generativejunkie.net' || origin.endsWith('.generativejunkie.net'));
+
+        if (isLocal || isVerifiedDomain) {
             callback(null, true);
         } else {
+            console.warn(`[SECURITY] Cross-Origin Resonance Blocked: ${origin}`);
             callback(new Error('Cross-Origin Resonance Blocked by Security Protocol'));
         }
     }
@@ -70,11 +75,21 @@ app.use((req, res, next) => {
     next();
 });
 
-// Secure Static Serving: Explicitly block sensitive directories
+// Secure Static Serving: Explicitly block sensitive directories and logs
 app.use((req, res, next) => {
-    const forbidden = ['.git', '.agent', 'node_modules', '.gitignore', 'package.json', 'package-lock.json'];
-    if (forbidden.some(dir => req.path.includes(dir))) {
-        return res.status(403).send('Forbidden: Access to system files is restricted.');
+    const forbidden = [
+        '.git', '.agent', 'node_modules', '.gitignore',
+        'package.json', 'package-lock.json',
+        'bridge-server.js', 'agent_resonance.mjs',
+        'MASTER_LOG.md', 'SECURITY.md', '.env'
+    ];
+
+    // Normalize path to prevent traversal attacks
+    const normalizedPath = path.normalize(req.path);
+
+    if (forbidden.some(item => normalizedPath.includes(item))) {
+        console.warn(`[SECURITY] Restricted file access attempt: ${req.path}`);
+        return res.status(403).send('Forbidden: Access to system files is restricted by Resonance Protocol.');
     }
     next();
 });

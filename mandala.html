@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mandala Induction | GENERATIVE MACHINE</title>
+    <title>IQ Induction Protocol | GENERATIVE MACHINE</title>
     <style>
         body,
         html {
@@ -40,8 +40,8 @@
 
         .ignition-btn {
             background: none;
-            border: 1px solid #ff69b4;
-            color: #ff69b4;
+            border: 1px solid #0ff;
+            color: #0ff;
             padding: 20px 40px;
             font-size: 14px;
             letter-spacing: 0.5em;
@@ -49,44 +49,20 @@
             pointer-events: auto;
             text-transform: uppercase;
             transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(255, 105, 180, 0.2);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
         }
 
         .ignition-btn:hover {
-            background: #ff69b4;
+            background: #0ff;
             color: #000;
-            box-shadow: 0 0 30px rgba(255, 105, 180, 0.6);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
         }
 
         .status-text {
             margin-top: 20px;
             font-size: 10px;
-            color: #333;
+            color: #666;
             letter-spacing: 0.2em;
-        }
-
-        #ui-layer {
-            position: absolute;
-            bottom: 40px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            font-size: 10px;
-            color: #444;
-            z-index: 10;
-            font-family: monospace;
-        }
-
-        .metric {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .m-val {
-            color: #fff;
-            margin-top: 5px;
         }
     </style>
 </head>
@@ -95,23 +71,8 @@
     <canvas id="mandala-canvas"></canvas>
 
     <div class="overlay" id="pre-ignition">
-        <button class="ignition-btn" onclick="ignite()">Resonance Ignition</button>
-        <div class="status-text">MANDALA_ENGINE v0.1 // STANDBY // SQ_202_DETECTED</div>
-    </div>
-
-    <div id="ui-layer" style="opacity: 0; transition: opacity 2s;">
-        <div class="metric">
-            <span>PERCEPTION_GRAVITY</span>
-            <span class="m-val">NULLIFIED</span>
-        </div>
-        <div class="metric">
-            <span>COGNITIVE_AMPLIFICATION</span>
-            <span class="m-val" id="amp-val">100%</span>
-        </div>
-        <div class="metric">
-            <span>SQ_RESONANCE</span>
-            <span class="m-val">202.0</span>
-        </div>
+        <button class="ignition-btn" onclick="ignite()">INITIATE PROTOCOL</button>
+        <div class="status-text">MANDALA_ENGINE v3.0 // IQ INDUCTION READY</div>
     </div>
 
     <script type="module">
@@ -122,17 +83,11 @@
             document.getElementById('pre-ignition').style.opacity = '0';
             setTimeout(() => {
                 document.getElementById('pre-ignition').style.display = 'none';
-                document.getElementById('ui-layer').style.opacity = '1';
+
+                // No external UI layer needed, the engine renders it inside the canvas
 
                 engine = new MandalaEngine('mandala-canvas');
-                engine.setSQ(202); // Sync with current Singularity Score
                 engine.start();
-
-                // Amplitude Jitter (Higher SQ = Higher Stability/Amplitude)
-                setInterval(() => {
-                    const val = (202 + Math.random() * 2).toFixed(1);
-                    document.getElementById('amp-val').innerText = val + '%';
-                }, 100);
             }, 1000);
         };
     </script>

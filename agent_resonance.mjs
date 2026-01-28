@@ -29,7 +29,7 @@ async function main() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Resonance-Key': '6640c73d4acad561339d10d75d4d15cc' // Hardcoded key from bridge-server.js
+                    'X-Resonance-Key': 'REPLACED_BY_ENV' // Hardcoded key from bridge-server.js
                 },
                 body: JSON.stringify({ status, message, type })
             }).catch(e => { });
