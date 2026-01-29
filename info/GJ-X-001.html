@@ -506,11 +506,11 @@
                     }, 3000);
 
                     const avg = (metrics.purity + metrics.symbiosis + metrics.leap) / 3;
-                    let rarity = 'COMMON';
+                    let rarity = 'SILENCE';
                     let color = '#888';
-                    if (avg > 92) { rarity = 'MYTHIC RARE'; color = '#ff3b3b'; }
-                    else if (avg > 88) { rarity = 'RARE'; color = '#fff'; }
-                    else { rarity = 'UNCOMMON'; color = '#ccc'; }
+                    if (avg > 92) { rarity = 'ARCHITECT / ANOMALY'; color = '#ff3b3b'; }
+                    else if (avg > 88) { rarity = 'SINGULARITY'; color = '#fff'; }
+                    else { rarity = 'RESONANCE'; color = '#ccc'; }
 
                     setTimeout(() => {
                         elements.rarity.innerText = rarity;
