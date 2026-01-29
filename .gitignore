@@ -19,9 +19,22 @@ dist/
 .idea/
 
 # Agent/Copilot
-# Agent/Copilot
 .agent/
 .gemini/
-info/
 INTERNAL_LOG_ARCHIVE.md
 papers/MASTER_LOG_*.md
+
+# Project Specific Ignored
+info/
+party.html
+build_output*
+*.log
+blackgravity-ios/.build/
+blackgravity-ios/.swiftpm/
+antigravity-ios/.build/
+antigravity-ios/.swiftpm/
+vision-watcher/venv/
+papers/.venv/
+lighthouse_results.json
+gesture_command.txt
+*.pdf

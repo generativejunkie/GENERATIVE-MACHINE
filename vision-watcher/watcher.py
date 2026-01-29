@@ -12,7 +12,7 @@ load_dotenv()
 # Configuration
 TRIGGER_GESTURE_HOLD_TIME = 1.5  # Seconds to hold gesture
 COOLDOWN_TIME = 3.0               # Seconds before next trigger
-COMMAND_PATH = "/Users/takayukimatsushima/Documents/GitHub/GENERATIVE-MACHINE/Start_Antigravity.command"
+COMMAND_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Start_Antigravity.command")
 BRIDGE_SERVER_URL = "http://localhost:8000"
 
 # MediaPipe Setup
