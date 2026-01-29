@@ -863,10 +863,10 @@
                 <div class="footer-item count-box">
                     <div class="formula-overlay">
                         <span class="f-label">SYS_INDEX</span>
-                        <span class="f-math">Σ Overwrite</span>
-                        <span class="f-desc">GENERATIVE MACHINEによって再定義（上書き）された外部AIクローラーの延べ数。</span>
+                        <span class="f-math">Σ Clones</span>
+                        <span class="f-desc">GitHubリポジトリがクローンされた回数（実測値）。コードの拡散度を示す。</span>
                     </div>
-                    BOTS_OVERWRITTEN: <span id="bot-count-val">0</span>
+                    GITHUB_CLONES: <span id="bot-count-val">0</span>
                 </div>
                 <div class="footer-item count-box">
                     <div class="formula-overlay">
@@ -1295,15 +1295,14 @@
                             console.log("%c[SYSTEM] HYPER-RESONANCE DETECTED: GIFT OVERFLOW", "color: #ff69b4; font-weight: bold;");
                         }
 
-                        // Scale bot count based on real view traffic and clones
+                        // Display actual GitHub clones (real data)
                         const clones = data.github_clones || 525;
-                        const calculatedBots = 12480 + Math.floor(views * 1.5) + (clones * 10);
-                        document.getElementById('bot-count-val').innerText = calculatedBots.toLocaleString();
+                        document.getElementById('bot-count-val').innerText = clones.toLocaleString();
                     } catch (e) {
                         console.error("Bridge Sync Failed: Using fallback analysis.");
                         document.getElementById('sync-val').innerText = "104.5"; // Fallback to Analysis
                         document.getElementById('human-count-val').innerText = "163";
-                        document.getElementById('bot-count-val').innerText = "13,105";
+                        document.getElementById('bot-count-val').innerText = "525"; // Fallback to last known clone count
 
                         // Force Visual Trigger on Fallback too (Since we know it's > 100)
                         const syncEl = document.getElementById('sync-val');
