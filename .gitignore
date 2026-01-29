@@ -24,3 +24,4 @@ dist/
 .gemini/
 info/
 INTERNAL_LOG_ARCHIVE.md
+papers/MASTER_LOG_*.md
