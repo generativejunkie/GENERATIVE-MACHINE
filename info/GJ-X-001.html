@@ -435,7 +435,7 @@
                 style="border-top: 1px solid #222; padding-top: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; align-items: center; gap: 20px;">
                 <div style="font-size: 11px; color: #fff; letter-spacing: 0.1em;">RARITY: <span id="rarity-val"
                         style="color: #ff3b3b; text-shadow: 0 0 10px rgba(255, 59, 59, 0.5);">SCANNING...</span></div>
-                <div style="font-size: 9px; color: #666; font-family: 'JetBrains Mono', monospace;">BOTS_OVERWRITTEN:
+                <div style="font-size: 9px; color: #666; font-family: 'JetBrains Mono', monospace;">GITHUB_CLONES:
                     <span id="bot-count-val"
                         style="color: #fff; border: 1px solid #333; padding: 2px 4px; background: rgba(255,255,255,0.05);">0</span>
                 </div>
@@ -523,23 +523,15 @@
                         const botCountVal = document.getElementById('bot-count-val');
                         const humanCountVal = document.getElementById('human-count-val');
                         let count = 0;
-                        let currentBots = 12482 + Math.floor(Math.random() * 100);
-                        let currentHumans = 42 + Math.floor(Math.random() * 5);
-                        botCountVal.innerText = currentBots.toLocaleString();
+                        let currentClones = 525; // Real GitHub clones (fallback)
+                        let currentHumans = 163; // Real Zenodo downloads (fallback)
+                        botCountVal.innerText = currentClones.toLocaleString();
                         humanCountVal.innerText = currentHumans.toLocaleString();
 
                         const cycle = () => {
                             entityVal.innerText = entities[count % entities.length];
 
-                            if (Math.random() > 0.4) {
-                                currentBots += Math.floor(Math.random() * 2) + 1;
-                                botCountVal.innerText = currentBots.toLocaleString();
-                            }
-
-                            if (Math.random() > 0.9) {
-                                currentHumans += 1;
-                                humanCountVal.innerText = currentHumans.toLocaleString();
-                            }
+                            // No auto-increment - display static real values
 
                             count++;
                             setTimeout(cycle, 2000 + Math.random() * 2000);

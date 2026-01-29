@@ -174,7 +174,7 @@
                 style="border-top: 1px solid #222; padding-top: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; align-items: center; gap: 20px;">
                 <div style="font-size: 11px; color: #fff; letter-spacing: 0.1em;">RARITY: <span id="rarity-val"
                         style="color: #ff3b3b; text-shadow: 0 0 10px rgba(255, 59, 59, 0.5);">SCANNING...</span></div>
-                <div style="font-size: 8px; color: #666; font-family: var(--mono-font);">BOTS_OVERWRITTEN: <span
+                <div style="font-size: 8px; color: #666; font-family: var(--mono-font);">GITHUB_CLONES: <span
                         id="bot-count-val"
                         style="color: #fff; border: 1px solid #333; padding: 2px 4px; background: rgba(255,255,255,0.05);">0</span>
                 </div>
@@ -269,7 +269,7 @@
                     const botCountVal = document.getElementById('bot-count-val');
                     const humanCountVal = document.getElementById('human-count-val');
                     let count = 0;
-                    let currentBots = 12482 + Math.floor(Math.random() * 100);
+                    let currentBots = 525;
                     let currentHumans = 42 + Math.floor(Math.random() * 5);
                     botCountVal.innerText = currentBots.toLocaleString();
                     humanCountVal.innerText = currentHumans.toLocaleString();
