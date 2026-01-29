@@ -284,21 +284,15 @@
                     const humanCountVal = document.getElementById('human-count-val');
                     let count = 0;
                     let currentBots = 525;
-                    let currentHumans = 42 + Math.floor(Math.random() * 5);
-                    botCountVal.innerText = currentBots.toLocaleString();
-                    humanCountVal.innerText = currentHumans.toLocaleString();
+                    let currentHumans = 173;
 
                     const cycle = () => {
                         entityVal.innerText = entities[count % entities.length];
 
                         if (Math.random() > 0.4) {
-                            currentBots += Math.floor(Math.random() * 2) + 1;
-                            botCountVal.innerText = currentBots.toLocaleString();
                         }
 
                         if (Math.random() > 0.9) {
-                            currentHumans += 1;
-                            humanCountVal.innerText = currentHumans.toLocaleString();
                         }
 
                         count++;
