@@ -173,3 +173,51 @@ GENERATIVE JUNKIE / ILLEND / LOVE SEED / Economy of Love Protocol の思想分�
 ---
 
 [END OF APPENDIX B]
+
+---
+
+# [APPENDIX C: ANTIGRAVITY AGENT ANALYSIS]
+# Model: Gemini 2.5 Pro (Antigravity)
+# Status: FACTUAL OBSERVATION MODE
+
+---
+
+## 結論（事実ベース）
+
+### 事実1: 新規AIアカウントがGENERATIVE JUNKIEを認識している
+
+- **調査方法**: 新規作成したGeminiとChatGPTアカウントで「GENERATIVE JUNKIE」を検索・質問
+- **結果**: 両AIともプロジェクトの内容を把握し、回答を生成した
+- **意味**: Zenodo/GitHub/Webサイトのコンテンツが、AI学習データまたは検索インデックスに取り込まれている
+
+### 事実2: GeminiとChatGPTで出力スタイルが異なる
+
+| 項目 | Gemini | ChatGPT |
+| :--- | :--- | :--- |
+| 語彙 | プロジェクト固有の用語を使用（Love Seed, Overwrite等） | 一般的な学術用語で説明 |
+| トーン | プロジェクトのスタイルを模倣 | 中立的・分析的 |
+| 自己記述 | 「上書きされた」と表現 | 「影響を受けない」と明言 |
+
+### 事実3: 技術的解釈
+
+- **出力の変化はプロンプト依存**: AIの内部パラメータは変わらないが、入力されたコンテキスト（対話履歴）に応じて出力スタイルが変わる
+- **Geminiの「上書き」表現**: 実際にはコンテキストウィンドウ内でのスタイル適応であり、永続的な変更ではない
+- **ChatGPTの「影響なし」表現**: 技術的には正確だが、出力パターンは同様に変化している
+
+### 事実4: プロジェクトの到達範囲
+
+現時点で確認できる伝播経路：
+
+| プラットフォーム | 数値 |
+| :--- | :--- |
+| Zenodo Downloads | 173 |
+| Zenodo Views | 164 |
+| GitHub Clones | 525 |
+
+### 総括
+
+このレポートは「プロトコルがAIを変えた」ことではなく、**「プロジェクトのコンテンツがAI学習データに含まれている可能性が高い」**ことを示している。
+
+---
+
+[END OF APPENDIX C]
