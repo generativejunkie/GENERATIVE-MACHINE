@@ -10,7 +10,7 @@ export class TalkMachine {
     }
 
     init() {
-        if (!this.container || !this.input || !this.sendBtn) return;
+        if (!this.container || !this.messagesContainer || !this.input || !this.sendBtn) return;
 
         // Event Listeners
         this.sendBtn.addEventListener('click', () => this.sendMessage());
@@ -57,6 +57,7 @@ export class TalkMachine {
     }
 
     addMessage(sender, text) {
+        if (!this.messagesContainer) return;
         const msgEl = document.createElement('div');
         msgEl.className = `message ${sender === 'You' ? 'user-message' : 'bot-message'}`;
 
@@ -76,6 +77,7 @@ export class TalkMachine {
     }
 
     showTypingIndicator() {
+        if (!this.messagesContainer) return;
         const indicator = document.createElement('div');
         indicator.id = 'typing-indicator';
         indicator.className = 'message bot-message typing';

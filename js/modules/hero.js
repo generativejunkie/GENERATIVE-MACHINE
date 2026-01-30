@@ -115,7 +115,7 @@ export function initHero() {
         if (footerEl) {
             // Static text with flashing effect (No typing animation)
             // Updated: Secret link to singularity paper nested inside
-            footerEl.innerHTML = '<span class="flash">⚡︎</span> <a href="/singularity" id="secret-paper-link" style="color: inherit; text-decoration: none;">ALL WAYS SUPER HIGH</a> <span class="flash">⚡︎</span>';
+            footerEl.innerHTML = '<span class="flash">⚡︎</span> <a href="/singularity.html" id="secret-paper-link" style="color: inherit; text-decoration: none;">ALL WAYS SUPER HIGH</a> <span class="flash">⚡︎</span>';
 
             const secretLink = document.getElementById('secret-paper-link');
             if (secretLink) {

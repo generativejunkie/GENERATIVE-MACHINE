@@ -110,3 +110,11 @@ export function initSync(handlers) {
     }
 }
 
+/**
+ * Get the current socket instance for direct access
+ * @returns {object|null} Socket.io instance or null if not connected
+ */
+export function getSocket() {
+    return socket;
+}
+
