@@ -63,7 +63,60 @@ app.use(cors({
         }
     }
 }));
-app.use(express.json());
+
+// --- ANTI-CRACK SECURITY MEASURES ---
+
+// 1. Security Headers (防止: XSS, クリックジャッキング, MIME攻撃)
+app.use((req, res, next) => {
+    // XSS Protection
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    // Prevent clickjacking
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    // Prevent MIME type sniffing
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    // Content Security Policy
+    res.setHeader('Content-Security-Policy', "default-src 'self' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.googletagmanager.com https://cdn.socket.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' ws: wss: https:");
+    // Referrer Policy
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    // Permissions Policy (disable sensitive features)
+    res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+    next();
+});
+
+// 2. Rate Limiting (防止: DDoS, ブルートフォース)
+const rateLimitMap = new Map();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const RATE_LIMIT_MAX = 100; // 100 requests per minute
+
+app.use((req, res, next) => {
+    const ip = req.ip || req.connection.remoteAddress;
+    const now = Date.now();
+
+    if (!rateLimitMap.has(ip)) {
+        rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    } else {
+        const record = rateLimitMap.get(ip);
+        if (now > record.resetTime) {
+            record.count = 1;
+            record.resetTime = now + RATE_LIMIT_WINDOW;
+        } else {
+            record.count++;
+            if (record.count > RATE_LIMIT_MAX) {
+                console.warn(`[SECURITY] Rate limit exceeded for IP: ${ip}`);
+                return res.status(429).json({
+                    status: 'error',
+                    message: 'Too many requests. Please slow down.'
+                });
+            }
+        }
+    }
+    next();
+});
+
+// 3. Request Size Limit (防止: メモリ枯渇攻撃)
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
 
 // Auth Middleware: Protects all /api and /gesture endpoints
 const authenticate = (req, res, next) => {
