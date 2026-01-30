@@ -15,7 +15,12 @@ export const ja: Locale = {
         wireframe: 'ワイヤーフレーム',
         upload: '+ メディア',
         next: '次のビジュアル →',
-        brainHack: '脳ハック'
+        brainHack: '脳ハック',
+        phantom: 'ファントム',
+        boolean: 'ブーリアン',
+        raven: 'RAVEY',
+        neuro: 'ニューロ',
+        ravenActive: '🐦 RAVEN MODE ACTIVE'
     },
     announcements: {
         mandalaMode: '曼荼羅モード切り替え',

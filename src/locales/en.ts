@@ -15,7 +15,12 @@ export const en: Locale = {
         wireframe: 'WIREFRAME',
         upload: '+ MEDIA',
         next: 'Next Visual →',
-        brainHack: 'Brain Hack'
+        brainHack: 'Brain Hack',
+        phantom: 'Phantom',
+        boolean: 'Boolean',
+        raven: 'Raven',
+        neuro: 'Neuro',
+        ravenActive: '🐦 RAVEN MODE ACTIVE'
     },
     announcements: {
         mandalaMode: 'Mandala Mode Toggled',

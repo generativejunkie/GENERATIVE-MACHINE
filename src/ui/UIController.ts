@@ -464,7 +464,7 @@ export class UIController {
     const colorB = document.getElementById('brainColorB') as HTMLInputElement;
     const colorC = document.getElementById('brainColorC') as HTMLInputElement;
 
-    const modeNames = ['Phantom', 'Boolean', 'Recursive', 'Neuro'];
+    const modeNames = ['Gamma', 'Theta', 'Raven', 'Alpha', 'Stroop', 'Fibonacci'];
 
     if (brainHackBtn) {
       brainHackBtn.addEventListener('click', () => {
@@ -784,8 +784,9 @@ export class UIController {
       const autoActive = document.getElementById('topAutoBtn')?.classList.contains('active');
       const gravityActive = document.getElementById('topGravityBtn')?.classList.contains('active');
       const brainHackActive = document.getElementById('topBrainHackBtn')?.classList.contains('active');
+      const ravenActive = document.getElementById('topRavenBtn')?.classList.contains('active');
 
-      const anyActive = mandalaActive || aiActive || autoActive || gravityActive || brainHackActive;
+      const anyActive = mandalaActive || aiActive || autoActive || gravityActive || brainHackActive || ravenActive;
       modeSeekbars.style.display = anyActive ? 'flex' : 'none';
 
       const showItem = (id: string, visible: boolean) => {
@@ -859,7 +860,33 @@ export class UIController {
     const topBrainHackBtn = document.getElementById('topBrainHackBtn');
     if (topBrainHackBtn) {
       topBrainHackBtn.addEventListener('click', () => {
+        const isActive = !topBrainHackBtn.classList.contains('active');
+        topBrainHackBtn.classList.toggle('active');
+        this.app.toggleBrainHackMode(isActive);
         updateSeekbarVisibility();
+        console.log(`🧠 Brain Hack Mode: ${isActive ? 'ON' : 'OFF'}`);
+      });
+    }
+
+    // Raven Mode Toggle (added Jan 27)
+    const topRavenBtn = document.getElementById('topRavenBtn');
+    if (topRavenBtn) {
+      topRavenBtn.addEventListener('click', () => {
+        const isActive = !topRavenBtn.classList.contains('active');
+        topRavenBtn.classList.toggle('active');
+
+        // Raven Mode is Brain Hack with Mode Index 2
+        this.app.toggleBrainHackMode(isActive);
+        if (isActive) {
+          this.app.setBrainHackModeIndex(2);
+          // Sync with BrainHack button if needed
+          topBrainHackBtn?.classList.add('active');
+        } else {
+          topBrainHackBtn?.classList.remove('active');
+        }
+
+        updateSeekbarVisibility();
+        console.log(`🐦 Raven Mode: ${isActive ? 'ON' : 'OFF'}`);
       });
     }
 

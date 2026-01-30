@@ -14,6 +14,11 @@ export interface Locale {
         upload: string;
         next: string;
         brainHack: string;
+        phantom: string;
+        boolean: string;
+        raven: string;
+        neuro: string;
+        ravenActive: string;
     };
     announcements: {
         mandalaMode: string;

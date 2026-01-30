@@ -377,7 +377,36 @@ input[type="text"] {
 .mode-btn.active {
     background: var(--active-bg);
     color: var(--accent-color);
-    border-color: var(--border-color);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.4);
+    position: relative;
+    animation: neon-pulse 2s infinite ease-in-out;
+}
+
+@keyframes neon-pulse {
+    0% {
+        box-shadow: 0 0 5px rgba(var(--accent-rgb), 0.2);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.6);
+    }
+
+    100% {
+        box-shadow: 0 0 5px rgba(var(--accent-rgb), 0.2);
+    }
+}
+
+.mode-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 15%;
+    width: 70%;
+    height: 2px;
+    background: var(--accent-color);
+    box-shadow: 0 0 10px var(--accent-color);
+    border-radius: 1px;
 }
 
 .mode-icon {

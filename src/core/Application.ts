@@ -1498,12 +1498,6 @@ export class Application extends EventEmitter<ApplicationEventMap> {
     const modeChangeInterval = beatInterval * modeChangeBeats;
 
     this.autoModeSwitchTimer = setInterval(() => {
-      // Auto Mode: Disable Mandala/Reflect/Symmetry for pure random placement
-      this.setMandalaMode(false);
-      this.setReflectMode(false);
-      this.state.symmetryEnabled = false;
-      this.emit('state:changed', this.state);
-
       // Randomly toggle antigravity mode (50% chance)
       this.toggleAntigravityMode(Math.random() < 0.5);
 
@@ -1511,8 +1505,6 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       const wireframeModes: ('solid' | 'wireframe' | 'mixed')[] = ['solid', 'wireframe', 'mixed'];
       const randomWireframeMode = wireframeModes[Math.floor(Math.random() * 3)];
       this.setWireframeMode(randomWireframeMode);
-
-      // User Request: "Mechanical algorithm to randomly place objects" -> No Symmetry, just random scatter
     }, modeChangeInterval);
   }
 
