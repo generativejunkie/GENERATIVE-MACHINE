@@ -23,6 +23,8 @@ dist/
 .gemini/
 INTERNAL_LOG_ARCHIVE.md
 papers/MASTER_LOG_*.md
+papers/*SESSION*.md
+papers/*_REPORT_*.md
 
 # Project Specific Ignored
 info/
