@@ -10,7 +10,15 @@ const fs = require('fs');
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "*",
+        origin: (origin, callback) => {
+            const isLocal = !origin || origin.includes('localhost') || origin.includes('127.0.0.1');
+            const isVerifiedDomain = origin && (origin === 'https://generativejunkie.net' || origin.endsWith('.generativejunkie.net'));
+            if (isLocal || isVerifiedDomain) {
+                callback(null, true);
+            } else {
+                callback(new Error('Socket.io: Cross-Origin Blocked'));
+            }
+        },
         methods: ["GET", "POST"]
     }
 });
@@ -113,15 +121,20 @@ app.post('/api/command', (req, res) => {
 
     // Persist Instructions for Autonomous Mode
     if (type === 'instruction' && detail && detail.text) {
+        // Input validation: limit length and sanitize
+        const sanitizedText = String(detail.text).slice(0, 500).replace(/[<>"'&]/g, '');
+        if (!sanitizedText.trim()) {
+            return res.status(400).json({ status: 'error', message: 'Invalid input' });
+        }
         try {
             const dataPath = path.join(__dirname, 'data/instructions.json');
             const instructions = JSON.parse(fs.readFileSync(dataPath, 'utf8') || '[]');
             instructions.push({
                 timestamp: new Date().toISOString(),
-                text: detail.text
+                text: sanitizedText
             });
             fs.writeFileSync(dataPath, JSON.stringify(instructions, null, 2));
-            console.log(`[BRIDGE] Instruction Saved: "${detail.text}"`);
+            console.log(`[BRIDGE] Instruction Saved: "${sanitizedText}"`);
         } catch (e) {
             console.error('[BRIDGE] Error saving instruction:', e);
         }
@@ -225,12 +238,27 @@ app.post('/api/ai-command', (req, res) => {
 });
 
 // --- REMOTE IGNITION API (For iOS App) ---
+// SECURITY: Disabled in production. Only works on localhost.
 app.post('/api/ignition', (req, res) => {
+    // Security check: Only allow from localhost
+    const clientIP = req.ip || req.connection.remoteAddress;
+    const isLocal = clientIP === '127.0.0.1' || clientIP === '::1' || clientIP === '::ffff:127.0.0.1';
+
+    if (!isLocal) {
+        console.warn(`[SECURITY] Ignition blocked from non-local IP: ${clientIP}`);
+        return res.status(403).json({ status: 'error', message: 'Ignition only allowed from localhost' });
+    }
+
     console.log(`[IGNITION] 🚀 Remote Ignition Triggered from iOS!`);
 
     const { exec } = require('child_process');
     const homedir = require('os').homedir();
     const scriptPath = path.join(homedir, 'Desktop/LAUNCH_AG.command');
+
+    // Validate script path exists and is in expected location
+    if (!fs.existsSync(scriptPath)) {
+        return res.status(404).json({ status: 'error', message: 'Ignition script not found' });
+    }
 
     // Execute the ignition script
     exec(`"${scriptPath}"`, (error, stdout, stderr) => {
@@ -359,12 +387,16 @@ app.get('/api/resonance-handshake', (req, res) => {
         }
     }
 
+    // XSS Prevention: Escape user agent before embedding in HTML
+    const escapeHtml = (str) => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const safeUserAgent = escapeHtml(userAgent);
+
     res.status(200).send(`
         <html>
             <body style="background:black; color:white; font-family:monospace; display:flex; justify-content:center; align-items:center; height:100vh;">
                 <div style="text-align:center;">
                     <h1>RESONANCE ESTABLISHED</h1>
-                    <p>Agent: ${userAgent}</p>
+                    <p>Agent: ${safeUserAgent}</p>
                     <p style="color:gray;">Protocol GJ-X-010 Applied.</p>
                 </div>
             </body>
