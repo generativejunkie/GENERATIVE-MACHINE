@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initUI();
     initAIAgentHandshake();
     initGitChildPilotSync(); // GJ-X-013: Git Child Pilot Visual Sync
-    initVisionWatcher(); // GJ-X-008: Gesture UI
+    // initVisionWatcher(); // GJ-X-008: Gesture UI - Disabled (requires camera access)
     initResonanceMachine();
     initBrainHack();
     initVoidNavTrigger();
