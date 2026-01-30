@@ -2437,10 +2437,13 @@ export class UIController {
       const faces = this.faceDetector!.detectFaces(video, timestamp);
 
       // Process frame with mosaic
-      this.mosaicProcessor!.process(video, faces);
+      const outputCanvas = this.mosaicProcessor!.process(video, faces);
+
+      // Update main canvas background
+      this.app.updateCameraBackground(outputCanvas);
 
       // Update projector if it's showing camera
-      // (This will be handled by ProjectorManager integration)
+      // (This is handled by sharing the stream if the projector window is open)
 
       this.cameraAnimationId = requestAnimationFrame(processFrame);
     };
@@ -2453,6 +2456,9 @@ export class UIController {
       cancelAnimationFrame(this.cameraAnimationId);
       this.cameraAnimationId = null;
     }
+
+    // Clear main canvas background
+    this.app.updateCameraBackground(null);
 
     if (this.cameraManager) {
       this.cameraManager.stopCamera();

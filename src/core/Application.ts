@@ -999,6 +999,13 @@ export class Application extends EventEmitter<ApplicationEventMap> {
   }
 
   /**
+   * Update camera background in the scene
+   */
+  public updateCameraBackground(canvas: HTMLCanvasElement | null): void {
+    this.sceneManager.setCameraBackground(canvas);
+  }
+
+  /**
    * Get microphone input gain
    */
   public getMicrophoneGain(): number {

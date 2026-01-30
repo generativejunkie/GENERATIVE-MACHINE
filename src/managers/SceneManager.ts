@@ -46,6 +46,10 @@ export class SceneManager extends EventEmitter {
   private dragPrevPositions: Map<THREE.Object3D, THREE.Vector3> = new Map(); // Previous positions before drag
   private dragDamping: number = 0.2; // Damping factor for smooth drag (0-1, higher = more responsive)
 
+  // Camera background properties
+  private cameraBackgroundPlane: THREE.Mesh | null = null;
+  private cameraTexture: THREE.CanvasTexture | null = null;
+
   constructor(containerId: string) {
     super();
 
@@ -1277,6 +1281,47 @@ export class SceneManager extends EventEmitter {
     this.baseRotation = degrees;
     // Clear cache to force rebuild with new rotation
     this.clearMeshCache();
+  }
+
+  /**
+   * Set the camera mosaic background
+   */
+  public setCameraBackground(canvas: HTMLCanvasElement | null): void {
+    if (!canvas) {
+      if (this.cameraBackgroundPlane) {
+        this.cameraBackgroundPlane.visible = false;
+      }
+      return;
+    }
+
+    if (!this.cameraTexture) {
+      // Create texture from canvas
+      this.cameraTexture = new THREE.CanvasTexture(canvas);
+      this.cameraTexture.colorSpace = THREE.SRGBColorSpace;
+
+      // Calculate size to fill viewport at Z=0
+      const distance = this.camera.position.z; // usually 100
+      const vFov = (this.camera.fov * Math.PI) / 180;
+      const height = 2 * Math.tan(vFov / 2) * distance;
+      const width = height * this.camera.aspect;
+
+      const geometry = new THREE.PlaneGeometry(width, height);
+      const material = new THREE.MeshBasicMaterial({
+        map: this.cameraTexture,
+        depthWrite: false, // Don't write to depth buffer so it stays in background
+        transparent: true
+      });
+
+      this.cameraBackgroundPlane = new THREE.Mesh(geometry, material);
+      this.cameraBackgroundPlane.position.set(0, 0, 0);
+      this.cameraBackgroundPlane.renderOrder = RENDER_ORDER.BACKGROUND - 1; // Stay behind everything
+
+      this.scene.add(this.cameraBackgroundPlane);
+    }
+
+    // Update texture and ensure visibility
+    this.cameraTexture.needsUpdate = true;
+    this.cameraBackgroundPlane!.visible = true;
   }
 
   /**
