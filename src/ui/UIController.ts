@@ -8,6 +8,9 @@ import type { Application } from '@core/Application';
 import { RadarController } from './RadarController';
 import * as THREE from 'three';
 import { MATERIALS } from '@materials/geometries';
+import { CameraManager } from '@managers/CameraManager';
+import { FaceDetectorManager } from '@managers/FaceDetector';
+import { MosaicProcessor } from '../processors/MosaicProcessor';
 
 interface ModeSettings {
   symmetry: number;
@@ -29,6 +32,12 @@ export class UIController {
   private radarController: RadarController | null = null;
 
   private midiManager: MidiManager;
+
+  // Camera Mosaic System
+  private cameraManager: CameraManager | null = null;
+  private faceDetector: FaceDetectorManager | null = null;
+  private mosaicProcessor: MosaicProcessor | null = null;
+  private cameraAnimationId: number | null = null;
 
   constructor(app: Application) {
     this.app = app;
@@ -236,6 +245,9 @@ export class UIController {
 
     // VJ Pro Controls
     this.setupVJProControls();
+
+    // Camera Mosaic Controls
+    this.setupCameraMosaicControl();
 
     this.setupResetButton();
 
@@ -2324,6 +2336,142 @@ export class UIController {
       document.getElementById('voidDialogueContainer')?.classList.add('hidden');
       document.documentElement.style.filter = '';
     }, 5000);
+  }
+
+  // ===== CAMERA MOSAIC CONTROL =====
+  private async setupCameraMosaicControl(): Promise<void> {
+    const cameraSelect = document.getElementById('cameraSelect') as HTMLSelectElement;
+    const startBtn = document.getElementById('startCameraBtn');
+    const stopBtn = document.getElementById('stopCameraBtn');
+    const mosaicSlider = document.getElementById('mosaicBlockSize') as HTMLInputElement;
+    const mosaicValue = document.getElementById('mosaicBlockSizeValue');
+    const mosaicCheckbox = document.getElementById('mosaicEnabled') as HTMLInputElement;
+
+    if (!cameraSelect || !startBtn || !stopBtn) {
+      console.log('📹 Camera mosaic controls not found, skipping setup');
+      return;
+    }
+
+    // Initialize camera system
+    this.cameraManager = new CameraManager();
+    this.faceDetector = new FaceDetectorManager();
+    this.mosaicProcessor = new MosaicProcessor();
+
+    // Populate camera dropdown
+    const populateCameras = async () => {
+      const devices = await this.cameraManager!.getDevices();
+      cameraSelect.innerHTML = '<option value="">-- Select Camera --</option>';
+      devices.forEach(device => {
+        const option = document.createElement('option');
+        option.value = device.deviceId;
+        option.textContent = device.label;
+        cameraSelect.appendChild(option);
+      });
+    };
+
+    // Populate on page load
+    await populateCameras();
+
+    // Start camera button
+    startBtn.addEventListener('click', async () => {
+      if (!this.cameraManager) return;
+
+      const selectedDevice = cameraSelect.value;
+      const video = await this.cameraManager.startCamera(selectedDevice || undefined);
+
+      if (video) {
+        // Initialize face detector if not already done
+        if (this.faceDetector && !this.faceDetector.isReady()) {
+          console.log('🔍 Initializing face detector...');
+          await this.faceDetector.initialize();
+        }
+
+        // Start processing loop
+        this.startCameraProcessingLoop();
+        startBtn.classList.add('active');
+        stopBtn.classList.remove('active');
+        console.log('📹 Camera mosaic started');
+      }
+    });
+
+    // Stop camera button
+    stopBtn.addEventListener('click', () => {
+      this.stopCameraProcessing();
+      startBtn.classList.remove('active');
+      stopBtn.classList.add('active');
+    });
+
+    // Mosaic strength slider
+    if (mosaicSlider && mosaicValue) {
+      mosaicSlider.addEventListener('input', () => {
+        const value = parseInt(mosaicSlider.value);
+        mosaicValue.textContent = value.toString();
+        if (this.mosaicProcessor) {
+          this.mosaicProcessor.setBlockSize(value);
+        }
+      });
+    }
+
+    // Mosaic enabled checkbox
+    if (mosaicCheckbox) {
+      mosaicCheckbox.addEventListener('change', () => {
+        if (this.mosaicProcessor) {
+          this.mosaicProcessor.setEnabled(mosaicCheckbox.checked);
+        }
+      });
+    }
+  }
+
+  private startCameraProcessingLoop(): void {
+    if (!this.cameraManager || !this.faceDetector || !this.mosaicProcessor) return;
+
+    const video = this.cameraManager.getVideoElement();
+    if (!video) return;
+
+    const processFrame = () => {
+      if (!this.cameraManager?.isRunning()) return;
+
+      const timestamp = performance.now();
+
+      // Detect faces
+      const faces = this.faceDetector!.detectFaces(video, timestamp);
+
+      // Process frame with mosaic
+      this.mosaicProcessor!.process(video, faces);
+
+      // Update projector if it's showing camera
+      // (This will be handled by ProjectorManager integration)
+
+      this.cameraAnimationId = requestAnimationFrame(processFrame);
+    };
+
+    processFrame();
+  }
+
+  private stopCameraProcessing(): void {
+    if (this.cameraAnimationId) {
+      cancelAnimationFrame(this.cameraAnimationId);
+      this.cameraAnimationId = null;
+    }
+
+    if (this.cameraManager) {
+      this.cameraManager.stopCamera();
+    }
+    console.log('📹 Camera mosaic stopped');
+  }
+
+  /**
+   * Get the mosaic output canvas for projector integration
+   */
+  public getMosaicCanvas(): HTMLCanvasElement | null {
+    return this.mosaicProcessor?.getCanvas() ?? null;
+  }
+
+  /**
+   * Get mosaic output as MediaStream
+   */
+  public getMosaicStream(): MediaStream | null {
+    return this.mosaicProcessor?.getStream() ?? null;
   }
 }
 

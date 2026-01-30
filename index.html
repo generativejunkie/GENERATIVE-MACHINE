@@ -454,6 +454,32 @@
                 </div>
             </div>
 
+            <!-- Camera Mosaic Section -->
+            <div class="menu-section" id="cameraMosaicSection">
+                <h3>📹 CAMERA MOSAIC</h3>
+                <div class="control-row" style="margin-bottom: 10px;">
+                    <label class="sub-label">Camera Select</label>
+                    <select id="cameraSelect"
+                        style="width: 100%; padding: 5px; background: var(--panel-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 4px;">
+                        <option value="">-- Select Camera --</option>
+                    </select>
+                </div>
+                <div class="vj-controls" style="margin-bottom: 10px;">
+                    <button class="vj-pro-btn" id="startCameraBtn">▶ START</button>
+                    <button class="vj-pro-btn" id="stopCameraBtn">⬛ STOP</button>
+                </div>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="mosaicEnabled" checked>
+                    <span>Mosaic Enabled</span>
+                </label>
+                <label class="sub-label" style="margin-top: 10px;">Mosaic Strength</label>
+                <div class="slider-wrapper">
+                    <input type="range" id="mosaicBlockSize" min="5" max="50" value="15">
+                    <span id="mosaicBlockSizeValue">15</span>
+                </div>
+                <div class="info-text">Camera preview appears in projector output</div>
+            </div>
+
             <div class="menu-section">
                 <button class="reset-btn" id="resetScene">RESET SCENE</button>
             </div>

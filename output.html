@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>𖣔 Mandala Machine - OUTPUT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            cursor: none;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        #status {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            color: #0f0;
+            font-family: monospace;
+            font-size: 12px;
+            opacity: 0.5;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        #status.hidden {
+            opacity: 0;
+        }
+
+        .connection-lost {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #f00;
+            font-family: monospace;
+            font-size: 24px;
+            display: none;
+        }
+
+        .connection-lost.visible {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="canvas-container"></div>
+    <div id="status">OUTPUT MODE - Waiting for connection...</div>
+    <div class="connection-lost">CONNECTION LOST</div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { BrainHackMandala } from './src/features/BrainHackMandala';
+
+        class OutputRenderer {
+            constructor() {
+                this.channel = new BroadcastChannel('mandala-vj-sync');
+                this.state = null;
+                this.renderer = null;
+                this.scene = null;
+                this.camera = null;
+                this.brainHack = null;
+                this.lastMessageTime = Date.now();
+                this.connectionTimeout = null;
+
+                this.init();
+                this.setupChannelListener();
+                this.startConnectionMonitor();
+            }
+
+            init() {
+                // Create Three.js renderer
+                const container = document.getElementById('canvas-container');
+
+                this.scene = new THREE.Scene();
+                this.scene.background = new THREE.Color(0x000000);
+
+                this.camera = new THREE.PerspectiveCamera(
+                    75,
+                    window.innerWidth / window.innerHeight,
+                    0.1,
+                    1000
+                );
+                this.camera.position.z = 5;
+
+                this.renderer = new THREE.WebGLRenderer({
+                    antialias: true,
+                    alpha: false
+                });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(window.devicePixelRatio);
+                container.appendChild(this.renderer.domElement);
+
+                // Initialize BrainHack
+                this.brainHack = new BrainHackMandala(this.renderer, this.scene);
+
+                // Handle resize
+                window.addEventListener('resize', () => this.onResize());
+
+                // Hide status after 3 seconds
+                setTimeout(() => {
+                    document.getElementById('status').classList.add('hidden');
+                }, 3000);
+
+                // Start render loop
+                this.animate();
+
+                // Request initial state
+                this.channel.postMessage({ type: 'request-state' });
+            }
+
+            setupChannelListener() {
+                this.channel.onmessage = (event) => {
+                    this.lastMessageTime = Date.now();
+                    this.hideConnectionLost();
+
+                    const { type, data } = event.data;
+
+                    switch (type) {
+                        case 'state-update':
+                            this.updateFromState(data);
+                            break;
+                        case 'frame-data':
+                            this.updateFromFrameData(data);
+                            break;
+                        case 'brainhack-update':
+                            this.updateBrainHack(data);
+                            break;
+                    }
+                };
+            }
+
+            updateFromState(state) {
+                this.state = state;
+
+                // Update background
+                if (state.backgroundColor) {
+                    this.scene.background = new THREE.Color(state.backgroundColor);
+                }
+
+                // Update BrainHack visibility
+                if (this.brainHack) {
+                    this.brainHack.setVisible(state.brainHackMode || false);
+                }
+
+                document.getElementById('status').textContent =
+                    `OUTPUT MODE - Connected | Mode: ${state.brainHackMode ? 'BRAIN HACK' : 'NORMAL'}`;
+            }
+
+            updateFromFrameData(data) {
+                // Real-time frame updates (audio, beat, etc.)
+                if (this.brainHack && this.state?.brainHackMode) {
+                    this.brainHack.update(
+                        data.beat || 0,
+                        data.audioLevel || 0,
+                        this.state.brainHackModeIndex || 0
+                    );
+                }
+            }
+
+            updateBrainHack(data) {
+                if (!this.brainHack) return;
+
+                this.brainHack.setVisible(data.visible);
+                if (data.modeIndex !== undefined) {
+                    this.brainHack.setMode(data.modeIndex);
+                }
+                if (data.colors) {
+                    this.brainHack.setColors(
+                        data.colors.a,
+                        data.colors.b,
+                        data.colors.c
+                    );
+                }
+            }
+
+            startConnectionMonitor() {
+                setInterval(() => {
+                    const elapsed = Date.now() - this.lastMessageTime;
+                    if (elapsed > 5000) {
+                        this.showConnectionLost();
+                    }
+                }, 1000);
+            }
+
+            showConnectionLost() {
+                document.querySelector('.connection-lost').classList.add('visible');
+            }
+
+            hideConnectionLost() {
+                document.querySelector('.connection-lost').classList.remove('visible');
+            }
+
+            onResize() {
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+
+                this.camera.aspect = width / height;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(width, height);
+
+                if (this.brainHack) {
+                    this.brainHack.resize(width, height);
+                }
+            }
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+
+                // Update BrainHack if active
+                if (this.brainHack && this.state?.brainHackMode) {
+                    // Autonomous update for smooth animation
+                    this.brainHack.update(0, 0, this.state.brainHackModeIndex || 0);
+                }
+
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            new OutputRenderer();
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // ESC to close
+            if (e.key === 'Escape') {
+                window.close();
+            }
+            // F to toggle fullscreen
+            if (e.key === 'f' || e.key === 'F') {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen();
+                } else {
+                    document.exitFullscreen();
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

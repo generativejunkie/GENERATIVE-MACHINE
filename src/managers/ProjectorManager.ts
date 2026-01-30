@@ -4,12 +4,63 @@
  * @module managers/ProjectorManager
  */
 
+export type ProjectorOutputMode = 'mandala' | 'camera' | 'overlay';
+
 export class ProjectorManager {
     private projectorWindow: Window | null = null;
     private checkInterval: number | null = null;
+    private cameraStream: MediaStream | null = null;
+    private mandalaStream: MediaStream | null = null;
+    private outputMode: ProjectorOutputMode = 'mandala';
+    private currentVideoElement: HTMLVideoElement | null = null;
 
     constructor() {
         this.setupWindowCleanup();
+    }
+
+    /**
+     * Set the camera mosaic stream for projector output
+     */
+    public setCameraStream(stream: MediaStream): void {
+        this.cameraStream = stream;
+        this.updateProjectorStream();
+    }
+
+    /**
+     * Set the output mode (mandala only, camera only, or overlay)
+     */
+    public setOutputMode(mode: ProjectorOutputMode): void {
+        this.outputMode = mode;
+        this.updateProjectorStream();
+        console.log(`📽️ Output mode: ${mode}`);
+    }
+
+    /**
+     * Update the projector stream based on current mode
+     */
+    private updateProjectorStream(): void {
+        if (!this.projectorWindow || this.projectorWindow.closed || !this.currentVideoElement) {
+            return;
+        }
+
+        let activeStream: MediaStream | null = null;
+
+        switch (this.outputMode) {
+            case 'mandala':
+                activeStream = this.mandalaStream;
+                break;
+            case 'camera':
+                activeStream = this.cameraStream;
+                break;
+            case 'overlay':
+                // For overlay, we could composite streams, but for now use camera
+                activeStream = this.cameraStream || this.mandalaStream;
+                break;
+        }
+
+        if (activeStream && this.currentVideoElement) {
+            this.currentVideoElement.srcObject = activeStream;
+        }
     }
 
     /**
@@ -29,7 +80,7 @@ export class ProjectorManager {
         }
 
         // Create stream (30-60fps depending on browser capability)
-        const stream = canvas.captureStream(60);
+        this.mandalaStream = canvas.captureStream(60);
 
         // Open new window
         // popup=yes ensures minimal UI chrome, but we add more flags to be sure
@@ -41,7 +92,7 @@ export class ProjectorManager {
             return;
         }
 
-        this.setupProjectorDOM(this.projectorWindow, stream);
+        this.setupProjectorDOM(this.projectorWindow, this.mandalaStream);
 
         // Start interval to check if window is closed
         this.startWindowCheck();
@@ -72,6 +123,9 @@ export class ProjectorManager {
         // If the user wants to fill the screen (potentially cropping), 'cover' would be used.
         video.style.objectFit = 'contain';
         video.srcObject = stream;
+
+        // Store reference for mode switching
+        this.currentVideoElement = video;
 
         doc.body.appendChild(video);
 
