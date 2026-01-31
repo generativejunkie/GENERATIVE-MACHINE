@@ -13,6 +13,7 @@ export class ResonanceController {
     constructor() {
         this.isActive = false;
         this.globalResonance = 0;
+        this.isFailSafe = false;
         this.machines = {
             image: null,
             sound: null,
@@ -20,6 +21,21 @@ export class ResonanceController {
             info: null
         };
         this.init();
+        this.initResilienceHandlers();
+    }
+
+    initResilienceHandlers() {
+        window.addEventListener('quantum-breach', (e) => {
+            console.warn('[RESONANCE] QUANTUM BREACH DETECTED. ACTIVATING FAIL-SAFE.');
+            this.setFailSafe(true);
+        });
+
+        window.addEventListener('neural-handshake-verified', () => {
+            if (this.isFailSafe) {
+                console.log('[RESONANCE] HUMAN NODE VERIFIED. EXITING FAIL-SAFE.');
+                this.setFailSafe(false);
+            }
+        });
     }
 
     init() {
@@ -89,6 +105,19 @@ export class ResonanceController {
             if (window.imageMachine && window.imageMachine.triggerSecret) {
                 window.imageMachine.triggerSecret('high');
             }
+        }
+    }
+
+    setFailSafe(active) {
+        this.isFailSafe = active;
+        if (active) {
+            document.documentElement.classList.add('fail-safe');
+            // Force Image Machine to safe color mode if available
+            if (window.imageMachine && window.imageMachine.setGlitchLevel) {
+                window.imageMachine.setGlitchLevel(0);
+            }
+        } else {
+            document.documentElement.classList.remove('fail-safe');
         }
     }
 }

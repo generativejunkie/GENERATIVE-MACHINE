@@ -4,6 +4,8 @@ import { getDialogue } from '../data/dialogue.js';
 import { playAmbientMusic, stopAmbientMusic } from './sound-machine.js';
 import { initVoidKeyboard, showInputKeyboard, setDialogueInputCallback, handleCapsuleChoice } from './void-input.js';
 import { broadcastEvent, initSync } from '../utils/sync.js';
+import { getImageAlt } from '../data/image-descriptions.js';
+import { AccessibilitySettings } from './accessibility-controller.js';
 
 
 export const imageMachineSketch = (p) => {
@@ -32,7 +34,7 @@ export const imageMachineSketch = (p) => {
     let animationFrame = 0;
     let transitionType = 'blocks';
     const chaosDuration = CONFIG.IMAGE_MACHINE.CHAOS_DURATION;
-    const transitionDuration = CONFIG.IMAGE_MACHINE.TRANSITION_DURATION;
+    const transitionDuration = AccessibilitySettings.reducedMotion ? 2 : CONFIG.IMAGE_MACHINE.TRANSITION_DURATION;
     let promptTimer = null;
     let useColorMode = false; // Flag for fallback mode
     let imageLoadAttempts = 0;
@@ -173,9 +175,13 @@ export const imageMachineSketch = (p) => {
                 getColorPattern(currentImageKey) :
                 allImages[currentImageKey];
 
-            const nextContent = useColorMode ?
-                getColorPattern(nextImageKey) :
-                allImages[nextImageKey];
+            // [AI IMPROVEMENT] Handle PENDING state for nextContent
+            let nextContent = null;
+            if (nextImageKey && nextImageKey !== 'PENDING') {
+                nextContent = useColorMode ?
+                    getColorPattern(nextImageKey) :
+                    allImages[nextImageKey];
+            }
 
             if (!currentContent && !useColorMode) {
                 p.background(255);
@@ -225,12 +231,39 @@ export const imageMachineSketch = (p) => {
                     break;
 
                 case 'chaos':
-                    drawGlitch(nextContent);
+                    // [AI IMPROVEMENT] If nextContent is still loading (PENDING), draw current or noise
+                    if (!nextContent) {
+                        drawGlitch(currentContent); // Stay on current glitch while waiting
+                    } else {
+                        drawGlitch(nextContent);
+                    }
+
                     animationFrame++;
-                    if (animationFrame > chaosDuration) {
+                    // [AI IMPROVEMENT] Only proceed to rebuild if we have a valid nextImageKey (not PENDING)
+                    if (animationFrame > chaosDuration && nextImageKey !== 'PENDING') {
                         animationFrame = 0;
                         animationState = 'rebuild';
-                        currentImageKey = nextImageKey;
+
+                        // Sync current image
+                        if (nextImageKey && nextImageKey.startsWith('photos/')) {
+                            currentImageKey = nextImageKey;
+                            useColorMode = false;
+                        } else if (nextImageKey && nextImageKey.startsWith('color-')) {
+                            currentImageKey = nextImageKey;
+                            useColorMode = true;
+                        }
+
+                        // [AI ACCESSIBILITY] Update Canvas ARIA label
+                        const canvas = p.canvas;
+                        if (canvas) {
+                            const filename = currentImageKey ? currentImageKey.split('/').pop() : '';
+                            const altText = useColorMode ? 'Generative color pattern' : getImageAlt(filename);
+                            canvas.setAttribute('aria-label', `IMAGE MACHINE: ${altText}`);
+
+                            // Log for debugging
+                            console.log(`[ACCESSIBILITY] Updated ARIA-label: ${altText}`);
+                        }
+
                         nextImageKey = null;
                     }
                     break;
@@ -1374,87 +1407,87 @@ export const imageMachineSketch = (p) => {
 
     const handleInteraction = () => {
         if (animationState === 'display' && !nextImageKey) {
-            // Immediate UI feedback (no blocking)
-            document.getElementById('imagePrompt').classList.add('hidden');
+            // Immediate UI feedback
+            const prompt = document.getElementById('imagePrompt');
+            if (prompt) prompt.classList.add('hidden');
             clearTimeout(promptTimer);
 
-            // Defer heavy processing to avoid blocking
-            // [AI OPTIMIZATION] Lock interaction immediately to prevent double triggers (INP fix)
-            nextImageKey = 'PENDING';
+            // [AI IMPROVEMENT] START DECAY IMMEDIATELY
+            // This provides instant visual feedback even if the image is still loading
+            animationFrame = 0;
+            animationState = 'decay';
 
-            requestAnimationFrame(() => {
-                // Randomly select transition effect
-                transitionType = p.random(transitionEffects);
+            // Randomly select transition effect
+            transitionType = p.random(transitionEffects);
 
-                if (useColorMode) {
-                    // Color mode - select different color pattern
-                    let newIndex = p.floor(p.random(colorPatterns.length));
-                    const currentIndex = parseInt(currentImageKey.replace('color-', ''));
-                    while (newIndex === currentIndex) {
-                        newIndex = p.floor(p.random(colorPatterns.length));
-                    }
-                    nextImageKey = `color-${newIndex}`;
-                    animationFrame = 0;
-                    animationState = 'decay';
-                } else {
-                    // Image mode - try to load new image
-                    let newIndex = p.floor(p.random(imageFileNames.length));
-                    while (imageFileNames[newIndex] === currentImageKey) {
-                        newIndex = p.floor(p.random(imageFileNames.length));
-                    }
+            // [AI IMPROVEMENT] Attempt to recover from color mode on every interaction
+            // If we were in color mode, try to switch back to image mode by default
+            if (useColorMode && Math.random() > 0.3) {
+                useColorMode = false;
+                console.log("[IMAGE] Attempting recovery from color mode...");
+            }
 
-                    let hasResponded = false; // Track if callback has been called
+            // Select next target
+            let newIndex = p.floor(p.random(imageFileNames.length));
+            // Ensure we don't pick the same image (or color key)
+            while (imageFileNames[newIndex] === currentImageKey || `color-${newIndex % colorPatterns.length}` === currentImageKey) {
+                newIndex = p.floor(p.random(imageFileNames.length));
+            }
 
-                    // MOBILE FIX: Guaranteed fallback to prevent freeze
-                    let loadTimeout = setTimeout(() => {
-                        if (!hasResponded) {
-                            console.warn(`Image load timeout (mobile freeze prevention): ${imageFileNames[newIndex]}`);
-                            hasResponded = true;
-                            // Fallback to color mode
-                            useColorMode = true;
-                            nextImageKey = `color-${p.floor(p.random(colorPatterns.length))}`;
-                            animationFrame = 0;
-                            animationState = 'decay';
-                        }
-                    }, 3000); // 3 second timeout
+            if (useColorMode) {
+                // Color mode path
+                nextImageKey = `color-${newIndex % colorPatterns.length}`;
+                console.log(`[IMAGE] Switching to color pattern: ${nextImageKey}`);
+            } else {
+                // Image mode path - load in parallel
+                nextImageKey = 'PENDING';
 
-                    loadImageDynamically(imageFileNames[newIndex], (result) => {
-                        if (hasResponded) return; // Prevent double execution
+                let hasResponded = false;
+                let loadTimeout = setTimeout(() => {
+                    if (!hasResponded) {
+                        console.warn(`[IMAGE] Load timeout: ${imageFileNames[newIndex]}`);
                         hasResponded = true;
-                        clearTimeout(loadTimeout);
+                        useColorMode = true;
+                        nextImageKey = `color-${newIndex % colorPatterns.length}`;
+                    }
+                }, 4000); // 4 second timeout for slow connections
 
-                        if (result.success) {
-                            nextImageKey = result.img.filePath;
-                            // Pre-load pixels once to avoid heavy loadPixels() in every draw() frame
-                            if (result.img.loadPixels) result.img.loadPixels();
-                            console.log(`Loaded: ${result.img.filePath}`);
-                            // Broadcast for Nebula Sync
-                            if (window.broadcastEvent) {
-                                window.broadcastEvent('image-update', { index: newIndex });
-                            }
-                        } else {
-                            // Switch to color mode
-                            console.warn(`Failed to load image, switching to color mode`);
-                            useColorMode = true;
-                            nextImageKey = `color-${p.floor(p.random(colorPatterns.length))}`;
+                loadImageDynamically(imageFileNames[newIndex], (result) => {
+                    if (hasResponded) return;
+                    hasResponded = true;
+                    clearTimeout(loadTimeout);
+
+                    if (result.success) {
+                        nextImageKey = result.img.filePath;
+                        if (result.img.loadPixels) result.img.loadPixels();
+                        console.log(`[IMAGE] Loaded: ${result.img.filePath}`);
+
+                        // Broadcast for mirroring
+                        if (window.broadcastEvent) {
+                            window.broadcastEvent('image-update', { index: newIndex });
                         }
-                        animationFrame = 0;
-                        animationState = 'decay';
-                    });
-                }
-            });
+                    } else {
+                        console.warn(`[IMAGE] Failed to load, falling back to color`);
+                        useColorMode = true;
+                        nextImageKey = `color-${newIndex % colorPatterns.length}`;
+                    }
+                });
+            }
         }
     };
 
     p.mousePressed = handleInteraction;
     p.touchStarted = (e) => {
-        // Check if touch is on canvas
-        const canvas = document.querySelector('#imageCanvas-container canvas');
-        if (canvas && e.target === canvas) {
+        // [AI IMPROVEMENT] Robust touch handling: Check if touch is on canvas container or prompt
+        const container = document.getElementById('imageCanvas-container');
+        const prompt = document.getElementById('imagePrompt');
+
+        if ((container && (e.target === container || container.contains(e.target))) ||
+            (prompt && (e.target === prompt || prompt.contains(e.target)))) {
             handleInteraction();
-            return false; // Prevent default only on canvas
+            return false; // Prevent default for these elements to avoid scrolling
         }
-        return true; // Allow default behavior for other elements
+        return true;
     };
 
     p.keyPressed = () => {

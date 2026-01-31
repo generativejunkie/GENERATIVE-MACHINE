@@ -42,6 +42,67 @@
     /* Faster, sharper */
     --transition-base: 300ms cubic-bezier(0.2, 0.0, 0.2, 1);
     --transition-slow: 500ms cubic-bezier(0.2, 0.0, 0.2, 1);
+
+    /* Accessibility Overrides */
+    --focus-ring-color: #007aff;
+    --focus-ring-width: 3px;
+}
+
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    ::before,
+    ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+.reduced-motion *,
+.reduced-motion ::before,
+.reduced-motion ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+}
+
+/* High Contrast Override */
+.high-contrast {
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #ffffff;
+    --color-bg-tertiary: #ffffff;
+    --color-text-primary: #000000;
+    --color-text-secondary: #000000;
+    --color-text-tertiary: #333333;
+    --color-accent: #000000;
+    --color-border: #000000;
+    --color-border-strong: #000000;
+}
+
+/* Fail-Safe Mode (Quantum Resilience v1.0) */
+.fail-safe {
+    filter: sepia(0.5) hue-rotate(-50deg) contrast(1.2);
+    border: 5px solid #ff0000;
+}
+
+.fail-safe::before {
+    content: "QUANTUM INTEGRITY BREACH - FAIL-SAFE ACTIVE";
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 0, 0, 0.9);
+    color: white;
+    padding: 20px 40px;
+    font-family: var(--font-family-mono);
+    font-weight: bold;
+    z-index: 10000;
+    pointer-events: none;
+    animation: flash 1s infinite;
 }
 
 /* ==================== Reset & Base ==================== */
@@ -58,6 +119,12 @@ html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
 }
 
 body {
@@ -117,6 +184,18 @@ h3 {
 @keyframes blink {
     50% {
         opacity: 0;
+    }
+}
+
+@keyframes flash {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
     }
 }
 

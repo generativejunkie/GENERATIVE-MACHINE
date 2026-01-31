@@ -24,6 +24,8 @@ import { initGitChildPilotSync } from './modules/git-child-pilot-sync.js';
 import { initVisionWatcher } from './modules/vision-watcher.js'; // GJ-X-008
 import { initResonanceMachine } from './modules/resonance-machine.js';
 import { initBrainHack } from './modules/brain-hack.js';
+import { AccessibilitySettings } from './modules/accessibility-controller.js';
+import { QuantumResilience } from './modules/quantum-resilience.js';
 
 // --- ORCHESTRATOR OVERLAY ---
 function showRemoteSignal(title, message, color = '#00ff00') {
@@ -49,7 +51,13 @@ function showRemoteSignal(title, message, color = '#00ff00') {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Central Command first
+    // Initialize Accessibility FIRST
+    AccessibilitySettings.init();
+
+    // Initialize Quantum Resilience Substrate
+    QuantumResilience.init();
+
+    // Initialize Central Command
     initResonanceControl();
 
     // Initialize standard modules
@@ -400,6 +408,8 @@ document.addEventListener('keydown', (e) => {
         if (window.broadcastEvent) {
             window.broadcastEvent('trigger-secret', { code: 'void' });
         }
+        // [RESILIENCE] Re-frame VOID ritual as a Neural Handshake verification
+        window.dispatchEvent(new CustomEvent('neural-handshake-verified'));
         keyHistory = [];
     } else if (historyStr.endsWith('high')) {
         console.log("KEY RITUAL: SUPER HIGH");
