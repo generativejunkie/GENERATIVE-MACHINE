@@ -39,6 +39,7 @@ export const imageMachineSketch = (p) => {
     let useColorMode = false; // Flag for fallback mode
     let imageLoadAttempts = 0;
     const maxLoadAttempts = 3;
+    let loadStartTime = 0; // [AI IMPROVEMENT] Track load timing
 
     // Available transition effects (GOD SPEED - removed heavy particle/noise effects)
     const transitionEffects = [
@@ -240,17 +241,35 @@ export const imageMachineSketch = (p) => {
 
                     animationFrame++;
                     // [AI IMPROVEMENT] Only proceed to rebuild if we have a valid nextImageKey (not PENDING)
-                    if (animationFrame > chaosDuration && nextImageKey !== 'PENDING') {
+                    // OR if the load has timed out (3 seconds safety)
+                    const loadElapsed = nextImageKey === 'PENDING' ? (p.millis() - loadStartTime) : 0;
+                    const isTimedOut = loadElapsed > 3000;
+
+                    if (animationFrame > chaosDuration && (nextImageKey !== 'PENDING' || isTimedOut)) {
+
+                        if (isTimedOut && nextImageKey === 'PENDING') {
+                            console.warn("[IMAGE] Load timeout exceeded in CHAOS state. Forcing color fallback.");
+                            useColorMode = true;
+                            nextImageKey = `color-${p.floor(p.random(colorPatterns.length))}`;
+                        }
+
                         animationFrame = 0;
                         animationState = 'rebuild';
 
                         // Sync current image
-                        if (nextImageKey && nextImageKey.startsWith('photos/')) {
+                        if (nextImageKey && nextImageKey.startsWith('/photos/')) {
                             currentImageKey = nextImageKey;
                             useColorMode = false;
                         } else if (nextImageKey && nextImageKey.startsWith('color-')) {
                             currentImageKey = nextImageKey;
                             useColorMode = true;
+                        }
+
+                        // Update indicators (e.g. 01/363)
+                        const counter = document.querySelector('.image-counter') || document.querySelector('.indicator');
+                        if (counter) {
+                            const num = currentImageKey.match(/\d+/) || ['01'];
+                            counter.innerText = num[0].toString().padStart(2, '0');
                         }
 
                         // [AI ACCESSIBILITY] Update Canvas ARIA label
@@ -397,12 +416,16 @@ export const imageMachineSketch = (p) => {
                 callback({ success: true, img: img });
             },
             () => {
-                console.warn(`Failed to load: ${filePath}`);
+                console.warn(`[IMAGE] Failed to load: ${filePath} (Attempt ${imageLoadAttempts}/${maxLoadAttempts})`);
                 if (imageLoadAttempts < maxLoadAttempts) {
                     const newIndex = p.floor(p.random(imageFileNames.length));
-                    loadImageDynamically(imageFileNames[newIndex], callback);
+                    // [AI IMPROVEMENT] Add exponential backoff for retries to avoid flooding during 429
+                    const delay = 500 * Math.pow(2, imageLoadAttempts - 1);
+                    setTimeout(() => {
+                        loadImageDynamically(imageFileNames[newIndex], callback);
+                    }, delay);
                 } else {
-                    console.log('Switching to color pattern mode');
+                    console.error('[IMAGE] Max load attempts reached. Falling back to color mode.');
                     imageLoadAttempts = 0;
                     callback({ success: false });
                 }
@@ -410,41 +433,46 @@ export const imageMachineSketch = (p) => {
         );
     }
 
-    // Background preloading logic
+    // Background preloading logic - SEQUENTIAL & THROTTLED
     function startPreloading() {
         let preloadIndex = 0;
-        // Shuffle array for random preloading
         const shuffledAttributes = [...imageFileNames].sort(() => 0.5 - Math.random());
 
         const loadNext = () => {
             if (preloadIndex >= shuffledAttributes.length) return;
 
-            // BAKUSOKU MODE: Limit preloading on touch devices to avoid memory lag
-            const maxPreloadCount = isTouch() ? 15 : 100;
+            // BAKUSOKU MODE with safety: Limit concurrent requests
+            const maxPreloadCount = isTouch() ? 15 : 60; // Reduced from 100 for better CPU
             if (Object.keys(allImages).length > maxPreloadCount) {
-                console.log("Bakusoku Phase: Reached preloading limit for mobile.");
+                console.log("[IMAGE] Sequential Preload: Reached quota.");
                 return;
             }
 
             const filePath = shuffledAttributes[preloadIndex];
             if (!allImages[filePath]) {
-                p.loadImage(filePath, (img) => {
-                    img.filePath = filePath;
-                    allImages[filePath] = img;
-                });
-            }
-
-            preloadIndex++;
-
-            if ('requestIdleCallback' in window) {
-                requestIdleCallback(loadNext, { timeout: 2000 });
+                p.loadImage(filePath,
+                    (img) => {
+                        img.filePath = filePath;
+                        allImages[filePath] = img;
+                        preloadIndex++;
+                        // Wait for success before scheduling next to avoid 429 flood
+                        const nextDelay = isTouch() ? 8000 : 3000;
+                        setTimeout(loadNext, nextDelay);
+                    },
+                    () => {
+                        // On failure, skip and move on after a delay
+                        preloadIndex++;
+                        setTimeout(loadNext, 5000);
+                    }
+                );
             } else {
-                setTimeout(loadNext, 1000); // Slower interval for better performance
+                preloadIndex++;
+                loadNext(); // Skip already loaded
             }
         };
 
-        // Delay preloading further to let primary tasks finish
-        setTimeout(loadNext, 5000);
+        // Delay start to prioritize main interaction
+        setTimeout(loadNext, 12000);
     }
 
     function runTransition(content, progress, isDecay) {
@@ -1441,6 +1469,7 @@ export const imageMachineSketch = (p) => {
             } else {
                 // Image mode path - load in parallel
                 nextImageKey = 'PENDING';
+                loadStartTime = p.millis(); // [AI IMPROVEMENT] Mark start time for timeout logic
 
                 let hasResponded = false;
                 let loadTimeout = setTimeout(() => {
