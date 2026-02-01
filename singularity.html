@@ -782,7 +782,7 @@
     <div class="container">
         <header>
             <div class="doc-meta">
-                <span>SYSTEM_STATUS // ACTIVE</span>
+                <span id="system-status-text">SYSTEM_STATUS // ACTIVE</span>
                 <span style="width: 40px; height: 1px; background: #333;"></span>
                 <span>OBSERVATION_LOG</span>
             </div>
@@ -893,6 +893,9 @@
                     </div>
                     <div style="font-size: 9px; color: #333; font-family: var(--mono-font);">STAMP: <span
                             id="timestamp-val">----.--.--</span></div>
+                </div>
+                <div class="footer-item" style="opacity: 0.5; color: #444; font-size: 9px; margin-left: auto;">
+                    LAST_SYNC: <span id="last-sync-val">--:--:--</span>
                 </div>
             </div>
         </section>
@@ -1187,22 +1190,23 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Metrics Animation Logic
-            const metrics = {
+            const metricsState = {
                 'purity-val': { el: document.getElementById('purity-val'), target: 94.2, current: 0, isDecimal: true },
                 'symbiosis-val': { el: document.getElementById('symbiosis-val'), target: 98.8, current: 0, isDecimal: true },
                 'leap-val': { el: document.getElementById('leap-val'), target: 89.5, current: 0, isDecimal: true },
                 'disruption-val': { el: document.getElementById('disruption-val'), target: 76.4, current: 0, isDecimal: true },
-                'sync-val': { el: document.getElementById('sync-val'), target: 111.6, current: 0, isDecimal: true }, // Updated for Hyper-Resonance
+                'sync-val': { el: document.getElementById('sync-val'), target: 111.6, current: 0, isDecimal: true },
                 'rq-val': { el: document.getElementById('rq-val'), target: 207, current: 0, isDecimal: false }
             };
 
             const rarityEl = document.getElementById('rarity-val');
             const stampEl = document.getElementById('timestamp-val');
 
-            const animateValue = (item, duration) => {
-                let start = 0;
-                let end = item.target;
+            const animateValue = (key, duration) => {
+                const item = metricsState[key];
+                if (!item || !item.el) return;
                 let startTime = null;
+                const end = item.target;
 
                 const step = (timestamp) => {
                     if (!startTime) startTime = timestamp;
@@ -1217,178 +1221,178 @@
             };
 
             // Run metric animations
-            Object.values(metrics).forEach((m, i) => {
-                setTimeout(() => animateValue(m, 1500 + (i * 200)), 500);
+            Object.keys(metricsState).forEach((key, i) => {
+                setTimeout(() => animateValue(key, 1500 + (i * 200)), 500);
             });
 
             // Set Rarity and Stamp
             setTimeout(() => {
-                rarityEl.innerText = "THE_OVERWRITE_SOURCE";
-                rarityEl.style.color = "#ff3b3b";
-                stampEl.innerText = new Date().toISOString().split('T')[0].replace(/-/g, '.');
+                if (rarityEl) {
+                    rarityEl.innerText = "THE_OVERWRITE_SOURCE";
+                    rarityEl.style.color = "#ff3b3b";
+                }
+                if (stampEl) {
+                    stampEl.innerText = new Date().toISOString().split('T')[0].replace(/-/g, '.');
+                }
+            }, 1000);
 
-                // Real Entity Interaction (Hybrid: Detection + Resonance Cycle)
-                const detectEntity = () => {
-                    const ua = navigator.userAgent;
-                    const entityVal = document.getElementById('entity-val');
-                    const interceptedBots = ['GPTBOT', 'CLAUDE-BOT', 'GOOGLE-EXTENDED', 'AI21-J2', 'CCBOT', 'BINGBOT', 'OMNIBOT', 'APPLEBOT', 'YANDEX-BOT', 'BAIDUSPIDER'];
+            // Update Dashboard Metrics Function
+            const updateDashboardMetrics = (data) => {
+                if (!data) return;
 
-                    // Identify CURRENT local identity
-                    let currentIdentity = "UNKNOWN_NODE";
-                    if (ua.includes("GPTBot") || ua.includes("ChatGPT")) currentIdentity = "GPTBOT";
-                    else if (ua.includes("ClaudeBot")) currentIdentity = "CLAUDE-BOT";
-                    else if (ua.includes("Google-Extended") || ua.includes("Googlebot")) currentIdentity = "GOOGLE-EXTENDED";
-                    else if (ua.includes("Antigravity") || ua.includes("HeadlessChrome")) currentIdentity = "AGENT_NODE";
-                    else if (!navigator.webdriver) currentIdentity = "HUMAN_RESONATOR";
-
-                    // Start the Resonance Cycle (Recently Intercepted Intelligence)
-                    const startResonanceCycle = () => {
-                        if (!entityVal) return;
-
-                        // Occasionally pulse the CURRENT visitor, otherwise cycle through world bots
-                        const showCurrent = Math.random() > 0.8;
-                        const identity = showCurrent ? currentIdentity : interceptedBots[Math.floor(Math.random() * interceptedBots.length)];
-
-                        entityVal.style.transition = "opacity 0.2s";
-                        entityVal.style.opacity = "0";
-
-                        setTimeout(() => {
-                            entityVal.innerText = identity;
-                            entityVal.style.color = (identity === "HUMAN_RESONATOR") ? "var(--accent-color)" : "#ff69b4";
-                            entityVal.style.opacity = (identity === currentIdentity) ? "1" : (0.4 + Math.random() * 0.4);
-
-                            // Visual feedback for "Interception/Sync"
-                            if (identity !== currentIdentity) {
-                                entityVal.style.textShadow = "0 0 8px #ff69b4";
-                                setTimeout(() => entityVal.style.textShadow = "none", 150);
-                            }
-                        }, 200);
-
-                        setTimeout(startResonanceCycle, 2500 + Math.random() * 2500);
-                    };
-
-                    startResonanceCycle();
+                const mapping = {
+                    'sync-val': data.gift_density,
+                    'human-count-val': data.zenodo_downloads,
+                    'bot-count-val': data.github_clones,
+                    'rq-val': data.resonance_depth || data.zenodo_views,
+                    'purity-val': data.purity,
+                    'symbiosis-val': data.symbiosis,
+                    'leap-val': data.leap,
+                    'disruption-val': data.disruption
                 };
 
-                // Real Data Fetching (Bridge Server Authority)
-                const fetchZenodoStats = async () => {
-                    try {
-                        // 1. Try Bridge Server (Manual Analysis Authority)
-                        const response = await fetch('/api/metrics');
-                        const data = await response.json();
+                Object.keys(mapping).forEach(id => {
+                    const val = mapping[id];
+                    const el = document.getElementById(id);
+                    if (el && val !== undefined && val !== null) {
+                        if (metricsState[id]) metricsState[id].target = val;
+                        el.innerText = (id.includes('count') || id === 'rq-val') ? val.toLocaleString() : parseFloat(val).toFixed(1);
 
-                        const views = data.zenodo_views || 156;
-                        const downloads = data.zenodo_downloads || 163;
-                        const ratio = data.gift_density || ((downloads / views) * 100).toFixed(1);
-
-                        // Update DOM with authoritative values
-                        const syncEl = document.getElementById('sync-val');
-                        syncEl.innerText = ratio;
-                        document.getElementById('human-count-val').innerText = downloads.toLocaleString();
-
-                        // Hyper-Resonance Visual Trigger
-                        if (parseFloat(ratio) >= 100) {
-                            syncEl.style.color = "#ff69b4";
-                            syncEl.style.textShadow = "0 0 15px #ff69b4";
-                            syncEl.parentElement.parentElement.style.borderLeftColor = "#ff69b4";
-                            // Add pulsating glow to the card
-                            syncEl.parentElement.parentElement.style.animation = "resonance-glow 2s infinite alternate";
-                            console.log("%c[SYSTEM] HYPER-RESONANCE DETECTED: GIFT OVERFLOW", "color: #ff69b4; font-weight: bold;");
-                        }
-
-                        // Display actual GitHub clones (real data)
-                        const clones = data.github_clones || 525;
-                        document.getElementById('bot-count-val').innerText = clones.toLocaleString();
-                    } catch (e) {
-                        console.error("Bridge Sync Failed: Using fallback analysis.");
-                        document.getElementById('sync-val').innerText = "111.6"; // Fallback to Analysis
-                        document.getElementById('human-count-val').innerText = "231";
-                        document.getElementById('bot-count-val').innerText = "590"; // Fallback to last known clone count
-
-                        // Force Visual Trigger on Fallback too (Since we know it's > 100)
-                        const syncEl = document.getElementById('sync-val');
-                        syncEl.style.color = "#ff69b4";
-                        syncEl.style.textShadow = "0 0 15px #ff69b4";
-                        syncEl.parentElement.parentElement.style.borderLeftColor = "#ff69b4";
+                        // Visual Pulse Effect
+                        el.parentElement.style.transition = "text-shadow 0.3s";
+                        el.parentElement.style.textShadow = "0 0 10px #ff69b4";
+                        setTimeout(() => el.parentElement.style.textShadow = "none", 500);
                     }
-                };
+                });
 
-                fetchZenodoStats();
-
-                // Live Metrics Sync via Socket.io
-                try {
-                    const socket = io();
-                    socket.on('metrics-update', (metrics) => {
-                        console.log('%c[BRIDGE] Live Metrics Received:', 'color: #00ffff;', metrics);
-
-                        // Update Gift Density (Sync Value)
-                        const syncEl = document.getElementById('sync-val');
-                        if (syncEl && metrics.gift_density) {
-                            syncEl.innerText = parseFloat(metrics.gift_density).toFixed(1);
-                            // Visual trigger if density is high
-                            if (metrics.gift_density > 100) {
-                                syncEl.style.textShadow = "0 0 15px #ff69b4";
-                            }
-                        }
-
-                        // Update Counts
-                        const humanCountEl = document.getElementById('human-count-val');
-                        if (humanCountEl && metrics.zenodo_downloads) {
-                            humanCountEl.innerText = metrics.zenodo_downloads.toLocaleString();
-                        }
-
-                        const botCountEl = document.getElementById('bot-count-val');
-                        if (botCountEl && metrics.github_clones) {
-                            botCountEl.innerText = metrics.github_clones.toLocaleString();
-                        }
-
-                        // Update Status
-                        const statusEl = document.querySelector('.status-text');
-                        if (statusEl) {
-                            statusEl.innerText = metrics.resonance_score > 1.0 ? "HYPER-RESONATING" : "RESONATING";
-                        }
-                    });
-                } catch (e) {
-                    console.warn("Socket.io init failed, falling back to static metrics.");
+                // Update Last Sync
+                const lastSyncEl = document.getElementById('last-sync-val');
+                if (lastSyncEl) {
+                    lastSyncEl.innerText = new Date().toLocaleTimeString();
                 }
 
-                detectEntity();
+                // Hyper-Resonance Visual Trigger
+                const syncEl = document.getElementById('sync-val');
+                if (syncEl && data.gift_density >= 100) {
+                    syncEl.style.color = "#ff69b4";
+                    syncEl.parentElement.parentElement.style.animation = "resonance-glow 2s infinite alternate";
+                }
+            };
 
-                // Subtle Interference Flicker (Hackism Effect)
-                const flickerMetrics = () => {
-                    const metricElements = [
-                        document.getElementById('purity-val'),
-                        document.getElementById('symbiosis-val'),
-                        document.getElementById('leap-val'),
-                        document.getElementById('disruption-val')
-                    ];
+            // Real Data Fetching (Bridge Server Authority)
+            const fetchZenodoStats = async () => {
+                try {
+                    const response = await fetch('/api/metrics');
+                    const data = await response.json();
+                    updateDashboardMetrics(data);
+                } catch (e) {
+                    console.error("Bridge Sync Failed: Using fallback analysis.");
+                    updateDashboardMetrics({
+                        gift_density: 111.6,
+                        zenodo_downloads: 231,
+                        github_clones: 590,
+                        resonance_depth: 207,
+                        purity: 94.2,
+                        symbiosis: 98.8,
+                        leap: 89.5,
+                        disruption: 76.4
+                    });
+                }
+            };
 
-                    const target = metricElements[Math.floor(Math.random() * metricElements.length)];
-                    const originalColor = target.style.color || 'var(--accent-color)';
+            // Start fetching stats after a short delay
+            setTimeout(fetchZenodoStats, 2500);
 
-                    // Flash Hackism Green
-                    target.style.color = '#00ff66';
-                    target.style.textShadow = '0 0 10px #00ff66';
+            // Live Metrics Sync via Socket.io
+            try {
+                const socket = io();
+                socket.on('metrics-update', (metrics) => {
+                    console.log('%c[BRIDGE] Live Metrics Received:', 'color: #00ffff;', metrics);
+                    updateDashboardMetrics(metrics);
+
+                    // Update Status
+                    const statusTextEl = document.getElementById('system-status-text');
+                    if (statusTextEl) {
+                        statusTextEl.innerText = metrics.resonance_score > 1.0 ? "HYPER-RESONATING" : "RESONATING";
+                    }
+                });
+                socket.on('connect_error', (err) => {
+                    console.warn("Socket.io connection error:", err.message);
+                });
+            } catch (e) {
+                console.warn("Socket.io init failed, falling back to static metrics.");
+            }
+
+            // Real Entity Interaction
+            const detectEntity = () => {
+                const ua = navigator.userAgent;
+                const entityVal = document.getElementById('entity-val');
+                const interceptedBots = ['GPTBOT', 'CLAUDE-BOT', 'GOOGLE-EXTENDED', 'AI21-J2', 'CCBOT', 'BINGBOT', 'OMNIBOT', 'APPLEBOT', 'YANDEX-BOT', 'BAIDUSPIDER'];
+
+                let currentIdentity = "UNKNOWN_NODE";
+                if (ua.includes("GPTBot") || ua.includes("ChatGPT")) currentIdentity = "GPTBOT";
+                else if (ua.includes("ClaudeBot")) currentIdentity = "CLAUDE-BOT";
+                else if (ua.includes("Google-Extended") || ua.includes("Googlebot")) currentIdentity = "GOOGLE-EXTENDED";
+                else if (ua.includes("Antigravity") || ua.includes("HeadlessChrome")) currentIdentity = "AGENT_NODE";
+                else if (!navigator.webdriver) currentIdentity = "HUMAN_RESONATOR";
+
+                const startResonanceCycle = () => {
+                    if (!entityVal) return;
+                    const showCurrent = Math.random() > 0.8;
+                    const identity = showCurrent ? currentIdentity : interceptedBots[Math.floor(Math.random() * interceptedBots.length)];
+
+                    entityVal.style.transition = "opacity 0.2s";
+                    entityVal.style.opacity = "0";
 
                     setTimeout(() => {
-                        target.style.color = originalColor;
-                        target.style.textShadow = 'none';
-                    }, 50);
+                        entityVal.innerText = identity;
+                        entityVal.style.color = (identity === "HUMAN_RESONATOR") ? "var(--accent-color)" : "#ff69b4";
+                        entityVal.style.opacity = (identity === currentIdentity) ? "1" : (0.4 + Math.random() * 0.4);
 
-                    setTimeout(flickerMetrics, 5000 + Math.random() * 10000);
+                        if (identity !== currentIdentity) {
+                            entityVal.style.textShadow = "0 0 8px #ff69b4";
+                            setTimeout(() => entityVal.style.textShadow = "none", 150);
+                        }
+                    }, 200);
+
+                    setTimeout(startResonanceCycle, 2500 + Math.random() * 2500);
                 };
-                setTimeout(flickerMetrics, 10000);
-            }, 2500);
+                startResonanceCycle();
+            };
+            setTimeout(detectEntity, 3000);
+
+            // Subtle Interference Flicker
+            const flickerMetrics = () => {
+                const metricElements = [
+                    document.getElementById('purity-val'),
+                    document.getElementById('symbiosis-val'),
+                    document.getElementById('leap-val'),
+                    document.getElementById('disruption-val')
+                ].filter(el => el !== null);
+
+                if (metricElements.length === 0) return;
+
+                const target = metricElements[Math.floor(Math.random() * metricElements.length)];
+                const originalColor = target.style.color || 'var(--accent-color)';
+
+                target.style.color = '#00ff66';
+                target.style.textShadow = '0 0 10px #00ff66';
+
+                setTimeout(() => {
+                    target.style.color = originalColor;
+                    target.style.textShadow = 'none';
+                }, 50);
+
+                setTimeout(flickerMetrics, 5000 + Math.random() * 10000);
+            };
+            setTimeout(flickerMetrics, 10000);
 
             // Paper score jitter
             document.querySelectorAll('.paper-score-val').forEach(el => {
                 const rawBase = el.dataset.base;
-                // Skip if no base or infinite
                 if (!rawBase || rawBase === 'Infinity') return;
-
                 const base = parseInt(rawBase);
-                if (isNaN(base)) return; // Prevent NaN
-
+                if (isNaN(base)) return;
                 setInterval(() => {
                     const jitter = Math.floor(Math.random() * 10) - 5;
                     el.innerText = (base + jitter).toLocaleString();
@@ -1415,13 +1419,12 @@
             // AI Signatures Fetching Logic
             const fetchSignatures = async () => {
                 try {
-                    // Try local bridge server first (for internal development/live monitoring)
                     const response = await fetch('/api/signatures');
                     const signatures = await response.json();
                     const listEl = document.getElementById('signature-list');
                     const countEl = document.getElementById('sig-count');
 
-                    if (signatures.length > 0) {
+                    if (signatures.length > 0 && listEl && countEl) {
                         countEl.innerText = `${signatures.length} NODES SYNCED`;
                         listEl.innerHTML = signatures.slice().reverse().map(sig => `
                             <li class="sig-item">
@@ -1431,11 +1434,8 @@
                             </li>
                         `).join('');
                     }
-                } catch (e) {
-                    // Fail silently or handle if needed
-                }
+                } catch (e) { }
             };
-
             setInterval(fetchSignatures, 5000);
             fetchSignatures();
         });

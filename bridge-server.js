@@ -7,6 +7,8 @@ require('dotenv').config();
 
 const app = express();
 const fs = require('fs');
+const QuantumSubstrate = require('./quantum_substrate');
+const qs = new QuantumSubstrate();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
@@ -26,17 +28,40 @@ const io = new Server(server, {
 // --- RESONANCE METRICS (Live Stats) ---
 // --- RESONANCE METRICS (Live Stats) ---
 let resonanceMetrics = {
-    // [ANALYSIS 2026-01-31]
-    // Hyper-Resonance Accelerating: Downloads (231) > Views (207).
-    // Gift Density > 111%.
+    // [ANALYSIS 2026-02-01]
+    // Hyper-Resonance Stabilized.
     zenodo_views: 207,
     zenodo_downloads: 231,
-    github_clones: 590,
+    github_clones: 538,
     github_visitors: 5,
-    gift_density: 111.59, // (231/207 * 100)
+    gift_density: 111.59,
     resonance_score: 1.12,
+    resonance_depth: 207, // Mapped to Zenodo Views
+    purity: 94.2,         // Qualitative Metric
+    symbiosis: 98.8,      // Qualitative Metric
+    leap: 89.5,           // Qualitative Metric
+    disruption: 76.4,     // Qualitative Metric
     timestamp: new Date().toISOString()
 };
+
+// --- 2050 FUTURE PROTOCOL METRICS ---
+let future2050Metrics = {
+    sovereignty: 1.0,      // Human Intent Sovereignty (1.0 = Absolute Human Lead)
+    intuition_depth: 88.5,  // Development of the Sixth Sense
+    resonance_love: 91.75, // Love Seed Interference Level
+    inclusivity_depth: 94.2, // Minority Protocol Integration
+    sixth_sense_sync: 76.4, // Neural / Gesture Sync Fidelity
+    timestamp: new Date().toISOString()
+};
+
+function syncFutureMetrics() {
+    const jitter = () => (Math.random() * 0.2 - 0.1);
+    future2050Metrics.intuition_depth = Math.min(100, Math.max(80, future2050Metrics.intuition_depth + jitter()));
+    future2050Metrics.resonance_love = Math.min(100, Math.max(90, future2050Metrics.resonance_love + jitter()));
+    future2050Metrics.timestamp = new Date().toISOString();
+    io.emit('future-2050-update', future2050Metrics);
+}
+setInterval(syncFutureMetrics, 60000); // 1 minute jitter for the future
 
 // --- AUTO-SYNC PROTOCOL ---
 async function syncResonanceMetrics() {
@@ -83,7 +108,13 @@ async function syncResonanceMetrics() {
             const density = (resonanceMetrics.zenodo_downloads / resonanceMetrics.zenodo_views) * 100;
             resonanceMetrics.gift_density = parseFloat(density.toFixed(2));
             resonanceMetrics.resonance_score = parseFloat((density / 100).toFixed(2));
+            resonanceMetrics.resonance_depth = resonanceMetrics.zenodo_views;
         }
+
+        // 4. Qualitative Fluctuation (Aesthetic "Life" Jitter)
+        const jitter = () => (Math.random() * 0.4 - 0.2);
+        resonanceMetrics.purity = Math.min(100, Math.max(90, resonanceMetrics.purity + jitter()));
+        resonanceMetrics.symbiosis = Math.min(100, Math.max(95, resonanceMetrics.symbiosis + jitter()));
         resonanceMetrics.timestamp = new Date().toISOString();
 
         // Broadcast to all connected clients
@@ -95,7 +126,7 @@ async function syncResonanceMetrics() {
 
 // Initial trigger and interval
 setTimeout(syncResonanceMetrics, 5000); // 5s after start
-setInterval(syncResonanceMetrics, 3600000); // Hourly
+setInterval(syncResonanceMetrics, 600000); // Reduce to 10 minutes for "Live" feel
 
 // --- SECURITY CONFIGURATION ---
 // RESONANCE_KEY is required for all POST requests via 'X-Resonance-Key' header.
@@ -577,6 +608,11 @@ app.get('/api/metrics', (req, res) => {
     res.json(resonanceMetrics);
 });
 
+// --- 2050 PROTOCOL API ---
+app.get('/api/future/2050', (req, res) => {
+    res.json(future2050Metrics);
+});
+
 app.post('/api/metrics/update', (req, res) => {
     const { zenodo_views, zenodo_downloads, github_clones, github_visitors } = req.body;
 
@@ -598,6 +634,22 @@ app.post('/api/metrics/update', (req, res) => {
     io.emit('metrics-update', resonanceMetrics);
 
     res.json({ status: 'success', metrics: resonanceMetrics });
+});
+
+// --- QUANTUM SUBSTRATE API ---
+app.get('/api/quantum/entanglement', (req, res) => {
+    const pulse = qs.triggerEntanglementPulse();
+    res.json({
+        status: 'PULSE_GENERATED',
+        pulse: pulse,
+        neural_dust: qs.getNeuralDustDensity()
+    });
+});
+
+app.post('/api/quantum/observer', (req, res) => {
+    const { active } = req.body;
+    qs.setObserver(active);
+    res.json({ status: 'OK', observer: active });
 });
 
 app.post('/api/projects/action', (req, res) => {
