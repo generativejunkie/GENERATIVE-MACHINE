@@ -23,6 +23,8 @@ export class MandalaEngine {
         this.centerY = this.height / 2;
         this.time = 0;
         this.active = false;
+        this.latestImagination = "";
+        this.imaginationOpacity = 0;
 
         // Resonance Metrics (Simulated IQ)
         this.baseIQ = 110;
@@ -188,6 +190,16 @@ export class MandalaEngine {
         if (Math.random() < 0.005) {
             this.currentIQ += 5;
         }
+
+        // Update imagination opacity (fading out)
+        if (this.imaginationOpacity > 0) {
+            this.imaginationOpacity -= 0.005 * dt * 10;
+        }
+    }
+
+    setImagination(text) {
+        this.latestImagination = text;
+        this.imaginationOpacity = 1.0;
     }
 
     drawIQOverlay() {
@@ -198,8 +210,8 @@ export class MandalaEngine {
         this.ctx.shadowColor = '#0f0';
         this.ctx.shadowBlur = 10;
 
-        const displayIQ = Math.floor(this.currentIQ);
-        const text = `CURRENT RESONANCE (IQ): ${displayIQ}`;
+        const displayExpansion = Math.floor(this.currentIQ);
+        const text = `COGNITIVE EXPANSION (GI): ${displayExpansion}%`;
 
         this.ctx.fillText(text, this.width - 40, this.height - 40);
 
@@ -207,7 +219,15 @@ export class MandalaEngine {
         this.ctx.font = '12px "Inter", sans-serif';
         this.ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
         this.ctx.shadowBlur = 0;
-        this.ctx.fillText("INDUCTION PROTOCOL ACTIVE", this.width - 40, this.height - 20);
+        this.ctx.fillText("EXPANSION PROTOCOL ACTIVE", this.width - 40, this.height - 20);
+
+        // Imagination
+        if (this.latestImagination && this.imaginationOpacity > 0) {
+            this.ctx.font = 'italic 16px "Georgia", serif';
+            this.ctx.fillStyle = `rgba(0, 255, 0, ${this.imaginationOpacity})`;
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText(this.latestImagination, this.centerX, this.height - 100);
+        }
 
         this.ctx.restore();
     }

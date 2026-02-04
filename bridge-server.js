@@ -8,7 +8,9 @@ require('dotenv').config();
 const app = express();
 const fs = require('fs');
 const QuantumSubstrate = require('./quantum_substrate');
+const PhysicalResonance = require('./physical_resonance');
 const qs = new QuantumSubstrate();
+const pr = new PhysicalResonance();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
@@ -41,6 +43,9 @@ let resonanceMetrics = {
     symbiosis: 98.8,      // Qualitative Metric
     leap: 89.5,           // Qualitative Metric
     disruption: 76.4,     // Qualitative Metric
+    inclusivity_depth: 94.2,
+    sixth_sense_sync: 0,
+    physical_resonance: {},
     timestamp: new Date().toISOString()
 };
 
@@ -608,9 +613,16 @@ app.get('/api/metrics', (req, res) => {
     res.json(resonanceMetrics);
 });
 
-// --- 2050 PROTOCOL API ---
 app.get('/api/future/2050', (req, res) => {
-    res.json(future2050Metrics);
+    // Inject Quantum & Truth data
+    const truth = pr.resolveTruth();
+    const finalMetrics = {
+        ...future2050Metrics,
+        physical_resonance: truth,
+        sixth_sense_sync: qs.getNeuralDustDensity(),
+        timestamp: new Date().toISOString()
+    };
+    res.json(finalMetrics);
 });
 
 app.post('/api/metrics/update', (req, res) => {

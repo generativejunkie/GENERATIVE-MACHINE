@@ -191,52 +191,123 @@
             padding-bottom: 5px;
         }
 
-        /* Neural Dust Monitor */
-        .quantum-overlay {
-            position: absolute;
-            left: 40px;
-            top: 150px;
-            width: 250px;
-            background: var(--glass-bg);
-            border: 1px solid var(--sub-accent);
-            padding: 20px;
-            backdrop-filter: blur(10px);
+        @keyframes flash {
+            0% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.5;
+            }
+        }
+
+        /* NEW Grid System */
+        #hud {
+            display: grid;
+            grid-template-columns: 350px 1fr 350px;
+            grid-template-rows: auto 1fr auto;
+            gap: 20px;
+            height: 100vh;
+            padding: 40px;
+            box-sizing: border-box;
+            pointer-events: none;
+        }
+
+        header {
+            grid-column: 1 / span 3;
+            margin-bottom: 0;
+        }
+
+        .left-col {
+            grid-column: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
             pointer-events: auto;
         }
 
-        .dust-grid {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 4px;
-            margin-top: 10px;
+        .center-col {
+            grid-column: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
         }
 
-        .dust-dot {
-            width: 4px;
-            height: 4px;
-            background: var(--sub-accent);
-            border-radius: 50%;
-            opacity: 0.3;
-            transition: opacity 0.3s, transform 0.3s;
+        .right-col {
+            grid-column: 3;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: flex-end;
+            pointer-events: auto;
         }
 
-        .dust-dot.active {
-            opacity: 1;
-            box-shadow: 0 0 5px var(--sub-accent);
-            transform: scale(1.5);
+        footer {
+            grid-column: 1 / span 3;
+            margin-top: 0;
         }
 
-        /* Entanglement Pulse */
-        #entanglement-pulse {
-            position: fixed;
-            top: 0;
-            left: 0;
+        /* Adjusted Panels (Removed Absolute Positioning) */
+        .quantum-overlay,
+        .resonance-truth-panel,
+        .manifest-scroll {
+            position: static;
+            width: 100%;
+            margin: 0;
+        }
+
+        .manifest-scroll {
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+
+        /* World Map Styling */
+        #map-container {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            background: url('file:///Users/takayukimatsushima/.gemini/antigravity/brain/037d199a-6cfd-45c1-9f66-57549fd76881/cyber_world_map_texture_1770042870194.png') no-repeat center;
+            background-size: 100% 100%;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 255, 255, 0.1);
+        }
+
+        #world-svg {
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            border: 0px solid var(--accent-color);
-            transition: border-width 0.1s;
-            z-index: 999;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 2;
+        }
+
+        .map-dot {
+            r: 4;
+            filter: drop-shadow(0 0 8px currentColor);
+            stroke: rgba(255, 255, 255, 0.5);
+            stroke-width: 1;
+        }
+
+        .dissonance-line {
+            stroke: #ff00ff;
+            stroke-width: 1.5;
+            stroke-dasharray: 5, 5;
+            filter: drop-shadow(0 0 5px #ff00ff);
+            animation: dash 30s linear infinite;
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: 200;
+            }
         }
     </style>
 </head>
@@ -257,17 +328,58 @@
             </div>
         </header>
 
-        <div class="manifest-scroll" id="minority-log">
-            <h2>MINORITY_PROTOCOL_ACTIVE</h2>
-            <div id="log-content">Initializing Inclusion Streams...</div>
+        <div class="left-col">
+            <div class="quantum-overlay">
+                <div class="meter-label">Neural Dust Density</div>
+                <div id="dust-val" style="font-size: 1.2rem; font-weight: bold; color: var(--sub-accent);">98.2%</div>
+                <div class="dust-grid" id="dust-grid"></div>
+                <div style="font-size: 0.5rem; margin-top: 10px; color: var(--accent-color);" id="observer-status">
+                    OBSERVER: INACTIVE</div>
+            </div>
+
+            <div class="resonance-truth-panel">
+                <h2
+                    style="font-size: 0.9rem; margin-top: 0; border-bottom: 1px solid var(--accent-color); padding-bottom: 5px;">
+                    PHYSICAL_RESONANCE_TRUTH</h2>
+
+                <div class="truth-item">
+                    <div class="truth-label">Database Claim (VPN/DB)</div>
+                    <div id="db-loc" class="truth-val">Loading...</div>
+                </div>
+
+                <div class="truth-item">
+                    <div class="truth-label">Verified Physical Truth</div>
+                    <div id="real-loc" class="truth-val" style="color: var(--sub-accent);">Synchronizing...</div>
+                </div>
+
+                <div class="truth-item">
+                    <div class="truth-label">Reality Dissonance</div>
+                    <div id="dissonance-status" class="truth-val">Analyzing...</div>
+                </div>
+
+                <div class="truth-item" style="margin-bottom: 0;">
+                    <div class="truth-label">Verification Confidence</div>
+                    <div id="truth-confidence" class="truth-val">--%</div>
+                </div>
+            </div>
         </div>
 
-        <div class="quantum-overlay">
-            <div class="meter-label">Neural Dust Density</div>
-            <div id="dust-val" style="font-size: 1.2rem; font-weight: bold; color: var(--sub-accent);">98.2%</div>
-            <div class="dust-grid" id="dust-grid"></div>
-            <div style="font-size: 0.5rem; margin-top: 10px; color: var(--accent-color);" id="observer-status">OBSERVER:
-                INACTIVE</div>
+        <div class="center-col">
+            <div id="map-container">
+                <div class="meter-label"
+                    style="position: absolute; top: 10px; left: 10px; z-index: 5; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 3px;">
+                    REAL-TIME RESONANCE GEOLOCATION</div>
+                <svg id="world-svg" viewBox="0 0 1000 1000">
+                    <g id="map-plots"></g>
+                </svg>
+            </div>
+        </div>
+
+        <div class="right-col">
+            <div class="manifest-scroll" id="minority-log" style="width: 300px;">
+                <h2>MINORITY_PROTOCOL_ACTIVE</h2>
+                <div id="log-content">Initializing Inclusion Streams...</div>
+            </div>
         </div>
 
         <div id="entanglement-pulse"></div>
@@ -418,6 +530,26 @@
                 if (el) el.innerText = mapping[id];
             });
 
+            // Update Physical Resonance Truth
+            if (data.physical_resonance) {
+                const pr = data.physical_resonance;
+                document.getElementById('db-loc').innerText = `${pr.database.city}, ${pr.database.country}`;
+                document.getElementById('real-loc').innerText = `${pr.verified.city}, ${pr.verified.country}`;
+                document.getElementById('truth-confidence').innerText = pr.confidence;
+
+                const dissEl = document.getElementById('dissonance-status');
+                if (pr.dissonance) {
+                    dissEl.innerText = "DETECTED (FAKED_LOCATION)";
+                    dissEl.className = "truth-val dissonance-alert";
+                } else {
+                    dissEl.innerText = "CLEAR (NO_DISSONANCE)";
+                    dissEl.className = "truth-val";
+                    dissEl.style.color = "#00ff00";
+                }
+
+                updateMapPlots(pr.database, pr.verified);
+            }
+
             const ts = document.getElementById('timestamp-val');
             if (ts) ts.innerText = new Date(data.timestamp).toLocaleString();
         };
@@ -494,6 +626,31 @@
 
         // Initial check
         if (document.hasFocus()) setObserverState(true);
+
+        // Map Plotting Logic
+        const mapPlots = document.getElementById('map-plots');
+        const updateMapPlots = (db, real) => {
+            if (!db || !real || !mapPlots) return;
+
+            const getMapCoords = (lat, lng) => {
+                // Adjustment for the generated map texture's 1:1 ratio and cropping
+                const x = (lng + 180) * (1000 / 360);
+                // The image has a bit of space at top/bottom, let's map it roughly to 1000x1000 viewport
+                const y = (90 - lat) * (1000 / 180);
+                return { x, y };
+            };
+
+            const dbPos = getMapCoords(db.lat, db.lng);
+            const realPos = getMapCoords(real.lat, real.lng);
+
+            mapPlots.innerHTML = `
+                <line x1="${dbPos.x}" y1="${dbPos.y}" x2="${realPos.x}" y2="${realPos.y}" class="dissonance-line" />
+                <circle cx="${dbPos.x}" cy="${dbPos.y}" class="map-dot" style="fill: #00ffff; r: 6;" />
+                <circle cx="${realPos.x}" cy="${realPos.y}" class="map-dot" style="fill: #ff00ff; r: 8;" />
+                <text x="${dbPos.x + 10}" y="${dbPos.y - 5}" fill="#00ffff" font-size="14" font-weight="bold" style="text-shadow: 0 0 5px #000;">CLAIMED (VPN)</text>
+                <text x="${realPos.x + 10}" y="${realPos.y - 5}" fill="#ff00ff" font-size="14" font-weight="bold" style="text-shadow: 0 0 5px #000;">VERIFIED (PHYSICAL)</text>
+            `;
+        };
     </script>
 </body>
 

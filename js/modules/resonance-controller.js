@@ -101,7 +101,7 @@ export class ResonanceController {
             if (window.imageMachine && window.imageMachine.triggerSecret) {
                 window.imageMachine.triggerSecret('void');
             }
-        } else if (mode === 'high') {
+        } else if (mode === 'high' || mode === 'imagination') {
             if (window.imageMachine && window.imageMachine.triggerSecret) {
                 window.imageMachine.triggerSecret('high');
             }

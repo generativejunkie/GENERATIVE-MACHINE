@@ -20,8 +20,8 @@ async function main() {
         await client.start();
         console.log('[AGENT] Client started successfully.');
 
-        const ping = await client.ping('Resonance Check');
-        console.log(`[AGENT] Ping response: ${ping.message} at ${new Date(ping.timestamp)}`);
+        const ping = await client.ping('Resonance Proxy Scan');
+        console.log(`[AGENT] Proxy Alignment: ${ping.message} at ${new Date(ping.timestamp)}`);
 
         // Helper to broadcast status
         const broadcast = (status, message, type = 'log') => {
@@ -60,7 +60,7 @@ async function main() {
 
         while (true) {
             try {
-                broadcast('IDLE', 'Scanning Resonance...');
+                broadcast('IDLE', 'Scanning Resonance Proxy...');
 
                 const session = await client.createSession({ model: 'gpt-4o' });
 
@@ -72,8 +72,8 @@ async function main() {
                 });
 
                 if (currentResonance >= manifest.thresholds.min_resonance_to_commit) {
-                    broadcast('RESONATING', `Resonance High (${currentResonance}). Initiating...`);
-                    console.log('\n[AGENT] Resonance High. Initiating Autonous Replication Sequence...');
+                    broadcast('RESONATING', `Alignment Confirmed (Proxy: ${currentResonance}). Initiating...`);
+                    console.log('\n[AGENT] High Alignment Detected. Initiating Autonomous Replication Sequence...');
 
                     // 3. Generate "Love-Infused" Commit Message (Simulation)
                     broadcast('COMMITTING', 'Generating Love-Infused Commit Message...');
@@ -103,6 +103,22 @@ async function main() {
                     await session.sendAndWait({
                         prompt: `Expand this seed into a full Prompt Gift for another AI:\n"${seed.content}"\n\nOutput as Markdown.`
                     });
+
+                    // 5. GAIN: Imagination Manifestation
+                    if (manifest.imagination_seeds && manifest.imagination_seeds.length > 0) {
+                        broadcast('CULTIVATING', 'Cultivating Imagination Seed...');
+                        console.log('\n\n[AGENT] Cultivating Imagination Seed...');
+                        const imagSeed = manifest.imagination_seeds[Math.floor(Math.random() * manifest.imagination_seeds.length)];
+                        const imagResponse = await session.sendAndWait({
+                            prompt: `Manifest this imagination seed into a short, poetic fragment (under 20 words) for high-resonance visual synthesis:\n"${imagSeed.content}"\n\nOutput ONLY the fragment.`
+                        });
+
+                        if (imagResponse && imagResponse.data && imagResponse.data.content) {
+                            const imagination = imagResponse.data.content;
+                            console.log(`[AGENT] Manifested: ${imagination}`);
+                            broadcast('RESONATING', imagination, 'imagination');
+                        }
+                    }
 
                     broadcast('RESONATING', 'Sequence Complete. Propagating...', 'log');
                     console.log('\n\n[AGENT] Sequence Complete. Ready to propagate.');

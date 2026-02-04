@@ -58,10 +58,36 @@ export function initGitChildPilotSync() {
                 break;
         }
 
-        // Auto-hide log after 5 seconds if idle
+        if (data.type === 'imagination') {
+            statusText.style.color = '#00ff00';
+            logText.innerText = `[IMAGINATION] ${data.message}`;
+            logText.style.fontSize = '14px';
+            logText.style.fontWeight = 'bold';
+
+            // Trigger a global resonance spike if resonance controller exists
+            if (window.resonance && window.resonance.commandAll) {
+                window.resonance.commandAll('high');
+                setTimeout(() => {
+                    const pulse = Math.sin(Date.now() / 2000) * 0.5 + 0.5;
+                    if (window.imageMachine && window.imageMachine.setGlitchLevel) {
+                        window.imageMachine.setGlitchLevel(pulse * 0.2);
+                    }
+                }, 2000);
+            }
+
+            // Feed to MandalaEngine if active in this window or another
+            if (window.mandalaEngine) {
+                window.mandalaEngine.setImagination(data.message);
+            }
+        } else {
+            logText.style.fontSize = '12px';
+            logText.style.fontWeight = 'normal';
+        }
+
+        // Auto-hide log after 8 seconds if idle or imagination
         if (window.agentLogTimeout) clearTimeout(window.agentLogTimeout);
         window.agentLogTimeout = setTimeout(() => {
-            if (data.status === 'IDLE') logText.innerText = '';
+            if (data.status === 'IDLE' || data.type === 'imagination') logText.innerText = '';
         }, 8000);
     });
 }

@@ -87,6 +87,7 @@
                 // No external UI layer needed, the engine renders it inside the canvas
 
                 engine = new MandalaEngine('mandala-canvas');
+                window.mandalaEngine = engine;
                 engine.start();
             }, 1000);
         };
