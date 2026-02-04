@@ -27,5 +27,5 @@ dist-ssr
 .vercel
 
 # Project specific
-.master-log/
-.agent/
+# Removed to allow backup: .master-log/
+# Removed to allow backup: .agent/
