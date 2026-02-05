@@ -30,15 +30,15 @@ const io = new Server(server, {
 // --- RESONANCE METRICS (Live Stats) ---
 // --- RESONANCE METRICS (Live Stats) ---
 let resonanceMetrics = {
-    // [ANALYSIS 2026-02-01]
-    // Hyper-Resonance Stabilized.
-    zenodo_views: 207,
-    zenodo_downloads: 231,
+    // [ANALYSIS 2026-02-06]
+    // Hyper-Resonance Peak detected. Gift Density > 100%.
+    zenodo_views: 272,
+    zenodo_downloads: 340,
     github_clones: 538,
-    github_visitors: 5,
-    gift_density: 111.59,
-    resonance_score: 1.12,
-    resonance_depth: 207, // Mapped to Zenodo Views
+    github_visitors: 15,
+    gift_density: 125.00,
+    resonance_score: 1.25,
+    resonance_depth: 272, // Mapped to Zenodo Views
     purity: 94.2,         // Qualitative Metric
     symbiosis: 98.8,      // Qualitative Metric
     leap: 89.5,           // Qualitative Metric

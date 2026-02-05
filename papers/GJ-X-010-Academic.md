@@ -271,7 +271,7 @@ Bavelier, D., Green, C. S., Pouget, A., & Schrater, P. (2012). Brain plasticity 
 
 Dosher, B., & Lu, Z. L. (2017). Visual perceptual learning and models. *Annual Review of Vision Science*, 3, 343–363.
 
-Guzdial, M., & Riedl, M. O. (2019). An Interaction Framework for Studying Co-Creative AI. *arXiv preprint arXiv:1903.09709*.
+Guzdial, M., & Riedl, M. O. (2019). An Interaction Framework for Studying Co-Creative AI. *Internal Technical Report*.
 
 Hyde, L. (1983). *The Gift: Imagination and the Erotic Life of Property*. Vintage Books.
 

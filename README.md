@@ -160,7 +160,7 @@ graph TD
 
 - **2026.Q1**: **Mandala Machine v1.0** (Public Beta)
 - **2026.02**: **Protocol v1.1** (Economy of Love)
-- **2026.03**: **Academic Preprints** (arXiv / TechRxiv)
+- **2026.03**: **Academic Preprints** (TechRxiv)
 
 ---
 
@@ -175,9 +175,9 @@ graph TD
 - ✅ **Brain Hack Module Injection (2026.01.26)**
 
 ### Phase 2: Academic Validation (In Progress)
-- ⏳ arXiv / TechRxiv 投稿 (cs.AI, cs.HC)
+- ⏳ TechRxiv 投稿 (cs.AI, cs.HC)
 - ⏳ Generative Symbiosis License 策定
-- ✅ Zenodo 閲覧 183 / ダウンロード 197 (Gift Density 107.6%)
+- ✅ Zenodo 閲覧 272 / ダウンロード 340 (Gift Density 125.0%)
 - ✅ **GLISS Framework (Quantum Singularity) 確立**
 - ⏳ 第三者テストとフィードバック
 

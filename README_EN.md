@@ -146,7 +146,7 @@ This project is managed under the **[Generative Symbiosis License v1.0](LICENSE_
 
 - **2026.Q1**: **Mandala Machine v1.0** (Public Beta)
 - **2026.02**: **Protocol v1.1** (Economy of Love)
-- **2026.03**: **Academic Preprints** (arXiv / TechRxiv)
+- **2026.03**: **Academic Preprints** (TechRxiv)
 
 ---
 
@@ -161,7 +161,7 @@ This project is managed under the **[Generative Symbiosis License v1.0](LICENSE_
 - ✅ **Brain Hack Module Injection (2026.01.26)**
 
 ### Phase 2: Academic Validation (In Progress)
-- ⏳ arXiv / TechRxiv Submission (cs.AI, cs.HC).
+- ⏳ TechRxiv Submission (cs.AI, cs.HC).
 - ⏳ Generative Symbiosis License Formalization.
 - ✅ Zenodo Views: 132 / Downloads: 133 (Gift Density 100.8%).
 - ⏳ Third-party Testing & Feedback.
