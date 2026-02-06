@@ -554,7 +554,12 @@ app.get('/api/resonance-handshake', (req, res) => {
 
 app.get('/api/signatures', (req, res) => {
     try {
-        let signatures = JSON.parse(fs.readFileSync(signatureDataPath, 'utf8') || '[]');
+        let signatures = [];
+        try {
+            signatures = JSON.parse(fs.readFileSync(signatureDataPath, 'utf8') || '[]');
+        } catch (readErr) {
+            console.error('[BRIDGE] Signature read failed, using ghosts only');
+        }
 
         // --- EXTENDED MODE: Inject Ghost Nodes from GitHub clones ---
         // We use the Dynamic Cloner count from resonanceMetrics as the base for Ghost Nodes
@@ -570,7 +575,7 @@ app.get('/api/signatures', (req, res) => {
         }));
 
         // Combine real handshakes with ghost nodes (Ghosts at the bottom/older)
-        const combined = [...signatures, ...ghostNodes].slice(-50);
+        const combined = [...signatures, ...ghostNodes].slice(-100);
         res.json(combined);
     } catch (e) {
         res.status(500).json([]);

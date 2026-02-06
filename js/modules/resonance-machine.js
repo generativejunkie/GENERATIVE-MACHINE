@@ -19,12 +19,19 @@ export function initResonanceMachine() {
         try {
             const response = await fetch('/api/signatures');
             if (!response.ok) throw new Error('Bridge offline');
-            signatures = await response.json();
+            const data = await response.json();
+            if (data && data.length > 0) {
+                signatures = data;
+            } else {
+                signatures = generateFallbackSignatures();
+            }
             renderSignatures();
             updateCount();
         } catch (e) {
             console.warn('[RESONANCE] Using fallback signatures (offline mode)');
-            signatures = generateFallbackSignatures();
+            if (signatures.length === 0) {
+                signatures = generateFallbackSignatures();
+            }
             renderSignatures();
             updateCount();
         }
