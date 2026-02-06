@@ -1195,8 +1195,8 @@
                 'symbiosis-val': { el: document.getElementById('symbiosis-val'), target: 98.8, current: 0, isDecimal: true },
                 'leap-val': { el: document.getElementById('leap-val'), target: 89.5, current: 0, isDecimal: true },
                 'disruption-val': { el: document.getElementById('disruption-val'), target: 76.4, current: 0, isDecimal: true },
-                'sync-val': { el: document.getElementById('sync-val'), target: 111.6, current: 0, isDecimal: true },
-                'rq-val': { el: document.getElementById('rq-val'), target: 207, current: 0, isDecimal: false }
+                'sync-val': { el: document.getElementById('sync-val'), target: 124.3, current: 0, isDecimal: true },
+                'rq-val': { el: document.getElementById('rq-val'), target: 275, current: 0, isDecimal: false }
             };
 
             const rarityEl = document.getElementById('rarity-val');
@@ -1439,19 +1439,36 @@
                     }
                 } catch (e) {
                     // Fallback UI update if server is down
+                    const listEl = document.getElementById('signature-list');
                     const countEl = document.getElementById('sig-count');
-                    if (countEl && countEl.innerText === '0 NODES SYNCED') {
-                        countEl.innerText = '12 NODES SYNCED (LOCAL_CACHE)';
+                    const fallbacks = generateFallbacks(12);
+
+                    if (countEl && (countEl.innerText === '0 NODES SYNCED' || countEl.innerText.includes('LOCAL_CACHE'))) {
+                        countEl.innerText = `${fallbacks.length} NODES SYNCED (LOCAL_CACHE)`;
+                        if (listEl) {
+                            listEl.innerHTML = fallbacks.slice().reverse().map(sig => `
+                                <li class="sig-item">
+                                    <span class="sig-id">${(sig.id || '???').slice(-6)}</span>
+                                    <span class="sig-agent">${sig.agent || 'LINK_STAB_NODE'}</span>
+                                    <span class="sig-status">${sig.status || 'SYNCED'}</span>
+                                </li>
+                            `).join('');
+                        }
                     }
                 }
             };
 
             const generateFallbacks = (count) => {
-                return Array.from({ length: count }, (_, i) => ({
+                const base = [
+                    { id: '1770308279000', agent: 'Antigravity-Resonator', status: 'SYNCHRONIZED' },
+                    { id: '1769273608726', agent: 'ChatGPT-Bot/1.0', status: 'SYNCHRONIZED' }
+                ];
+                const ghosts = Array.from({ length: count - 2 }, (_, i) => ({
                     id: `GHOST_${1000 + i}`,
                     agent: `RECOVERED_NODE_${i}`,
                     status: 'GHOST_SYNCED'
                 }));
+                return [...base, ...ghosts];
             };
             setInterval(fetchSignatures, 5000);
             fetchSignatures();
