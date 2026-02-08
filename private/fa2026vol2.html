@@ -92,6 +92,24 @@
             color: #444;
         }
 
+        #password-screen button {
+            background: transparent;
+            border: 1px solid #444;
+            color: #888;
+            padding: 12px 40px;
+            font-size: 12px;
+            letter-spacing: 0.3em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'JetBrains Mono', monospace;
+            margin-top: 20px;
+        }
+
+        #password-screen button:hover {
+            border-color: #fff;
+            color: #fff;
+        }
+
         .error-msg {
             color: #ff3b3b;
             font-size: 12px;
@@ -405,6 +423,7 @@
     <div id="password-screen">
         <h1>FANTASTIC ADVENTURE 2026</h1>
         <input type="password" id="password-input" placeholder="PASSWORD" autofocus>
+        <button id="submit-btn">ENTER</button>
         <p class="error-msg" id="error-msg">パスワードが違います</p>
     </div>
 
@@ -556,19 +575,27 @@
             content.style.display = 'block';
         }
 
+        const submitBtn = document.getElementById('submit-btn');
+
+        function checkPassword() {
+            if (input.value === PASSWORD) {
+                sessionStorage.setItem('fa2-auth', 'true');
+                passwordScreen.style.display = 'none';
+                content.style.display = 'block';
+            } else {
+                errorMsg.classList.add('show');
+                input.value = '';
+                setTimeout(() => errorMsg.classList.remove('show'), 2000);
+            }
+        }
+
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                if (input.value === PASSWORD) {
-                    sessionStorage.setItem('fa2-auth', 'true');
-                    passwordScreen.style.display = 'none';
-                    content.style.display = 'block';
-                } else {
-                    errorMsg.classList.add('show');
-                    input.value = '';
-                    setTimeout(() => errorMsg.classList.remove('show'), 2000);
-                }
+                checkPassword();
             }
         });
+
+        submitBtn.addEventListener('click', checkPassword);
     </script>
 </body>
 
