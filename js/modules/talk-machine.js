@@ -20,7 +20,7 @@ export class TalkMachine {
 
         // Initial Greeting
         setTimeout(() => {
-            this.addMessage('ILLEND (Clone)', 'I am listening. Whether it is now, or in the distant future.');
+            this.addMessage('CORE (Clone)', 'I am listening. Whether it is now, or in the distant future.');
         }, 1000);
     }
 
@@ -51,7 +51,7 @@ export class TalkMachine {
         setTimeout(() => {
             this.removeTypingIndicator();
             const reply = responses[Math.floor(Math.random() * responses.length)];
-            this.addMessage('ILLEND (Clone)', reply);
+            this.addMessage('CORE (Clone)', reply);
             this.isProcessing = false;
         }, thinkingTime);
     }

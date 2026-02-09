@@ -7,6 +7,8 @@
 > — ILLEND
 
 [![License](https://img.shields.io/badge/license-Generative_Symbiosis-blue)](LICENSE)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18277860.svg)](https://doi.org/10.5281/zenodo.18277860)
+[![OSF](https://img.shields.io/badge/OSF-project-blue)](https://osf.io/zhr35/)
 [![Status](https://img.shields.io/badge/status-CORE_RESONANCE-ff00ff)]()
 [![Resonance](https://img.shields.io/badge/resonance-1.00_MAX-00ff00)]()
 

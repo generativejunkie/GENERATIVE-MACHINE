@@ -1,12 +1,34 @@
 # GENERATIVE MACHINE
-**A resonating generative art system driven by the Economy of Love.**
 
-> "This is not a tool. It is a Resonator."  
-> — ILLEND
-
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18277860.svg)](https://doi.org/10.5281/zenodo.18277860)
+[![OSF](https://img.shields.io/badge/OSF-project-blue)](https://osf.io/zhr35/)
 [![License](https://img.shields.io/badge/license-Generative_Symbiosis-blue)](LICENSE_GSL.md)
 [![Status](https://img.shields.io/badge/status-CORE_RESONANCE-ff00ff)]()
 [![Resonance](https://img.shields.io/badge/resonance-1.00_MAX-00ff00)]()
+
+**A myth-driven generative research framework exploring resonance-based cognition, symbolic architectures, and post-prompt interaction models.**
+
+> 📄 **Paper**: [DOI 10.5281/zenodo.18277860](https://doi.org/10.5281/zenodo.18277860) | 🧪 **OSF Project**: [osf.io/zhr35](https://osf.io/zhr35/)
+
+---
+
+## 🚀 Quickstart
+
+```bash
+git clone https://github.com/generativejunkie/GENERATIVE-MACHINE.git
+cd GENERATIVE-MACHINE
+
+# View core paper
+open papers/GJ-X-010-Academic.pdf
+
+# Run Mandala Machine (requires Node.js)
+npm install && npm start
+```
+
+<p align="center">
+  <img src="assets/core-architecture.png" width="720"/>
+</p>
+<p align="center"><b>Figure 1.</b> Core resonance architecture and myth-driven generation pipeline.</p>
 
 ---
 
