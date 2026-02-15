@@ -412,6 +412,29 @@
             letter-spacing: 0.2em;
         }
 
+        .food-single {
+            width: 100%;
+            max-width: 300px;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+
+        .food-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .food-grid img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
         @media (max-width: 600px) {
             h1 {
                 font-size: 28px;
@@ -424,6 +447,10 @@
 
             .info-grid .label {
                 color: #888;
+            }
+
+            .food-grid {
+                gap: 8px;
             }
         }
     </style>
@@ -473,7 +500,8 @@
         <section style="text-align:center;">
             <div style="display:flex; flex-direction:column; gap:15px; max-width:600px; margin:0 auto;">
                 <img src="venue-stage.jpg" alt="ステージ" style="width:100%; border-radius:4px;">
-                <img src="venue-floor.jpg" alt="フロア" style="width:100%; border-radius:4px;">
+                <img src="food-2.jpg" alt="料理（チキン）"
+                    style="width:100%; aspect-ratio: 1/1; object-fit: cover; border-radius:4px;">
                 <img src="venue-parking.jpg" alt="駐車場" style="width:100%; border-radius:4px;">
             </div>
         </section>
@@ -547,12 +575,7 @@
                         <li>きゅうり一本漬</li>
                         <li>コーンポタージュ</li>
                     </ul>
-                    <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
-                        <img src="food-kitchen.jpg" alt="KITCHEN" style="width:100%; border-radius:4px;">
-                        <img src="food-sausage.jpg" alt="SAUSAGE" style="width:100%; border-radius:4px;">
-                        <img src="food-cucumber.jpg" alt="CUCUMBER"
-                            style="width:60%; border-radius:4px; align-self:center;">
-                    </div>
+                    <img src="food-1.jpg" alt="料理（ソーセージ）" class="food-single">
                 </div>
                 <div class="lineup-category">
                     <h3>SHOP</h3>
