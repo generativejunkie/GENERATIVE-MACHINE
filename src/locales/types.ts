@@ -50,6 +50,7 @@ export interface Locale {
         blinkingMode: string;
         blinkingSpeed: string;
         blink: string;
+        strobe: string;
     };
     announcements: {
         mandalaMode: string;

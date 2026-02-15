@@ -51,7 +51,8 @@ export const en: Locale = {
         autoBg: 'AUTO BG',
         blinkingMode: 'Blinking Mode',
         blinkingSpeed: 'Blinking Speed',
-        blink: 'BLINK'
+        blink: 'BLINK',
+        strobe: 'STROBE'
     },
     announcements: {
         mandalaMode: 'Mandala Mode Toggled',

@@ -51,7 +51,8 @@ export const ja: Locale = {
         autoBg: 'AUTO 背景',
         blinkingMode: '点滅モード',
         blinkingSpeed: '点滅速度',
-        blink: '点滅/ストロボ'
+        blink: '点滅/ストロボ',
+        strobe: 'STROBE'
     },
     announcements: {
         mandalaMode: '曼荼羅モード切り替え',
