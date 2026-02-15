@@ -94,7 +94,8 @@ export class SceneManager extends EventEmitter {
       SCENE_CONFIG.CAMERA_NEAR,
       SCENE_CONFIG.CAMERA_FAR
     );
-    camera.position.z = SCENE_CONFIG.CAMERA_POSITION_Z;
+    camera.position.set(0, 0, SCENE_CONFIG.CAMERA_POSITION_Z);
+    camera.lookAt(0, 0, 0);
     return camera;
   }
 
@@ -112,11 +113,6 @@ export class SceneManager extends EventEmitter {
 
     // Fixed Full HD Resolution
     renderer.setSize(1920, 1080, false); // false prevents inline styling resizing
-
-    // Apply CSS to fit container while maintaining aspect ratio
-    renderer.domElement.style.width = '100%';
-    renderer.domElement.style.height = '100%';
-    renderer.domElement.style.objectFit = 'contain';
 
     this.container.appendChild(renderer.domElement);
 
@@ -176,11 +172,12 @@ export class SceneManager extends EventEmitter {
    */
   private handleResize(): void {
     // Keep internal resolution fixed at 1920x1080
-    // We rely on CSS object-fit: contain (applied in createRenderer) to scale it.
+    // We rely on CSS object-fit: contain to scale it.
 
     // Ensure camera stays 16:9
     this.camera.aspect = 1920 / 1080;
     this.camera.updateProjectionMatrix();
+    this.camera.lookAt(0, 0, 0);
 
     // ensure renderer stays 1920x1080 (in case something reset it)
     this.renderer.setSize(1920, 1080, false);
@@ -193,7 +190,6 @@ export class SceneManager extends EventEmitter {
     instances: ObjectInstance[],
     mandalaMode: boolean,
     symmetryEnabled: boolean,
-    mirrorBallMode: boolean,
     symmetryCount: number,
     sizeMultiplier: number,
     speedMultiplier: number,
@@ -256,7 +252,6 @@ export class SceneManager extends EventEmitter {
             instance,
             mandalaMode,
             symmetryEnabled,
-            mirrorBallMode,
             symmetryCount,
             sizeMultiplier,
             speedMultiplier,
@@ -427,7 +422,6 @@ export class SceneManager extends EventEmitter {
     instance: ObjectInstance,
     _mandalaMode: boolean,
     symmetryEnabled: boolean,
-    _mirrorBallMode: boolean,
     symmetryCount: number,
     sizeMultiplier: number,
     speedMultiplier: number,
@@ -548,7 +542,7 @@ export class SceneManager extends EventEmitter {
         }
 
         // Position Calculation
-        const ringOffset = (instance.id % 8) * 5.0;
+        const ringOffset = (instance.id % 8) * 3.0;
         const radius = (spacingMultiplier + ringOffset) * spreadMultiplier;
 
         const x = radius * Math.cos(effectiveAngle) + floatOffsetX;
@@ -643,16 +637,48 @@ export class SceneManager extends EventEmitter {
   /**
    * Apply dispersion force to all objects (e.g. on bass kick)
    */
-  public disperseObjects(force: number): void {
+  public disperseObjects(force: number, pattern: 'outward' | 'inward' | 'spiral' | 'vortex' | 'random' | 'expandX' | 'expandY' = 'outward'): void {
     let count = 0;
+    const UP = new THREE.Vector3(0, 1, 0);
+
     this.meshCache.forEach((meshes) => {
       meshes.forEach(mesh => {
-        // Create random direction vector for EACH mesh
-        // User Request: "Match divergence to Sound Machine" -> Radial outward expansion
-        // Instead of random, use vector from center to mesh
-        const direction = mesh.position.clone().normalize();
+        let direction = new THREE.Vector3();
 
-        // If position is at center (0,0,0), use random fallback or Up
+        switch (pattern) {
+          case 'inward':
+            direction = mesh.position.clone().normalize().multiplyScalar(-1);
+            break;
+          case 'spiral':
+            {
+              const radial = mesh.position.clone().normalize();
+              const tangent = radial.clone().cross(UP).normalize();
+              direction = radial.add(tangent.multiplyScalar(0.5)).normalize();
+            }
+            break;
+          case 'vortex':
+            direction = mesh.position.clone().normalize().cross(UP).normalize();
+            break;
+          case 'random':
+            direction.set(
+              (Math.random() - 0.5) * 2,
+              (Math.random() - 0.5) * 2,
+              (Math.random() - 0.5) * 2
+            ).normalize();
+            break;
+          case 'expandX':
+            direction.set(mesh.position.x, 0, 0).normalize();
+            break;
+          case 'expandY':
+            direction.set(0, mesh.position.y, 0).normalize();
+            break;
+          case 'outward':
+          default:
+            direction = mesh.position.clone().normalize();
+            break;
+        }
+
+        // If position is at center (0,0,0) or direction became zero, use random fallback
         if (direction.lengthSq() < 0.001) {
           direction.set(
             (Math.random() - 0.5) * 2,
@@ -670,7 +696,7 @@ export class SceneManager extends EventEmitter {
         count++;
       });
     });
-    console.log(`💥 DISPERSE APPLIED to ${count} meshes with force ${force}`);
+    console.log(`💥 DISPERSE APPLIED Pattern: ${pattern.toUpperCase()}, Force: ${force}`);
   }
 
   /**
@@ -888,7 +914,7 @@ export class SceneManager extends EventEmitter {
 
     // Calculate symmetric position
     // Use spacingMultiplier as base radius, plus INDEX-BASED offset for stable multi-layer distribution
-    const ringOffset = (instance.id % 8) * 5.0;
+    const ringOffset = (instance.id % 8) * 3.0;
     const radius = (spacingMultiplier + ringOffset) * spreadMultiplier;
 
     const x = radius * Math.cos(angle);

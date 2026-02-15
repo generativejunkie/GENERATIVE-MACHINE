@@ -12,6 +12,10 @@ import { SceneManager } from '@managers/SceneManager';
 import { AccessibilityManager } from '@managers/AccessibilityManager';
 import { EventEmitter } from '@utils/EventEmitter';
 import { MATERIALS } from '@materials/geometries';
+
+// Managers
+import { QuantumManager } from '@managers/QuantumManager';
+import { ProjectorManager } from '@managers/ProjectorManager';
 // AI Features
 import { NeuralPatternLearner } from '@features/NeuralPatternLearner';
 import { ProcessingLayer } from '@features/ProcessingLayer';
@@ -28,6 +32,8 @@ export class Application extends EventEmitter<ApplicationEventMap> {
   private instanceManager: InstanceManager;
   private sceneManager: SceneManager;
   private midiManager: MidiManager;
+  private quantumManager: QuantumManager;
+  private projectorManager: ProjectorManager;
 
 
 
@@ -51,7 +57,7 @@ export class Application extends EventEmitter<ApplicationEventMap> {
     high: 0
   };
   private snapshotInterval: NodeJS.Timeout | null = null;
-  private defaultObjectColor: { r: number; g: number; b: number } | null = { r: 0, g: 0, b: 0 };
+  private defaultObjectColor: { r: number; g: number; b: number } | null = { r: 51, g: 51, b: 51 };
   private defaultWireframeMode: 'solid' | 'wireframe' | 'mixed' = 'solid';
   private excludedMaterialIndices: Set<number> = new Set(); // Materials excluded from auto-generate
 
@@ -71,12 +77,12 @@ export class Application extends EventEmitter<ApplicationEventMap> {
   private recordedChunks: Blob[] = [];
 
   // New AUTO / Antigravity extended state
-  private autoColorHue: number = 0;
   private autoModeCycleTimer: number = Date.now();
   private gravityCycleTimer: number = Date.now();
   private lastMandalaUpdate: number = 0;
   private lastBPM: number = 120;
   private cosmicPhase: 'cosmic' | 'mechanical' = 'cosmic';
+  private beatCounter: number = 0;
 
   constructor(canvasContainerId: string) {
     super();
@@ -87,6 +93,8 @@ export class Application extends EventEmitter<ApplicationEventMap> {
     this.midiManager = new MidiManager();
     this.instanceManager = new InstanceManager();
     this.sceneManager = new SceneManager(canvasContainerId);
+    this.quantumManager = new QuantumManager();
+    this.projectorManager = new ProjectorManager();
     new AccessibilityManager(this);
 
     // Initialize AI features
@@ -120,12 +128,11 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       autoMode: false,    // AUTO Mode OFF
       mandalaMode: false, // Mandala Mode OFF
       symmetryEnabled: false, // New Flag: Decoupled visual symmetry
-      mirrorBallMode: false,
       symmetryCount: 1,
       sizeMultiplier: 1.0,
       speedMultiplier: 1.0,
       spreadMultiplier: 1.0,
-      spacingMultiplier: 10.0, // Increased for better initial dispersion
+      spacingMultiplier: 8.0, // Reduced for centralized initial layout (was 10.0)
       aiSpeedMultiplier: 5.0,
       baseRotation: 0,
       autoGenerateMode: false,
@@ -136,7 +143,18 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       antigravityMode: false,
       reflectMode: false,
       brainHackMode: false,
-      brainHackModeIndex: 0
+      brainHackModeIndex: 0,
+      quantumMode: false,
+      quantumCoherence: 0.5,
+      quantumEntangled: false,
+      wireframeMode: 'solid',
+      dispersionPattern: 'outward',
+      autoCyclePatterns: true,
+      autoColorStrobe: false,
+      autoColorA: '#ffffff',
+      autoColorB: '#000000',
+      blinkingMode: false,
+      blinkingSpeed: 5
     };
 
     // Initialize InstanceManager with spacing multiplier
@@ -235,11 +253,23 @@ export class Application extends EventEmitter<ApplicationEventMap> {
     const bands = this.getCurrentFrequencyBands();
 
     // 1. Frequency-Based Dispersion
-    // User Request: "Disperse based on input frequency range"
+    // User Request: "Patterns for divergence and auto-cycling"
+    this.beatCounter++;
+
+    // Cycle pattern every 32 beats if enabled
+    if (this.state.autoCyclePatterns && this.beatCounter % 32 === 0) {
+      const patterns: Array<'outward' | 'inward' | 'spiral' | 'vortex' | 'random' | 'expandX' | 'expandY'> =
+        ['outward', 'inward', 'spiral', 'vortex', 'random', 'expandX', 'expandY'];
+      const nextIndex = (patterns.indexOf(this.state.dispersionPattern) + 1) % patterns.length;
+      this.setDispersionPattern(patterns[nextIndex]);
+    }
+
     if (bands.low > 60) {
       // Bass: Strong Disperse
       // @ts-ignore
-      if (this.sceneManager.disperseObjects) this.sceneManager.disperseObjects(bands.low / 255 * 12.0);
+      if (this.sceneManager.disperseObjects) {
+        this.sceneManager.disperseObjects(bands.low / 255 * 12.0, this.state.dispersionPattern);
+      }
     } else if (bands.mid > 170) {
       // Mids: Vibrate (Shake)
       // @ts-ignore
@@ -323,10 +353,10 @@ export class Application extends EventEmitter<ApplicationEventMap> {
         // 2. Return to Diastole (Baseline)
         // Sharp decay for ECG feel
         setTimeout(() => {
-          this.setSpacingMultiplier(5.0); // Baseline
-          this.setSpreadMultiplier(0.5);  // Baseline
+          this.setSpacingMultiplier(2.0); // Baseline reduced for centering (was 5.0)
+          this.setSpreadMultiplier(0.4);  // Baseline reduced (was 0.5)
           this.setSizeMultiplier(1.0);    // Baseline
-        }, 120);
+        }, 100); // Faster return (was 120)
 
         // 3. Randomize Symmetry (If Reflect is Active)
         // User want "Mandala Reflect -> Random"
@@ -342,6 +372,30 @@ export class Application extends EventEmitter<ApplicationEventMap> {
   }
 
 
+  public setDispersionPattern(pattern: 'outward' | 'inward' | 'spiral' | 'vortex' | 'random' | 'expandX' | 'expandY'): void {
+    this.state.dispersionPattern = pattern;
+    this.emit('state:changed', this.state);
+    console.log(`🌀 Dispersion Pattern set to: ${pattern}`);
+  }
+
+  public setAutoCyclePatterns(enabled: boolean): void {
+    this.state.autoCyclePatterns = enabled;
+    this.emit('state:changed', this.state);
+    console.log(`🔄 Auto Cycle Patterns: ${enabled}`);
+  }
+
+  public setAutoColorStrobe(enabled: boolean): void {
+    this.state.autoColorStrobe = enabled;
+    this.emit('state:changed', this.state);
+    console.log(`⚡ AUTO Strobe: ${enabled}`);
+  }
+
+  public setAutoColors(colorA: string, colorB: string): void {
+    this.state.autoColorA = colorA;
+    this.state.autoColorB = colorB;
+    this.emit('state:changed', this.state);
+    console.log(`🎨 AUTO Colors: ${colorA} / ${colorB}`);
+  }
 
   /**
    * Start the application
@@ -375,10 +429,9 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       this.updateSmoothing();
       this.audioManager.detectBPM();
 
-      // Continuous Low-Frequency Reaction (Shake/Vibrate)
-      // if (this.state.mandalaMode) {
-      //    this.handleLowFreqVibration();
-      // }
+      // 🎵 Global Audio-Reactive Dispersion (All Modes)
+      // Matches Sound Machine behavior - objects disperse with audio input
+      this.handleGlobalDispersion();
     }
 
     // Handle frequency-based spawning
@@ -392,8 +445,13 @@ export class Application extends EventEmitter<ApplicationEventMap> {
     }
 
     // AUTO Mode: Slow parameter cycles and feature switching
-    if (this.state.autoMode && this.state.isPlaying) {
+    if (this.state.autoMode && this.state.isPlaying && !this.state.blinkingMode) {
       this.handleSlowAutoFeatures();
+    }
+
+    // Global Blinking Mode
+    if (this.state.blinkingMode && this.state.isPlaying) {
+      this.handleBlinkingMode();
     }
 
     // Space Mode: Auto-control parameters based on audio
@@ -425,6 +483,19 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       this.brainHack.update(beatProgress, kick, this.state.brainHackModeIndex);
     }
 
+    // Update Quantum simulation
+    if (this.state.quantumMode) {
+      this.quantumManager.update(
+        this.performanceStats.frameTime,
+        this.state.quantumCoherence,
+        this.state.quantumEntangled
+      );
+
+      // Use quantum factors to subtly modulate object parameters
+      const quantumFactor = this.quantumManager.getQuantumFactor(0);
+      this.state.sizeMultiplier *= (0.95 + quantumFactor * 0.1);
+    }
+
     // Get all instances and update scene
     const instances = this.instanceManager.getAllInstances();
     // Use mixer frequency data if mixer is enabled, otherwise use regular audio manager
@@ -435,7 +506,6 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       instances,
       this.state.mandalaMode,
       this.state.symmetryEnabled,
-      this.state.mirrorBallMode,
       this.state.symmetryCount,
       this.state.sizeMultiplier,
       this.state.speedMultiplier,
@@ -607,8 +677,8 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       const newSize = 0.5 + Math.random() * 2.0;
       this.setSizeMultiplier(this.state.reflectMode ? -newSize : newSize);
 
-      // Spacing (Distance): 2.0 - 20.0
-      const newSpacing = 2.0 + Math.random() * 18.0;
+      // Spacing (Distance): 1.0 - 15.0 (Reduced range for centering)
+      const newSpacing = 1.0 + Math.random() * 14.0;
       this.setSpacingMultiplier(newSpacing);
 
       // Random Speed Direction
@@ -671,9 +741,9 @@ export class Application extends EventEmitter<ApplicationEventMap> {
     const bass = bands.low / 255;
     if (bass > 0.1) {
       // Divergence speed based on bass
-      // User Request: "Reduced divergence to match subtle kick"
-      // Reduced from 0.05 to 0.008
-      const divergenceSpeed = bass * 0.008;
+      // User Request: "Match Sound Machine dispersion"
+      // Increased for visible effect
+      const divergenceSpeed = bass * 2.0;
       this.sceneManager.disperseObjects(divergenceSpeed);
     }
 
@@ -709,15 +779,45 @@ export class Application extends EventEmitter<ApplicationEventMap> {
   }
 
   /**
+   * Handle global background blinking logic
+   */
+  private handleBlinkingMode(): void {
+    const now = Date.now();
+    // speed 1 (500ms) to 10 (50ms)
+    const interval = 500 / this.state.blinkingSpeed;
+    const strobe = Math.floor(now / interval) % 2 === 0;
+
+    // Default to Black/White for global blinking unless we want to use autoColors?
+    // Use autoColors if they exist, otherwise White/Black is safer for "blinking" feel.
+    const colorHex = strobe ? this.state.autoColorA : this.state.autoColorB;
+    this.setBackgroundColor(this.hexToRgb(colorHex));
+  }
+
+  /**
    * New functionality: Slowly cycle RGB colors and features in AUTO mode
    */
   private handleSlowAutoFeatures(): void {
     const now = Date.now();
 
-    // 1. Slow RGB Cycle (HSL base)
-    this.autoColorHue = (this.autoColorHue + 0.05) % 360; // Very slow shift
-    const color = this.hslToRgb(this.autoColorHue, 70, 60);
-    this.setBackgroundColor(color);
+    // 1. Background Color Management
+    if (this.state.autoColorStrobe) {
+      // Strobe logic: Fast flash between A and B
+      const strobe = Math.floor(now / 100) % 2 === 0;
+      const colorHex = strobe ? this.state.autoColorA : this.state.autoColorB;
+      this.setBackgroundColor(this.hexToRgb(colorHex));
+    } else {
+      // Gradual shift logic using custom colors
+      const mix = Math.sin(now / 3000) * 0.5 + 0.5; // 3s cycle
+      const colorA = this.hexToRgb(this.state.autoColorA);
+      const colorB = this.hexToRgb(this.state.autoColorB);
+
+      const mixedColor = {
+        r: Math.round(colorA.r * mix + colorB.r * (1 - mix)),
+        g: Math.round(colorA.g * mix + colorB.g * (1 - mix)),
+        b: Math.round(colorA.b * mix + colorB.b * (1 - mix))
+      };
+      this.setBackgroundColor(mixedColor);
+    }
 
     // Also modulate size or rotation slowly
     const pulse = Math.sin(now / 5000) * 0.5 + 1.5; // slow 5s wave
@@ -735,7 +835,6 @@ export class Application extends EventEmitter<ApplicationEventMap> {
           this.setSpaceMode(false);
           this.toggleAntigravityMode(false);
           this.setFrequencySpawn(false);
-          this.setMirrorBallMode(false);
         },
         () => {
           this.setMandalaMode(false);
@@ -750,8 +849,7 @@ export class Application extends EventEmitter<ApplicationEventMap> {
         },
         () => {
           this.setMandalaMode(false);
-          this.setSpaceMode(false);
-          this.setMirrorBallMode(true);
+          this.setSpaceMode(true);
           this.setFrequencySpawn(false);
         },
         () => {
@@ -766,7 +864,6 @@ export class Application extends EventEmitter<ApplicationEventMap> {
           this.setMandalaMode(false);
           this.setSpaceMode(false);
           this.toggleAntigravityMode(false);
-          this.setMirrorBallMode(false);
           this.toggleGoldenRatioMode(false);
           this.setFrequencySpawn(false);
           this.setReflectMode(false);
@@ -774,42 +871,47 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       ];
 
       const randomFeature = features[Math.floor(Math.random() * features.length)];
-      console.log(`🔄 AUTO Mode: Triggering random feature shift`);
+      console.log(`⟳ AUTO Mode: Triggering random feature shift`);
       randomFeature();
     }
   }
 
   private resetBackgroundIfManual(): void {
-    if (!this.state.autoMode) {
+    if (!this.state.autoMode && !this.state.blinkingMode) {
       this.setBackgroundColor({ r: 255, g: 255, b: 255 });
     }
   }
 
   /**
-   * Helper to convert HSL to RGB
+   * Toggle global blinking mode
    */
-  private hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: number } {
-    h /= 360; s /= 100; l /= 100;
-    let r, g, b;
-    if (s === 0) {
-      r = g = b = l;
-    } else {
-      const hue2rgb = (p: number, q: number, t: number) => {
-        if (t < 0) t += 1;
-        if (t > 1) t -= 1;
-        if (t < 1 / 6) return p + (q - p) * 6 * t;
-        if (t < 1 / 2) return q;
-        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-        return p;
-      };
-      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-      const p = 2 * l - q;
-      r = hue2rgb(p, q, h + 1 / 3);
-      g = hue2rgb(p, q, h);
-      b = hue2rgb(p, q, h - 1 / 3);
+  public setBlinkingMode(enabled: boolean): void {
+    this.state.blinkingMode = enabled;
+    if (!enabled) {
+      this.resetBackgroundIfManual();
     }
-    return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+    console.log(`💡 Blinking Mode: ${enabled ? 'ON' : 'OFF'}`);
   }
+
+  /**
+   * Set blinking speed (1-10)
+   */
+  public setBlinkingSpeed(speed: number): void {
+    this.state.blinkingSpeed = speed;
+  }
+
+  /**
+   * Helper to convert Hex to RGB
+   */
+  private hexToRgb(hex: string): { r: number; g: number; b: number } {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : { r: 255, g: 255, b: 255 };
+  }
+
 
   // Track last AI object spawn time
   private lastAIObjectSpawn: number = 0;
@@ -838,6 +940,30 @@ export class Application extends EventEmitter<ApplicationEventMap> {
    */
   private smoothTransition(current: number, target: number, factor: number): number {
     return current + (target - current) * factor;
+  }
+
+  /**
+   * 🎵 Global Audio-Reactive Dispersion
+   * Applies radial dispersion based on bass and vibration based on mids.
+   * Works with microphone input - matches Sound Machine behavior.
+   */
+  private handleGlobalDispersion(): void {
+    const bands = this.getCurrentFrequencyBands();
+    const bass = bands.low / 255;
+    const mid = bands.mid / 255;
+
+    // Bass -> Radial Dispersion (発散)
+    // Objects explode outward from center when bass hits
+    if (bass > 0.15) {
+      const dispersionForce = bass * 2.0; // Strong dispersion force
+      this.sceneManager.disperseObjects(dispersionForce);
+    }
+
+    // Mid -> Vibration (振動)
+    // Objects shake/vibrate on mid frequencies
+    if (mid > 0.25) {
+      this.sceneManager.vibrateObjects(mid * 2.0);
+    }
   }
 
   /**
@@ -1627,6 +1753,41 @@ export class Application extends EventEmitter<ApplicationEventMap> {
     this.setReflectMode(!this.state.reflectMode);
   }
 
+  // ========== Quantum Methods ==========
+
+  public toggleQuantumMode(enabled?: boolean): void {
+    const nextValue = enabled !== undefined ? enabled : !this.state.quantumMode;
+    this.state.quantumMode = nextValue;
+    if (!nextValue) {
+      this.quantumManager.reset();
+    }
+    this.emit('state:changed', this.state);
+    console.log(`🌌 Quantum Mode: ${nextValue ? 'ON' : 'OFF'}`);
+  }
+
+  public setQuantumCoherence(val: number): void {
+    this.state.quantumCoherence = val;
+    this.quantumManager.setCoherence(val);
+    this.emit('state:changed', this.state);
+  }
+
+  public toggleQuantumEntanglement(enabled?: boolean): void {
+    const nextValue = enabled !== undefined ? enabled : !this.state.quantumEntangled;
+    this.state.quantumEntangled = nextValue;
+    this.quantumManager.setEntangled(nextValue);
+    this.emit('state:changed', this.state);
+  }
+
+  public quantumMeasure(): void {
+    this.quantumManager.measure();
+  }
+
+  // ========== Projector Methods ==========
+
+  public openProjectorWindow(): void {
+    this.projectorManager.openWindow();
+  }
+
 
 
   /**
@@ -1839,6 +2000,7 @@ export class Application extends EventEmitter<ApplicationEventMap> {
    */
   public setWireframeMode(mode: 'solid' | 'wireframe' | 'mixed'): void {
     this.defaultWireframeMode = mode;
+    this.state.wireframeMode = mode;
 
     // Update all existing instances
     const instances = this.instanceManager.getAllInstances();
@@ -1848,6 +2010,9 @@ export class Application extends EventEmitter<ApplicationEventMap> {
 
     // Clear mesh cache to force rebuild with new wireframe setting
     this.sceneManager.clearMeshCache();
+
+    // Emit state change for UI synchronization
+    this.emit('state:changed', this.state);
   }
 
   /**
@@ -1874,7 +2039,6 @@ export class Application extends EventEmitter<ApplicationEventMap> {
     // Trigger audio randomization when enabling
     if (newState) {
       if (!this.state.spaceMode) this.randomizeParametersByAudio();
-      this.state.mirrorBallMode = false; // Exclusive
       this.state.mandalaMode = false;
     }
 
@@ -1943,36 +2107,6 @@ export class Application extends EventEmitter<ApplicationEventMap> {
 
       console.log('🎪 VJ Mode: OFF (Default colors)');
     }
-  }
-
-  /**
-   * Toggle Mirror Ball Mode
-   */
-  public toggleMirrorBallMode(force?: boolean): void {
-    const newState = force !== undefined ? force : !this.state.mirrorBallMode;
-    this.setMirrorBallMode(newState);
-  }
-
-  public setMirrorBallMode(enabled: boolean): void {
-    this.state.mirrorBallMode = enabled;
-    this.resetBackgroundIfManual();
-
-    if (enabled) {
-      this.state.mandalaMode = false;
-      this.state.spaceMode = false;
-      this.state.antigravityMode = false; // Disable float logic, use sphere rotation
-      this.sceneManager.setAntigravityMode(false);
-
-      // Ensure auto mode is on to spawn objects
-      if (!this.state.autoMode) this.state.autoMode = true;
-
-      // Set optimal sphere defaults
-      this.setSpreadMultiplier(1.0);
-      this.setSpacingMultiplier(10.0); // Sphere radius
-    }
-
-    this.emit('state:changed', this.state);
-    console.log(`🪩 Mirror Ball Mode: ${enabled ? 'ON' : 'OFF'}`);
   }
 
   // ========== VJ Pro Controls ==========

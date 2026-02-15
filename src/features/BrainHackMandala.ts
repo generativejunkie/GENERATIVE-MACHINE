@@ -9,6 +9,8 @@ import * as THREE from 'three';
  * 1: Boolean Rhythm (論理演算の高速切り替え)
  * 2: Recursive Matrix (無限フラクタル)
  * 3: Neuro-Feedback Noise (カオスと秩序の崩壊)
+ * 4: Lattice Interference (格子の干渉)
+ * 5: Orbital Resonance (軌道共鳴)
  */
 
 export class BrainHackMandala {
@@ -258,6 +260,52 @@ export class BrainHackMandala {
                 return col;
             }
 
+            // Module 5: Lattice Interference (Grid-based interference)
+            vec3 moduleLattice(vec2 uv) {
+                vec2 gv = fract(uv * 10.0) - 0.5;
+                vec2 id = floor(uv * 10.0);
+                
+                float d = sdBox(gv, vec2(0.4 * sin(uTime + length(id) * 0.5) * 0.5 + 0.5));
+                
+                // Interference wave
+                float wave = sin(length(uv) * 15.0 - uTime * 3.0 + uKick * 5.0);
+                
+                vec3 col = mix(uColorA, uColorB, wave * 0.5 + 0.5);
+                col *= (0.01 / abs(d));
+                
+                // Add secondary grid
+                vec2 uv2 = uv * rotate2d(PI/4.0);
+                float grid2 = sin(uv2.x * 20.0) * sin(uv2.y * 20.0);
+                col += uColorC * step(0.95, grid2) * 0.5;
+                
+                return col;
+            }
+
+            // Module 6: Orbital Resonance (Planetary motion)
+            vec3 moduleOrbital(vec2 uv) {
+                vec3 col = vec3(0.0);
+                float d = length(uv);
+                
+                // Central "star"
+                col += uColorA * (0.02 / d) * (1.0 + uKick);
+                
+                // Orbiting "planets"
+                for(float i=1.0; i<=3.0; i++) {
+                    float radius = i * 0.3;
+                    float orbitSpeed = uTime * (1.1 - i * 0.2);
+                    vec2 p = vec2(sin(orbitSpeed), cos(orbitSpeed)) * radius;
+                    
+                    float planet = sdCircle(uv - p, 0.05 * (1.0 + uKick * 0.5));
+                    col += palette(i * 0.2 + uTime * 0.1) * (0.005 / abs(planet));
+                    
+                    // Orbit ring
+                    float ring = abs(length(uv) - radius);
+                    col += uColorB * (0.001 / ring) * 0.2;
+                }
+                
+                return col;
+            }
+
             void main() {
                 vec2 uv = (gl_FragCoord.xy * 2.0 - uResolution.xy) / min(uResolution.x, uResolution.y);
                 
@@ -273,6 +321,10 @@ export class BrainHackMandala {
                     color = moduleRecursive(uv);
                 } else if (uMode == 3) {
                     color = moduleNeuro(uv);
+                } else if (uMode == 4) {
+                    color = moduleLattice(uv);
+                } else if (uMode == 5) {
+                    color = moduleOrbital(uv);
                 }
                 
                 // Global Vignette & Tone Mapping

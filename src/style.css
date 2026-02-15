@@ -77,6 +77,10 @@ body {
     z-index: 10;
 }
 
+body:not(.dark-mode) .panel-side {
+    background: rgba(255, 255, 255, 0.7);
+}
+
 #mainPanel {
     display: grid;
     grid-template-rows: 50px 1fr 40px;
@@ -85,6 +89,11 @@ body {
     overflow: hidden;
     height: 100vh;
     min-width: 0;
+}
+
+#mainPanel>* {
+    pointer-events: auto;
+    /* Re-enable events for UI elements */
 }
 
 /* Explicit columns for side panels too for safety */
@@ -453,14 +462,11 @@ body.dark-mode .mode-seekbars {
     position: relative;
     width: 100%;
     height: 100%;
-    width: 100%;
-    height: 100%;
     background: var(--letterbox-bg);
-    /* Use letterbox background for wrapper */
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative;
+    overflow: hidden;
     transition: background 0.3s ease;
 }
 
@@ -469,15 +475,17 @@ body.dark-mode .mode-seekbars {
     height: 100%;
     position: relative;
     display: flex;
-    /* Center the canvas */
     justify-content: center;
     align-items: center;
+    overflow: hidden;
 }
 
 canvas {
     display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
     background: var(--canvas-bg);
-    /* Use canvas specific background */
     transition: background 0.3s ease;
 }
 
@@ -1052,18 +1060,6 @@ body.show-keyboard-hints::after {
     }
 }
 
-/* Color Blindness Filters */
-.filter-protanopia {
-    filter: url('#protanopia');
-}
-
-.filter-deuteranopia {
-    filter: url('#deuteranopia');
-}
-
-.filter-tritanopia {
-    filter: url('#tritanopia');
-}
 
 /* Simple Mode */
 .simple-mode #leftPanel {

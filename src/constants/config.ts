@@ -69,9 +69,9 @@ export const INSTANCE_CONFIG = {
   DEFAULT_SCALE: 1,
   DEFAULT_WIREFRAME: 'solid' as const,
   DEFAULT_PINNED: false,
-  MIN_DISTANCE: 12, // Increased for more spacious layout (was 5)
-  MAX_SPAWN_ATTEMPTS: 100, // Increased attempts to find good positions (was 50)
-  DUPLICATE_OFFSET: 3, // Increased offset for duplicates (was 2)
+  MIN_DISTANCE: 8, // Reduced for more centered clustering (was 12)
+  MAX_SPAWN_ATTEMPTS: 100,
+  DUPLICATE_OFFSET: 3,
 } as const;
 
 /**
@@ -81,9 +81,9 @@ export const MULTIPLIER_DEFAULTS = {
   SIZE: 1,
   SPEED: 1,
   SPREAD: 1,
-  SPACING: 15, // Increased for more spacious layout (was 10)
+  SPACING: 8, // Reduced for centralized initial layout (was 15)
   SYMMETRY_COUNT: 8,
-  MAX_OBJECTS: 20, // Default limit for auto-spawn modes (can be manually increased to 100)
+  MAX_OBJECTS: 20,
   AUTO_GENERATE_SPEED: 4,
 } as const;
 

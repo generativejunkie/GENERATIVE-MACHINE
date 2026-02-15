@@ -248,6 +248,8 @@ export class UIController {
 
     // Camera Mosaic Controls
     this.setupCameraMosaicControl();
+    this.setupAutoBgControls();
+    this.setupBlinkingControls();
 
     this.setupResetButton();
 
@@ -476,7 +478,7 @@ export class UIController {
     const colorB = document.getElementById('brainColorB') as HTMLInputElement;
     const colorC = document.getElementById('brainColorC') as HTMLInputElement;
 
-    const modeNames = ['Gamma', 'Theta', 'Raven', 'Alpha', 'Stroop', 'Fibonacci'];
+    const modeNames = ['Phantom', 'Boolean', 'Raven', 'Neuro', 'Lattice', 'Orbital'];
 
     if (brainHackBtn) {
       brainHackBtn.addEventListener('click', () => {
@@ -789,8 +791,9 @@ export class UIController {
 
   private setupTopBarModeButtons(): void {
     const modeSeekbars = document.getElementById('modeSeekbars');
+    if (!modeSeekbars) return;
+
     const updateSeekbarVisibility = () => {
-      if (!modeSeekbars) return;
       const mandalaActive = document.getElementById('topMandalaBtn')?.classList.contains('active');
       const aiActive = document.getElementById('topAiBtn')?.classList.contains('active');
       const autoActive = document.getElementById('topAutoBtn')?.classList.contains('active');
@@ -811,6 +814,7 @@ export class UIController {
       showItem('autoGenSeekbar', !!autoActive);
       showItem('antigravitySeekbar', !!gravityActive);
       showItem('brainHackSeekbar', !!brainHackActive);
+      showItem('quantumSeekbar', !!this.app.getState().quantumMode);
     };
 
     // Mandala Mode
@@ -820,26 +824,9 @@ export class UIController {
         const isActive = !topMandalaBtn.classList.contains('active');
         topMandalaBtn.classList.toggle('active');
         this.app.setMandalaMode(isActive);
-
         updateSeekbarVisibility();
-        console.log(`🌸 Mandala Mode: ${isActive ? 'ON' : 'OFF'}`);
+        console.log(`🌀 Mandala Mode: ${isActive ? 'ON' : 'OFF'}`);
       });
-    }
-
-    // Mirror Ball Mode - DELETED per user request
-    const topMirrorBallBtn = document.getElementById('topMirrorBallBtn');
-    if (topMirrorBallBtn) {
-      topMirrorBallBtn.style.display = 'none'; // Hide button
-      /*
-     topMirrorBallBtn.addEventListener('click', () => {
-       const isActive = !topMirrorBallBtn.classList.contains('active');
-       topMirrorBallBtn.classList.toggle('active');
-       this.app.toggleMirrorBallMode();
-
-       updateSeekbarVisibility();
-       console.log(`🪩 Mirror Ball Mode: ${isActive ? 'ON' : 'OFF'}`);
-     });
-     */
     }
 
     // Space/AI Mode
@@ -849,9 +836,8 @@ export class UIController {
         const isActive = !topAiBtn.classList.contains('active');
         topAiBtn.classList.toggle('active');
         this.app.toggleSpaceMode();
-
         updateSeekbarVisibility();
-        console.log(`✨ Space Mode: ${isActive ? 'ON' : 'OFF'}`);
+        console.log(`✧ Space Mode: ${isActive ? 'ON' : 'OFF'}`);
       });
     }
 
@@ -862,9 +848,8 @@ export class UIController {
         const isActive = !topAutoBtn.classList.contains('active');
         topAutoBtn.classList.toggle('active');
         this.app.toggleAutoMode();
-
         updateSeekbarVisibility();
-        console.log(`🤖 AUTO Mode: ${isActive ? 'ON' : 'OFF'}`);
+        console.log(`⟳ AUTO Mode: ${isActive ? 'ON' : 'OFF'}`);
       });
     }
 
@@ -876,29 +861,25 @@ export class UIController {
         topBrainHackBtn.classList.toggle('active');
         this.app.toggleBrainHackMode(isActive);
         updateSeekbarVisibility();
-        console.log(`🧠 Brain Hack Mode: ${isActive ? 'ON' : 'OFF'}`);
+        console.log(`⌬ Brain Hack Mode: ${isActive ? 'ON' : 'OFF'}`);
       });
     }
 
-    // Raven Mode Toggle (added Jan 27)
+    // Raven Mode Toggle
     const topRavenBtn = document.getElementById('topRavenBtn');
     if (topRavenBtn) {
       topRavenBtn.addEventListener('click', () => {
         const isActive = !topRavenBtn.classList.contains('active');
         topRavenBtn.classList.toggle('active');
-
-        // Raven Mode is Brain Hack with Mode Index 2
         this.app.toggleBrainHackMode(isActive);
         if (isActive) {
           this.app.setBrainHackModeIndex(2);
-          // Sync with BrainHack button if needed
           topBrainHackBtn?.classList.add('active');
         } else {
           topBrainHackBtn?.classList.remove('active');
         }
-
         updateSeekbarVisibility();
-        console.log(`🐦 Raven Mode: ${isActive ? 'ON' : 'OFF'}`);
+        console.log(`◈ Raven Mode: ${isActive ? 'ON' : 'OFF'}`);
       });
     }
 
@@ -909,77 +890,59 @@ export class UIController {
         const isActive = !topGravityBtn.classList.contains('active');
         topGravityBtn.classList.toggle('active');
         this.app.toggleAntigravityMode(isActive);
-
         updateSeekbarVisibility();
-        console.log(`🌊 Gentle Float: ${isActive ? 'ON' : 'OFF'}`);
+        console.log(`◈ Gentle Float: ${isActive ? 'ON' : 'OFF'}`);
       });
     }
 
-    // Wireframe Mode Buttons
+    // Quantum Mode Toggle
+    const topQuantumBtn = document.getElementById('topQuantumBtn');
+    if (topQuantumBtn) {
+      topQuantumBtn.addEventListener('click', () => {
+        const isActive = !topQuantumBtn.classList.contains('active');
+        topQuantumBtn.classList.toggle('active');
+        this.app.toggleQuantumMode(isActive);
+        updateSeekbarVisibility();
+      });
+    }
+
+    // View Options (Top Bar)
     const topSolidBtn = document.getElementById('topSolidBtn');
     const topWireBtn = document.getElementById('topWireBtn');
     const topMixBtn = document.getElementById('topMixBtn');
 
-    const setWireframeMode = (mode: 'solid' | 'wireframe' | 'mixed') => {
-      this.app.setWireframeMode(mode);
-      topSolidBtn?.classList.toggle('active', mode === 'solid');
-      topWireBtn?.classList.toggle('active', mode === 'wireframe');
-      topMixBtn?.classList.toggle('active', mode === 'mixed');
-    };
-
-    topSolidBtn?.addEventListener('click', () => setWireframeMode('solid'));
-    topWireBtn?.addEventListener('click', () => setWireframeMode('wireframe'));
-    topMixBtn?.addEventListener('click', () => setWireframeMode('mixed'));
-
-    // Mic Input Button
-    const topMicBtn = document.getElementById('topMicBtn');
-    if (topMicBtn) {
-      topMicBtn.addEventListener('click', async () => {
-        const isActive = !topMicBtn.classList.contains('active');
-
-        if (isActive) {
-          try {
-            // Get selected device ID if available
-            const deviceSelect = document.getElementById('audioDeviceSelect') as HTMLSelectElement;
-            const deviceId = deviceSelect ? deviceSelect.value : undefined;
-
-            const deviceLabel = await this.app.startMicrophone(deviceId);
-            if (deviceLabel) {
-              topMicBtn.classList.add('active');
-              console.log(`🎤 Mic Input: ON (${deviceLabel})`);
-              // Alert only if device is known to avoid spamming
-              if (deviceId) {
-                alert(`マイク入力ON: ${deviceLabel}`);
-              }
-            } else {
-              console.error('🎤 Mic Input: FAILED');
-              alert('マイク入力を開始できませんでした。');
-              topMicBtn.classList.remove('active');
-            }
-          } catch (e) {
-            console.error(e);
-            topMicBtn.classList.remove('active');
-          }
-        } else {
-          this.app.stopMicrophone();
-          topMicBtn.classList.remove('active');
-          console.log('🎤 Mic Input: OFF');
-        }
+    if (topSolidBtn) {
+      topSolidBtn.addEventListener('click', () => {
+        this.app.setWireframeMode('solid');
+        console.log('▦ View Mode: SOLID');
       });
     }
 
-    // Fullscreen Button
-    const topFullscreenBtn = document.getElementById('topFullscreenBtn');
-    if (topFullscreenBtn) {
-      topFullscreenBtn.addEventListener('click', () => {
-        if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen();
-        } else {
-          document.exitFullscreen();
-        }
+    if (topWireBtn) {
+      topWireBtn.addEventListener('click', () => {
+        this.app.setWireframeMode('wireframe');
+        console.log('▦ View Mode: WIREFRAME');
       });
     }
+
+    if (topMixBtn) {
+      topMixBtn.addEventListener('click', () => {
+        this.app.setWireframeMode('mixed');
+        console.log('▦ View Mode: MIXED');
+      });
+    }
+
+    // V-OUT Button
+    const vOutBtn = document.getElementById('vOutBtn');
+    if (vOutBtn) {
+      vOutBtn.addEventListener('click', () => {
+        this.app.openProjectorWindow();
+      });
+    }
+
+    updateSeekbarVisibility();
   }
+
 
   private setupDarkModeToggle(): void {
     const darkModeToggle = document.getElementById('darkModeToggle');
@@ -1102,7 +1065,7 @@ export class UIController {
   }
 
   private setupModeControlBar(): void {
-
+    const topQuantumBtn = document.getElementById('topQuantumBtn');
 
     // Mandala Enable Checkbox (Right Panel - Visual Symmetry Only)
     const mandalaCheckbox = document.getElementById('mandalaMode') as HTMLInputElement;
@@ -1129,6 +1092,42 @@ export class UIController {
         const value = parseInt((e.target as HTMLInputElement).value);
         symmetryValue.textContent = value.toString();
         this.app.setSymmetryCount(value);
+      });
+    }
+
+    // Quantum Controls (Right Panel)
+    const quantumCheckbox = document.getElementById('quantumMode') as HTMLInputElement;
+    if (quantumCheckbox) {
+      quantumCheckbox.addEventListener('change', () => {
+        const isActive = quantumCheckbox.checked;
+        this.app.toggleQuantumMode(isActive);
+        const controls = document.getElementById('quantumControls');
+        if (controls) controls.style.display = isActive ? 'block' : 'none';
+        topQuantumBtn?.classList.toggle('active', isActive);
+      });
+    }
+
+    const quantumCoherence = document.getElementById('quantumCoherence') as HTMLInputElement;
+    const quantumCoherenceVal = document.getElementById('quantumCoherenceRightValue');
+    if (quantumCoherence) {
+      quantumCoherence.addEventListener('input', (e) => {
+        const val = parseFloat((e.target as HTMLInputElement).value);
+        if (quantumCoherenceVal) quantumCoherenceVal.textContent = val.toFixed(2);
+        this.app.setQuantumCoherence(val);
+      });
+    }
+
+    const quantumEntangled = document.getElementById('quantumEntangled') as HTMLInputElement;
+    if (quantumEntangled) {
+      quantumEntangled.addEventListener('change', () => {
+        this.app.toggleQuantumEntanglement(quantumEntangled.checked);
+      });
+    }
+
+    const quantumMeasureBtn = document.getElementById('quantumMeasureBtn');
+    if (quantumMeasureBtn) {
+      quantumMeasureBtn.addEventListener('click', () => {
+        this.app.quantumMeasure();
       });
     }
 
@@ -1169,7 +1168,7 @@ export class UIController {
         } else {
           this.saveCurrentSettings('auto');
         }
-        console.log(`⚡ Auto Generate: ${isActive ? 'ON' : 'OFF'}`);
+        console.log(`✦ Auto Generate: ${isActive ? 'ON' : 'OFF'}`);
       });
     }
 
@@ -1195,7 +1194,7 @@ export class UIController {
         } else {
           this.saveCurrentSettings('antigravity');
         }
-        console.log(`🚀 Antigravity: ${isActive ? 'ON' : 'OFF'}`);
+        console.log(`⌬ Antigravity: ${isActive ? 'ON' : 'OFF'}`);
       });
     }
 
@@ -1241,7 +1240,7 @@ export class UIController {
 
           this.app.setWireframeMode('solid');
           localStorage.setItem('wireframeMode', 'solid');
-          console.log('🔲 Wireframe Mode: SOLID');
+          console.log('▦ Wireframe Mode: SOLID');
         } else {
           // If turning off, default to solid
           solidBtn.classList.add('active');
@@ -1267,7 +1266,7 @@ export class UIController {
 
           this.app.setWireframeMode('wireframe');
           localStorage.setItem('wireframeMode', 'wireframe');
-          console.log('🔲 Wireframe Mode: WIREFRAME');
+          console.log('▦ Wireframe Mode: WIREFRAME');
         } else {
           // If turning off, default to solid
           solidBtn?.classList.add('active');
@@ -1295,7 +1294,7 @@ export class UIController {
 
           this.app.setWireframeMode('mixed');
           localStorage.setItem('wireframeMode', 'mixed');
-          console.log('🔲 Wireframe Mode: MIXED');
+          console.log('▦ Wireframe Mode: MIXED');
         } else {
           // If turning off, default to solid
           solidBtn?.classList.add('active');
@@ -1874,14 +1873,6 @@ export class UIController {
     const topMandalaBtn = document.getElementById('topMandalaBtn');
     if (topMandalaBtn) topMandalaBtn.classList.toggle('active', state.mandalaMode);
 
-    const topMirrorBallBtn = document.getElementById('topMirrorBallBtn');
-    if (topMirrorBallBtn) topMirrorBallBtn.classList.toggle('active', state.mirrorBallMode);
-
-    // Check if mode switched recently? 
-    // It's hard to detect "switch" here without previous state.
-    // relying on button click handlers is safer for "Action" feedback.
-
-
     const topAiBtn = document.getElementById('topAiBtn');
     if (topAiBtn) topAiBtn.classList.toggle('active', state.spaceMode);
 
@@ -1975,6 +1966,36 @@ export class UIController {
       rotationValue.textContent = `${Math.round(state.baseRotation)}°`;
       this.updateSliderVisual(rotationSlider);
     }
+
+    // Update Wireframe UI (Top Bar & Sidebar Sync)
+    const wireframeMode = state.wireframeMode || 'solid';
+
+    // Top Bar Sync
+    const tSolid = document.getElementById('topSolidBtn');
+    const tWire = document.getElementById('topWireBtn');
+    const tMix = document.getElementById('topMixBtn');
+    if (tSolid) tSolid.classList.toggle('active', wireframeMode === 'solid');
+    if (tWire) tWire.classList.toggle('active', wireframeMode === 'wireframe');
+    if (tMix) tMix.classList.toggle('active', wireframeMode === 'mixed');
+
+    // Sidebar Sync
+    const sSolid = document.getElementById('solidModeBtn');
+    const sWire = document.getElementById('wireModeBtn');
+    const sMix = document.getElementById('mixModeBtn');
+    if (sSolid) sSolid.classList.toggle('active', wireframeMode === 'solid');
+    if (sWire) sWire.classList.toggle('active', wireframeMode === 'wireframe');
+    if (sMix) sMix.classList.toggle('active', wireframeMode === 'mixed');
+
+    // Sync with STROKE buttons
+    const strokeButtons = document.querySelectorAll('.stroke-btn');
+    strokeButtons.forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-wireframe') === wireframeMode);
+    });
+
+    // Sync with wireframe toggle button (cycling button)
+    const wireframeToggle = document.getElementById('wireframeToggle');
+    const wireframeModeLabel = wireframeToggle?.querySelector('.wireframe-mode-label');
+    this.updateWireframeToggleUI(wireframeToggle, wireframeModeLabel, wireframeMode);
   }
 
   private setupKeyboardShortcuts(): void {
@@ -2478,6 +2499,47 @@ export class UIController {
    */
   public getMosaicStream(): MediaStream | null {
     return this.mosaicProcessor?.getStream() ?? null;
+  }
+
+  private setupAutoBgControls(): void {
+    const strobeCheckbox = document.getElementById('autoStrobeCheckbox') as HTMLInputElement;
+    const colorAPicker = document.getElementById('autoColorAPicker') as HTMLInputElement;
+    const colorBPicker = document.getElementById('autoColorBPicker') as HTMLInputElement;
+
+    if (strobeCheckbox) {
+      strobeCheckbox.addEventListener('change', () => {
+        this.app.setAutoColorStrobe(strobeCheckbox.checked);
+      });
+    }
+
+    const updateAutoColors = () => {
+      if (colorAPicker && colorBPicker) {
+        this.app.setAutoColors(colorAPicker.value, colorBPicker.value);
+      }
+    };
+
+    if (colorAPicker) colorAPicker.addEventListener('input', updateAutoColors);
+    if (colorBPicker) colorBPicker.addEventListener('input', updateAutoColors);
+  }
+
+  private setupBlinkingControls(): void {
+    const blinkingCheckbox = document.getElementById('blinkingModeCheckbox') as HTMLInputElement;
+    const blinkingSpeedSlider = document.getElementById('blinkingSpeedSlider') as HTMLInputElement;
+    const blinkingSpeedValue = document.getElementById('blinkingSpeedValue');
+
+    if (blinkingCheckbox) {
+      blinkingCheckbox.addEventListener('change', () => {
+        this.app.setBlinkingMode(blinkingCheckbox.checked);
+      });
+    }
+
+    if (blinkingSpeedSlider && blinkingSpeedValue) {
+      blinkingSpeedSlider.addEventListener('input', () => {
+        const speed = parseInt(blinkingSpeedSlider.value);
+        blinkingSpeedValue.textContent = speed.toString();
+        this.app.setBlinkingSpeed(speed);
+      });
+    }
   }
 }
 

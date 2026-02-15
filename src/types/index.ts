@@ -41,6 +41,7 @@ export type TransitionType = 'fadeIn' | 'scaleIn' | 'slideIn' | 'rotateIn' | 'ra
  * Wireframe mode types
  */
 export type WireframeMode = 'solid' | 'wireframe' | 'mixed';
+export type DispersionPattern = 'outward' | 'inward' | 'spiral' | 'vortex' | 'random' | 'expandX' | 'expandY';
 
 /**
  * Media types supported
@@ -224,7 +225,6 @@ export interface EventMap {
 export interface ApplicationState {
   mandalaMode: boolean;
   symmetryEnabled: boolean; // New Flag: Decoupled visual symmetry
-  mirrorBallMode: boolean; // particles form a sphere
   symmetryCount: number;
   sizeMultiplier: number;
   speedMultiplier: number;
@@ -244,6 +244,17 @@ export interface ApplicationState {
   brainHackMode: boolean;
   brainHackModeIndex: number;
   isPlaying: boolean;
+  quantumMode: boolean;
+  quantumCoherence: number;
+  quantumEntangled: boolean;
+  wireframeMode: WireframeMode;
+  dispersionPattern: DispersionPattern;
+  autoCyclePatterns: boolean;
+  autoColorStrobe: boolean;
+  autoColorA: string;
+  autoColorB: string;
+  blinkingMode: boolean;
+  blinkingSpeed: number;
 }
 
 /**

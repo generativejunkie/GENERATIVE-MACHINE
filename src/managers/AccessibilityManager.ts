@@ -9,7 +9,6 @@ export class AccessibilityManager extends EventEmitter {
     private synth: SpeechSynthesis;
     private highContrastEnabled: boolean = false;
     private announceEnabled: boolean = false;
-    private colorBlindnessMode: 'none' | 'protanopia' | 'deuteranopia' | 'tritanopia' = 'none';
     private simpleModeEnabled: boolean = false;
     private currentLang: 'ja' | 'en' = 'ja';
     private locale: Locale = ja;
@@ -71,7 +70,8 @@ export class AccessibilityManager extends EventEmitter {
 
                 case 'KeyC':
                     e.preventDefault();
-                    this.toggleColorBlindness();
+                    // Color blindness toggle disabled to unify selection colors to red
+                    console.log('Color Blindness filters are disabled to maintain consistent red selection colors.');
                     break;
 
                 case 'KeyS':
@@ -188,28 +188,6 @@ export class AccessibilityManager extends EventEmitter {
         this.announce(msg);
     }
 
-    /**
-     * Toggle color blindness mode
-     */
-    public toggleColorBlindness(): void {
-        const modes: ('none' | 'protanopia' | 'deuteranopia' | 'tritanopia')[] = ['none', 'protanopia', 'deuteranopia', 'tritanopia'];
-        const currentIndex = modes.indexOf(this.colorBlindnessMode);
-        const nextIndex = (currentIndex + 1) % modes.length;
-        this.colorBlindnessMode = modes[nextIndex];
-
-        // Remove all filter classes
-        document.body.classList.remove('filter-protanopia', 'filter-deuteranopia', 'filter-tritanopia');
-
-        // Add new filter class if not none
-        if (this.colorBlindnessMode !== 'none') {
-            document.body.classList.add(`filter-${this.colorBlindnessMode}`);
-        }
-
-        localStorage.setItem('colorBlindnessMode', this.colorBlindnessMode);
-
-        const modeName = this.locale.modes[this.colorBlindnessMode];
-        this.announce(`${this.locale.announcements.colorMode}: ${modeName}`);
-    }
 
     /**
      * Toggle simple mode
@@ -288,7 +266,6 @@ export class AccessibilityManager extends EventEmitter {
     private loadPreferences(): void {
         const savedHighContrast = localStorage.getItem('highContrast') === 'true';
         const savedAnnounce = localStorage.getItem('announceEnabled');
-        const savedColorBlindness = localStorage.getItem('colorBlindnessMode') as any;
         const savedSimpleMode = localStorage.getItem('simpleMode') === 'true';
         const savedLang = localStorage.getItem('language') as any;
 
@@ -301,10 +278,6 @@ export class AccessibilityManager extends EventEmitter {
             this.announceEnabled = savedAnnounce === 'true';
         }
 
-        if (savedColorBlindness && ['protanopia', 'deuteranopia', 'tritanopia'].includes(savedColorBlindness)) {
-            this.colorBlindnessMode = savedColorBlindness;
-            document.body.classList.add(`filter-${this.colorBlindnessMode}`);
-        }
 
         if (savedSimpleMode) {
             // Force disable 'Simple Mode' to fix stuck layout issues

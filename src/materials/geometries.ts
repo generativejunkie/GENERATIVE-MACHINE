@@ -1206,6 +1206,205 @@ export const MATERIALS: Material[] = [
       group.userData = { vel: new THREE.Vector3(0.014, 0.01, 0.012) };
       return group;
     }
+  },
+  {
+    id: 'mat44',
+    name: 'Raven Matrix',
+    create3D: (isSolid = false) => {
+      const group = new THREE.Group();
+      const dotSize = 0.25;
+      const spacing = 0.6;
+      for (let x = -1; x <= 1; x++) {
+        for (let y = -1; y <= 1; y++) {
+          const geo = getSharedGeometry(`raven_dot_${dotSize}`, () => new THREE.SphereGeometry(dotSize, 12, 12));
+          let mesh: THREE.Object3D;
+          if (isSolid) {
+            mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: MATERIAL_CONFIG.SOLID_COLOR }));
+          } else {
+            const edges = new THREE.EdgesGeometry(geo);
+            mesh = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: MATERIAL_CONFIG.WIREFRAME_COLOR }));
+          }
+          mesh.position.set(x * spacing, y * spacing, 0);
+          mesh.userData.originalGeo = geo;
+          group.add(mesh);
+        }
+      }
+      group.userData = { vel: new THREE.Vector3(0.01, 0.012, 0.014) };
+      return group;
+    }
+  },
+  {
+    id: 'mat45',
+    name: 'IQ Concentric',
+    create3D: (isSolid = false) => {
+      const group = new THREE.Group();
+      // Outer square
+      const squareGeo = getSharedGeometry('iq_outer_square', () => new THREE.BoxGeometry(1.6, 1.6, 0.1));
+      // Inner circle
+      const circleGeo = getSharedGeometry('iq_inner_circle', () => new THREE.TorusGeometry(0.5, 0.05, 8, 32));
+      // Nested triangle
+      const triGeo = getSharedGeometry('iq_inner_tri', () => new THREE.CylinderGeometry(0.3, 0.3, 0.1, 3));
+
+      [
+        { geo: squareGeo, pos: [0, 0, 0], rot: [0, 0, 0] },
+        { geo: circleGeo, pos: [0, 0, 0], rot: [0, 0, 0] },
+        { geo: triGeo, pos: [0, 0, 0], rot: [Math.PI / 2, 0, 0] }
+      ].forEach(({ geo, pos, rot }) => {
+        let mesh: THREE.Object3D;
+        if (isSolid) {
+          mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: MATERIAL_CONFIG.SOLID_COLOR }));
+        } else {
+          const edges = new THREE.EdgesGeometry(geo);
+          mesh = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: MATERIAL_CONFIG.WIREFRAME_COLOR }));
+        }
+        mesh.position.set(pos[0], pos[1], pos[2]);
+        mesh.rotation.set(rot[0], rot[1], rot[2]);
+        mesh.userData.originalGeo = geo;
+        group.add(mesh);
+      });
+
+      group.userData = { vel: new THREE.Vector3(0.012, 0.015, 0.01) };
+      return group;
+    }
+  },
+  {
+    id: 'mat46',
+    name: 'Raven Divider',
+    create3D: (isSolid = false) => {
+      const group = new THREE.Group();
+      const frameGeo = getSharedGeometry('raven_frame', () => new THREE.BoxGeometry(1.5, 1.5, 0.1));
+      const crossGeo = getSharedGeometry('raven_cross', () => new THREE.BoxGeometry(1.8, 0.05, 0.05));
+
+      // Frame
+      let frame: THREE.Object3D;
+      if (isSolid) {
+        frame = new THREE.Mesh(frameGeo, new THREE.MeshStandardMaterial({ color: MATERIAL_CONFIG.SOLID_COLOR, transparent: true, opacity: 0.5 }));
+      } else {
+        frame = new THREE.LineSegments(new THREE.EdgesGeometry(frameGeo), new THREE.LineBasicMaterial({ color: MATERIAL_CONFIG.WIREFRAME_COLOR }));
+      }
+      frame.userData.originalGeo = frameGeo;
+      group.add(frame);
+
+      // Diagonal Lines
+      for (let i = 0; i < 2; i++) {
+        let line: THREE.Object3D;
+        if (isSolid) {
+          line = new THREE.Mesh(crossGeo, new THREE.MeshStandardMaterial({ color: MATERIAL_CONFIG.SOLID_COLOR }));
+        } else {
+          line = new THREE.LineSegments(new THREE.EdgesGeometry(crossGeo), new THREE.LineBasicMaterial({ color: MATERIAL_CONFIG.WIREFRAME_COLOR }));
+        }
+        line.rotation.z = (i === 0 ? 1 : -1) * Math.PI / 4;
+        line.userData.originalGeo = crossGeo;
+        group.add(line);
+      }
+
+      group.userData = { vel: new THREE.Vector3(0.013, 0.011, 0.016) };
+      return group;
+    }
+  },
+  {
+    id: 'mat47',
+    name: 'IQ Sectors',
+    create3D: (isSolid = false) => {
+      const group = new THREE.Group();
+      const segments = 4;
+      for (let i = 0; i < segments; i++) {
+        const geo = getSharedGeometry(`raven_sector_${i}`, () => new THREE.CylinderGeometry(0.8, 0.8, 0.1, 32, 1, false, (i / segments) * Math.PI * 2, (1 / (segments * 2)) * Math.PI * 2));
+        let mesh: THREE.Object3D;
+        if (isSolid) {
+          mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: MATERIAL_CONFIG.SOLID_COLOR }));
+        } else {
+          const edges = new THREE.EdgesGeometry(geo);
+          mesh = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: MATERIAL_CONFIG.WIREFRAME_COLOR }));
+        }
+        mesh.rotation.x = Math.PI / 2;
+        mesh.userData.originalGeo = geo;
+        group.add(mesh);
+      }
+      group.userData = { vel: new THREE.Vector3(0.01, 0.014, 0.012) };
+      return group;
+    }
+  },
+  {
+    id: 'mat48',
+    name: 'Raven Lattice',
+    create3D: (isSolid = false) => {
+      const group = new THREE.Group();
+      const lines = 5;
+      const spacing = 0.4;
+      const length = 1.6;
+
+      const geo = getSharedGeometry('raven_line', () => new THREE.BoxGeometry(length, 0.04, 0.04));
+
+      for (let i = 0; i < lines; i++) {
+        // Horizontal
+        const hLine = isSolid
+          ? new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: MATERIAL_CONFIG.SOLID_COLOR }))
+          : new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({ color: MATERIAL_CONFIG.WIREFRAME_COLOR }));
+        hLine.position.y = (i - (lines - 1) / 2) * spacing;
+        hLine.userData.originalGeo = geo;
+        group.add(hLine);
+
+        // Vertical
+        const vLine = isSolid
+          ? new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: MATERIAL_CONFIG.SOLID_COLOR }))
+          : new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({ color: MATERIAL_CONFIG.WIREFRAME_COLOR }));
+        vLine.position.x = (i - (lines - 1) / 2) * spacing;
+        vLine.rotation.z = Math.PI / 2;
+        vLine.userData.originalGeo = geo;
+        group.add(vLine);
+      }
+
+      group.userData = { vel: new THREE.Vector3(0.011, 0.013, 0.015) };
+      return group;
+    }
+  },
+  {
+    id: 'mat49',
+    name: 'Raven Arrow',
+    create3D: (isSolid = false) => {
+      const group = new THREE.Group();
+
+      const createArrow = (pos: THREE.Vector3, rot: number) => {
+        const arrowGroup = new THREE.Group();
+        const shaftGeo = getSharedGeometry('arrow_shaft', () => new THREE.CylinderGeometry(0.05, 0.05, 0.6, 8));
+        const headGeo = getSharedGeometry('arrow_head', () => new THREE.ConeGeometry(0.15, 0.25, 8));
+
+        const shaft = isSolid
+          ? new THREE.Mesh(shaftGeo, new THREE.MeshStandardMaterial({ color: MATERIAL_CONFIG.SOLID_COLOR }))
+          : new THREE.LineSegments(new THREE.EdgesGeometry(shaftGeo), new THREE.LineBasicMaterial({ color: MATERIAL_CONFIG.WIREFRAME_COLOR }));
+
+        const head = isSolid
+          ? new THREE.Mesh(headGeo, new THREE.MeshStandardMaterial({ color: MATERIAL_CONFIG.SOLID_COLOR }))
+          : new THREE.LineSegments(new THREE.EdgesGeometry(headGeo), new THREE.LineBasicMaterial({ color: MATERIAL_CONFIG.WIREFRAME_COLOR }));
+
+        head.position.y = 0.4;
+        shaft.userData.originalGeo = shaftGeo;
+        head.userData.originalGeo = headGeo;
+
+        arrowGroup.add(shaft);
+        arrowGroup.add(head);
+        arrowGroup.position.copy(pos);
+        arrowGroup.rotation.z = rot;
+        return arrowGroup;
+      };
+
+      const positions = [
+        { p: new THREE.Vector3(-0.6, 0.6, 0), r: 0 },
+        { p: new THREE.Vector3(0, 0.6, 0), r: Math.PI / 4 },
+        { p: new THREE.Vector3(0.6, 0.6, 0), r: Math.PI / 2 },
+        { p: new THREE.Vector3(-0.6, 0, 0), r: -Math.PI / 4 },
+        { p: new THREE.Vector3(0, 0, 0), r: Math.PI },
+        { p: new THREE.Vector3(0.6, 0, 0), r: Math.PI + Math.PI / 4 }
+      ];
+
+      positions.forEach(({ p, r }) => {
+        group.add(createArrow(p, r));
+      });
+
+      group.userData = { vel: new THREE.Vector3(0.012, 0.01, 0.016) };
+      return group;
+    }
   }
 ];
 
