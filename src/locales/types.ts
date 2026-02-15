@@ -49,6 +49,7 @@ export interface Locale {
         autoBg: string;
         blinkingMode: string;
         blinkingSpeed: string;
+        blink: string;
     };
     announcements: {
         mandalaMode: string;

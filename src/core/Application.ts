@@ -894,6 +894,15 @@ export class Application extends EventEmitter<ApplicationEventMap> {
   }
 
   /**
+   * Toggle global blinking mode
+   */
+  public toggleBlinkingMode(): boolean {
+    const newState = !this.state.blinkingMode;
+    this.setBlinkingMode(newState);
+    return newState;
+  }
+
+  /**
    * Set blinking speed (1-10)
    */
   public setBlinkingSpeed(speed: number): void {

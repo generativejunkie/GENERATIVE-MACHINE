@@ -853,6 +853,18 @@ export class UIController {
       });
     }
 
+    // BLINK Mode
+    const topBlinkBtn = document.getElementById('topBlinkBtn');
+    const blinkingCheckbox = document.getElementById('blinkingModeCheckbox') as HTMLInputElement;
+
+    if (topBlinkBtn) {
+      topBlinkBtn.addEventListener('click', () => {
+        const isActive = this.app.toggleBlinkingMode();
+        topBlinkBtn.classList.toggle('active', isActive);
+        if (blinkingCheckbox) blinkingCheckbox.checked = isActive;
+      });
+    }
+
     // BrainHack Toggle
     const topBrainHackBtn = document.getElementById('topBrainHackBtn');
     if (topBrainHackBtn) {
@@ -2529,7 +2541,10 @@ export class UIController {
 
     if (blinkingCheckbox) {
       blinkingCheckbox.addEventListener('change', () => {
-        this.app.setBlinkingMode(blinkingCheckbox.checked);
+        const isChecked = blinkingCheckbox.checked;
+        this.app.setBlinkingMode(isChecked);
+        const topBlinkBtn = document.getElementById('topBlinkBtn');
+        if (topBlinkBtn) topBlinkBtn.classList.toggle('active', isChecked);
       });
     }
 

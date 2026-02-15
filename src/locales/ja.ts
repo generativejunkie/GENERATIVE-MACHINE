@@ -50,7 +50,8 @@ export const ja: Locale = {
         ravenActive: '◈ RAVEN MODE ACTIVE',
         autoBg: 'AUTO 背景',
         blinkingMode: '点滅モード',
-        blinkingSpeed: '点滅速度'
+        blinkingSpeed: '点滅速度',
+        blink: '点滅/ストロボ'
     },
     announcements: {
         mandalaMode: '曼荼羅モード切り替え',

@@ -50,7 +50,8 @@ export const en: Locale = {
         ravenActive: '◈ RAVEN MODE ACTIVE',
         autoBg: 'AUTO BG',
         blinkingMode: 'Blinking Mode',
-        blinkingSpeed: 'Blinking Speed'
+        blinkingSpeed: 'Blinking Speed',
+        blink: 'BLINK'
     },
     announcements: {
         mandalaMode: 'Mandala Mode Toggled',

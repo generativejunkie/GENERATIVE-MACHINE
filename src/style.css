@@ -865,6 +865,15 @@ input[type="range"]::-webkit-slider-thumb:hover {
     transition: opacity 0.2s;
 }
 
+.icon.symbol {
+    background-image: none !important;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
 body.dark-mode .icon {
     filter: invert(1);
     /* White icons in dark mode */
