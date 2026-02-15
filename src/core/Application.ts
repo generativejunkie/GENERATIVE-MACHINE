@@ -1410,8 +1410,8 @@ export class Application extends EventEmitter<ApplicationEventMap> {
     // Update cosmic visual effects every frame
     this.sceneManager.updateCosmicEffects();
 
-    // Cosmic cycle every 6-8 seconds (randomized for organic feel)
-    const cycleInterval = 6000 + Math.random() * 2000;
+    // Cosmic cycle every 8 seconds
+    const cycleInterval = 8000;
     if (now - this.gravityCycleTimer > cycleInterval) {
       this.gravityCycleTimer = now;
 

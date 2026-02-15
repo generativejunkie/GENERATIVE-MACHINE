@@ -586,9 +586,10 @@ export class SceneManager extends EventEmitter {
         let posZ = instance.position.z * spreadMultiplier + floatOffsetZ;
 
         if (this.antigravityMode) {
-          // In Zero Gravity, spread out X/Y more to fill the "Space"
-          posX = posX * 1.5;
-          posY = posY * 1.5;
+          // In Zero Gravity, spread out X/Y/Z more to fill the "Space" (distant view)
+          posX = posX * 2.5;
+          posY = posY * 2.5;
+          posZ = posZ * 1.8; // Also push Z further back
         }
 
         mesh.position.set(posX, posY, posZ);
@@ -780,7 +781,7 @@ export class SceneManager extends EventEmitter {
    * Spawn burst particles at a position (cosmic explosion effect)
    */
   public spawnBurst(position: THREE.Vector3, color?: THREE.Color): void {
-    const particleCount = 20 + Math.floor(Math.random() * 15);
+    const particleCount = 40 + Math.floor(Math.random() * 30); // More particles
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const velocities = new Float32Array(particleCount * 3);
@@ -791,15 +792,15 @@ export class SceneManager extends EventEmitter {
       positions[i * 3 + 1] = position.y;
       positions[i * 3 + 2] = position.z;
 
-      // Random outward velocity
+      // Random outward velocity (much slower for gradual diffusion)
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.random() * Math.PI;
-      const speed = 0.02 + Math.random() * 0.06;
+      const speed = 0.005 + Math.random() * 0.015; // Reduced from 0.02-0.08 to 0.005-0.02
       velocities[i * 3] = Math.sin(phi) * Math.cos(theta) * speed;
       velocities[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * speed;
       velocities[i * 3 + 2] = Math.cos(phi) * speed;
 
-      sizes[i] = 0.02 + Math.random() * 0.04;
+      sizes[i] = 0.03 + Math.random() * 0.05; // Slightly larger particles
     }
 
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -808,7 +809,7 @@ export class SceneManager extends EventEmitter {
     const burstColor = color || new THREE.Color().setHSL(Math.random(), 0.7, 0.7);
     const material = new THREE.PointsMaterial({
       color: burstColor,
-      size: 0.05,
+      size: 0.08, // Larger base size
       transparent: true,
       opacity: 1.0,
       blending: THREE.AdditiveBlending,
@@ -819,7 +820,7 @@ export class SceneManager extends EventEmitter {
     const points = new THREE.Points(geometry, material);
     (points as any)._burstVelocities = velocities;
     (points as any)._burstStartTime = Date.now();
-    (points as any)._burstDuration = 1200 + Math.random() * 600;
+    (points as any)._burstDuration = 3000 + Math.random() * 2000; // 3-5 seconds (was 1.2-1.8s)
 
     this.scene.add(points);
     this.burstParticles.push(points);
@@ -895,10 +896,10 @@ export class SceneManager extends EventEmitter {
         positions.setX(i, positions.getX(i) + velocities[i * 3]);
         positions.setY(i, positions.getY(i) + velocities[i * 3 + 1]);
         positions.setZ(i, positions.getZ(i) + velocities[i * 3 + 2]);
-        // Slow down
-        velocities[i * 3] *= 0.97;
-        velocities[i * 3 + 1] *= 0.97;
-        velocities[i * 3 + 2] *= 0.97;
+        // Slow down very gradually for extended diffusion
+        velocities[i * 3] *= 0.99;
+        velocities[i * 3 + 1] *= 0.99;
+        velocities[i * 3 + 2] *= 0.99;
       }
       positions.needsUpdate = true;
 
