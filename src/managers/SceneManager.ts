@@ -37,6 +37,10 @@ export class SceneManager extends EventEmitter {
   private gravityFloatSpeed: number = 0.1; // Gravity float speed multiplier
   private floatVariations: Map<number, { speedMult: number; stayInPlace: boolean; scaleMult: number; zOffset: number }> = new Map(); // Random variation per instance
 
+  // Zero Gravity cosmic effects
+  private fadeOutInstances: Map<number, { startTime: number; duration: number; meshes: THREE.Object3D[] }> = new Map();
+  private burstParticles: THREE.Points[] = []; // Active burst particle systems
+
   // Mandala mode tracking for drag operations
   private currentMandalaMode: boolean = false;
   private currentSymmetryCount: number = 4;
@@ -745,6 +749,166 @@ export class SceneManager extends EventEmitter {
   private applyAntigravity(_instances: ObjectInstance[]): void {
     // Logic moved to updateMeshesForInstance for tighter integration with positioning
     // Kept empty or used for state management if needed
+  }
+
+  /**
+   * Begin fade-out animation for an instance (Zero Gravity cosmic effect)
+   */
+  public fadeOutInstance(instanceId: number, duration: number = 800): void {
+    const meshes = this.meshCache.get(instanceId);
+    if (!meshes || meshes.length === 0) return;
+
+    // Clone meshes references — they'll animate via updateCosmicEffects
+    this.fadeOutInstances.set(instanceId, {
+      startTime: Date.now(),
+      duration,
+      meshes: [...meshes]
+    });
+
+    // Make materials transparent for fade
+    meshes.forEach(mesh => {
+      mesh.traverse((child: THREE.Object3D) => {
+        if (child instanceof THREE.Mesh && child.material) {
+          const mat = child.material as THREE.MeshStandardMaterial;
+          mat.transparent = true;
+        }
+      });
+    });
+  }
+
+  /**
+   * Spawn burst particles at a position (cosmic explosion effect)
+   */
+  public spawnBurst(position: THREE.Vector3, color?: THREE.Color): void {
+    const particleCount = 20 + Math.floor(Math.random() * 15);
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const velocities = new Float32Array(particleCount * 3);
+    const sizes = new Float32Array(particleCount);
+
+    for (let i = 0; i < particleCount; i++) {
+      positions[i * 3] = position.x;
+      positions[i * 3 + 1] = position.y;
+      positions[i * 3 + 2] = position.z;
+
+      // Random outward velocity
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.random() * Math.PI;
+      const speed = 0.02 + Math.random() * 0.06;
+      velocities[i * 3] = Math.sin(phi) * Math.cos(theta) * speed;
+      velocities[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * speed;
+      velocities[i * 3 + 2] = Math.cos(phi) * speed;
+
+      sizes[i] = 0.02 + Math.random() * 0.04;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+    const burstColor = color || new THREE.Color().setHSL(Math.random(), 0.7, 0.7);
+    const material = new THREE.PointsMaterial({
+      color: burstColor,
+      size: 0.05,
+      transparent: true,
+      opacity: 1.0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      sizeAttenuation: true
+    });
+
+    const points = new THREE.Points(geometry, material);
+    (points as any)._burstVelocities = velocities;
+    (points as any)._burstStartTime = Date.now();
+    (points as any)._burstDuration = 1200 + Math.random() * 600;
+
+    this.scene.add(points);
+    this.burstParticles.push(points);
+  }
+
+  /**
+   * Update all cosmic effects (fade-outs and burst particles)
+   */
+  public updateCosmicEffects(): void {
+    const now = Date.now();
+
+    // Update fade-out instances
+    const completedFades: number[] = [];
+    this.fadeOutInstances.forEach((fade, instanceId) => {
+      const elapsed = now - fade.startTime;
+      const progress = Math.min(elapsed / fade.duration, 1.0);
+      const eased = 1.0 - Math.pow(1.0 - progress, 2); // ease-out quad
+
+      fade.meshes.forEach(mesh => {
+        // Shrink
+        const scale = Math.max(0.01, 1.0 - eased);
+        mesh.scale.multiplyScalar(scale / Math.max(mesh.scale.x, 0.01));
+
+        // Fade opacity
+        mesh.traverse((child: THREE.Object3D) => {
+          if (child instanceof THREE.Mesh && child.material) {
+            const mat = child.material as THREE.MeshStandardMaterial;
+            mat.opacity = 1.0 - eased;
+          }
+        });
+      });
+
+      if (progress >= 1.0) {
+        completedFades.push(instanceId);
+      }
+    });
+
+    // Clean up completed fades
+    completedFades.forEach(id => {
+      const fade = this.fadeOutInstances.get(id);
+      if (fade) {
+        // Spawn burst at the position of the faded object
+        if (fade.meshes.length > 0) {
+          const pos = fade.meshes[0].position.clone();
+          this.spawnBurst(pos);
+        }
+      }
+      this.fadeOutInstances.delete(id);
+      this.removeMeshesForInstance(id);
+    });
+
+    // Update burst particles
+    const aliveBursts: THREE.Points[] = [];
+    this.burstParticles.forEach(points => {
+      const startTime = (points as any)._burstStartTime;
+      const duration = (points as any)._burstDuration;
+      const velocities = (points as any)._burstVelocities as Float32Array;
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1.0);
+
+      if (progress >= 1.0) {
+        // Remove
+        this.scene.remove(points);
+        points.geometry.dispose();
+        (points.material as THREE.PointsMaterial).dispose();
+        return;
+      }
+
+      // Update positions
+      const positions = points.geometry.attributes.position as THREE.BufferAttribute;
+      const count = positions.count;
+      for (let i = 0; i < count; i++) {
+        positions.setX(i, positions.getX(i) + velocities[i * 3]);
+        positions.setY(i, positions.getY(i) + velocities[i * 3 + 1]);
+        positions.setZ(i, positions.getZ(i) + velocities[i * 3 + 2]);
+        // Slow down
+        velocities[i * 3] *= 0.97;
+        velocities[i * 3 + 1] *= 0.97;
+        velocities[i * 3 + 2] *= 0.97;
+      }
+      positions.needsUpdate = true;
+
+      // Fade out
+      const mat = points.material as THREE.PointsMaterial;
+      mat.opacity = 1.0 - Math.pow(progress, 1.5);
+
+      aliveBursts.push(points);
+    });
+    this.burstParticles = aliveBursts;
   }
 
   /**

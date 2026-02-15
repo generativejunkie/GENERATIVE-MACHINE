@@ -4,6 +4,7 @@
  * @module core/Application
  */
 
+import * as THREE from 'three';
 import { AudioManager } from '@managers/AudioManager';
 import { MixerManager } from '@managers/MixerManager';
 import { MidiManager } from '@managers/MidiManager';
@@ -1401,33 +1402,58 @@ export class Application extends EventEmitter<ApplicationEventMap> {
   }
 
   /**
-   * Handle Gravity Mode: Random object switching
+   * Handle Gravity Mode: Cosmic object switching with effects
    */
   private handleGravityMode(): void {
     const now = Date.now();
-    // Meditative object cycle every 10-15 seconds
-    if (now - this.gravityCycleTimer > 12000) {
+
+    // Update cosmic visual effects every frame
+    this.sceneManager.updateCosmicEffects();
+
+    // Cosmic cycle every 6-8 seconds (randomized for organic feel)
+    const cycleInterval = 6000 + Math.random() * 2000;
+    if (now - this.gravityCycleTimer > cycleInterval) {
       this.gravityCycleTimer = now;
 
       const instances = this.instanceManager.getAllInstances();
       const currentCount = instances.length;
 
-      // Maintain a small, calm population (3-7 objects)
-      const targetCount = 3 + Math.floor(Math.random() * 5);
+      // Dynamic population (3-8 objects)
+      const targetCount = 3 + Math.floor(Math.random() * 6);
 
       if (currentCount > targetCount) {
-        // Slowly remove oldest
-        this.instanceManager.removeOldestInstance();
+        // Fade out the oldest with cosmic effect
+        const oldest = instances.find(inst => !inst.mediaData && !inst.pinned);
+        if (oldest) {
+          this.sceneManager.fadeOutInstance(oldest.id, 800);
+          // Delay actual removal — the fade-out handler in SceneManager will clean up
+          setTimeout(() => {
+            this.instanceManager.removeInstance(oldest.id);
+          }, 850);
+        }
       } else if (currentCount < targetCount) {
-        // Slowly add new material
+        // Add new with burst entrance
         this.addRandomInstance();
+        // Spawn burst at a random position near center for entrance effect
+        const burstPos = new THREE.Vector3(
+          (Math.random() - 0.5) * 2,
+          (Math.random() - 0.5) * 2,
+          (Math.random() - 0.5) * 2
+        );
+        this.sceneManager.spawnBurst(burstPos);
       } else {
-        // At target count: SWITCH one to keep it fresh
-        this.instanceManager.removeOldestInstance();
-        this.addRandomInstance();
+        // Switch: fade out one, add another
+        const oldest = instances.find(inst => !inst.mediaData && !inst.pinned);
+        if (oldest) {
+          this.sceneManager.fadeOutInstance(oldest.id, 800);
+          setTimeout(() => {
+            this.instanceManager.removeInstance(oldest.id);
+            this.addRandomInstance();
+          }, 850);
+        }
       }
 
-      console.log(`🧘 Antigravity Cycle: ${currentCount} -> ${targetCount} objects (Switching)`);
+      console.log(`🌌 Zero Gravity Cycle: ${currentCount} → ${targetCount} objects`);
     }
   }
 
