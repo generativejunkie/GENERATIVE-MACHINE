@@ -153,6 +153,7 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       autoColorStrobe: false,
       autoColorA: '#ffffff',
       autoColorB: '#000000',
+      autoColorC: '#000000', // Default third to black
       blinkingMode: false,
       blinkingSpeed: 5
     };
@@ -390,11 +391,12 @@ export class Application extends EventEmitter<ApplicationEventMap> {
     console.log(`⚡ AUTO Strobe: ${enabled}`);
   }
 
-  public setAutoColors(colorA: string, colorB: string): void {
+  public setAutoColors(colorA: string, colorB: string, colorC: string = '#000000'): void {
     this.state.autoColorA = colorA;
     this.state.autoColorB = colorB;
+    this.state.autoColorC = colorC;
     this.emit('state:changed', this.state);
-    console.log(`🎨 AUTO Colors: ${colorA} / ${colorB}`);
+    console.log(`🎨 AUTO Colors: ${colorA} / ${colorB} / ${colorC}`);
   }
 
   /**
@@ -785,12 +787,16 @@ export class Application extends EventEmitter<ApplicationEventMap> {
     const now = Date.now();
     // speed 1 (500ms) to 10 (50ms)
     const interval = 500 / this.state.blinkingSpeed;
-    const strobe = Math.floor(now / interval) % 2 === 0;
 
-    // Default to Black/White for global blinking unless we want to use autoColors?
-    // Use autoColors if they exist, otherwise White/Black is safer for "blinking" feel.
-    const colorHex = strobe ? this.state.autoColorA : this.state.autoColorB;
-    this.setBackgroundColor(this.hexToRgb(colorHex));
+    // Support 3-color cycle if autoColorC is different from others
+    const { autoColorA, autoColorB, autoColorC } = this.state;
+    const colors = [autoColorA, autoColorB];
+    if (autoColorC !== autoColorB && autoColorC !== autoColorA) {
+      colors.push(autoColorC);
+    }
+
+    const phase = Math.floor(now / interval) % colors.length;
+    this.setBackgroundColor(this.hexToRgb(colors[phase]));
   }
 
   /**

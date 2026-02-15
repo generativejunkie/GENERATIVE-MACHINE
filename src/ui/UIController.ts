@@ -2517,6 +2517,7 @@ export class UIController {
     const strobeCheckbox = document.getElementById('autoStrobeCheckbox') as HTMLInputElement;
     const colorAPicker = document.getElementById('autoColorAPicker') as HTMLInputElement;
     const colorBPicker = document.getElementById('autoColorBPicker') as HTMLInputElement;
+    const colorCPicker = document.getElementById('autoColorCPicker') as HTMLInputElement;
 
     if (strobeCheckbox) {
       strobeCheckbox.addEventListener('change', () => {
@@ -2525,13 +2526,28 @@ export class UIController {
     }
 
     const updateAutoColors = () => {
-      if (colorAPicker && colorBPicker) {
-        this.app.setAutoColors(colorAPicker.value, colorBPicker.value);
+      if (colorAPicker && colorBPicker && colorCPicker) {
+        this.app.setAutoColors(colorAPicker.value, colorBPicker.value, colorCPicker.value);
       }
     };
 
     if (colorAPicker) colorAPicker.addEventListener('input', updateAutoColors);
     if (colorBPicker) colorBPicker.addEventListener('input', updateAutoColors);
+    if (colorCPicker) colorCPicker.addEventListener('input', updateAutoColors);
+
+    // Presets
+    const presetButtons = document.querySelectorAll('.color-preset-btn');
+    presetButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const colors = btn.getAttribute('data-colors')?.split(',');
+        if (colors && colors.length >= 2) {
+          if (colorAPicker) colorAPicker.value = colors[0];
+          if (colorBPicker) colorBPicker.value = colors[1];
+          if (colorCPicker) colorCPicker.value = colors[2] || colors[1];
+          updateAutoColors();
+        }
+      });
+    });
   }
 
   private setupBlinkingControls(): void {

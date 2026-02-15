@@ -253,6 +253,7 @@ export interface ApplicationState {
   autoColorStrobe: boolean;
   autoColorA: string;
   autoColorB: string;
+  autoColorC: string;
   blinkingMode: boolean;
   blinkingSpeed: number;
 }

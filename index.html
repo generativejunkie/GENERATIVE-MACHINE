@@ -66,8 +66,17 @@
                     <label style="font-size: 10px; opacity: 0.8; letter-spacing: 1px;">COLORS</label>
                     <div style="display: flex; gap: 5px;">
                         <input type="color" id="autoColorAPicker" value="#ffffff" class="color-picker-mini">
-                        <input type="color" id="autoColorBPicker" value="#000000" class="color-picker-mini">
+                        <input type="color" id="autoColorBPicker" value="#ff0000" class="color-picker-mini">
+                        <input type="color" id="autoColorCPicker" value="#0000ff" class="color-picker-mini">
                     </div>
+                </div>
+                <div style="display: flex; gap: 4px; justify-content: flex-end; margin-top: 4px;">
+                    <button class="color-preset-btn" data-colors="#ffffff,#ff0000,#0000ff" title="W/R/B"
+                        style="background: linear-gradient(to right, #fff 33%, #f00 33%, #f00 66%, #00f 66%); width: 24px; height: 14px; border: 1px solid #444; cursor: pointer;"></button>
+                    <button class="color-preset-btn" data-colors="#ff0000,#000000,#0000ff" title="R/K/B"
+                        style="background: linear-gradient(to right, #f00 33%, #000 33%, #000 66%, #00f 66%); width: 24px; height: 14px; border: 1px solid #444; cursor: pointer;"></button>
+                    <button class="color-preset-btn" data-colors="#000000,#ff0000,#000000" title="K/R/K"
+                        style="background: linear-gradient(to right, #000 33%, #f00 33%, #f00 66%, #000 66%); width: 24px; height: 14px; border: 1px solid #444; cursor: pointer;"></button>
                 </div>
             </div>
 
