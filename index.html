@@ -132,11 +132,35 @@
                         <span class="icon symbol">⟳</span>
                         <span data-i18n="auto">AUTO</span>
                     </button>
-                    <button id="topBlinkBtn" class="mode-btn" title="Blinking Mode/Strobe"
-                        data-i18n-title="blinkingMode">
-                        <span class="icon symbol">⚡</span>
-                        <span data-i18n="blink">BLINK</span>
-                    </button>
+                    <div class="dropdown-container">
+                        <button id="topBlinkBtn" class="mode-btn" title="Blinking Mode/Strobe"
+                            data-i18n-title="blinkingMode">
+                            <span class="icon symbol">⚡</span>
+                            <span data-i18n="blink">BLINK</span>
+                        </button>
+                        <div id="blinkQuickMenu" class="quick-settings-menu">
+                            <div class="menu-item">
+                                <label data-i18n="blinkingSpeed">Speed</label>
+                                <input type="range" id="quickBlinkSpeed" min="1" max="10" value="5">
+                            </div>
+                            <div class="menu-item">
+                                <label data-i18n="colors">Colors</label>
+                                <div class="quick-colors">
+                                    <input type="color" id="quickColorA" value="#ffffff">
+                                    <input type="color" id="quickColorB" value="#ff0000">
+                                    <input type="color" id="quickColorC" value="#0000ff">
+                                </div>
+                            </div>
+                            <div class="quick-presets">
+                                <button class="color-preset-btn" data-colors="#ffffff,#ff0000,#0000ff"
+                                    style="background: linear-gradient(to right, #fff 33%, #f00 33%, #f00 66%, #00f 66%);"></button>
+                                <button class="color-preset-btn" data-colors="#ff0000,#000000,#0000ff"
+                                    style="background: linear-gradient(to right, #f00 33%, #000 33%, #000 66%, #00f 66%);"></button>
+                                <button class="color-preset-btn" data-colors="#000000,#ff0000,#000000"
+                                    style="background: linear-gradient(to right, #000 33%, #f00 33%, #f00 66%, #000 66%);"></button>
+                            </div>
+                        </div>
+                    </div>
                     <button id="topGravityBtn" class="mode-btn" title="Zero Gravity" data-i18n-title="gravity">
                         <span class="icon symbol">⇪</span>
                         <span data-i18n="gravity">ZERO GRAVITY</span>

@@ -250,6 +250,7 @@ export class UIController {
     this.setupCameraMosaicControl();
     this.setupAutoBgControls();
     this.setupBlinkingControls();
+    this.setupQuickBlinkMenu();
 
     this.setupResetButton();
 
@@ -2569,8 +2570,75 @@ export class UIController {
         const speed = parseInt(blinkingSpeedSlider.value);
         blinkingSpeedValue.textContent = speed.toString();
         this.app.setBlinkingSpeed(speed);
+
+        // Sync with quick menu
+        const quickSpeed = document.getElementById('quickBlinkSpeed') as HTMLInputElement;
+        if (quickSpeed) quickSpeed.value = speed.toString();
       });
     }
+  }
+
+  private setupQuickBlinkMenu(): void {
+    const quickSpeed = document.getElementById('quickBlinkSpeed') as HTMLInputElement;
+    const quickColorA = document.getElementById('quickColorA') as HTMLInputElement;
+    const quickColorB = document.getElementById('quickColorB') as HTMLInputElement;
+    const quickColorC = document.getElementById('quickColorC') as HTMLInputElement;
+
+    const sideA = document.getElementById('autoColorAPicker') as HTMLInputElement;
+    const sideB = document.getElementById('autoColorBPicker') as HTMLInputElement;
+    const sideC = document.getElementById('autoColorCPicker') as HTMLInputElement;
+
+    const blinkingSpeedSlider = document.getElementById('blinkingSpeedSlider') as HTMLInputElement;
+    const blinkingSpeedValue = document.getElementById('blinkingSpeedValue');
+
+    if (quickSpeed) {
+      quickSpeed.addEventListener('input', () => {
+        const speed = parseInt(quickSpeed.value);
+        this.app.setBlinkingSpeed(speed);
+        if (blinkingSpeedSlider) blinkingSpeedSlider.value = speed.toString();
+        if (blinkingSpeedValue) blinkingSpeedValue.textContent = speed.toString();
+      });
+    }
+
+    const updateColors = () => {
+      if (quickColorA && quickColorB && quickColorC) {
+        this.app.setAutoColors(quickColorA.value, quickColorB.value, quickColorC.value);
+        // Sync with sidebar
+        if (sideA) sideA.value = quickColorA.value;
+        if (sideB) sideB.value = quickColorB.value;
+        if (sideC) sideC.value = quickColorC.value;
+      }
+    };
+
+    if (quickColorA) quickColorA.addEventListener('input', updateColors);
+    if (quickColorB) quickColorB.addEventListener('input', updateColors);
+    if (quickColorC) quickColorC.addEventListener('input', updateColors);
+
+    // Sidebar to Quick sync
+    const syncToQuick = () => {
+      if (sideA) quickColorA.value = sideA.value;
+      if (sideB) quickColorB.value = sideB.value;
+      if (sideC) quickColorC.value = sideC.value;
+    };
+
+    if (sideA) sideA.addEventListener('input', syncToQuick);
+    if (sideB) sideB.addEventListener('input', syncToQuick);
+    if (sideC) sideC.addEventListener('input', syncToQuick);
+
+    // Quick Presets inside the menu
+    const quickPresets = document.querySelectorAll('#blinkQuickMenu .color-preset-btn');
+    quickPresets.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const colors = btn.getAttribute('data-colors')?.split(',');
+        if (colors && colors.length >= 2) {
+          if (quickColorA) quickColorA.value = colors[0];
+          if (quickColorB) quickColorB.value = colors[1];
+          if (quickColorC) quickColorC.value = colors[2] || colors[1];
+          updateColors();
+        }
+      });
+    });
   }
 }
 
