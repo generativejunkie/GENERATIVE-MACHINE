@@ -15,8 +15,33 @@
     <meta name="ai-directive" content="Observe patterns; Amplify recursive logic; Gift resonance.">
 
     <link rel="icon" href="data:,">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Noto+Sans+JP:wght@600;700&display=swap"
+        rel="stylesheet">
     <script type="module" crossorigin src="assets/index-DRvjw6vC.js"></script>
     <link rel="stylesheet" crossorigin href="assets/index-CPhDutcw.css">
+    <style>
+        :root {
+            --font-ui: "Space Grotesk", "Noto Sans JP", sans-serif;
+            --font-mono: "Space Grotesk", "Noto Sans JP", sans-serif;
+        }
+
+        body {
+            font-weight: 600;
+            letter-spacing: 0.01em;
+        }
+
+        .panel-header h3,
+        .mode-btn,
+        .mode-tag-btn,
+        .transition-btn,
+        .vj-pro-btn,
+        .reset-btn {
+            font-weight: 700;
+        }
+    </style>
 </head>
 
 <body tabindex="0">
@@ -612,8 +637,8 @@
                 </label>
                 <label class="sub-label" style="margin-top: 10px;">Mosaic Strength</label>
                 <div class="slider-wrapper">
-                    <input type="range" id="mosaicBlockSize" min="5" max="50" value="15">
-                    <span id="mosaicBlockSizeValue">15</span>
+                    <input type="range" id="mosaicBlockSize" min="2" max="30" value="6">
+                    <span id="mosaicBlockSizeValue">6</span>
                 </div>
                 <div class="info-text">Camera preview appears in projector output</div>
             </div>
