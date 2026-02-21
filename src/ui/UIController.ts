@@ -251,6 +251,7 @@ export class UIController {
     this.setupAutoBgControls();
     this.setupBlinkingControls();
     this.setupQuickBlinkMenu();
+    this.setupGlobalEffectsControl();
 
     this.setupResetButton();
 
@@ -801,8 +802,10 @@ export class UIController {
       const gravityActive = document.getElementById('topGravityBtn')?.classList.contains('active');
       const brainHackActive = document.getElementById('topBrainHackBtn')?.classList.contains('active');
       const ravenActive = document.getElementById('topRavenBtn')?.classList.contains('active');
+      const glitchActive = document.getElementById('topGlitchBtn')?.classList.contains('active');
+      const hassanActive = document.getElementById('topHassanBtn')?.classList.contains('active');
 
-      const anyActive = mandalaActive || aiActive || autoActive || gravityActive || brainHackActive || ravenActive;
+      const anyActive = mandalaActive || aiActive || autoActive || gravityActive || brainHackActive || ravenActive || glitchActive || hassanActive;
       modeSeekbars.style.display = anyActive ? 'flex' : 'none';
 
       const showItem = (id: string, visible: boolean) => {
@@ -896,6 +899,34 @@ export class UIController {
       });
     }
 
+    // Glitch Mode
+    const topGlitchBtn = document.getElementById('topGlitchBtn');
+    const sideGlitchBtn = document.getElementById('sideGlitchBtn');
+    if (topGlitchBtn) {
+      topGlitchBtn.addEventListener('click', () => {
+        const isActive = !topGlitchBtn.classList.contains('active');
+        topGlitchBtn.classList.toggle('active');
+        sideGlitchBtn?.classList.toggle('active', isActive);
+        this.app.setGlitchMode(isActive);
+        updateSeekbarVisibility();
+        console.log(`⚡ Glitch Mode: ${isActive ? 'ON' : 'OFF'}`);
+      });
+    }
+
+    // Hassan Mode
+    const topHassanBtn = document.getElementById('topHassanBtn');
+    const sideHassanBtn = document.getElementById('sideHassanBtn');
+    if (topHassanBtn) {
+      topHassanBtn.addEventListener('click', () => {
+        const isActive = !topHassanBtn.classList.contains('active');
+        topHassanBtn.classList.toggle('active');
+        sideHassanBtn?.classList.toggle('active', isActive);
+        this.app.setHassanMode(isActive);
+        updateSeekbarVisibility();
+        console.log(`✴ Hassan Mode: ${isActive ? 'ON' : 'OFF'}`);
+      });
+    }
+
     // Antigravity Mode
     const topGravityBtn = document.getElementById('topGravityBtn');
     if (topGravityBtn) {
@@ -956,6 +987,38 @@ export class UIController {
     updateSeekbarVisibility();
   }
 
+  private setupGlobalEffectsControl(): void {
+    const sideGlitchBtn = document.getElementById('sideGlitchBtn');
+    const sideHassanBtn = document.getElementById('sideHassanBtn');
+    const sideNoiseBtn = document.getElementById('sideNoiseBtn');
+    const sideMosaicBtn = document.getElementById('sideMosaicBtn');
+
+    sideGlitchBtn?.addEventListener('click', () => {
+      const topGlitchBtn = document.getElementById('topGlitchBtn');
+      const isActive = !sideGlitchBtn.classList.contains('active');
+      sideGlitchBtn.classList.toggle('active');
+      topGlitchBtn?.classList.toggle('active', isActive);
+      this.app.setGlitchMode(isActive);
+    });
+
+    sideHassanBtn?.addEventListener('click', () => {
+      const topHassanBtn = document.getElementById('topHassanBtn');
+      const isActive = !sideHassanBtn.classList.contains('active');
+      sideHassanBtn.classList.toggle('active');
+      topHassanBtn?.classList.toggle('active', isActive);
+      this.app.setHassanMode(isActive);
+    });
+
+    sideNoiseBtn?.addEventListener('click', () => {
+      sideNoiseBtn.classList.toggle('active');
+      this.app.toggleGlobalEffect('noise');
+    });
+
+    sideMosaicBtn?.addEventListener('click', () => {
+      sideMosaicBtn.classList.toggle('active');
+      this.app.toggleGlobalEffect('mosaic');
+    });
+  }
 
   private setupDarkModeToggle(): void {
     const darkModeToggle = document.getElementById('darkModeToggle');

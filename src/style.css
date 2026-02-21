@@ -68,8 +68,10 @@ body {
 }
 
 .panel-side {
-    background: var(--panel-bg);
-    border-right: 1px solid var(--border-color);
+    background: rgba(17, 17, 17, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -78,12 +80,16 @@ body {
 }
 
 body:not(.dark-mode) .panel-side {
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 #mainPanel {
     display: grid;
-    grid-template-rows: 50px 1fr 40px;
+    grid-template-rows: auto 1fr 40px;
+    grid-column: 2;
+    /* Explicitly place in middle column */
     background: var(--bg-color);
     position: relative;
     overflow: hidden;
@@ -128,15 +134,25 @@ body:not(.dark-mode) .panel-side {
 
 /* --- Headers --- */
 .panel-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border-color);
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--panel-bg);
+    background: transparent;
     position: sticky;
     top: 0;
     z-index: 20;
+}
+
+.panel-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 16px;
+    right: 16px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
 }
 
 .panel-header h3 {
@@ -353,29 +369,67 @@ input[type="text"] {
     justify-content: center;
     position: relative;
     z-index: 20;
+    min-height: 50px;
+    padding: 4px 0;
 }
 
 .mode-control-bar {
     display: flex;
-    gap: 2px;
-    height: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
     align-items: center;
+    justify-content: center;
+    padding: 2px 12px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.mode-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 4px;
+}
+
+.mode-group.system-tools {
+    gap: 2px;
+}
+
+@media (max-width: 1200px) {
+    .mode-group {
+        flex-basis: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 1000px) {
+    .mode-btn {
+        padding: 0 8px !important;
+        font-size: 9px !important;
+        gap: 4px !important;
+    }
+
+    .mode-btn .icon {
+        font-size: 12px !important;
+    }
 }
 
 .mode-btn {
-    height: 36px;
-    padding: 0 16px;
+    height: 30px;
+    padding: 0 8px;
     border: 1px solid transparent;
     background: transparent;
     color: var(--text-muted);
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 11px;
-    font-weight: 600;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 500;
     border-radius: 4px;
     transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .mode-btn:hover {
@@ -502,13 +556,13 @@ input[type="text"] {
 .mode-btn.active::after {
     content: '';
     position: absolute;
-    bottom: -1px;
-    left: 15%;
-    width: 70%;
-    height: 2px;
-    background: var(--accent-color);
-    box-shadow: 0 0 10px var(--accent-color);
-    border-radius: 1px;
+    bottom: 0px;
+    left: 20%;
+    width: 60%;
+    height: 3px;
+    background: #00ffff;
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.8);
+    border-radius: 2px 2px 0 0;
 }
 
 .mode-icon {
@@ -551,6 +605,28 @@ body.dark-mode .mode-seekbars {
 }
 
 /* Canvas Wrapper */
+/* Master Screen Mirror */
+body.mirror-mode #canvasWrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    background: inherit;
+    transform: scaleX(-1);
+    z-index: 100;
+    pointer-events: none;
+    backdrop-filter: blur(0px);
+    /* Trigger rendering? */
+}
+
+/* Base Mirror (Flip entire screen) */
+body.mirror-mode #canvasWrapper {
+    /* Alternative: rotateY(180deg) but simple scaleX is fine for glitchy feel */
+    transform: scaleX(-1);
+}
+
 #canvasWrapper {
     position: relative;
     width: 100%;
@@ -1139,6 +1215,27 @@ body.show-keyboard-hints::after {
     pointer-events: none;
 }
 
+/* FX Button - Neon Glitch Style */
+.fx-btn.active {
+    background: rgba(0, 255, 255, 0.15) !important;
+    border-color: rgba(0, 255, 255, 0.6) !important;
+    color: #fff !important;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.8) !important;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2),
+        inset 0 0 5px rgba(0, 255, 255, 0.1) !important;
+    animation: fx-pulse 2s infinite alternate;
+}
+
+@keyframes fx-pulse {
+    from {
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
+    }
+
+    to {
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    }
+}
+
 /* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
 
@@ -1260,6 +1357,13 @@ body.show-keyboard-hints::after {
     gap: 2px;
 }
 
+.divider-vertical {
+    width: 1px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    margin: 0 8px;
+}
+
 .eq-bar-container {
     width: 8px;
     height: 20px;
@@ -1291,9 +1395,10 @@ body.show-keyboard-hints::after {
     gap: 16px;
     flex: 1;
     justify-content: flex-end;
-    font-family: var(--font-mono);
+    font-family: 'Outfit', sans-serif;
     font-size: 10px;
     color: var(--text-muted);
+    letter-spacing: 0.05em;
 }
 
 .stat-item span {
@@ -1413,6 +1518,121 @@ body.dark-mode #generatingOverlay {
 .void-output {
     white-space: pre-wrap;
     line-height: 1.5;
+
+    /* Compact Mode Buttons (for UI tools) */
+    .mode-btn-compact {
+        background: rgba(40, 40, 45, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.6);
+        padding: 6px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .mode-btn-compact:hover {
+        background: rgba(60, 60, 65, 0.9);
+        color: #fff;
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .mode-btn-compact.active {
+        background: rgba(0, 255, 255, 0.15);
+        border-color: rgba(0, 255, 255, 0.6);
+        color: #0ff;
+
+        /* DJ Effect Selector Buttons */
+        /* DJ Effect Selector - Cyberpunk Upgrade */
+    }
+}
+
+.effect-selector {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 2px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.dj-effect-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: rgba(255, 255, 255, 0.3);
+    font-family: 'Outfit', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    padding: 6px 0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex: 1;
+    text-transform: uppercase;
+}
+
+.dj-effect-btn:hover {
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.dj-effect-btn.current {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1),
+        inset 0 0 5px rgba(255, 255, 255, 0.1);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+/* Specific glow colors for effects */
+.dj-effect-btn[data-effect="glitch"]:hover,
+.dj-effect-btn[data-effect="glitch"].current {
+    color: #ff0055;
+    border-color: rgba(255, 0, 85, 0.4);
+    box-shadow: 0 0 15px rgba(255, 0, 85, 0.15);
+}
+
+.dj-effect-btn[data-effect="mosaic"]:hover,
+.dj-effect-btn[data-effect="mosaic"].current {
+    color: #00ffff;
+    border-color: rgba(0, 255, 255, 0.4);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.15);
+}
+
+.void-output {
+    white-space: pre-wrap;
+    line-height: 1.5;
+
+    /* Compact Mode Buttons (for UI tools) */
+    .mode-btn-compact {
+        background: rgba(40, 40, 45, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.6);
+        padding: 6px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .mode-btn-compact:hover {
+        background: rgba(60, 60, 65, 0.9);
+        color: #fff;
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .mode-btn-compact.active {
+        background: rgba(0, 255, 255, 0.15);
+        border-color: rgba(0, 255, 255, 0.6);
+        color: #0ff;
+
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.1);
+    }
 }
 
 .void-input-line {
