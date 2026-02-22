@@ -11,12 +11,16 @@ import p5 from 'p5';
 export class ProcessingLayer {
     private containerId: string;
 
-    // Visual State
+    // DJ Name State
+    private canvasText: string = '';
+    private showDJName: boolean = false;
+    private djEffect: string = 'none';
+
+    // Original HUD State
     private bpm: number = 0;
     private beatPulse: number = 0;
-
-    // MIDI State (Simplified)
-    private knobValues: number[] = [0, 0, 0, 0]; // 4 knobs
+    private knobValues: number[] = [0, 0, 0, 0];
+    private intensity: number = 0;
 
     constructor(containerId: string) {
         this.containerId = containerId;
@@ -32,11 +36,9 @@ export class ProcessingLayer {
 
                 const canvas = p.createCanvas(w, h);
                 canvas.parent(this.containerId);
-                p.clear(); // Transparent background
+                p.clear();
                 p.frameRate(60);
-
-                // Font setup if needed
-                p.textFont('monospace');
+                p.textFont('Inter, sans-serif'); // Use a cleaner font
             };
 
             p.windowResized = () => {
@@ -47,23 +49,187 @@ export class ProcessingLayer {
             };
 
             p.draw = () => {
-                p.clear(); // Clear previous frame for transparency
-
+                p.clear();
                 this.updateState();
 
-                // 1. Draw Beat/BPM
-                // this.drawBPM(p);
-
-                // 2. Draw Audio Waveform
-                // this.drawWaveform();
-
-                // 3. Draw MIDI Controller HUD
-                // this.drawControllerHUD(p);
+                if (this.showDJName && this.canvasText) {
+                    this.drawDJName(p);
+                }
             };
         };
 
         new p5(sketch);
         console.log('🎨 Processing Layer Initialized (p5.js)');
+    }
+
+    private drawDJName(p: p5): void {
+        const now = p.millis();
+        const intensity = this.intensity;
+        p.push();
+        p.translate(p.width / 2, p.height / 2);
+
+        switch (this.djEffect) {
+            case 'simple':
+            case 'none':
+                this.drawSimpleText(p, now, intensity);
+                break;
+            case 'mosaic':
+                this.drawMosaicText(p, now, intensity);
+                break;
+            case 'data':
+                this.drawDataStreamText(p, now, intensity);
+                break;
+            case 'glitch':
+                this.drawGlitchText(p, now, intensity);
+                break;
+            default:
+                this.drawSimpleText(p, now, intensity);
+                break;
+        }
+        p.pop();
+    }
+
+    private drawSimpleText(p: p5, now: number, intensity: number): void {
+        const txt = this.canvasText.toUpperCase();
+        p.textStyle(p.BOLD);
+
+        // Reactive scale based on intensity
+        const baseSize = 120;
+        let size = baseSize + (intensity * 40);
+
+        // --- Prevent Overflow Logic ---
+        p.textSize(size);
+        const margin = 40;
+        const maxWidth = p.width - margin;
+        const currentWidth = p.textWidth(txt);
+
+        if (currentWidth > maxWidth) {
+            // Calculate a scale factor to fit
+            const scaleFactor = maxWidth / currentWidth;
+            size *= scaleFactor;
+            p.textSize(size);
+        }
+        // ------------------------------
+
+        p.textAlign(p.CENTER, p.CENTER);
+
+        // Classic techno-bold look
+        p.fill(255);
+        p.noStroke();
+
+        // Subtle wobble
+        const wobble = p.sin(now * 0.01) * 3;
+        p.text(txt, wobble, 0);
+
+        // Subtle outline
+        p.stroke(255);
+        p.strokeWeight(1);
+        p.noFill();
+        p.text(txt, wobble, 0);
+    }
+
+    private drawMosaicText(p: p5, _now: number, intensity: number): void {
+        const txt = this.canvasText.toUpperCase();
+        const baseSize = 120;
+        let size = baseSize + (intensity * 40);
+
+        p.textSize(size);
+        p.textAlign(p.CENTER, p.CENTER);
+
+        // Draw to a temporary graphics object if we wanted real pixelation, 
+        // but for high performance p5, we can simulate with blocky characters or rectangles.
+        // Let's use a "shuffling block" approach.
+
+        const chars = txt.split('');
+        const blockWidth = p.textWidth('W');
+        const startX = -(p.textWidth(txt) / 2);
+
+        // Random jitter range: scales with intensity (2~12px)
+        const jitterRange = 2 + (intensity * 10);
+
+        for (let i = 0; i < chars.length; i++) {
+            const x = startX + (i * blockWidth);
+            // Per-character random offset
+            const jitterX = p.random(-jitterRange, jitterRange);
+            const jitterY = p.random(-jitterRange, jitterRange);
+            // Black and White blocks as requested
+            if (p.random() > 0.8 - (intensity * 0.5)) {
+                p.fill(p.random() > 0.5 ? 255 : 0);
+                p.noStroke();
+                p.rect(x + jitterX, -size / 2 + jitterY, blockWidth, size);
+            } else {
+                p.fill(255);
+                p.text(chars[i], x + blockWidth / 2 + jitterX, jitterY);
+            }
+        }
+    }
+
+    private drawDataStreamText(p: p5, _now: number, intensity: number): void {
+        const txt = this.canvasText.toUpperCase();
+        p.textFont('monospace');
+        p.textSize(80 + intensity * 60);
+        p.textAlign(p.CENTER, p.CENTER);
+
+        // High speed character mosaic / data stream
+        let displayTxt = '';
+        const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+=';
+
+        for (let i = 0; i < txt.length; i++) {
+            if (p.random() > 0.2 + (intensity * 0.3)) {
+                displayTxt += txt[i];
+            } else {
+                displayTxt += charset[Math.floor(p.random() * charset.length)];
+            }
+        }
+
+        p.fill(0); // Black text as requested in some logs
+        p.stroke(0, 255, 0); // Green glow for techno feel
+        p.strokeWeight(1);
+        p.text(displayTxt, 0, 0);
+    }
+
+    private drawGlitchText(p: p5, _now: number, intensity: number): void {
+        const txt = this.canvasText.toUpperCase();
+        p.textSize(120 + intensity * 50);
+        p.textAlign(p.CENTER, p.CENTER);
+
+        if (p.random() > 0.9) {
+            p.push();
+            p.translate(p.random(-10, 10), p.random(-5, 5));
+            p.fill(255, 0, 0, 150);
+            p.text(txt, 0, 0);
+            p.pop();
+
+            p.push();
+            p.translate(p.random(-10, 10), p.random(-5, 5));
+            p.fill(0, 255, 255, 150);
+            p.text(txt, 0, 0);
+            p.pop();
+        }
+
+        p.fill(255);
+        p.text(txt, 0, 0);
+    }
+
+    // Public API for Application.ts
+    public updateCanvasText(text: string): void {
+        this.canvasText = text;
+    }
+
+    public setShowDJName(show: boolean): void {
+        this.showDJName = show;
+    }
+
+    public updateDJNameEffect(effect: any): void {
+        this.djEffect = effect;
+    }
+
+    public updateGlobalEffects(_effects: any): void {
+        // UI support for top-bar effects
+    }
+
+    public update(intensity: number): void {
+        this.intensity = intensity;
     }
 
     private updateState(): void {

@@ -42,6 +42,8 @@ export type TransitionType = 'fadeIn' | 'scaleIn' | 'slideIn' | 'rotateIn' | 'ra
  */
 export type WireframeMode = 'solid' | 'wireframe' | 'mixed';
 export type DispersionPattern = 'outward' | 'inward' | 'spiral' | 'vortex' | 'random' | 'expandX' | 'expandY';
+export type DJNameEffect = 'none' | 'plasma' | 'neon' | 'matrix' | 'glitch' | 'mosaic' | 'data';
+export type OrbitAxis = 'horizontal' | 'vertical' | 'complex';
 
 /**
  * Media types supported
@@ -256,6 +258,24 @@ export interface ApplicationState {
   autoColorC: string;
   blinkingMode: boolean;
   blinkingSpeed: number;
+  glitchMode: boolean;
+  hassanMode: boolean;
+  coreMandalaMode: boolean;
+  videoReactivityMode: boolean;
+  neuralLinkMode: boolean;
+  cameraOrbitMode: boolean;
+  cameraOrbitAxis: OrbitAxis;
+  cameraOrbitReverse: boolean;
+  djName: string;
+  showDJName: boolean;
+  djNameEffect: DJNameEffect;
+  globalEffects: {
+    noise: boolean;
+    mosaic: boolean;
+    dataStream: boolean;
+    glitch: boolean;
+    hassan: boolean;
+  };
 }
 
 /**

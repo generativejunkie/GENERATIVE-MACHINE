@@ -270,6 +270,9 @@ export class UIController {
     // Keyboard shortcuts
     this.setupKeyboardShortcuts();
 
+    // DJ Name and Effects
+    this.setupCanvasTextControl();
+
     // Initialize slider visuals
     document.querySelectorAll('input[type="range"]').forEach(el => {
       const slider = el as HTMLInputElement;
@@ -802,10 +805,7 @@ export class UIController {
       const gravityActive = document.getElementById('topGravityBtn')?.classList.contains('active');
       const brainHackActive = document.getElementById('topBrainHackBtn')?.classList.contains('active');
       const ravenActive = document.getElementById('topRavenBtn')?.classList.contains('active');
-      const glitchActive = document.getElementById('topGlitchBtn')?.classList.contains('active');
-      const hassanActive = document.getElementById('topHassanBtn')?.classList.contains('active');
-
-      const anyActive = mandalaActive || aiActive || autoActive || gravityActive || brainHackActive || ravenActive || glitchActive || hassanActive;
+      const anyActive = mandalaActive || aiActive || autoActive || gravityActive || brainHackActive || ravenActive;
       modeSeekbars.style.display = anyActive ? 'flex' : 'none';
 
       const showItem = (id: string, visible: boolean) => {
@@ -899,33 +899,7 @@ export class UIController {
       });
     }
 
-    // Glitch Mode
-    const topGlitchBtn = document.getElementById('topGlitchBtn');
-    const sideGlitchBtn = document.getElementById('sideGlitchBtn');
-    if (topGlitchBtn) {
-      topGlitchBtn.addEventListener('click', () => {
-        const isActive = !topGlitchBtn.classList.contains('active');
-        topGlitchBtn.classList.toggle('active');
-        sideGlitchBtn?.classList.toggle('active', isActive);
-        this.app.setGlitchMode(isActive);
-        updateSeekbarVisibility();
-        console.log(`⚡ Glitch Mode: ${isActive ? 'ON' : 'OFF'}`);
-      });
-    }
 
-    // Hassan Mode
-    const topHassanBtn = document.getElementById('topHassanBtn');
-    const sideHassanBtn = document.getElementById('sideHassanBtn');
-    if (topHassanBtn) {
-      topHassanBtn.addEventListener('click', () => {
-        const isActive = !topHassanBtn.classList.contains('active');
-        topHassanBtn.classList.toggle('active');
-        sideHassanBtn?.classList.toggle('active', isActive);
-        this.app.setHassanMode(isActive);
-        updateSeekbarVisibility();
-        console.log(`✴ Hassan Mode: ${isActive ? 'ON' : 'OFF'}`);
-      });
-    }
 
     // Antigravity Mode
     const topGravityBtn = document.getElementById('topGravityBtn');
@@ -988,26 +962,8 @@ export class UIController {
   }
 
   private setupGlobalEffectsControl(): void {
-    const sideGlitchBtn = document.getElementById('sideGlitchBtn');
-    const sideHassanBtn = document.getElementById('sideHassanBtn');
     const sideNoiseBtn = document.getElementById('sideNoiseBtn');
     const sideMosaicBtn = document.getElementById('sideMosaicBtn');
-
-    sideGlitchBtn?.addEventListener('click', () => {
-      const topGlitchBtn = document.getElementById('topGlitchBtn');
-      const isActive = !sideGlitchBtn.classList.contains('active');
-      sideGlitchBtn.classList.toggle('active');
-      topGlitchBtn?.classList.toggle('active', isActive);
-      this.app.setGlitchMode(isActive);
-    });
-
-    sideHassanBtn?.addEventListener('click', () => {
-      const topHassanBtn = document.getElementById('topHassanBtn');
-      const isActive = !sideHassanBtn.classList.contains('active');
-      sideHassanBtn.classList.toggle('active');
-      topHassanBtn?.classList.toggle('active', isActive);
-      this.app.setHassanMode(isActive);
-    });
 
     sideNoiseBtn?.addEventListener('click', () => {
       sideNoiseBtn.classList.toggle('active');
@@ -2676,6 +2632,76 @@ export class UIController {
         }
       });
     });
+  }
+
+  private setupCanvasTextControl(): void {
+    const textInput = document.getElementById('canvasText') as HTMLInputElement;
+    if (textInput) {
+      textInput.addEventListener('input', (e) => {
+        const text = (e.target as HTMLInputElement).value;
+        this.app.setCanvasText(text);
+      });
+
+      const state = this.app.getState();
+      if (state.djName) {
+        textInput.value = state.djName;
+      }
+    }
+
+    const effectButtons = document.querySelectorAll('.dj-name-effects .mode-tag-btn');
+    effectButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const effect = btn.getAttribute('data-effect') as any;
+        this.app.setDJNameEffect(effect);
+
+        effectButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    const sendBtn = document.getElementById('sendTextBtn');
+    if (sendBtn) {
+      sendBtn.addEventListener('click', () => {
+        if (textInput) this.app.setCanvasText(textInput.value);
+      });
+    }
+
+    const onBtn = document.getElementById('djNameOnBtn');
+    const offBtn = document.getElementById('djNameOffBtn');
+
+    if (onBtn && offBtn) {
+      onBtn.addEventListener('click', () => {
+        this.app.toggleShowDJName(true);
+        onBtn.classList.add('active');
+        offBtn.classList.remove('active');
+      });
+
+      offBtn.addEventListener('click', () => {
+        this.app.toggleShowDJName(false);
+        offBtn.classList.add('active');
+        onBtn.classList.remove('active');
+      });
+
+      // Initial state sync
+      const state = this.app.getState();
+      if (state.showDJName) {
+        onBtn.classList.add('active');
+        offBtn.classList.remove('active');
+      } else {
+        offBtn.classList.add('active');
+        onBtn.classList.remove('active');
+      }
+
+      // Sync effect buttons
+      const effectButtons = document.querySelectorAll('.dj-name-effects .mode-tag-btn');
+      effectButtons.forEach(btn => {
+        if (btn.getAttribute('data-effect') === state.djNameEffect) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
   }
 }
 

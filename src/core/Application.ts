@@ -156,11 +156,29 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       autoColorB: '#000000',
       autoColorC: '#000000', // Default third to black
       blinkingMode: false,
-      blinkingSpeed: 5
+      blinkingSpeed: 5,
+      glitchMode: false,
+      hassanMode: false,
+      coreMandalaMode: false,
+      videoReactivityMode: false,
+      neuralLinkMode: false,
+      cameraOrbitMode: false,
+      cameraOrbitAxis: 'horizontal',
+      cameraOrbitReverse: false,
+      djName: 'G JUNKIE',
+      showDJName: false,
+      djNameEffect: 'none',
+      globalEffects: {
+        noise: false,
+        mosaic: false,
+        dataStream: false,
+        glitch: false,
+        hassan: false
+      }
     };
 
-    // Initialize InstanceManager with spacing multiplier
-    this.instanceManager.setSpacingMultiplier(this.state.spacingMultiplier);
+    // Initialize ProcessingLayer with initial DJ Name
+    this.processingLayer.updateCanvasText(this.state.djName);
 
     this.setupEventListeners();
     this.startSnapshotRecording();
@@ -435,6 +453,10 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       // 🎵 Global Audio-Reactive Dispersion (All Modes)
       // Matches Sound Machine behavior - objects disperse with audio input
       this.handleGlobalDispersion();
+
+      // 🎨 Update Processing Layer (p5.js)
+      const bands = this.getCurrentFrequencyBands();
+      this.processingLayer.update(bands.low / 255);
     }
 
     // Handle frequency-based spawning
@@ -461,6 +483,14 @@ export class Application extends EventEmitter<ApplicationEventMap> {
     if (this.state.spaceMode && this.state.isPlaying) {
       this.handleAIControl();
       if (!this.state.mandalaMode) this.state.mandalaMode = true;
+    }
+
+    // New: Glitch and Hassan Modes
+    if (this.state.glitchMode && this.state.isPlaying) {
+      this.handleGlitchMode();
+    }
+    if (this.state.hassanMode && this.state.isPlaying) {
+      this.handleHassanMode();
     }
 
     // AUTO Mode: Auto-spawn objects logic
@@ -515,7 +545,11 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       this.state.spreadMultiplier,
       this.state.spacingMultiplier,
       frequencyData,
-      this.state.reflectMode
+      this.state.reflectMode,
+      this.state.goldenRatioMode,
+      this.state.cameraOrbitMode,
+      this.state.cameraOrbitAxis,
+      this.state.cameraOrbitReverse
     );
 
     this.sceneManager.render();
@@ -1770,6 +1804,32 @@ export class Application extends EventEmitter<ApplicationEventMap> {
   }
 
   /**
+   * Set canvas text
+   */
+  public setCanvasText(text: string): void {
+    this.state.djName = text;
+    this.state.showDJName = true; // Auto-show when text is set/sent
+    this.processingLayer.updateCanvasText(text);
+    this.processingLayer.setShowDJName(true);
+    this.emit('state:changed', this.state);
+
+    // Sync UI buttons if they exist
+    const onBtn = document.getElementById('djNameOnBtn');
+    const offBtn = document.getElementById('djNameOffBtn');
+    if (onBtn && offBtn) {
+      onBtn.classList.add('active');
+      offBtn.classList.remove('active');
+    }
+  }
+
+  public toggleShowDJName(enabled?: boolean): void {
+    const nextValue = enabled !== undefined ? enabled : !this.state.showDJName;
+    this.state.showDJName = nextValue;
+    this.processingLayer.setShowDJName(nextValue);
+    this.emit('state:changed', this.state);
+  }
+
+  /**
    * Get max objects
    */
   public getMaxObjects(): number {
@@ -2477,5 +2537,74 @@ export class Application extends EventEmitter<ApplicationEventMap> {
   }
   public getSceneManager(): SceneManager {
     return this.sceneManager;
+  }
+
+  // ========== New Effect Control Methods ==========
+
+  public setGlobalEffect(effect: keyof ApplicationState['globalEffects'], enabled: boolean): void {
+    this.state.globalEffects[effect] = enabled;
+    this.processingLayer.updateGlobalEffects(this.state.globalEffects);
+    this.emit('state:changed', this.state);
+  }
+
+  public toggleGlobalEffect(effect: keyof ApplicationState['globalEffects']): void {
+    this.state.globalEffects[effect] = !this.state.globalEffects[effect];
+    this.processingLayer.updateGlobalEffects(this.state.globalEffects);
+
+    if (effect === 'mosaic') {
+      this.sceneManager.setMosaic(this.state.globalEffects.mosaic);
+    }
+
+    this.emit('state:changed', this.state);
+  }
+
+  public setDJNameEffect(effect: ApplicationState['djNameEffect']): void {
+    this.state.djNameEffect = effect;
+    this.processingLayer.updateDJNameEffect(effect);
+    this.emit('state:changed', this.state);
+  }
+
+  public setGlitchMode(enabled: boolean): void {
+    this.state.glitchMode = enabled;
+    this.setGlobalEffect('glitch', enabled);
+  }
+
+  public setHassanMode(enabled: boolean): void {
+    this.state.hassanMode = enabled;
+    this.setGlobalEffect('hassan', enabled);
+  }
+
+  private handleGlitchMode(): void {
+    if (!this.state.glitchMode || !this.state.isPlaying) return;
+    const bands = this.getCurrentFrequencyBands();
+    const intensity = bands.low / 255;
+
+    // Trigger intense glitch bursts on strong beats
+    if (intensity > 0.85) {
+      this.processingLayer.updateGlobalEffects({ glitch: true });
+    } else if (intensity < 0.4) {
+      if (Math.random() > 0.95) {
+        this.processingLayer.updateGlobalEffects({ glitch: false });
+      }
+    }
+  }
+
+  private handleHassanMode(): void {
+    if (!this.state.hassanMode || !this.state.isPlaying) return;
+    const bands = this.getCurrentFrequencyBands();
+    const intensity = bands.low / 255;
+
+    if (intensity > 0.8) {
+      const originalSpacing = this.state.spacingMultiplier;
+      const originalSpread = this.state.spreadMultiplier;
+
+      this.state.spacingMultiplier = originalSpacing * (1 + intensity * 0.5);
+      this.state.spreadMultiplier = originalSpread * (1 + intensity * 0.3);
+
+      setTimeout(() => {
+        this.state.spacingMultiplier = originalSpacing;
+        this.state.spreadMultiplier = originalSpread;
+      }, 100);
+    }
   }
 }
