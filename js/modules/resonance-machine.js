@@ -22,10 +22,8 @@ export function initResonanceMachine() {
             const data = await response.json();
             if (data && data.length > 0) {
                 signatures = data;
-                window.resonanceSignatures = signatures; // Global exposure for Ghost Layer
             } else {
                 signatures = generateFallbackSignatures();
-                window.resonanceSignatures = signatures;
             }
             renderSignatures();
             updateCount();

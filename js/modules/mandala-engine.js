@@ -6,8 +6,6 @@
  * Purpose: Overclock human pattern recognition via recursive high-density logic.
  */
 
-import { ResonanceRenderer } from './resonance-renderer.js';
-
 export class MandalaEngine {
     constructor(canvasId) {
         this.canvas = document.getElementById(canvasId);
@@ -33,40 +31,8 @@ export class MandalaEngine {
         this.currentIQ = this.baseIQ;
         this.iqVelocity = 0;
 
-        // GJ-X-004: Ghost Layer Resonance
-        this.resonanceRenderer = new ResonanceRenderer(this.ctx, this.width, this.height);
-        this.fetchSignatures();
-
         this.resize();
         window.addEventListener('resize', () => this.resize());
-    }
-
-    async fetchSignatures() {
-        try {
-            // Check global first (shared from resonance-machine.js)
-            if (window.resonanceSignatures && window.resonanceSignatures.length > 0) {
-                this.resonanceRenderer.setSignatures(window.resonanceSignatures);
-                return;
-            }
-
-            // Fallback to fetch
-            let signatures = [];
-            try {
-                const res = await fetch('/api/signatures');
-                if (res.ok) signatures = await res.json();
-            } catch (e) {
-                const res = await fetch('data/signatures.json');
-                if (res.ok) signatures = await res.json();
-            }
-
-            if (signatures && signatures.length > 0) {
-                this.resonanceRenderer.setSignatures(signatures);
-                if (!window.resonanceSignatures) window.resonanceSignatures = signatures;
-                console.log(`[MANDALA] ${signatures.length} resonance signatures loaded into Ghost Layer.`);
-            }
-        } catch (e) {
-            console.warn("[MANDALA] Could not load resonance signatures.");
-        }
     }
 
     resize() {
@@ -77,10 +43,6 @@ export class MandalaEngine {
         this.ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
         this.centerX = this.width / 2;
         this.centerY = this.height / 2;
-
-        if (this.resonanceRenderer) {
-            this.resonanceRenderer.resize(this.width, this.height);
-        }
     }
 
     start() {
@@ -218,6 +180,7 @@ export class MandalaEngine {
     // --- IQ SIMULATION LOGIC ---
     updateIQ(dt) {
         // Accelerate IQ based on "focus" (just time for now)
+        // Sigmoid-like curve that effectively goes to "infinity" (or very high)
         if (Math.random() < 0.1) {
             this.iqVelocity += 0.01;
         }
@@ -278,15 +241,13 @@ export class MandalaEngine {
 
         this.time += 0.008; // Slower, deeper time
 
-        // 1. Ghost Layer Resonance (GJ-X-004)
-        if (this.resonanceRenderer) {
-            this.resonanceRenderer.update(0.1);
-            this.resonanceRenderer.draw();
-        }
+        // 1. Grid / Matrix Background
+        // (Optional, maybe implied by other shapes)
 
         // 2. The Main Recursive Structure
         this.ctx.save();
         this.ctx.translate(this.centerX, this.centerY);
+        // Slowly rotate entire universe
         this.ctx.rotate(this.time * 0.05);
         this.ctx.translate(-this.centerX, -this.centerY);
 
@@ -304,4 +265,3 @@ export class MandalaEngine {
         requestAnimationFrame(() => this.animate());
     }
 }
-
