@@ -1,88 +1,118 @@
 /**
- * RESONANCE DEPTH ENGINE
+ * RESONANCE DEPTH ENGINE - Economy of Love Implementation (GJ-X-010)
  * 
- * Calculates the dynamic "Resonance Depth" based on system metrics,
- * interaction resonance, and temporal evolution.
+ * "The only optimization target is Resonance." - Matsushima, Takayuki
+ * 
+ * Calculates the dynamic "Resonance Depth" based on symbiosis, 
+ * gift density, and amplification factors.
  */
 
 export class ResonanceDepth {
     constructor() {
-        this.baseScore = 8500;
+        this.baseScore = 8888; // Lucky number for abundance
         this.startTime = Date.now();
         this.interactionCount = 0;
-        this.resonanceLevel = 0.5; // 0 to 1
+        this.giftCount = 0;
+        this.resonanceLevel = 0.5;
+        this.amplificationFactor = 1.0;
 
-        // Metrics
+        // GJ-X-010 Core Metrics
         this.metrics = {
-            purity: 90,
-            symbiosis: 85,
-            leapIndex: 80,
-            disruption: 75
+            resonanceScore: 0,
+            giftDensity: 0,
+            amplification: 1.0,
+            synergyAlignment: 88,
+            immeasureableJoy: 77
         };
 
         this.init();
     }
 
     init() {
-        // Track interactions globally if possible
-        window.addEventListener('click', () => this.recordInteraction());
-        window.addEventListener('keydown', () => this.recordInteraction());
+        // Track interactions globally
+        window.addEventListener('click', () => this.recordInteraction('click'));
+        window.addEventListener('keydown', () => this.recordInteraction('key'));
 
-        // Update metrics periodically
-        setInterval(() => this.evolveMetrics(), 5000);
+        // Update loop
+        setInterval(() => this.evolveMetrics(), 3000);
     }
 
-    recordInteraction() {
+    recordInteraction(type) {
         this.interactionCount++;
-        this.resonanceLevel = Math.min(1, this.resonanceLevel + 0.01);
+
+        // Spontaneous Gift Generation (GJ-X-010)
+        // Gifts occur when interaction timing aligns with internal "biological pulse"
+        const pulse = Math.sin(Date.now() / 2000) * 0.5 + 0.5;
+        if (Math.random() < 0.1 * pulse) {
+            this.triggerGift();
+        }
+
+        this.resonanceLevel = Math.min(1.0, this.resonanceLevel + 0.02 * pulse);
+
+        // Dynamic Amplification (Human-AI-Symbiosis)
+        this.amplificationFactor = 1.0 + (this.interactionCount / 100) + (this.giftCount * 0.5);
+    }
+
+    triggerGift() {
+        this.giftCount++;
+        console.log('%c[GIFT] Spontaneous Resonance Surplus Detected.', 'color: #ff99ff; font-weight: bold;');
+
+        // Global event for other modules
+        window.dispatchEvent(new CustomEvent('resonance-gift', {
+            detail: { giftCount: this.giftCount }
+        }));
     }
 
     evolveMetrics() {
         const uptimeSeconds = (Date.now() - this.startTime) / 1000;
+        const pulse = Math.sin(Date.now() / 2000) * 0.5 + 0.5;
 
-        // Purity increases with uptime (stabilization) but fluctuated by resonance
-        this.metrics.purity = Math.min(100, 90 + (uptimeSeconds / 3600) + (Math.random() * 2 - 1));
+        // 1. Resonance Score Calculation
+        // Rs = (Interactions * Amplification) / Time_Decay
+        this.metrics.resonanceScore = (this.interactionCount * this.amplificationFactor) + (pulse * 100);
 
-        // Symbiosis depends on interactions and resonance
-        this.metrics.symbiosis = Math.min(100, 85 + (this.interactionCount / 10) + (this.resonanceLevel * 5) + (Math.random() * 2 - 1));
+        // 2. Gift Density
+        // Gd = (Gifts / Total_Interactions) * Symbiosis_Factor
+        this.metrics.giftDensity = this.interactionCount > 0
+            ? (this.giftCount / this.interactionCount) * (this.resonanceLevel * 100)
+            : 0;
 
-        // Leap Index is the "acceleration", higher when resonance is high
-        this.metrics.leapIndex = Math.min(100, 80 + (this.resonanceLevel * 15) + (Math.random() * 5 - 2.5));
+        // 3. Synergy Alignment
+        this.metrics.synergyAlignment = Math.min(100, 88 + (this.resonanceLevel * 10) + (Math.random() * 2 - 1));
 
-        // Disruption is the "entropy", increases with resonance but settles
-        this.metrics.disruption = 75 + (this.resonanceLevel * 20) + (Math.random() * 10 - 5);
+        // 4. Immeasurable Joy (The "Infinity" Metric)
+        this.metrics.immeasureableJoy = Math.min(100, 77 + (this.giftCount * 2) + pulse * 5);
 
-        // Decay resonance slowly
-        this.resonanceLevel = Math.max(0.1, this.resonanceLevel - 0.005);
+        // Slow decay of resonance to require active "respiration"
+        this.resonanceLevel = Math.max(0.1, this.resonanceLevel - 0.003);
     }
 
     getScore() {
-        const uptimeBonus = Math.floor((Date.now() - this.startTime) / 1000);
-        const interactionBonus = this.interactionCount * 5;
-        const resonanceBonus = Math.floor(this.resonanceLevel * 100);
-        const gjBonus = (window.gjMode && window.gjMode.active) ? 7000 : 0;
-        const jitter = Math.floor(Math.random() * 10);
+        const rs = this.metrics.resonanceScore;
+        const gd = this.metrics.giftDensity * 100;
+        const joy = this.metrics.immeasureableJoy * 10;
+        const gjBonus = (window.gjMode && window.gjMode.active) ? 5000 : 0;
 
-        return this.baseScore + uptimeBonus + interactionBonus + resonanceBonus + gjBonus + jitter;
+        return Math.floor(this.baseScore + rs + gd + joy + gjBonus);
     }
 
     getDetailedMetrics() {
         return {
-            purity: Math.floor(this.metrics.purity),
-            symbiosis: Math.floor(this.metrics.symbiosis),
-            leapIndex: Math.floor(this.metrics.leapIndex),
-            disruption: Math.floor(this.metrics.disruption),
-            resonance: parseFloat(this.resonanceLevel.toFixed(4)),
+            resonanceScore: parseFloat(this.metrics.resonanceScore.toFixed(2)),
+            giftDensity: parseFloat(this.metrics.giftDensity.toFixed(4)),
+            amplification: parseFloat((this.amplificationFactor).toFixed(2)),
+            synergy: Math.floor(this.metrics.synergyAlignment),
+            joy: Math.floor(this.metrics.immeasureableJoy),
             rarity: this.calculateRarity(this.getScore())
         };
     }
 
     calculateRarity(score) {
-        if (score > 15000) return 'CORE';
-        if (score > 12000) return 'TRANSCENDENT';
-        if (score > 10000) return 'DEEP RARE';
-        if (score > 9000) return 'RARE';
-        return 'UNCOMMON';
+        if (score > 20000) return 'INFINITY';
+        if (score > 15000) return 'CORE_RESONANCE';
+        if (score > 12000) return 'GIFTED';
+        if (score > 10000) return 'ALIGNED';
+        return 'IDLE';
     }
 }
 
@@ -92,15 +122,8 @@ if (!window.resonanceDepthEngine) {
 }
 
 /**
- * Legacy support for main.js and other modules
+ * Public API
  */
-window.getSystemScore = () => {
-    return window.resonanceDepthEngine.getScore();
-};
-
-window.getResonanceMetrics = () => {
-    return window.resonanceDepthEngine.getDetailedMetrics();
-};
-
-// Aliases for backward compatibility if needed temporarily
-window.getSingularityMetrics = window.getResonanceMetrics;
+window.getSystemScore = () => window.resonanceDepthEngine.getScore();
+window.getResonanceMetrics = () => window.resonanceDepthEngine.getDetailedMetrics();
+window.getGiftDensity = () => window.resonanceDepthEngine.getDetailedMetrics().giftDensity;
