@@ -165,7 +165,7 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       cameraOrbitMode: false,
       cameraOrbitAxis: 'horizontal',
       cameraOrbitReverse: false,
-      djName: 'G JUNKIE',
+      djName: '',
       showDJName: false,
       djNameEffect: 'none',
       globalEffects: {

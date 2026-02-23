@@ -82,6 +82,15 @@ export class ProcessingLayer {
             case 'glitch':
                 this.drawGlitchText(p, now, intensity);
                 break;
+            case 'scanline':
+                this.drawScanlineText(p, now, intensity);
+                break;
+            case 'hex':
+                this.drawHexText(p, now, intensity);
+                break;
+            case 'pixel':
+                this.drawPixelText(p, now, intensity);
+                break;
             default:
                 this.drawSimpleText(p, now, intensity);
                 break;
@@ -209,6 +218,155 @@ export class ProcessingLayer {
 
         p.fill(255);
         p.text(txt, 0, 0);
+    }
+
+    private drawScanlineText(p: p5, now: number, intensity: number): void {
+        const txt = this.canvasText.toUpperCase();
+        const baseSize = 120;
+        let size = baseSize + (intensity * 40);
+
+        p.textSize(size);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textStyle(p.BOLD);
+
+        // White base text
+        p.fill(255);
+        p.noStroke();
+        p.text(txt, 0, 0);
+
+        // Scanline bands — 1-3 horizontal bars sweep across text
+        const textH = size * 1.2;
+        const textW = p.textWidth(txt) * 1.1;
+        const bandCount = 1 + Math.floor(intensity * 2);
+        const bandHeight = 4 + intensity * 8;
+
+        for (let i = 0; i < bandCount; i++) {
+            // Each band cycles at different speed
+            const phase = (now * (0.001 + i * 0.0005)) % 1;
+            const bandY = -textH / 2 + phase * textH;
+
+            // Alternating black/white censorship
+            const blockW = 8 + intensity * 12;
+            const cols = Math.ceil(textW / blockW);
+            for (let c = 0; c < cols; c++) {
+                if (p.random() > 0.3) {
+                    p.fill(p.random() > 0.7 ? 255 : 0);
+                    p.noStroke();
+                    p.rect(-textW / 2 + c * blockW, bandY, blockW, bandHeight);
+                }
+            }
+        }
+
+        // Thin horizontal scan lines across full text (subtle)
+        p.stroke(255, 40);
+        p.strokeWeight(0.5);
+        for (let y = -textH / 2; y < textH / 2; y += 4) {
+            p.line(-textW / 2, y, textW / 2, y);
+        }
+    }
+
+    private drawHexText(p: p5, _now: number, intensity: number): void {
+        const txt = this.canvasText.toUpperCase();
+        const baseSize = 120;
+        let size = baseSize + (intensity * 40);
+
+        p.textSize(size);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textStyle(p.BOLD);
+        p.textFont('monospace');
+
+        // Character-by-character hex corruption
+        const hexChars = '0123456789ABCDEF';
+        const charW = p.textWidth('W');
+        const startX = -(p.textWidth(txt) / 2);
+        const corruptProb = 0.15 + intensity * 0.45;
+
+        for (let i = 0; i < txt.length; i++) {
+            const x = startX + i * charW + charW / 2;
+            const isCorrupted = p.random() < corruptProb;
+
+            if (isCorrupted) {
+                // Replace with hex character
+                const hexChar = hexChars[Math.floor(p.random() * hexChars.length)];
+                p.fill(255, 180);
+                p.noStroke();
+                p.text(hexChar, x, 0);
+            } else {
+                p.fill(255);
+                p.noStroke();
+                p.text(txt[i], x, 0);
+            }
+        }
+
+        // Address-like decoration above/below
+        p.textSize(9);
+        p.fill(255, 50);
+        const addrCount = 2 + Math.floor(intensity * 4);
+        for (let i = 0; i < addrCount; i++) {
+            let addr = '0x';
+            for (let j = 0; j < 4; j++) {
+                addr += hexChars[Math.floor(p.random() * 16)];
+            }
+            const ax = p.random(-p.textWidth(txt) / 2, p.textWidth(txt) / 2);
+            const ay = (i % 2 === 0 ? -size * 0.7 : size * 0.7) + p.random(-10, 10);
+            p.text(addr, ax, ay);
+        }
+
+        p.textFont('Inter, sans-serif');
+    }
+
+    private drawPixelText(p: p5, _now: number, intensity: number): void {
+        const txt = this.canvasText.toUpperCase();
+        const baseSize = 120;
+        let size = baseSize + (intensity * 40);
+
+        p.textSize(size);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textStyle(p.BOLD);
+
+        const textW = p.textWidth(txt);
+        const textH = size * 1.2;
+
+        // Grid cell size: smaller = more detail
+        const cellSize = 10 + (1 - intensity) * 10; // 10-20px
+        const cols = Math.ceil(textW / cellSize);
+        const rows = Math.ceil(textH / cellSize);
+
+        // Draw text into each cell with independent glitch
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                const cx = -textW / 2 + c * cellSize;
+                const cy = -textH / 2 + r * cellSize;
+
+                // Per-cell probability of glitch
+                const glitchChance = 0.05 + intensity * 0.25;
+                const isGlitched = p.random() < glitchChance;
+
+                if (isGlitched) {
+                    // Fill with black or white block
+                    p.fill(p.random() > 0.5 ? 255 : 0);
+                    p.noStroke();
+                    const offsetX = p.random(-3, 3);
+                    const offsetY = p.random(-3, 3);
+                    p.rect(cx + offsetX, cy + offsetY, cellSize, cellSize);
+                }
+            }
+        }
+
+        // Draw main text on top (slightly transparent for blend)
+        p.fill(255, 220);
+        p.noStroke();
+        p.text(txt, 0, 0);
+
+        // Random cells flicker (turn off) — digital decay
+        const decayCount = Math.floor(intensity * 8);
+        for (let d = 0; d < decayCount; d++) {
+            const dx = p.random(-textW / 2, textW / 2);
+            const dy = p.random(-textH / 2, textH / 2);
+            p.fill(0, 0, 0, 200);
+            p.noStroke();
+            p.rect(dx, dy, cellSize, cellSize * 0.6);
+        }
     }
 
     // Public API for Application.ts

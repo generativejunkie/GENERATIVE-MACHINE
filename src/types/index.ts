@@ -42,7 +42,7 @@ export type TransitionType = 'fadeIn' | 'scaleIn' | 'slideIn' | 'rotateIn' | 'ra
  */
 export type WireframeMode = 'solid' | 'wireframe' | 'mixed';
 export type DispersionPattern = 'outward' | 'inward' | 'spiral' | 'vortex' | 'random' | 'expandX' | 'expandY';
-export type DJNameEffect = 'none' | 'plasma' | 'neon' | 'matrix' | 'glitch' | 'mosaic' | 'data';
+export type DJNameEffect = 'none' | 'plasma' | 'neon' | 'matrix' | 'glitch' | 'mosaic' | 'scanline' | 'hex' | 'pixel' | 'data';
 export type OrbitAxis = 'horizontal' | 'vertical' | 'complex';
 
 /**
