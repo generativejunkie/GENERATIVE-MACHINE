@@ -268,64 +268,47 @@ export class ProcessingLayer {
     }
 
     // ─── MOS: B&W Irregular Block Dispersion ────────────────────
-    // White text + scattered black/white blocks of varying sizes.
-    // Text partially visible through gaps between blocks.
+    // White text + scattered black/white/gray blocks of varying sizes.
     private drawMosaicText(p: p5, _now: number, intensity: number): void {
         const txt = this.canvasText.toUpperCase();
         p.textStyle(p.BOLD);
         const size = this.fitTextSize(p, txt, 120 + intensity * 30);
         p.textAlign(p.CENTER, p.CENTER);
-        p.noStroke();
 
-        // White text underneath
+        // Heavy white text with thick stroke for imposing look
         p.fill(255);
+        p.stroke(255);
+        p.strokeWeight(3);
         p.text(txt, 0, 0);
+        p.noStroke();
 
         const tw = p.textWidth(txt);
         const th = size * 1.6;
 
-        // Irregular black & white blocks — mixed sizes
+        // Irregular black/white/gray blocks — no rotation, random sizes
         const blockCount = 50 + Math.floor(intensity * 70);
 
         for (let i = 0; i < blockCount; i++) {
-            // Position scattered across text area
+            // Scattered position
             const bx = p.random(-tw / 2 - 30, tw / 2 + 30);
             const by = p.random(-th / 2 - 10, th / 2 + 10);
 
-            // Highly irregular sizes: mix of tiny squares and large horizontal bars
-            let bw: number, bh: number;
-            const sizeType = p.random();
-            if (sizeType < 0.3) {
-                // Tiny squares (3-8px)
-                bw = p.random(3, 8);
-                bh = p.random(3, 8);
-            } else if (sizeType < 0.7) {
-                // Medium blocks (8-25px)
-                bw = p.random(8, 25 + intensity * 10);
-                bh = p.random(5, 15);
-            } else {
-                // Large horizontal bars (30-80px wide, thin)
-                bw = p.random(30, 80 + intensity * 30);
-                bh = p.random(4, 12);
-            }
+            // Random sizes: tiny to large
+            const bw = p.random(3, 70 + intensity * 30);
+            const bh = p.random(3, 20 + intensity * 10);
 
-            // Slight rotation for organic feel
-            p.push();
-            p.translate(bx, by);
-            p.rotate(p.random(-0.1, 0.1));
-
-            // Black, white, or gray
+            // Clear black, white, or gray — 3 distinct tones
             const tone = p.random();
-            if (tone < 0.45) {
-                p.fill(0); // black
-            } else if (tone < 0.75) {
-                p.fill(255); // white
+            if (tone < 0.4) {
+                p.fill(0);       // pure black
+            } else if (tone < 0.65) {
+                p.fill(128);     // clear gray
             } else {
-                p.fill(p.random(60, 180)); // gray tones
+                p.fill(255);     // pure white
             }
 
-            p.rect(-bw / 2, -bh / 2, bw, bh);
-            p.pop();
+            // No rotation — axis-aligned rectangles
+            p.rect(bx, by, bw, bh);
         }
     }
 
