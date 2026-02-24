@@ -267,9 +267,9 @@ export class ProcessingLayer {
         p.endShape();
     }
 
-    // ─── MOS: White-on-White Irregular Mosaic ───────────────────
-    // White text + irregular white blocks. Invisible on white bg,
-    // text revealed when dark mandala objects appear behind.
+    // ─── MOS: B&W Irregular Block Dispersion ────────────────────
+    // White text + scattered black/white blocks of varying sizes.
+    // Text partially visible through gaps between blocks.
     private drawMosaicText(p: p5, _now: number, intensity: number): void {
         const txt = this.canvasText.toUpperCase();
         p.textStyle(p.BOLD);
@@ -277,34 +277,53 @@ export class ProcessingLayer {
         p.textAlign(p.CENTER, p.CENTER);
         p.noStroke();
 
-        // White text — always white, visible only against dark bg
+        // White text underneath
         p.fill(255);
         p.text(txt, 0, 0);
 
         const tw = p.textWidth(txt);
         const th = size * 1.6;
 
-        // Irregular white blocks scattered over text area
-        // On white bg: blocks blend in, text invisible
-        // On dark bg (mandala): gaps between blocks reveal white text
-        const blockCount = 40 + Math.floor(intensity * 60);
+        // Irregular black & white blocks — mixed sizes
+        const blockCount = 50 + Math.floor(intensity * 70);
 
         for (let i = 0; i < blockCount; i++) {
-            // Irregular position — not grid-aligned
-            const bx = p.random(-tw / 2 - 20, tw / 2 + 20);
-            const by = p.random(-th / 2, th / 2);
+            // Position scattered across text area
+            const bx = p.random(-tw / 2 - 30, tw / 2 + 30);
+            const by = p.random(-th / 2 - 10, th / 2 + 10);
 
-            // Irregular size — varying widths and heights
-            const bw = p.random(6, 30 + intensity * 15);
-            const bh = p.random(4, 20 + intensity * 10);
+            // Highly irregular sizes: mix of tiny squares and large horizontal bars
+            let bw: number, bh: number;
+            const sizeType = p.random();
+            if (sizeType < 0.3) {
+                // Tiny squares (3-8px)
+                bw = p.random(3, 8);
+                bh = p.random(3, 8);
+            } else if (sizeType < 0.7) {
+                // Medium blocks (8-25px)
+                bw = p.random(8, 25 + intensity * 10);
+                bh = p.random(5, 15);
+            } else {
+                // Large horizontal bars (30-80px wide, thin)
+                bw = p.random(30, 80 + intensity * 30);
+                bh = p.random(4, 12);
+            }
 
-            // Slight random rotation for more organic feel
+            // Slight rotation for organic feel
             p.push();
             p.translate(bx, by);
-            p.rotate(p.random(-0.15, 0.15));
+            p.rotate(p.random(-0.1, 0.1));
 
-            // All blocks are white — camouflage on white bg
-            p.fill(255);
+            // Black, white, or gray
+            const tone = p.random();
+            if (tone < 0.45) {
+                p.fill(0); // black
+            } else if (tone < 0.75) {
+                p.fill(255); // white
+            } else {
+                p.fill(p.random(60, 180)); // gray tones
+            }
+
             p.rect(-bw / 2, -bh / 2, bw, bh);
             p.pop();
         }
