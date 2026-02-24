@@ -88,6 +88,7 @@ export class ProcessingLayer {
         p.push();
         p.translate(p.width / 2, p.height / 2);
         p.scale(1, 0.9); // 縦90%圧縮
+        p.textFont('Helvetica Neue, Helvetica, Arial, sans-serif');
 
         switch (this.djEffect) {
             case 'simple':
