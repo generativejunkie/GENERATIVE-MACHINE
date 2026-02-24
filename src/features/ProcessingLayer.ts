@@ -87,6 +87,7 @@ export class ProcessingLayer {
         const intensity = this.intensity;
         p.push();
         p.translate(p.width / 2, p.height / 2);
+        p.scale(1, 0.9); // 縦90%圧縮
 
         switch (this.djEffect) {
             case 'simple':
