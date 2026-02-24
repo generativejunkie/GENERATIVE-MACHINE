@@ -271,14 +271,15 @@ export class ProcessingLayer {
     // White text + scattered black/white/gray blocks of varying sizes.
     private drawMosaicText(p: p5, _now: number, intensity: number): void {
         const txt = this.canvasText.toUpperCase();
+        p.textFont('Arial Black, Impact, sans-serif');
         p.textStyle(p.BOLD);
         const size = this.fitTextSize(p, txt, 120 + intensity * 30);
         p.textAlign(p.CENTER, p.CENTER);
 
-        // Heavy white text with thick stroke for imposing look
+        // Heavy white text
         p.fill(255);
         p.stroke(255);
-        p.strokeWeight(3);
+        p.strokeWeight(2);
         p.text(txt, 0, 0);
         p.noStroke();
 
@@ -286,7 +287,7 @@ export class ProcessingLayer {
         const th = size * 1.6;
 
         // Irregular black/white/gray blocks — no rotation, random sizes
-        const blockCount = 50 + Math.floor(intensity * 70);
+        const blockCount = 80 + Math.floor(intensity * 100);
 
         for (let i = 0; i < blockCount; i++) {
             // Scattered position
@@ -310,6 +311,8 @@ export class ProcessingLayer {
             // No rotation — axis-aligned rectangles
             p.rect(bx, by, bw, bh);
         }
+
+        p.textFont('Inter, sans-serif');
     }
 
     // ─── SCN: Laser Scan Reveal ──────────────────────────────────
