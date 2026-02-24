@@ -267,9 +267,9 @@ export class ProcessingLayer {
         p.endShape();
     }
 
-    // ─── MOS: Geometric Reveal ───────────────────────────────────
-    // Clean geometric grid overlay with systematic reveal/conceal pattern
-    private drawMosaicText(p: p5, now: number, intensity: number): void {
+    // ─── MOS: High-Speed B&W Block Dispersion ──────────────────
+    // Entire text area covered with rapidly flickering black/white blocks
+    private drawMosaicText(p: p5, _now: number, intensity: number): void {
         const txt = this.canvasText.toUpperCase();
         p.textStyle(p.BOLD);
         const size = this.fitTextSize(p, txt, 120 + intensity * 30);
@@ -277,43 +277,35 @@ export class ProcessingLayer {
         p.noStroke();
 
         const tw = p.textWidth(txt);
-        const th = size * 1.2;
+        const th = size * 1.4;
 
-        // Base text rendered dim
-        p.fill(255, 60);
+        // Text rendered underneath (partially visible through block gaps)
+        p.fill(255, 120);
         p.text(txt, 0, 0);
 
-        // Grid cells — systematic reveal based on time
-        const cellSize = 14;
-        const cols = Math.ceil(tw / cellSize);
-        const rows = Math.ceil(th / cellSize);
-        const cycle = (now * 0.001) % (cols + rows); // diagonal sweep
+        // Dense grid of black/white blocks covering entire text area
+        const blockSize = 8 + (1 - intensity) * 6; // 8-14px, smaller = denser
+        const cols = Math.ceil(tw / blockSize) + 4;
+        const rows = Math.ceil(th / blockSize) + 2;
+        const coverage = 0.7 + intensity * 0.25; // 70-95% coverage
 
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
-                const cx = -tw / 2 + c * cellSize;
-                const cy = -th / 2 + r * cellSize;
-                const diagPos = c + r;
+                if (p.random() > coverage) continue; // gap — text shows through
 
-                // Diagonal sweep reveal
-                const dist = Math.abs(diagPos - cycle);
-                const reveal = dist < 3;
+                const bx = -tw / 2 - blockSize * 2 + c * blockSize;
+                const by = -th / 2 - blockSize + r * blockSize;
 
-                if (reveal) {
-                    // Bright white cell
-                    p.fill(255, 200 - dist * 40);
-                    p.rect(cx, cy, cellSize - 1, cellSize - 1);
-                } else if (p.random() < 0.02 + intensity * 0.06) {
-                    // Sparse flicker
-                    p.fill(255, 30);
-                    p.rect(cx, cy, cellSize - 1, cellSize - 1);
-                }
+                // Random dispersion offset — blocks scatter outward
+                const disperse = 1 + intensity * 4;
+                const ox = p.random(-disperse, disperse);
+                const oy = p.random(-disperse, disperse);
+
+                // Black or white, high contrast
+                p.fill(p.random() > 0.5 ? 255 : 0);
+                p.rect(bx + ox, by + oy, blockSize - 1, blockSize - 1);
             }
         }
-
-        // Full text on top at sweep position
-        p.fill(255, 240);
-        p.text(txt, 0, 0);
     }
 
     // ─── SCN: Laser Scan Reveal ──────────────────────────────────
