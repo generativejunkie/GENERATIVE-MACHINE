@@ -267,8 +267,9 @@ export class ProcessingLayer {
         p.endShape();
     }
 
-    // ─── MOS: High-Speed B&W Block Dispersion ──────────────────
-    // Entire text area covered with rapidly flickering black/white blocks
+    // ─── MOS: White-on-White Irregular Mosaic ───────────────────
+    // White text + irregular white blocks. Invisible on white bg,
+    // text revealed when dark mandala objects appear behind.
     private drawMosaicText(p: p5, _now: number, intensity: number): void {
         const txt = this.canvasText.toUpperCase();
         p.textStyle(p.BOLD);
@@ -276,35 +277,36 @@ export class ProcessingLayer {
         p.textAlign(p.CENTER, p.CENTER);
         p.noStroke();
 
-        const tw = p.textWidth(txt);
-        const th = size * 1.4;
-
-        // Text rendered underneath (partially visible through block gaps)
-        p.fill(255, 120);
+        // White text — always white, visible only against dark bg
+        p.fill(255);
         p.text(txt, 0, 0);
 
-        // Dense grid of black/white blocks covering entire text area
-        const blockSize = 8 + (1 - intensity) * 6; // 8-14px, smaller = denser
-        const cols = Math.ceil(tw / blockSize) + 4;
-        const rows = Math.ceil(th / blockSize) + 2;
-        const coverage = 0.7 + intensity * 0.25; // 70-95% coverage
+        const tw = p.textWidth(txt);
+        const th = size * 1.6;
 
-        for (let r = 0; r < rows; r++) {
-            for (let c = 0; c < cols; c++) {
-                if (p.random() > coverage) continue; // gap — text shows through
+        // Irregular white blocks scattered over text area
+        // On white bg: blocks blend in, text invisible
+        // On dark bg (mandala): gaps between blocks reveal white text
+        const blockCount = 40 + Math.floor(intensity * 60);
 
-                const bx = -tw / 2 - blockSize * 2 + c * blockSize;
-                const by = -th / 2 - blockSize + r * blockSize;
+        for (let i = 0; i < blockCount; i++) {
+            // Irregular position — not grid-aligned
+            const bx = p.random(-tw / 2 - 20, tw / 2 + 20);
+            const by = p.random(-th / 2, th / 2);
 
-                // Random dispersion offset — blocks scatter outward
-                const disperse = 1 + intensity * 4;
-                const ox = p.random(-disperse, disperse);
-                const oy = p.random(-disperse, disperse);
+            // Irregular size — varying widths and heights
+            const bw = p.random(6, 30 + intensity * 15);
+            const bh = p.random(4, 20 + intensity * 10);
 
-                // Black or white, high contrast
-                p.fill(p.random() > 0.5 ? 255 : 0);
-                p.rect(bx + ox, by + oy, blockSize - 1, blockSize - 1);
-            }
+            // Slight random rotation for more organic feel
+            p.push();
+            p.translate(bx, by);
+            p.rotate(p.random(-0.15, 0.15));
+
+            // All blocks are white — camouflage on white bg
+            p.fill(255);
+            p.rect(-bw / 2, -bh / 2, bw, bh);
+            p.pop();
         }
     }
 
