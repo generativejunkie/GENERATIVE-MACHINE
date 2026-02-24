@@ -106,6 +106,9 @@ export class ProcessingLayer {
             case 'mosaic':
                 this.drawMosaicText(p, now, intensity);
                 break;
+            case 'warp':
+                this.drawWarpText(p, now, intensity);
+                break;
             case 'scanline':
                 this.drawScanlineText(p, now, intensity);
                 break;
@@ -314,6 +317,50 @@ export class ProcessingLayer {
         }
 
         p.textFont('Inter, sans-serif');
+    }
+
+    // ─── WRP: Dimension Warp ─────────────────────────────────────
+    // Each character distorts independently — rotation, scale, Y-shift
+    // as if space itself is bending around the text
+    private drawWarpText(p: p5, now: number, intensity: number): void {
+        const txt = this.canvasText.toUpperCase();
+        p.textStyle(p.BOLD);
+        const size = this.fitTextSize(p, txt, 120 + intensity * 30);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.noStroke();
+
+        const chars = txt.split('');
+        const charW = p.textWidth('W');
+        const totalW = charW * chars.length;
+        const startX = -totalW / 2;
+
+        for (let i = 0; i < chars.length; i++) {
+            const x = startX + i * charW + charW / 2;
+
+            // Per-character warp based on time + position
+            const phase = now * 0.002 + i * 0.7;
+            const warpY = Math.sin(phase) * (15 + intensity * 25);
+            const warpScale = 0.6 + Math.sin(phase * 0.8 + 1.5) * (0.3 + intensity * 0.4);
+            const warpRotation = Math.sin(phase * 0.6 + 3.0) * (0.15 + intensity * 0.3);
+            const warpSkewX = Math.sin(phase * 1.2) * (5 + intensity * 15);
+
+            // Alpha flicker — some chars phase in/out
+            const alpha = 150 + Math.sin(phase * 1.5) * 105;
+
+            p.push();
+            p.translate(x + warpSkewX, warpY);
+            p.rotate(warpRotation);
+            p.scale(warpScale, warpScale * (0.7 + Math.sin(phase * 0.5) * 0.3));
+
+            p.fill(255, alpha);
+            p.text(chars[i], 0, 0);
+            p.pop();
+        }
+
+        // Ghostly echo — faint shifted copy
+        p.fill(255, 20 + intensity * 15);
+        const echoShift = Math.sin(now * 0.001) * 8;
+        p.text(txt, echoShift, Math.sin(now * 0.0015) * 6);
     }
 
     // ─── SCN: Laser Scan Reveal ──────────────────────────────────
