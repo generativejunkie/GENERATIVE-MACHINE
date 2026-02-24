@@ -271,7 +271,7 @@ export class ProcessingLayer {
     // White text + scattered black/white/gray blocks of varying sizes.
     private drawMosaicText(p: p5, _now: number, intensity: number): void {
         const txt = this.canvasText.toUpperCase();
-        p.textFont('Arial Black, Impact, sans-serif');
+        p.textFont('Bebas Neue, Arial Black, sans-serif');
         p.textStyle(p.BOLD);
         const size = this.fitTextSize(p, txt, 120 + intensity * 30);
         p.textAlign(p.CENTER, p.CENTER);
