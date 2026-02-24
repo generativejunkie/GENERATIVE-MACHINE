@@ -662,6 +662,11 @@ canvas {
     background: transparent !important;
 }
 
+/* Counter-invert p5 canvas in dark mode to keep text white */
+body.dark-mode #p5-container canvas {
+    filter: invert(1) hue-rotate(180deg);
+}
+
 .canvas-overlays {
     position: absolute;
     bottom: 16px;
