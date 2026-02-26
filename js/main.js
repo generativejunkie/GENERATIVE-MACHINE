@@ -11,7 +11,6 @@
 // Main entry point for GENERATIVE MACHINE
 import { initImageMachine } from './modules/image-machine.js';
 import { initSoundMachine } from './modules/sound-machine.js';
-import { initWordMachine } from './modules/word-machine.js';
 import { initTalkMachine } from './modules/talk-machine.js';
 import { initInformationMachine } from './modules/information-machine.js';
 import { initUI } from './modules/ui.js';
@@ -65,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initHero();
     initImageMachine();
     initSoundMachine();
-    initWordMachine();
     initTalkMachine(); // Initialize Talk Machine prototype
     initInformationMachine();
     initGJMode();
