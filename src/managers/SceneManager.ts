@@ -781,7 +781,8 @@ export class SceneManager extends EventEmitter {
    * Spawn burst particles at a position (cosmic explosion effect)
    */
   public spawnBurst(position: THREE.Vector3, color?: THREE.Color): void {
-    const particleCount = 40 + Math.floor(Math.random() * 30); // More particles
+    // Disabled: Removes colored particle dots from canvas
+    return;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const velocities = new Float32Array(particleCount * 3);
