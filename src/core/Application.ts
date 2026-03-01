@@ -24,7 +24,7 @@ import { BrainHackMandala } from '@features/BrainHackMandala';
 
 // Reserved for future use
 // import { MULTIPLIER_DEFAULTS } from '@constants/config';
-import type { ObjectInstance, ApplicationState, ApplicationEventMap, FrequencyBands } from '@types';
+import type { ObjectInstance, ApplicationState, ApplicationEventMap, FrequencyBands, RGBColor } from '@types';
 
 export class Application extends EventEmitter<ApplicationEventMap> {
   // Managers
@@ -84,6 +84,9 @@ export class Application extends EventEmitter<ApplicationEventMap> {
   private lastBPM: number = 120;
   private cosmicPhase: 'cosmic' | 'mechanical' = 'cosmic';
   private beatCounter: number = 0;
+
+  // Baryon mode original colors
+  private preBaryonColors: Map<number, RGBColor | null> = new Map();
 
   constructor(canvasContainerId: string) {
     super();
@@ -515,7 +518,7 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       // Base spin speed + audio-reactive acceleration
       const spinSpeed = 0.3 + audioBoost * 1.5;
       this.state.baseRotation = (this.state.baseRotation + spinSpeed) % 360;
-      this.sceneManager.setBaseRotation(this.state.baseRotation);
+      this.sceneManager.setSmoothBaseRotation(this.state.baseRotation);
     }
 
     // BARYON Mode: Audio-reactive particle background + object dispersion
@@ -2260,8 +2263,10 @@ export class Application extends EventEmitter<ApplicationEventMap> {
         this.addRandomInstance();
       }
 
-      // Set all existing objects to white
+      // Save original colors and set all existing objects to white
+      this.preBaryonColors.clear();
       this.instanceManager.getAllInstances().forEach(inst => {
+        this.preBaryonColors.set(inst.id, inst.color ? { ...inst.color } : null);
         inst.color = { r: 255, g: 255, b: 255 };
       });
       this.sceneManager.clearMeshCache();
@@ -2274,10 +2279,15 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       // Restore white background
       this.sceneManager.setBackgroundColor({ r: 255, g: 255, b: 255 });
 
-      // Restore object colors to dark (default)
+      // Restore object colors to their original state (or dark default if not saved)
       this.instanceManager.getAllInstances().forEach(inst => {
-        inst.color = { r: 51, g: 51, b: 51 };
+        if (this.preBaryonColors.has(inst.id)) {
+          inst.color = this.preBaryonColors.get(inst.id) || null;
+        } else {
+          inst.color = { r: 51, g: 51, b: 51 };
+        }
       });
+      this.preBaryonColors.clear();
       this.sceneManager.clearMeshCache();
 
       // Turn off orbit if it was auto-enabled

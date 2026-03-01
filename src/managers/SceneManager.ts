@@ -1489,6 +1489,13 @@ export class SceneManager extends EventEmitter {
   }
 
   /**
+   * Set base rotation smoothly without cache rebuild (for continuous animation)
+   */
+  public setSmoothBaseRotation(degrees: number): void {
+    this.baseRotation = degrees;
+  }
+
+  /**
    * Set the camera mosaic background
    */
   public setCameraBackground(canvas: HTMLCanvasElement | null): void {
