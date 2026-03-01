@@ -935,6 +935,17 @@ export class UIController {
       });
     }
 
+    // SPIN Mode (mandala rotation in place)
+    const topSpinBtn = document.getElementById('topSpinBtn');
+    if (topSpinBtn) {
+      topSpinBtn.addEventListener('click', () => {
+        const isActive = !topSpinBtn.classList.contains('active');
+        topSpinBtn.classList.toggle('active');
+        this.app.toggleSpinMode(isActive);
+        updateSeekbarVisibility();
+      });
+    }
+
     // BARYON Mode (heavy particle background)
     const topBaryonBtn = document.getElementById('topBaryonBtn');
     if (topBaryonBtn) {
@@ -1941,6 +1952,9 @@ export class UIController {
 
     const topOrbitBtn = document.getElementById('topOrbitBtn');
     if (topOrbitBtn) topOrbitBtn.classList.toggle('active', state.orbitMode);
+
+    const topSpinBtn = document.getElementById('topSpinBtn');
+    if (topSpinBtn) topSpinBtn.classList.toggle('active', state.spinMode);
 
     const topBaryonBtn = document.getElementById('topBaryonBtn');
     if (topBaryonBtn) topBaryonBtn.classList.toggle('active', state.baryonMode);

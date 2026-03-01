@@ -167,6 +167,7 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       cameraOrbitReverse: false,
       orbitMode: false,
       baryonMode: false,
+      spinMode: false,
       djName: '',
       showDJName: false,
       djNameEffect: 'none',
@@ -505,6 +506,16 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       const bands = this.getCurrentFrequencyBands();
       const intensity = (bands.low + bands.mid + bands.high) / (255 * 3);
       this.sceneManager.updateOrbit(intensity);
+    }
+
+    // SPIN Mode: Rotate mandala in place (shape preserved)
+    if (this.state.spinMode && this.state.isPlaying) {
+      const bands = this.getCurrentFrequencyBands();
+      const audioBoost = (bands.low + bands.mid) / (255 * 2);
+      // Base spin speed + audio-reactive acceleration
+      const spinSpeed = 0.3 + audioBoost * 1.5;
+      this.state.baseRotation = (this.state.baseRotation + spinSpeed) % 360;
+      this.sceneManager.setBaseRotation(this.state.baseRotation);
     }
 
     // BARYON Mode: Audio-reactive particle background + object dispersion
@@ -2203,6 +2214,16 @@ export class Application extends EventEmitter<ApplicationEventMap> {
     this.sceneManager.setOrbitMode(newState);
     this.emit('state:changed', this.state);
     console.log(`◎ Orbit Mode: ${newState ? 'ON' : 'OFF'}`);
+  }
+
+  /**
+   * Toggle spin mode (rotate mandala in place)
+   */
+  public toggleSpinMode(force?: boolean): void {
+    const newState = force !== undefined ? force : !this.state.spinMode;
+    this.state.spinMode = newState;
+    this.emit('state:changed', this.state);
+    console.log(`⟳ Spin Mode: ${newState ? 'ON' : 'OFF'}`);
   }
 
   /**

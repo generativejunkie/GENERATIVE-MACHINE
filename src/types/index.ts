@@ -268,6 +268,7 @@ export interface ApplicationState {
   cameraOrbitReverse: boolean;
   orbitMode: boolean;       // 360° XYZ rotation
   baryonMode: boolean;      // Heavy particle background
+  spinMode: boolean;        // Mandala spin in place
   djName: string;
   showDJName: boolean;
   djNameEffect: DJNameEffect;
