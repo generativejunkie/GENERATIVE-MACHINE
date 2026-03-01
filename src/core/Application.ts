@@ -2253,6 +2253,12 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       // Restore white background
       this.sceneManager.setBackgroundColor({ r: 255, g: 255, b: 255 });
 
+      // Restore object colors to dark (default)
+      this.instanceManager.getAllInstances().forEach(inst => {
+        inst.color = { r: 51, g: 51, b: 51 };
+      });
+      this.sceneManager.clearMeshCache();
+
       // Turn off orbit if it was auto-enabled
       this.toggleOrbitMode(false);
     }
