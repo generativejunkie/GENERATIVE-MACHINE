@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -46,6 +46,9 @@
 
 <body tabindex="0">
     <div id="app-root">
+        <!-- Left panel toggle button -->
+        <button id="leftPanelToggle" class="panel-open" title="Toggle Objects Panel">‹</button>
+
         <!-- 左パネル (PRESETS) -->
         <div id="leftPanel" class="panel-side">
             <div class="panel-header">
@@ -663,25 +666,25 @@
 
     <!-- Context Menu -->
     <div id="contextMenu" class="context-menu">
-        <div class="context-menu-item" data-action="pin">📌 固定</div>
+        <div class="context-menu-item" data-action="pin">📌 Pin</div>
         <div class="context-menu-separator"></div>
-        <div class="context-menu-item" data-action="duplicate">📋 複製</div>
-        <div class="context-menu-item" data-action="savePreset">💾 プリセットに登録</div>
+        <div class="context-menu-item" data-action="duplicate">📋 Duplicate</div>
+        <div class="context-menu-item" data-action="savePreset">💾 Save as Preset</div>
         <div class="context-menu-separator"></div>
-        <div class="context-menu-item" data-action="color">🎨 色を変更</div>
+        <div class="context-menu-item" data-action="color">🎨 Change Color</div>
         <div class="context-menu-separator"></div>
-        <div class="context-menu-item" data-action="front">最前面へ</div>
-        <div class="context-menu-item" data-action="forward">前面へ</div>
-        <div class="context-menu-item" data-action="backward">背面へ</div>
-        <div class="context-menu-item" data-action="back">最背面へ</div>
+        <div class="context-menu-item" data-action="front">Bring to Front</div>
+        <div class="context-menu-item" data-action="forward">Bring Forward</div>
+        <div class="context-menu-item" data-action="backward">Send Backward</div>
+        <div class="context-menu-item" data-action="back">Send to Back</div>
         <div class="context-menu-separator"></div>
-        <div class="context-menu-item danger" data-action="delete">削除</div>
+        <div class="context-menu-item danger" data-action="delete">Delete</div>
     </div>
 
     <!-- Color Picker Modal -->
     <div id="colorPickerModal" class="color-picker-modal" style="display: none;">
         <div class="color-picker-content">
-            <h3>色を選択</h3>
+            <h3>Select Color</h3>
             <div class="color-sliders">
                 <div class="color-slider-group">
                     <label>R: <span id="pickerRValue">0</span></label>
@@ -698,13 +701,57 @@
             </div>
             <div class="color-preview" id="colorPreview"></div>
             <div class="color-picker-buttons">
-                <button id="colorPickerApply">適用</button>
-                <button id="colorPickerCancel">キャンセル</button>
+                <button id="colorPickerApply">Apply</button>
+                <button id="colorPickerCancel">Cancel</button>
             </div>
         </div>
     </div>
 
+    <!-- Left panel toggle logic -->
+    <script>
+        (function () {
+            const btn = document.getElementById('leftPanelToggle');
+            const panel = document.getElementById('leftPanel');
+            const root = document.getElementById('app-root');
+            let isOpen = true;
 
+            btn.addEventListener('click', () => {
+                isOpen = !isOpen;
+                if (isOpen) {
+                    panel.classList.remove('collapsed');
+                    root.classList.remove('left-collapsed');
+                    btn.classList.add('panel-open');
+                    btn.textContent = '‹';
+                    btn.title = 'Collapse Objects Panel';
+                } else {
+                    panel.classList.add('collapsed');
+                    root.classList.add('left-collapsed');
+                    btn.classList.remove('panel-open');
+                    btn.textContent = '›';
+                    btn.title = 'Expand Objects Panel';
+                }
+            });
+
+            // Dark mode button: toggle light-mode class instead of dark-mode
+            document.addEventListener('DOMContentLoaded', () => {
+                const darkBtn = document.getElementById('topDarkModeBtn');
+                if (darkBtn) {
+                    darkBtn.addEventListener('click', () => {
+                        document.body.classList.toggle('light-mode');
+                        const moonIcon = darkBtn.querySelector('.moon-icon');
+                        const sunIcon = darkBtn.querySelector('.sun-icon');
+                        if (document.body.classList.contains('light-mode')) {
+                            if (moonIcon) moonIcon.style.display = 'none';
+                            if (sunIcon) sunIcon.style.display = '';
+                        } else {
+                            if (moonIcon) moonIcon.style.display = '';
+                            if (sunIcon) sunIcon.style.display = 'none';
+                        }
+                    }, { capture: true });
+                }
+            });
+        })();
+    </script>
 
 </body>
 
