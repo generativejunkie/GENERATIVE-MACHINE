@@ -2250,6 +2250,9 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       this.state.spreadMultiplier = 1.0;
       this.state.spacingMultiplier = 8.0;
 
+      // Restore white background
+      this.sceneManager.setBackgroundColor({ r: 255, g: 255, b: 255 });
+
       // Turn off orbit if it was auto-enabled
       this.toggleOrbitMode(false);
     }
