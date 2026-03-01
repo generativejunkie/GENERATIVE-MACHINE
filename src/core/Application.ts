@@ -507,10 +507,16 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       this.sceneManager.updateOrbit(intensity);
     }
 
-    // BARYON Mode: Audio-reactive particle background
+    // BARYON Mode: Audio-reactive particle background + object dispersion
     if (this.state.baryonMode && this.state.isPlaying) {
       const bands = this.getCurrentFrequencyBands();
       this.sceneManager.updateBaryonParticles(bands);
+
+      // Disperse 3D objects with bass
+      const bass = bands.low / 255;
+      if (bass > 0.15) {
+        this.sceneManager.disperseObjects(bass * 1.5, 'outward');
+      }
     }
 
     // Antigravity Mode: Meditative object cycling
@@ -2200,16 +2206,52 @@ export class Application extends EventEmitter<ApplicationEventMap> {
   }
 
   /**
-   * Toggle baryon mode (heavy particle background)
+   * Toggle baryon mode (heavy particle objects scattered across canvas)
    */
   public toggleBaryonMode(force?: boolean): void {
     const newState = force !== undefined ? force : !this.state.baryonMode;
     this.state.baryonMode = newState;
     this.sceneManager.setBaryonMode(newState);
 
-    // Auto-set black background when baryon mode is enabled
     if (newState) {
+      // Disable mandala/symmetry — baryon is free-form scatter
+      this.setMandalaMode(false);
+      this.setReflectMode(false);
+      this.state.symmetryEnabled = false;
+
+      // Black background
       this.sceneManager.setBackgroundColor({ r: 0, g: 0, b: 0 });
+
+      // White objects
+      this.defaultObjectColor = { r: 255, g: 255, b: 255 };
+
+      // Wide spread for full-canvas scatter
+      this.state.spreadMultiplier = 3.0;
+      this.state.spacingMultiplier = 15.0;
+
+      // Auto-enable orbit for XYZ rotation
+      this.toggleOrbitMode(true);
+
+      // Spawn scattered objects to fill the space
+      const currentCount = this.instanceManager.getAllInstances().length;
+      const targetCount = 30; // Good number for scattered display
+      for (let i = currentCount; i < targetCount; i++) {
+        this.addRandomInstance();
+      }
+
+      // Set all existing objects to white
+      this.instanceManager.getAllInstances().forEach(inst => {
+        inst.color = { r: 255, g: 255, b: 255 };
+      });
+      this.sceneManager.clearMeshCache();
+    } else {
+      // Restore defaults
+      this.defaultObjectColor = { r: 51, g: 51, b: 51 };
+      this.state.spreadMultiplier = 1.0;
+      this.state.spacingMultiplier = 8.0;
+
+      // Turn off orbit if it was auto-enabled
+      this.toggleOrbitMode(false);
     }
 
     this.emit('state:changed', this.state);
