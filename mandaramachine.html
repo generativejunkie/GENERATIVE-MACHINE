@@ -64,7 +64,7 @@
         .context-menu-item:hover{background:#1e1e1e !important}
         .preset-item{background:#111 !important}
         .icon{filter:invert(1) !important}
-        #leftPanel{transition:width .28s cubic-bezier(.4,0,.2,1),opacity .22s,transform .28s;overflow:hidden}
+        #leftPanel{transition:width .28s cubic-bezier(.4,0,.2,1),opacity .22s,transform .28s;overflow-y:auto;overflow-x:hidden}
         #leftPanel.collapsed{width:0 !important;min-width:0 !important;opacity:0;pointer-events:none;transform:translateX(-8px)}
         #app-root.left-collapsed{grid-template-columns:0 1fr 260px !important}
         #leftPanelToggle{position:fixed;top:10px;left:10px;z-index:9999;width:28px;height:28px;background:#111;border:1px solid #2a2a2a;color:#666;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:3px;transition:left .28s cubic-bezier(.4,0,.2,1)}
