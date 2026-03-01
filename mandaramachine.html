@@ -40,8 +40,8 @@
             font-weight: 700;
         }
     </style>
-    <script type="module" crossorigin src="/assets/index-CuGxZEi6.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-Z5quO2QH.css">
+  <script type="module" crossorigin src="/assets/index-C94rS7FL.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-_3glWkjg.css">
 </head>
 
 <body tabindex="0">
@@ -81,7 +81,6 @@
                 <div class="dj-name-effects" style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px;">
                     <button class="mode-tag-btn active" data-effect="mosaic">MOS</button>
                     <button class="mode-tag-btn" data-effect="warp">WRP</button>
-                    <button class="mode-tag-btn" data-effect="grid">GRD</button>
                     <button class="mode-tag-btn" data-effect="none">MIN</button>
                     <button class="mode-tag-btn" data-effect="neon">FLT</button>
                     <button class="mode-tag-btn" data-effect="glitch">GLT</button>
@@ -172,8 +171,10 @@
                             <span class="icon symbol">🌀</span>
                             <span data-i18n="mandala">MANDALA</span>
                         </button>
-
-
+                        <button id="topAutoBtn" class="mode-btn" title="Auto Mode" data-i18n-title="auto">
+                            <span class="icon symbol">⟳</span>
+                            <span data-i18n="auto">AUTO</span>
+                        </button>
                         <div class="dropdown-container">
                             <button id="topBlinkBtn" class="mode-btn" title="Strobe" data-i18n-title="blinkingMode">
                                 <span class="icon symbol">⚡</span>
@@ -206,6 +207,11 @@
                             <span class="icon symbol">⇪</span>
                             <span data-i18n="gravity">ZERO GRAVITY</span>
                         </button>
+                        <button id="topBrainHackBtn" class="mode-btn" title="Brain Hack Mode"
+                            data-i18n-title="brainhack">
+                            <span class="icon symbol">⌬</span>
+                            <span data-i18n="brainhack">BRAIN HACK</span>
+                        </button>
                         <button id="topRavenBtn" class="mode-btn" title="Raven Mode" data-i18n-title="raven">
                             <span class="icon symbol">◈</span>
                             <span data-i18n="raven">RAVEN</span>
@@ -213,10 +219,6 @@
                         <button id="topQuantumBtn" class="mode-btn" title="Quantum Mode" data-i18n-title="quantum">
                             <span class="icon symbol">✦</span>
                             <span data-i18n="quantum">QUANTUM</span>
-                        </button>
-                        <button id="topGlitchBtn" class="mode-btn" title="Glitch Mode">
-                            <span class="icon symbol">⚡</span>
-                            <span>GLITCH</span>
                         </button>
                     </div>
 
@@ -298,6 +300,10 @@
                     <div class="seekbar-item" id="antigravitySeekbar">
                         <label>Float Speed: <span id="gravitySpeedValue">0.1</span></label>
                         <input type="range" id="gravitySpeedSeekbar" min="0.1" max="3" step="0.1" value="0.1">
+                    </div>
+                    <div class="seekbar-item" id="brainHackSeekbar" style="display: none;">
+                        <label><span data-i18n="mode">Mode</span>: <span id="brainHackModeValue">Phantom</span></label>
+                        <input type="range" id="brainHackModeSeekbar" min="0" max="5" step="1" value="0">
                     </div>
                     <div class="seekbar-item" id="quantumSeekbar" style="display: none;">
                         <label><span data-i18n="coherence">Coherence</span>: <span
@@ -501,6 +507,29 @@
                 <div class="info-text">φ spiral pattern</div>
             </div>
 
+            <div class="menu-section">
+                <h3 data-i18n="brainhack">BRAIN HACK</h3>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="brainHackMode">
+                    <span data-i18n="active">Active</span>
+                </label>
+                <div class="mode-selection" style="margin-top: 10px;">
+                    <button class="mode-tag-btn active" data-mode="0" data-i18n="phantom">PHANTOM</button>
+                    <button class="mode-tag-btn" data-mode="1" data-i18n="boolean">BOOLEAN</button>
+                    <button class="mode-tag-btn" data-mode="2" data-i18n="raven">RAVEN</button>
+                    <button class="mode-tag-btn" data-mode="3" data-i18n="neuro">NEURO</button>
+                    <button class="mode-tag-btn" data-mode="4" data-i18n="lattice">LATTICE</button>
+                    <button class="mode-tag-btn" data-mode="5" data-i18n="orbital">ORBITAL</button>
+                </div>
+                <!-- ... coloring omitted for brevity if matching precisely ... -->
+                <div class="color-picker-group" style="margin-top: 10px;">
+                    <div style="display: flex; gap: 5px; align-items: center;">
+                        <input type="color" id="brainColorA" value="#00ffcc" title="Color A">
+                        <input type="color" id="brainColorB" value="#ff00aa" title="Color B">
+                        <input type="color" id="brainColorC" value="#110033" title="Avoid Color">
+                    </div>
+                </div>
+            </div>
 
             <div class="menu-section">
                 <h3 data-i18n="zeroGravity">ZERO GRAVITY</h3>
@@ -535,11 +564,10 @@
 
             <div class="menu-section">
                 <h3 data-i18n="maxObjects">MAX OBJECTS</h3>
-                <div class="slider-wrapper" style="margin-bottom: 5px; width: 100%;">
-                    <input type="number" id="maxObjects" min="1" max="600" step="1" value="40" class="number-input"
-                        style="width: 80px;">
+                <div class="slider-wrapper">
+                    <input type="number" id="maxObjects" min="1" max="100" step="1" value="20" class="number-input">
+                    <span id="maxObjectsValue">20</span>
                 </div>
-                <!-- Presets removed per user request -->
             </div>
 
             <div class="menu-section">
