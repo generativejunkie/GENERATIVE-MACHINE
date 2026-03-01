@@ -165,6 +165,8 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       cameraOrbitMode: false,
       cameraOrbitAxis: 'horizontal',
       cameraOrbitReverse: false,
+      orbitMode: false,
+      baryonMode: false,
       djName: '',
       showDJName: false,
       djNameEffect: 'none',
@@ -496,6 +498,19 @@ export class Application extends EventEmitter<ApplicationEventMap> {
     // AUTO Mode: Auto-spawn objects logic
     if (this.state.autoMode && this.state.isPlaying) {
       this.handleAutoMode();
+    }
+
+    // ORBIT Mode: 360° camera rotation
+    if (this.state.orbitMode && this.state.isPlaying) {
+      const bands = this.getCurrentFrequencyBands();
+      const intensity = (bands.low + bands.mid + bands.high) / (255 * 3);
+      this.sceneManager.updateOrbit(intensity);
+    }
+
+    // BARYON Mode: Audio-reactive particle background
+    if (this.state.baryonMode && this.state.isPlaying) {
+      const bands = this.getCurrentFrequencyBands();
+      this.sceneManager.updateBaryonParticles(bands);
     }
 
     // Antigravity Mode: Meditative object cycling
@@ -2171,6 +2186,34 @@ export class Application extends EventEmitter<ApplicationEventMap> {
     this.sceneManager.setAntigravityMode(newState);
     this.emit('state:changed', this.state);
     console.log(`🚀 Antigravity Mode: ${this.state.antigravityMode ? 'ON' : 'OFF'}`);
+  }
+
+  /**
+   * Toggle 360° orbit mode
+   */
+  public toggleOrbitMode(force?: boolean): void {
+    const newState = force !== undefined ? force : !this.state.orbitMode;
+    this.state.orbitMode = newState;
+    this.sceneManager.setOrbitMode(newState);
+    this.emit('state:changed', this.state);
+    console.log(`◎ Orbit Mode: ${newState ? 'ON' : 'OFF'}`);
+  }
+
+  /**
+   * Toggle baryon mode (heavy particle background)
+   */
+  public toggleBaryonMode(force?: boolean): void {
+    const newState = force !== undefined ? force : !this.state.baryonMode;
+    this.state.baryonMode = newState;
+    this.sceneManager.setBaryonMode(newState);
+
+    // Auto-set black background when baryon mode is enabled
+    if (newState) {
+      this.sceneManager.setBackgroundColor({ r: 0, g: 0, b: 0 });
+    }
+
+    this.emit('state:changed', this.state);
+    console.log(`⊛ Baryon Mode: ${newState ? 'ON' : 'OFF'}`);
   }
 
   /**

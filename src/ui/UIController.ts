@@ -924,6 +924,28 @@ export class UIController {
       });
     }
 
+    // ORBIT Mode (360° rotation)
+    const topOrbitBtn = document.getElementById('topOrbitBtn');
+    if (topOrbitBtn) {
+      topOrbitBtn.addEventListener('click', () => {
+        const isActive = !topOrbitBtn.classList.contains('active');
+        topOrbitBtn.classList.toggle('active');
+        this.app.toggleOrbitMode(isActive);
+        updateSeekbarVisibility();
+      });
+    }
+
+    // BARYON Mode (heavy particle background)
+    const topBaryonBtn = document.getElementById('topBaryonBtn');
+    if (topBaryonBtn) {
+      topBaryonBtn.addEventListener('click', () => {
+        const isActive = !topBaryonBtn.classList.contains('active');
+        topBaryonBtn.classList.toggle('active');
+        this.app.toggleBaryonMode(isActive);
+        updateSeekbarVisibility();
+      });
+    }
+
     // View Options (Top Bar)
     const topSolidBtn = document.getElementById('topSolidBtn');
     const topWireBtn = document.getElementById('topWireBtn');
@@ -1916,6 +1938,12 @@ export class UIController {
 
     const topBrainHackBtn = document.getElementById('topBrainHackBtn');
     if (topBrainHackBtn) topBrainHackBtn.classList.toggle('active', state.brainHackMode);
+
+    const topOrbitBtn = document.getElementById('topOrbitBtn');
+    if (topOrbitBtn) topOrbitBtn.classList.toggle('active', state.orbitMode);
+
+    const topBaryonBtn = document.getElementById('topBaryonBtn');
+    if (topBaryonBtn) topBaryonBtn.classList.toggle('active', state.baryonMode);
 
     // Update Mode Seekbars Visibility
     const modeSeekbars = document.getElementById('modeSeekbars');

@@ -266,6 +266,8 @@ export interface ApplicationState {
   cameraOrbitMode: boolean;
   cameraOrbitAxis: OrbitAxis;
   cameraOrbitReverse: boolean;
+  orbitMode: boolean;       // 360° XYZ rotation
+  baryonMode: boolean;      // Heavy particle background
   djName: string;
   showDJName: boolean;
   djNameEffect: DJNameEffect;

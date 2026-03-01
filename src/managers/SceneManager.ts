@@ -54,6 +54,19 @@ export class SceneManager extends EventEmitter {
   private cameraBackgroundPlane: THREE.Mesh | null = null;
   private cameraTexture: THREE.CanvasTexture | null = null;
 
+  // 360° Orbit mode
+  private orbitMode: boolean = false;
+  private orbitAngleX: number = 0;
+  private orbitAngleY: number = 0;
+  private orbitAngleZ: number = 0;
+  private orbitBaseSpeed: number = 0.003;
+
+  // Baryon mode (heavy particle background)
+  private baryonMode: boolean = false;
+  private baryonParticles: THREE.Points | null = null;
+  private baryonBasePositions: Float32Array | null = null;
+  private baryonVelocities: Float32Array | null = null;
+
   constructor(containerId: string) {
     super();
 
@@ -1528,12 +1541,243 @@ export class SceneManager extends EventEmitter {
     this.meshCache.clear();
   }
 
+  // ==================== 360° ORBIT MODE ====================
+
+  /**
+   * Set orbit mode (360° XYZ rotation of the entire view)
+   */
+  public setOrbitMode(enabled: boolean): void {
+    this.orbitMode = enabled;
+    if (!enabled) {
+      // Reset camera to default position
+      this.camera.position.set(0, 0, SCENE_CONFIG.CAMERA_POSITION_Z);
+      this.camera.lookAt(0, 0, 0);
+      this.orbitAngleX = 0;
+      this.orbitAngleY = 0;
+      this.orbitAngleZ = 0;
+    }
+  }
+
+  /**
+   * Update orbit rotation each frame
+   * @param audioIntensity - normalized 0-1 audio level
+   */
+  public updateOrbit(audioIntensity: number): void {
+    if (!this.orbitMode) return;
+
+    const cameraDistance = SCENE_CONFIG.CAMERA_POSITION_Z;
+
+    // Base rotation speed + audio boost
+    const speedBoost = 1.0 + audioIntensity * 3.0;
+
+    // Y axis: main horizontal orbit (always rotating)
+    this.orbitAngleY += this.orbitBaseSpeed * speedBoost;
+
+    // X axis: slow vertical tilt (audio reactive)
+    this.orbitAngleX += this.orbitBaseSpeed * 0.3 * speedBoost;
+
+    // Z axis: very slow roll
+    this.orbitAngleZ += this.orbitBaseSpeed * 0.1;
+
+    // Calculate camera position on sphere around origin
+    const x = cameraDistance * Math.sin(this.orbitAngleY) * Math.cos(this.orbitAngleX);
+    const y = cameraDistance * Math.sin(this.orbitAngleX) * 0.4; // Less vertical movement
+    const z = cameraDistance * Math.cos(this.orbitAngleY) * Math.cos(this.orbitAngleX);
+
+    this.camera.position.set(x, y, z);
+    this.camera.lookAt(0, 0, 0);
+
+    // Apply subtle roll
+    this.camera.rotation.z = Math.sin(this.orbitAngleZ) * 0.1;
+  }
+
+  // ==================== BARYON MODE ====================
+
+  private static readonly BARYON_COUNT = 4000;
+  private static readonly BARYON_RADIUS = 80;
+
+  /**
+   * Set baryon mode (heavy particle background)
+   */
+  public setBaryonMode(enabled: boolean): void {
+    this.baryonMode = enabled;
+
+    if (enabled) {
+      this.createBaryonParticles();
+    } else {
+      this.removeBaryonParticles();
+    }
+  }
+
+  /**
+   * Create baryon particle system
+   */
+  private createBaryonParticles(): void {
+    if (this.baryonParticles) {
+      this.removeBaryonParticles();
+    }
+
+    const count = SceneManager.BARYON_COUNT;
+    const radius = SceneManager.BARYON_RADIUS;
+    const positions = new Float32Array(count * 3);
+    const basePositions = new Float32Array(count * 3);
+    const velocities = new Float32Array(count * 3);
+    const sizes = new Float32Array(count);
+
+    for (let i = 0; i < count; i++) {
+      // Spherical distribution
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      const r = radius * (0.2 + Math.random() * 0.8); // 20-100% of radius
+
+      const x = r * Math.sin(phi) * Math.cos(theta);
+      const y = r * Math.sin(phi) * Math.sin(theta);
+      const z = r * Math.cos(phi);
+
+      positions[i * 3] = x;
+      positions[i * 3 + 1] = y;
+      positions[i * 3 + 2] = z;
+
+      // Store base positions for return-to-origin
+      basePositions[i * 3] = x;
+      basePositions[i * 3 + 1] = y;
+      basePositions[i * 3 + 2] = z;
+
+      // Random velocities (start at 0)
+      velocities[i * 3] = 0;
+      velocities[i * 3 + 1] = 0;
+      velocities[i * 3 + 2] = 0;
+
+      sizes[i] = 0.08 + Math.random() * 0.2;
+    }
+
+    this.baryonBasePositions = basePositions;
+    this.baryonVelocities = velocities;
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+    const material = new THREE.PointsMaterial({
+      color: 0xccddff,
+      size: 0.15,
+      transparent: true,
+      opacity: 0.7,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      sizeAttenuation: true,
+    });
+
+    this.baryonParticles = new THREE.Points(geometry, material);
+    this.baryonParticles.renderOrder = -1; // Behind everything
+    this.scene.add(this.baryonParticles);
+  }
+
+  /**
+   * Remove baryon particle system
+   */
+  private removeBaryonParticles(): void {
+    if (this.baryonParticles) {
+      this.scene.remove(this.baryonParticles);
+      this.baryonParticles.geometry.dispose();
+      (this.baryonParticles.material as THREE.PointsMaterial).dispose();
+      this.baryonParticles = null;
+      this.baryonBasePositions = null;
+      this.baryonVelocities = null;
+    }
+  }
+
+  /**
+   * Update baryon particles each frame (audio-reactive dispersion)
+   * @param bands - frequency bands { low, mid, high } (0-255 each)
+   */
+  public updateBaryonParticles(bands: { low: number; mid: number; high: number }): void {
+    if (!this.baryonParticles || !this.baryonBasePositions || !this.baryonVelocities) return;
+
+    const positions = this.baryonParticles.geometry.attributes.position as THREE.BufferAttribute;
+    const basePos = this.baryonBasePositions;
+    const vel = this.baryonVelocities;
+    const count = positions.count;
+
+    // Normalize bands to 0-1
+    const bass = bands.low / 255;
+    const mid = bands.mid / 255;
+    const high = bands.high / 255;
+
+    // Bass drives outward dispersion
+    const disperseForce = bass * 0.8;
+    // Mid drives rotation
+    const rotSpeed = mid * 0.005;
+    // High adds shimmer (size pulsing handled by opacity)
+    const shimmer = high * 0.3;
+
+    const time = Date.now() * 0.001;
+
+    for (let i = 0; i < count; i++) {
+      const i3 = i * 3;
+
+      // Current position
+      let px = positions.getX(i);
+      let py = positions.getY(i);
+      let pz = positions.getZ(i);
+
+      // Base position
+      const bx = basePos[i3];
+      const by = basePos[i3 + 1];
+      const bz = basePos[i3 + 2];
+
+      // Apply bass dispersion: push outward from origin
+      const dist = Math.sqrt(px * px + py * py + pz * pz) || 1;
+      const nx = px / dist;
+      const ny = py / dist;
+      const nz = pz / dist;
+
+      vel[i3] += nx * disperseForce * 0.3;
+      vel[i3 + 1] += ny * disperseForce * 0.3;
+      vel[i3 + 2] += nz * disperseForce * 0.3;
+
+      // Spring force: pull back to base position
+      vel[i3] += (bx - px) * 0.02;
+      vel[i3 + 1] += (by - py) * 0.02;
+      vel[i3 + 2] += (bz - pz) * 0.02;
+
+      // Damping
+      vel[i3] *= 0.95;
+      vel[i3 + 1] *= 0.95;
+      vel[i3 + 2] *= 0.95;
+
+      // Apply velocity
+      px += vel[i3];
+      py += vel[i3 + 1];
+      pz += vel[i3 + 2];
+
+      // Apply slow rotation (mid-frequency driven)
+      const cosR = Math.cos(rotSpeed);
+      const sinR = Math.sin(rotSpeed);
+      const rx = px * cosR - pz * sinR;
+      const rz = px * sinR + pz * cosR;
+
+      positions.setXYZ(i, rx, py, rz);
+    }
+
+    positions.needsUpdate = true;
+
+    // Update opacity based on shimmer
+    const mat = this.baryonParticles.material as THREE.PointsMaterial;
+    mat.opacity = 0.5 + shimmer;
+
+    // Slow global rotation of the particle system
+    this.baryonParticles.rotation.y += 0.0005;
+    this.baryonParticles.rotation.x = Math.sin(time * 0.1) * 0.05;
+  }
+
   /**
    * Cleanup
    */
   public dispose(): void {
     this.stopAnimation();
     this.clearMeshes();
+    this.removeBaryonParticles();
 
     if (this.dragControls) {
       this.dragControls.dispose();
