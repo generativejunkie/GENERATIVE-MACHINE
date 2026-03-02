@@ -793,8 +793,6 @@
         if (!mm || !btn) return setTimeout(applyReset, 200);
 
         btn.addEventListener('click', () => {
-          if (!confirm('RESET ALL\nすべてのオブジェクトと設定を初期化します。')) return;
-
           // 全モードボタンのアクティブ状態を解除
           document.querySelectorAll('.mode-btn.active').forEach(b => b.classList.remove('active'));
 
