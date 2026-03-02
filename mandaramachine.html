@@ -830,6 +830,18 @@
             if (el) { el.value = 0; el.dispatchEvent(new Event('input', {bubbles:true})); }
           });
 
+          // 全モード強制OFFを最後に念押し（非同期処理の後に確実にOFFにするため）
+          setTimeout(() => {
+            mm.toggleAutoMode(false);
+            mm.setMandalaMode(false);
+            mm.setSpaceMode(false);
+            mm.state.autoMode = false;
+            mm.state.mandalaMode = false;
+            mm.state.spaceMode = false;
+            document.querySelectorAll('.mode-btn.active').forEach(b => b.classList.remove('active'));
+            mm.setBackgroundColor({r:255, g:255, b:255});
+          }, 100);
+
           console.log('RESET complete');
         });
 
