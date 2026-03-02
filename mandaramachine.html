@@ -1047,7 +1047,10 @@
         // ---- デバイスリストを構築 ----
         async function buildDeviceList() {
           const devices = await navigator.mediaDevices.enumerateDevices();
-          const cams    = devices.filter(d => d.kind === 'videoinput');
+          const cams    = devices.filter(d =>
+              d.kind === 'videoinput' &&
+              !/facetime|macbook|built.?in|内蔵/i.test(d.label)
+            );
 
           // ラベルなし（未許可）なら1件だけ表示
           deviceList.innerHTML = '';
