@@ -1189,7 +1189,7 @@
             const disp = filter.querySelector('feDisplacementMap');
             if (disp) disp.setAttribute('scale', 8 + Math.random() * 20);
           }
-          glitchTimer = setTimeout(animateGlitch, 80 + Math.random() * 120);
+          glitchTimer = setTimeout(animateGlitch, 150 + Math.random() * 250);
         }
 
         // NOISE アニメーション
@@ -1198,7 +1198,7 @@
           if (!state.noise) return;
           const turb = document.querySelector('#filter-noise feTurbulence');
           if (turb) turb.setAttribute('seed', Math.floor(Math.random() * 100));
-          noiseTimer = setTimeout(animateNoise, 50);
+          noiseTimer = setTimeout(animateNoise, 200);
         }
 
         function applyFilter() {
@@ -1206,7 +1206,10 @@
           if (state.glitch) filters.push('url(#filter-glitch)');
           if (state.noise)  filters.push('url(#filter-noise)');
           if (state.mosaic) filters.push('url(#filter-mosaic)');
-          container.style.filter = filters.join(' ') || 'none';
+          // Three.jsとp5のcanvasにのみfilterをかける（video背景を除外）
+          const threeCanvas = window.mandalaMachine?.sceneManager?.renderer?.domElement;
+          const p5Canvas = document.querySelector('#p5-container canvas');
+          [threeCanvas, p5Canvas].forEach(c => { if(c) c.style.filter = filters.join(' ') || 'none'; });
         }
 
         const filterDefs = [
