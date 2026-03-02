@@ -741,6 +741,41 @@
 
     <script>
         (function(){var b=document.getElementById('leftPanelToggle'),p=document.getElementById('leftPanel'),r=document.getElementById('app-root'),o=true;b.addEventListener('click',function(){o=!o;if(o){p.classList.remove('collapsed');r.classList.remove('left-collapsed');b.classList.add('open');b.textContent='‹';}else{p.classList.add('collapsed');r.classList.add('left-collapsed');b.classList.remove('open');b.textContent='›';}});})();
-    <\/script></body>
+    <\/script><!-- FIX: BARYON Mode OFF → preserve object color from sliders -->
+    <script>
+      (function patchBaryonColorReset() {
+        function applyPatch() {
+          const mm = window.mandalaMachine;
+          if (!mm || typeof mm.toggleBaryonMode !== 'function') {
+            return setTimeout(applyPatch, 200);
+          }
+          const _orig = mm.toggleBaryonMode.bind(mm);
+          mm.toggleBaryonMode = function(t) {
+            const willTurnOff = (t === false) || (t === undefined && this.state.baryonMode);
+            let savedColor = null;
+            if (willTurnOff) {
+              const r = parseInt(document.getElementById('colorR')?.value ?? 0);
+              const g = parseInt(document.getElementById('colorG')?.value ?? 0);
+              const b = parseInt(document.getElementById('colorB')?.value ?? 0);
+              savedColor = { r, g, b };
+            }
+            _orig(t);
+            if (willTurnOff && savedColor) {
+              this.defaultObjectColor = savedColor;
+              this.instanceManager.getAllInstances().forEach(inst => {
+                inst.color = savedColor;
+              });
+              this.sceneManager.clearMeshCache();
+            }
+          };
+          console.log('✅ BARYON color reset patch applied');
+        }
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', applyPatch);
+        } else {
+          applyPatch();
+        }
+      })();
+    </script></body>
 
 </html>
