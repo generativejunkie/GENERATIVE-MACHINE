@@ -268,6 +268,20 @@
 
                     <div class="divider-vertical"></div>
                         <div class="mode-group">
+                            <button id="topGlitchBtn" class="mode-btn" title="GLITCH">
+                                <span class="icon symbol">▓</span>
+                                <span>GLITCH</span>
+                            </button>
+                            <button id="topNoiseBtn" class="mode-btn" title="NOISE">
+                                <span class="icon symbol">░</span>
+                                <span>NOISE</span>
+                            </button>
+                            <button id="topMosaicBtn" class="mode-btn" title="MOSAIC">
+                                <span class="icon symbol">▦</span>
+                                <span>MOSAIC</span>
+                            </button>
+                        </div>
+                        <div class="mode-group">
                             <button id="topResetBtn" class="mode-btn" title="RESET ALL" style="color:#ff4444;border-color:#ff4444;">
                                 <span class="icon symbol">⟳</span>
                                 <span>RESET</span>
@@ -856,6 +870,40 @@
           applyPatch();
         }
       })();
+    </script>
+
+    <!-- FILTER BUTTONS -->
+    <script>
+    (function setupFilterButtons() {
+      function applyFilters() {
+        const mm = window.mandalaMachine;
+        if (!mm) return setTimeout(applyFilters, 200);
+
+        const filters = [
+          { id: 'topGlitchBtn', key: 'glitch' },
+          { id: 'topNoiseBtn',  key: 'noise'  },
+          { id: 'topMosaicBtn', key: 'mosaic' },
+        ];
+
+        filters.forEach(({ id, key }) => {
+          const btn = document.getElementById(id);
+          if (!btn) return;
+          btn.addEventListener('click', () => {
+            mm.toggleGlobalEffect(key);
+            const isOn = mm.state.globalEffects[key];
+            btn.classList.toggle('active', isOn);
+          });
+        });
+
+        console.log('Filter buttons ready');
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applyFilters);
+      } else {
+        applyFilters();
+      }
+    })();
     </script>
 
     <!-- RESET ALL BUTTON -->
