@@ -873,29 +873,91 @@
     </script>
 
     <!-- FILTER BUTTONS -->
+    <!-- SVG filters for visual effects -->
+    <svg style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="filter-noise">
+          <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" result="noise"/>
+          <feColorMatrix type="saturate" values="0" in="noise" result="grayNoise"/>
+          <feBlend in="SourceGraphic" in2="grayNoise" mode="overlay" result="blend"/>
+          <feComposite in="blend" in2="SourceGraphic" operator="in"/>
+        </filter>
+        <filter id="filter-mosaic">
+          <feMorphology operator="erode" radius="4" result="erode"/>
+          <feMorphology operator="dilate" radius="4" in="erode"/>
+        </filter>
+        <filter id="filter-glitch">
+          <feTurbulence type="turbulence" baseFrequency="0.02 0.8" numOctaves="1" result="turb" seed="2"/>
+          <feDisplacementMap in="SourceGraphic" in2="turb" scale="12" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+      </defs>
+    </svg>
     <script>
     (function setupFilterButtons() {
       function applyFilters() {
-        const mm = window.mandalaMachine;
-        if (!mm) return setTimeout(applyFilters, 200);
+        const container = document.querySelector('.canvas-container');
+        if (!container) return setTimeout(applyFilters, 200);
 
-        const filters = [
-          { id: 'topGlitchBtn', key: 'glitch' },
-          { id: 'topNoiseBtn',  key: 'noise'  },
-          { id: 'topMosaicBtn', key: 'mosaic' },
+        // フィルター状態管理
+        const state = { glitch: false, noise: false, mosaic: false };
+
+        // アニメーションするGLITCH用
+        let glitchTimer = null;
+        function animateGlitch() {
+          if (!state.glitch) return;
+          const filter = document.getElementById('filter-glitch');
+          const turb = filter?.querySelector('feTurbulence');
+          if (turb) {
+            const seed = Math.floor(Math.random() * 100);
+            turb.setAttribute('seed', seed);
+            turb.setAttribute('baseFrequency', (0.01 + Math.random() * 0.04) + ' ' + (0.5 + Math.random() * 0.6));
+            const disp = filter.querySelector('feDisplacementMap');
+            if (disp) disp.setAttribute('scale', 8 + Math.random() * 20);
+          }
+          glitchTimer = setTimeout(animateGlitch, 80 + Math.random() * 120);
+        }
+
+        // NOISE アニメーション
+        let noiseTimer = null;
+        function animateNoise() {
+          if (!state.noise) return;
+          const turb = document.querySelector('#filter-noise feTurbulence');
+          if (turb) turb.setAttribute('seed', Math.floor(Math.random() * 100));
+          noiseTimer = setTimeout(animateNoise, 50);
+        }
+
+        function applyFilter() {
+          const filters = [];
+          if (state.glitch) filters.push('url(#filter-glitch)');
+          if (state.noise)  filters.push('url(#filter-noise)');
+          if (state.mosaic) filters.push('url(#filter-mosaic)');
+          container.style.filter = filters.join(' ') || 'none';
+        }
+
+        const filterDefs = [
+          { id: 'topGlitchBtn', key: 'glitch',
+            onEnable:  () => { animateGlitch(); },
+            onDisable: () => { clearTimeout(glitchTimer); } },
+          { id: 'topNoiseBtn',  key: 'noise',
+            onEnable:  () => { animateNoise(); },
+            onDisable: () => { clearTimeout(noiseTimer); } },
+          { id: 'topMosaicBtn', key: 'mosaic',
+            onEnable:  () => {},
+            onDisable: () => {} },
         ];
 
-        filters.forEach(({ id, key }) => {
+        filterDefs.forEach(({ id, key, onEnable, onDisable }) => {
           const btn = document.getElementById(id);
           if (!btn) return;
           btn.addEventListener('click', () => {
-            mm.toggleGlobalEffect(key);
-            const isOn = mm.state.globalEffects[key];
-            btn.classList.toggle('active', isOn);
+            state[key] = !state[key];
+            btn.classList.toggle('active', state[key]);
+            state[key] ? onEnable() : onDisable();
+            applyFilter();
           });
         });
 
-        console.log('Filter buttons ready');
+        console.log('Filter buttons ready (CSS/SVG mode)');
       }
 
       if (document.readyState === 'loading') {
