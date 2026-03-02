@@ -1005,78 +1005,78 @@
     <script>
     (function setupCameraInput() {
       function applyCamera() {
-        const mm = window.mandalaMachine;
         const btn = document.getElementById('cameraInputBtn');
-        if (!mm || !btn) return setTimeout(applyCamera, 200);
+        if (!btn) return setTimeout(applyCamera, 200);
 
         let stream = null;
-        let videoEl = null;
-        let rafId = null;
         let isActive = false;
-
-        function tick() {
-          if (!isActive || !videoEl) return;
-          mm.updateCameraBackground(videoEl);
-          rafId = requestAnimationFrame(tick);
-        }
 
         async function startCamera() {
           try {
-            // 利用可能なカメラデバイスを列挙
             const devices = await navigator.mediaDevices.enumerateDevices();
-            const videoDevices = devices.filter(d => d.kind === 'videoinput');
-            console.log('Available cameras:', videoDevices.map(d => d.label));
-
-            // iPhoneカメラを優先
-            const iphone = videoDevices.find(d => /iphone|continuity/i.test(d.label));
-            const deviceId = iphone?.deviceId || videoDevices[0]?.deviceId;
+            const cams = devices.filter(d => d.kind === 'videoinput');
+            const iphone = cams.find(d => /iphone|continuity/i.test(d.label));
+            const target = iphone || cams[0];
 
             stream = await navigator.mediaDevices.getUserMedia({
-              video: deviceId ? { deviceId: { exact: deviceId }, width: 1280, height: 720 } : { width: 1280, height: 720 },
+              video: { deviceId: { ideal: target?.deviceId }, width: 1280, height: 720 },
               audio: false
             });
 
-            videoEl = document.createElement('video');
-            videoEl.srcObject = stream;
-            videoEl.autoplay = true;
-            videoEl.muted = true;
-            videoEl.playsInline = true;
-            await videoEl.play();
+            const container = document.querySelector('.canvas-container');
+            const sm = window.mandalaMachine?.sceneManager;
 
+            document.getElementById('__cam_video__')?.remove();
+
+            const video = document.createElement('video');
+            video.id = '__cam_video__';
+            video.srcObject = stream;
+            video.autoplay = true;
+            video.muted = true;
+            video.playsInline = true;
+            video.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:1;pointer-events:none;';
+
+            container.style.position = 'relative';
+            container.insertBefore(video, container.firstChild);
+
+            if (sm) {
+              sm.renderer.domElement.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;background:transparent;z-index:2;';
+              sm.scene.background = null;
+            }
+
+            const p5c = document.getElementById('p5-container');
+            if (p5c) p5c.style.zIndex = '3';
+
+            await video.play();
             isActive = true;
             btn.classList.add('active');
-            btn.textContent = '⏹ カメラ';
-            tick();
-            console.log('Camera started:', iphone ? 'iPhone' : 'default');
-          } catch (e) {
-            console.error('Camera error:', e);
-            alert('カメラにアクセスできませんでした: ' + e.message);
+            btn.textContent = '⏹ CAM';
+            console.log('Camera live:', target?.label);
+          } catch(e) {
+            console.error('Camera error:', e.name, e.message);
           }
         }
 
         function stopCamera() {
           isActive = false;
-          cancelAnimationFrame(rafId);
           if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
-          if (videoEl) { videoEl.srcObject = null; videoEl = null; }
-          mm.updateCameraBackground(null);
+          document.getElementById('__cam_video__')?.remove();
+          const sm = window.mandalaMachine?.sceneManager;
+          if (sm) {
+            sm.renderer.domElement.style.cssText = '';
+            sm.renderer.domElement.style.backgroundColor = 'rgb(255,255,255)';
+          }
           btn.classList.remove('active');
-          btn.textContent = '📷 カメラ';
-          console.log('Camera stopped');
+          btn.textContent = '📷 CAM';
         }
 
-        btn.addEventListener('click', () => {
-          isActive ? stopCamera() : startCamera();
-        });
-
+        btn.addEventListener('click', () => isActive ? stopCamera() : startCamera());
         console.log('Camera input ready');
       }
 
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', applyCamera);
-      } else {
-        applyCamera();
-      }
+      } else { applyCamera(); }
     })();
     </script>
 
