@@ -747,7 +747,81 @@
 
     <script>
         (function(){var b=document.getElementById('leftPanelToggle'),p=document.getElementById('leftPanel'),r=document.getElementById('app-root'),o=true;b.addEventListener('click',function(){o=!o;if(o){p.classList.remove('collapsed');r.classList.remove('left-collapsed');b.classList.add('open');b.textContent='‹';}else{p.classList.add('collapsed');r.classList.add('left-collapsed');b.classList.remove('open');b.textContent='›';}});})();
-    <\/script><!-- FIX: BARYON Mode OFF → preserve object color from sliders -->
+    <\/script><!-- PERFORMANCE: Auto GC + FPS monitor -->
+    <script>
+    (function setupPerformanceManager() {
+      function applyPatch() {
+        const mm = window.mandalaMachine;
+        if (!mm) return setTimeout(applyPatch, 200);
+
+        const sm = mm.sceneManager;
+
+        // 1. clearAllにclearMeshCacheを追加（メモリリーク防止）
+        const _origClearAll = mm.clearAll.bind(mm);
+        mm.clearAll = function() {
+          _origClearAll();
+          sm.clearMeshCache();
+        };
+
+        // 2. 30秒ごとに自動GC（形状切り替え時の残骸を解放）
+        setInterval(() => {
+          if (!mm.state?.isPlaying) return;
+          const before = sm.renderer?.info?.memory?.geometries || 0;
+          sm.clearMeshCache();
+          const after = sm.renderer?.info?.memory?.geometries || 0;
+          if (before > after) console.log('GC: ' + before + ' -> ' + after + ' geometries');
+        }, 30000);
+
+        // 3. FPS監視 - 30FPS以下が3秒続いたら自動GC
+        let lowFpsCount = 0;
+        let lastFpsCheck = performance.now();
+        let frameCount = 0;
+
+        const origRaf = requestAnimationFrame;
+        let monitorActive = true;
+
+        function fpsMonitor() {
+          if (!monitorActive) return;
+          frameCount++;
+          const now = performance.now();
+          if (now - lastFpsCheck >= 1000) {
+            const fps = frameCount;
+            frameCount = 0;
+            lastFpsCheck = now;
+
+            if (fps < 30) {
+              lowFpsCount++;
+              if (lowFpsCount >= 3) {
+                // 3秒連続で30FPS以下 → 自動GC実行
+                sm.clearMeshCache();
+                lowFpsCount = 0;
+                console.log('Auto GC triggered (low FPS: ' + fps + ')');
+              }
+            } else {
+              lowFpsCount = 0;
+            }
+          }
+          requestAnimationFrame(fpsMonitor);
+        }
+        requestAnimationFrame(fpsMonitor);
+
+        // 4. オブジェクト上限を50に設定（デフォルトが無制限の場合）
+        if (typeof mm.setMaxObjects === 'function') {
+          mm.setMaxObjects(50);
+        }
+
+        console.log('Performance manager ready');
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applyPatch);
+      } else {
+        applyPatch();
+      }
+    })();
+    </script>
+
+    <!-- FIX: BARYON Mode OFF → preserve object color from sliders -->
     <script>
       (function patchBaryonColorReset() {
         function applyPatch() {
