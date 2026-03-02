@@ -267,6 +267,12 @@
                     </div>
 
                     <div class="divider-vertical"></div>
+                        <div class="mode-group">
+                            <button id="topResetBtn" class="mode-btn" title="RESET ALL" style="color:#ff4444;border-color:#ff4444;">
+                                <span class="icon symbol">⟳</span>
+                                <span>RESET</span>
+                            </button>
+                        </div>
 
                     <!-- Mode Group 3: View & Tools -->
                     <div class="mode-group system-tools">
@@ -776,6 +782,65 @@
           applyPatch();
         }
       })();
+    </script>
+
+    <!-- RESET ALL BUTTON -->
+    <script>
+    (function setupResetButton() {
+      function applyReset() {
+        const mm = window.mandalaMachine;
+        const btn = document.getElementById('topResetBtn');
+        if (!mm || !btn) return setTimeout(applyReset, 200);
+
+        btn.addEventListener('click', () => {
+          if (!confirm('RESET ALL\nすべてのオブジェクトと設定を初期化します。')) return;
+
+          // 全モードボタンのアクティブ状態を解除
+          document.querySelectorAll('.mode-btn.active').forEach(b => b.classList.remove('active'));
+
+          // アプリ全体をリセット
+          mm.clearAll();
+          mm.toggleBaryonMode(false);
+          mm.setMandalaMode(false);
+          mm.setReflectMode(false);
+          mm.toggleAntigravityMode(false);
+          mm.toggleSpinMode(false);
+          mm.toggleOrbitMode(false);
+          mm.toggleAutoMode(false);
+          mm.setWireframeMode('solid');
+          mm.setBackgroundColor({r:255, g:255, b:255});
+          mm.setDefaultObjectColor({r:0, g:0, b:0});
+          mm.setSizeMultiplier(1);
+          mm.setSpeedMultiplier(1);
+          mm.setSpreadMultiplier(1);
+          mm.setSpacingMultiplier(8);
+          mm.setSymmetryCount(1);
+          mm.setMasterIntensity(100);
+          mm.setBrightness(100);
+          mm.setContrast(100);
+          mm.setSaturation(100);
+
+          // カラースライダーをリセット
+          ['colorR','colorG','colorB'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) { el.value = 0; el.dispatchEvent(new Event('input', {bubbles:true})); }
+          });
+
+          // デフォルトオブジェクトを1つ追加
+          mm.addRandomInstance();
+
+          console.log('RESET complete');
+        });
+
+        console.log('Reset button ready');
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applyReset);
+      } else {
+        applyReset();
+      }
+    })();
     </script></body>
 
 </html>
