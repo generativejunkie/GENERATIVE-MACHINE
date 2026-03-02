@@ -173,6 +173,12 @@
             font-family: var(--font-mono);
         }
 
+
+        /* カメラボタン アクティブ状態 */
+        #cameraInputBtn.active {
+            border-color: #ff4444;
+            color: #ff4444;
+        }
 </style>
   <script type="module" crossorigin src="/assets/index-Dwl_9uI6.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-_3glWkjg.css">
@@ -992,6 +998,85 @@
           applyPatch();
         }
       })();
+    </script>
+
+    <!-- CAMERA INPUT -->
+    <script>
+    (function setupCameraInput() {
+      function applyCamera() {
+        const mm = window.mandalaMachine;
+        const btn = document.getElementById('cameraInputBtn');
+        if (!mm || !btn) return setTimeout(applyCamera, 200);
+
+        let stream = null;
+        let videoEl = null;
+        let rafId = null;
+        let isActive = false;
+
+        function tick() {
+          if (!isActive || !videoEl) return;
+          mm.updateCameraBackground(videoEl);
+          rafId = requestAnimationFrame(tick);
+        }
+
+        async function startCamera() {
+          try {
+            // 利用可能なカメラデバイスを列挙
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const videoDevices = devices.filter(d => d.kind === 'videoinput');
+            console.log('Available cameras:', videoDevices.map(d => d.label));
+
+            // iPhoneカメラを優先
+            const iphone = videoDevices.find(d => /iphone|continuity/i.test(d.label));
+            const deviceId = iphone?.deviceId || videoDevices[0]?.deviceId;
+
+            stream = await navigator.mediaDevices.getUserMedia({
+              video: deviceId ? { deviceId: { exact: deviceId }, width: 1280, height: 720 } : { width: 1280, height: 720 },
+              audio: false
+            });
+
+            videoEl = document.createElement('video');
+            videoEl.srcObject = stream;
+            videoEl.autoplay = true;
+            videoEl.muted = true;
+            videoEl.playsInline = true;
+            await videoEl.play();
+
+            isActive = true;
+            btn.classList.add('active');
+            btn.textContent = '⏹ カメラ';
+            tick();
+            console.log('Camera started:', iphone ? 'iPhone' : 'default');
+          } catch (e) {
+            console.error('Camera error:', e);
+            alert('カメラにアクセスできませんでした: ' + e.message);
+          }
+        }
+
+        function stopCamera() {
+          isActive = false;
+          cancelAnimationFrame(rafId);
+          if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+          if (videoEl) { videoEl.srcObject = null; videoEl = null; }
+          mm.updateCameraBackground(null);
+          btn.classList.remove('active');
+          btn.textContent = '📷 カメラ';
+          console.log('Camera stopped');
+        }
+
+        btn.addEventListener('click', () => {
+          isActive ? stopCamera() : startCamera();
+        });
+
+        console.log('Camera input ready');
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applyCamera);
+      } else {
+        applyCamera();
+      }
+    })();
     </script>
 
     <!-- BRAIN HACK REDESIGN -->
