@@ -824,9 +824,6 @@
             if (el) { el.value = 0; el.dispatchEvent(new Event('input', {bubbles:true})); }
           });
 
-          // デフォルトオブジェクトを1つ追加
-          mm.addRandomInstance();
-
           console.log('RESET complete');
         });
 
