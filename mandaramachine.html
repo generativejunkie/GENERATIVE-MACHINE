@@ -70,7 +70,110 @@
         #leftPanelToggle{position:fixed;top:10px;left:10px;z-index:9999;width:28px;height:28px;background:#111;border:1px solid #2a2a2a;color:#666;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:3px;transition:left .28s cubic-bezier(.4,0,.2,1)}
         #leftPanelToggle:hover{color:#e0e0e0;background:#1e1e1e}
         #leftPanelToggle.open{left:calc(var(--left-panel-width) + 10px)}
-    </style>
+    
+        /* ===== BRAIN HACK REDESIGN ===== */
+        .menu-section h3 {
+            font-size: 9px;
+            letter-spacing: 0.15em;
+            color: #444;
+            margin: 0 0 12px 0;
+            text-transform: uppercase;
+        }
+
+        /* モードグリッド: 3x2 */
+        .bh-mode-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+
+        .bh-mode-btn {
+            background: transparent;
+            border: 1px solid #222;
+            border-radius: 2px;
+            padding: 7px 0;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bh-mode-btn:hover {
+            border-color: #444;
+            background: #0a0a0a;
+        }
+
+        .bh-mode-btn.active {
+            border-color: #fff;
+            background: #000;
+        }
+
+        .bh-mode-btn.active::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+        }
+
+        .bh-mode-label {
+            display: block;
+            font-size: 7.5px;
+            letter-spacing: 0.12em;
+            color: #333;
+            text-align: center;
+            font-family: var(--font-mono);
+            transition: color 0.15s;
+        }
+
+        .bh-mode-btn.active .bh-mode-label {
+            color: #fff;
+        }
+
+        .bh-mode-btn:hover .bh-mode-label {
+            color: #888;
+        }
+
+        /* カラースウォッチ */
+        .bh-color-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .bh-swatch-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .bh-swatch {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 32px;
+            height: 32px;
+            border: 1px solid #222;
+            border-radius: 2px;
+            background: none;
+            cursor: pointer;
+            padding: 2px;
+            transition: border-color 0.15s;
+        }
+
+        .bh-swatch:hover { border-color: #555; }
+
+        .bh-swatch::-webkit-color-swatch-wrapper { padding: 0; border-radius: 1px; }
+        .bh-swatch::-webkit-color-swatch { border: none; border-radius: 1px; }
+
+        .bh-swatch-label {
+            font-size: 7px;
+            color: #333;
+            letter-spacing: 0.1em;
+            font-family: var(--font-mono);
+        }
+
+</style>
   <script type="module" crossorigin src="/assets/index-Dwl_9uI6.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-_3glWkjg.css">
 </head>
@@ -573,25 +676,44 @@
 
             <div class="menu-section">
                 <h3 data-i18n="brainhack">BRAIN HACK</h3>
-                <label class="checkbox-label">
-                    <input type="checkbox" id="brainHackMode">
-                    <span data-i18n="active">Active</span>
-                </label>
-                <div class="mode-selection" style="margin-top: 10px;">
-                    <button class="mode-tag-btn active" data-mode="0" data-i18n="phantom">PHANTOM</button>
-                    <button class="mode-tag-btn" data-mode="1" data-i18n="boolean">BOOLEAN</button>
-                    <button class="mode-tag-btn" data-mode="2" data-i18n="raven">RAVEN</button>
-                    <button class="mode-tag-btn" data-mode="3" data-i18n="neuro">NEURO</button>
-                    <button class="mode-tag-btn" data-mode="4" data-i18n="lattice">LATTICE</button>
-                    <button class="mode-tag-btn" data-mode="5" data-i18n="orbital">ORBITAL</button>
+
+                <!-- MODE GRID -->
+                <div class="bh-mode-grid">
+                    <button class="bh-mode-btn active" data-mode="0">
+                        <span class="bh-mode-label">PHANTOM</span>
+                    </button>
+                    <button class="bh-mode-btn" data-mode="1">
+                        <span class="bh-mode-label">BOOLEAN</span>
+                    </button>
+                    <button class="bh-mode-btn" data-mode="2">
+                        <span class="bh-mode-label">RAVEN</span>
+                    </button>
+                    <button class="bh-mode-btn" data-mode="3">
+                        <span class="bh-mode-label">NEURO</span>
+                    </button>
+                    <button class="bh-mode-btn" data-mode="4">
+                        <span class="bh-mode-label">LATTICE</span>
+                    </button>
+                    <button class="bh-mode-btn" data-mode="5">
+                        <span class="bh-mode-label">ORBITAL</span>
+                    </button>
                 </div>
-                <!-- ... coloring omitted for brevity if matching precisely ... -->
-                <div class="color-picker-group" style="margin-top: 10px;">
-                    <div style="display: flex; gap: 5px; align-items: center;">
-                        <input type="color" id="brainColorA" value="#00ffcc" title="Color A">
-                        <input type="color" id="brainColorB" value="#ff00aa" title="Color B">
-                        <input type="color" id="brainColorC" value="#110033" title="Avoid Color">
+
+                <!-- COLOR SWATCHES -->
+                <div class="bh-color-row">
+                    <div class="bh-swatch-wrap">
+                        <input type="color" id="brainColorA" value="#00ffcc" class="bh-swatch">
+                        <span class="bh-swatch-label">A</span>
                     </div>
+                    <div class="bh-swatch-wrap">
+                        <input type="color" id="brainColorB" value="#ff00aa" class="bh-swatch">
+                        <span class="bh-swatch-label">B</span>
+                    </div>
+                    <div class="bh-swatch-wrap">
+                        <input type="color" id="brainColorC" value="#110033" class="bh-swatch">
+                        <span class="bh-swatch-label">C</span>
+                    </div>
+                </div>
                 </div>
             </div>
 
@@ -870,6 +992,73 @@
           applyPatch();
         }
       })();
+    </script>
+
+    <!-- BRAIN HACK REDESIGN -->
+    <script>
+    (function setupBrainHack() {
+      function applyBH() {
+        const mm = window.mandalaMachine;
+        if (!mm) return setTimeout(applyBH, 200);
+
+        const modeNames = ['Phantom','Boolean','Raven','Neuro','Lattice','Orbital'];
+
+        // モードボタン
+        document.querySelectorAll('.bh-mode-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const mode = parseInt(btn.dataset.mode);
+            document.querySelectorAll('.bh-mode-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            mm.setBrainHackModeIndex(mode);
+
+            // 既存seekbarとも同期
+            const seekbar = document.getElementById('brainHackModeSeekbar');
+            const valueEl = document.getElementById('brainHackModeValue');
+            if (seekbar) seekbar.value = mode;
+            if (valueEl) valueEl.textContent = modeNames[mode];
+          });
+        });
+
+        // カラーピッカー（既存と同じロジック）
+        const colorMap = {
+          brainColorA: 0, brainColorB: 1, brainColorC: 2
+        };
+        Object.entries(colorMap).forEach(([id]) => {
+          const input = document.getElementById(id);
+          if (!input) return;
+          input.addEventListener('input', () => {
+            const a = document.getElementById('brainColorA')?.value || '#00ffcc';
+            const b = document.getElementById('brainColorB')?.value || '#ff00aa';
+            const c = document.getElementById('brainColorC')?.value || '#110033';
+            const hex2rgb = h => {
+              const r = parseInt(h.slice(1,3),16)/255;
+              const g = parseInt(h.slice(3,5),16)/255;
+              const bl = parseInt(h.slice(5,7),16)/255;
+              return {r,g,b:bl};
+            };
+            mm.setBrainHackColors(hex2rgb(a), hex2rgb(b), hex2rgb(c));
+          });
+        });
+
+        // topBrainHackBtnと連動（既存チェックボックスの代替）
+        const topBtn = document.getElementById('topBrainHackBtn');
+        if (topBtn) {
+          const orig = topBtn.onclick;
+          topBtn.addEventListener('click', () => {
+            const isOn = mm.state?.brainHackMode;
+            mm.toggleBrainHackMode(!isOn);
+          });
+        }
+
+        console.log('Brain Hack redesign ready');
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applyBH);
+      } else {
+        applyBH();
+      }
+    })();
     </script>
 
     <!-- FILTER BUTTONS -->
