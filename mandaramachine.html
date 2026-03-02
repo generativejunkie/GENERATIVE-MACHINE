@@ -179,6 +179,23 @@
             border-color: #ff4444;
             color: #ff4444;
         }
+        #camSelectBtn.has-iphone { border-color: #0af; color: #0af; }
+        .cam-device-item {
+            padding: 7px 12px;
+            font-size: 10px;
+            font-family: var(--font-mono);
+            color: #aaa;
+            cursor: pointer;
+            border-bottom: 1px solid #222;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.1s;
+        }
+        .cam-device-item:last-child { border-bottom: none; }
+        .cam-device-item:hover { background: #1a1a1a; color: #fff; }
+        .cam-device-item.active { color: #0af; }
+        .cam-device-icon { font-size: 14px; }
 </style>
   <script type="module" crossorigin src="/assets/index-Dwl_9uI6.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-_3glWkjg.css">
@@ -207,7 +224,11 @@
             </div>
             <div class="upload-section">
                 <button id="uploadMediaBtn" class="upload-btn" data-i18n="upload">+ MEDIA</button>
-                <button id="cameraInputBtn" class="upload-btn" style="margin-left:4px;" title="カメラ入力">📷 CAM</button>
+                <div id="cam-select-wrap" style="display:inline-flex;margin-left:4px;gap:2px;position:relative;">
+                    <button id="cameraInputBtn" class="upload-btn" title="カメラ入力">📷 CAM</button>
+                    <button id="camSelectBtn" class="upload-btn" style="padding:0 6px;font-size:9px;" title="カメラを選択">▼</button>
+                    <div id="camDeviceList" style="display:none;position:absolute;top:100%;left:0;margin-top:3px;background:#111;border:1px solid #333;border-radius:4px;min-width:180px;z-index:999;overflow:hidden;"></div>
+                </div>
                 <input type="file" id="mediaUpload" accept="image/*,video/*" style="display: none;">
             </div>
             <div class="text-input-section">
@@ -1005,21 +1026,75 @@
     <script>
     (function setupCameraInput() {
       function applyCamera() {
-        const btn = document.getElementById('cameraInputBtn');
+        const btn        = document.getElementById('cameraInputBtn');
+        const selectBtn  = document.getElementById('camSelectBtn');
+        const deviceList = document.getElementById('camDeviceList');
         if (!btn) return setTimeout(applyCamera, 200);
 
-        let stream = null;
-        let isActive = false;
+        let stream         = null;
+        let isActive       = false;
+        let selectedDevice = null; // { deviceId, label }
 
+        // ---- デバイスアイコン判定 ----
+        function deviceIcon(label) {
+          if (/iphone/i.test(label))  return '📱';
+          if (/ipad/i.test(label))    return '📱';
+          if (/continuity/i.test(label)) return '📱';
+          if (/facetime/i.test(label)) return '💻';
+          return '📷';
+        }
+
+        // ---- デバイスリストを構築 ----
+        async function buildDeviceList() {
+          const devices = await navigator.mediaDevices.enumerateDevices();
+          const cams    = devices.filter(d => d.kind === 'videoinput');
+
+          // ラベルなし（未許可）なら1件だけ表示
+          deviceList.innerHTML = '';
+          cams.forEach((cam, i) => {
+            const label = cam.label || `カメラ ${i + 1}`;
+            const icon  = deviceIcon(label);
+            const item  = document.createElement('div');
+            item.className = 'cam-device-item' + (selectedDevice?.deviceId === cam.deviceId ? ' active' : '');
+            item.innerHTML = `<span class="cam-device-icon">${icon}</span><span>${label}</span>`;
+            item.addEventListener('click', () => {
+              selectedDevice = { deviceId: cam.deviceId, label };
+              deviceList.style.display = 'none';
+              // アクティブ表示更新
+              [...deviceList.querySelectorAll('.cam-device-item')].forEach(el => el.classList.remove('active'));
+              item.classList.add('active');
+              // CAMが起動中なら切り替え
+              if (isActive) { stopCamera(); startCamera(); }
+            });
+            deviceList.appendChild(item);
+
+            // iPhoneを自動選択（初回）
+            if (!selectedDevice && /iphone|ipad|continuity/i.test(label)) {
+              selectedDevice = { deviceId: cam.deviceId, label };
+            }
+          });
+
+          // それでも未選択なら先頭
+          if (!selectedDevice && cams.length) {
+            selectedDevice = { deviceId: cams[0].deviceId, label: cams[0].label || 'カメラ 1' };
+          }
+
+          // iPhoneが選択されていたら▼ボタンを青く
+          if (selectedDevice && /iphone|ipad|continuity/i.test(selectedDevice.label)) {
+            selectBtn.classList.add('has-iphone');
+          }
+        }
+
+        // ---- カメラ起動 ----
         async function startCamera() {
           try {
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            const cams = devices.filter(d => d.kind === 'videoinput');
-            const iphone = cams.find(d => /iphone|continuity/i.test(d.label));
-            const target = iphone || cams[0];
-
             stream = await navigator.mediaDevices.getUserMedia({
-              video: { deviceId: { ideal: target?.deviceId }, width: 1280, height: 720 },
+              video: {
+                deviceId:  selectedDevice?.deviceId ? { ideal: selectedDevice.deviceId } : undefined,
+                width:     { ideal: 640 },
+                height:    { ideal: 360 },
+                frameRate: { ideal: 30, max: 30 }
+              },
               audio: false
             });
 
@@ -1034,14 +1109,15 @@
             video.autoplay = true;
             video.muted = true;
             video.playsInline = true;
-            video.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:1;pointer-events:none;';
+            video.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:1;pointer-events:none;will-change:transform;';
 
             container.style.position = 'relative';
             container.insertBefore(video, container.firstChild);
 
             if (sm) {
-              sm.renderer.domElement.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;background:transparent;z-index:2;';
+              sm.renderer.domElement.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;background:transparent;z-index:2;will-change:transform;';
               sm.scene.background = null;
+              sm.renderer.setPixelRatio(1);
             }
 
             const p5c = document.getElementById('p5-container');
@@ -1051,12 +1127,13 @@
             isActive = true;
             btn.classList.add('active');
             btn.textContent = '⏹ CAM';
-            console.log('Camera live:', target?.label);
           } catch(e) {
             console.error('Camera error:', e.name, e.message);
+            alert('カメラエラー: ' + e.message);
           }
         }
 
+        // ---- カメラ停止 ----
         function stopCamera() {
           isActive = false;
           if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
@@ -1065,13 +1142,34 @@
           if (sm) {
             sm.renderer.domElement.style.cssText = '';
             sm.renderer.domElement.style.backgroundColor = 'rgb(255,255,255)';
+            sm.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
           }
           btn.classList.remove('active');
           btn.textContent = '📷 CAM';
         }
 
-        btn.addEventListener('click', () => isActive ? stopCamera() : startCamera());
-        console.log('Camera input ready');
+        // ---- ▼ボタン: リスト開閉 ----
+        selectBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const isOpen = deviceList.style.display !== 'none';
+          if (isOpen) {
+            deviceList.style.display = 'none';
+          } else {
+            await buildDeviceList();
+            deviceList.style.display = 'block';
+          }
+        });
+
+        // 外側クリックで閉じる
+        document.addEventListener('click', () => { deviceList.style.display = 'none'; });
+
+        // ---- CAMボタン ----
+        btn.addEventListener('click', async () => {
+          if (isActive) { stopCamera(); return; }
+          // 初回は先にデバイスリスト構築（自動選択のため）
+          if (!selectedDevice) await buildDeviceList();
+          startCamera();
+        });
       }
 
       if (document.readyState === 'loading') {
