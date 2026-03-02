@@ -796,6 +796,10 @@
           // 全モードボタンのアクティブ状態を解除
           document.querySelectorAll('.mode-btn.active').forEach(b => b.classList.remove('active'));
 
+          // autoModeを先にOFF（背景色リセットのため）
+          mm.toggleAutoMode(false);
+          mm.setSpaceMode(false);
+
           // アプリ全体をリセット
           mm.clearAll();
           mm.toggleBaryonMode(false);
@@ -804,9 +808,7 @@
           mm.toggleAntigravityMode(false);
           mm.toggleSpinMode(false);
           mm.toggleOrbitMode(false);
-          mm.toggleAutoMode(false);
           mm.setWireframeMode('solid');
-          mm.setBackgroundColor({r:255, g:255, b:255});
           mm.setDefaultObjectColor({r:0, g:0, b:0});
           mm.setSizeMultiplier(1);
           mm.setSpeedMultiplier(1);
@@ -817,6 +819,9 @@
           mm.setBrightness(100);
           mm.setContrast(100);
           mm.setSaturation(100);
+
+          // 背景を白に強制セット
+          mm.setBackgroundColor({r:255, g:255, b:255});
 
           // カラースライダーをリセット
           ['colorR','colorG','colorB'].forEach(id => {
