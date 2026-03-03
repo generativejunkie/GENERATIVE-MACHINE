@@ -1482,13 +1482,10 @@
           { on: () => mm.toggleSpinMode(true),            off: () => mm.toggleSpinMode(false) },
           { on: () => mm.toggleBaryonMode(true),          off: () => mm.toggleBaryonMode(false) },
           { on: () => mm.toggleQuantumMode(true),         off: () => mm.toggleQuantumMode(false) },
-          { on: () => mm.toggleBrainHackMode(true),       off: () => mm.toggleBrainHackMode(false) },
           // STROBE: ON/OFFはblinkingModeで制御（短時間だけON）
           { on: () => { mm.setBlinkingMode(true); mm.setBlinkingSpeed(rand(4,10)); },
             off: () => mm.setBlinkingMode(false) },
-          // RAVEN: ボタン経由（専用APIなし）
-          { on: () => { const b = document.getElementById('topRavenBtn'); if(b && !b.classList.contains('active')) b.click(); },
-            off: () => { const b = document.getElementById('topRavenBtn'); if(b && b.classList.contains('active')) b.click(); } },
+
         ];
 
         // プリセットグリッドのボタンを取得
