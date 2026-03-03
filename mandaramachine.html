@@ -1479,15 +1479,19 @@
           const btns = getPresetBtns();
           if (!btns.length) return;
           const target = btns[rand(0, btns.length - 1)];
-          target.click();
+          // rAFで次フレームに分散（同フレーム内の処理集中を防ぐ）
+          requestAnimationFrame(() => target.click());
         }
 
         // ランダムにオブジェクト数を変更
         function randomizeCount() {
           const n = rand(1, 20);
-          mm.setObjectCount?.(n);
-          const input = document.getElementById('objectCount');
-          if (input) { input.value = n; input.dispatchEvent(new Event('input', { bubbles: true })); }
+          // rAFで次フレームに分散
+          requestAnimationFrame(() => {
+            mm.setObjectCount?.(n);
+            const input = document.getElementById('objectCount');
+            if (input) { input.value = n; input.dispatchEvent(new Event('input', { bubbles: true })); }
+          });
         }
 
         // ランダムにパラメータを変更
@@ -1524,11 +1528,16 @@
         }
 
         function cycle() {
+          // 各処理を1フレームずつ分散してガクつきゼロ
           randomizePreset();
-          randomizeModes();
-          randomizeParams();
-          randomizeWireframe();
-          if (Math.random() < 0.4) randomizeCount();
+          requestAnimationFrame(() => {
+            randomizeModes();
+            requestAnimationFrame(() => {
+              randomizeParams();
+              randomizeWireframe();
+              if (Math.random() < 0.4) randomizeCount();
+            });
+          });
         }
 
         // AUTO開始
