@@ -1464,6 +1464,42 @@
           return { r: Math.round((r+m)*255), g: Math.round((g+m)*255), b: Math.round((b+m)*255) };
         }
 
+        // 黒背景用: 明るい色 (L: 65-90)
+        function randBrightColor() {
+          const h = rand(0, 360);
+          const s = rand(60, 100);
+          const l = rand(65, 90);
+          const c = (1 - Math.abs(2 * l / 100 - 1)) * s / 100;
+          const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+          const m = l / 100 - c / 2;
+          let r = 0, g = 0, b = 0;
+          if (h < 60)       { r=c; g=x; }
+          else if (h < 120) { r=x; g=c; }
+          else if (h < 180) { g=c; b=x; }
+          else if (h < 240) { g=x; b=c; }
+          else if (h < 300) { r=x; b=c; }
+          else              { r=c; b=x; }
+          return { r: Math.round((r+m)*255), g: Math.round((g+m)*255), b: Math.round((b+m)*255) };
+        }
+
+        // 白背景用: 濃い色 (L: 10-40)
+        function randDarkColor() {
+          const h = rand(0, 360);
+          const s = rand(60, 100);
+          const l = rand(10, 40);
+          const c = (1 - Math.abs(2 * l / 100 - 1)) * s / 100;
+          const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+          const m = l / 100 - c / 2;
+          let r = 0, g = 0, b = 0;
+          if (h < 60)       { r=c; g=x; }
+          else if (h < 120) { r=x; g=c; }
+          else if (h < 180) { g=c; b=x; }
+          else if (h < 240) { g=x; b=c; }
+          else if (h < 300) { r=x; b=c; }
+          else              { r=c; b=x; }
+          return { r: Math.round((r+m)*255), g: Math.round((g+m)*255), b: Math.round((b+m)*255) };
+        }
+
         // ランダムにモードを切り替え（1〜3個をON）
         function randomizeModes() {
           // 全OFF
@@ -1504,13 +1540,13 @@
           const isDark = Math.random() < 0.5;
           const bg = isDark ? { r: 0, g: 0, b: 0 } : { r: 255, g: 255, b: 255 };
           mm.setBackgroundColor?.(bg);
-          // 黒背景なら白かカラー、白背景なら黒かカラー
+          // オブジェクトカラー: 背景と被らない色を必ず選ぶ
           if (isDark) {
-            // 暗背景 → 白 or カラー（黒は使わない）
-            mm.setDefaultObjectColor?.(Math.random() < 0.5 ? { r: 255, g: 255, b: 255 } : randColor());
+            // 黒背景 → 白 or 明るいカラー（黒は使わない）
+            mm.setDefaultObjectColor?.(Math.random() < 0.5 ? { r: 255, g: 255, b: 255 } : randBrightColor());
           } else {
-            // 白背景 → 黒 or カラー
-            mm.setDefaultObjectColor?.(Math.random() < 0.5 ? { r: 0, g: 0, b: 0 } : randColor());
+            // 白背景 → 黒 or 濃いカラー（白は使わない）
+            mm.setDefaultObjectColor?.(Math.random() < 0.5 ? { r: 0, g: 0, b: 0 } : randDarkColor());
           }
         }
 
