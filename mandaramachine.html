@@ -325,6 +325,10 @@
                     <!-- Left Side: Features -->
                     <!-- Mode Group 1: Core Mechanics -->
                     <div class="mode-group">
+                        <button id="topAutoBtn" class="mode-btn" title="Auto Mode" data-i18n-title="auto">
+                            <span class="icon symbol">⟳</span>
+                            <span data-i18n="auto">AUTO</span>
+                        </button>
                         <button id="topAiBtn" class="mode-btn" title="Space Mode" data-i18n-title="space">
                             <span class="icon symbol">✧</span>
                             <span data-i18n="space">SPACE</span>
@@ -333,10 +337,6 @@
                             aria-pressed="false" role="switch" data-i18n-title="mandala">
                             <span class="icon symbol">🌀</span>
                             <span data-i18n="mandala">MANDALA</span>
-                        </button>
-                        <button id="topAutoBtn" class="mode-btn" title="Auto Mode" data-i18n-title="auto">
-                            <span class="icon symbol">⟳</span>
-                            <span data-i18n="auto">AUTO</span>
                         </button>
                         <div class="dropdown-container">
                             <button id="topBlinkBtn" class="mode-btn" title="Strobe" data-i18n-title="blinkingMode">
@@ -1412,6 +1412,160 @@
         applyReset();
       }
     })();
-    </script></body>
+    </script>
+    <!-- AUTO FULL MODE -->
+    <script>
+    (function setupAutoFullMode() {
+      function apply() {
+        const btn = document.getElementById('topAutoBtn');
+        if (!btn) return setTimeout(apply, 200);
+
+        const mm = window.mandalaMachine;
+        if (!mm) return setTimeout(apply, 300);
+
+        let isActive = false;
+        let timers = [];
+
+        // 利用可能なモードリスト（Brain Hackは除外）
+        const MODES = [
+          { on: () => mm.setSpaceMode(true),              off: () => mm.setSpaceMode(false) },
+          { on: () => mm.setMandalaMode(true),            off: () => mm.setMandalaMode(false) },
+          { on: () => mm.toggleAntigravityMode(true),     off: () => mm.toggleAntigravityMode(false) },
+          { on: () => mm.toggleOrbitMode(true),           off: () => mm.toggleOrbitMode(false) },
+          { on: () => mm.toggleSpinMode(true),            off: () => mm.toggleSpinMode(false) },
+          { on: () => mm.toggleBaryonMode(true),          off: () => mm.toggleBaryonMode(false) },
+        ];
+
+        // プリセットグリッドのボタンを取得
+        function getPresetBtns() {
+          return [...document.querySelectorAll('#presetGridLeft .preset-item, #presetGridLeft button')];
+        }
+
+        // ランダム整数
+        function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+        // ランダムカラー（低彩度〜高彩度のランダム）
+        function randColor() {
+          const h = rand(0, 360);
+          const s = rand(40, 100);
+          const l = rand(30, 70);
+          // HSLをRGBに変換
+          const c = (1 - Math.abs(2 * l / 100 - 1)) * s / 100;
+          const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+          const m = l / 100 - c / 2;
+          let r = 0, g = 0, b = 0;
+          if (h < 60)       { r=c; g=x; }
+          else if (h < 120) { r=x; g=c; }
+          else if (h < 180) { g=c; b=x; }
+          else if (h < 240) { g=x; b=c; }
+          else if (h < 300) { r=x; b=c; }
+          else              { r=c; b=x; }
+          return { r: Math.round((r+m)*255), g: Math.round((g+m)*255), b: Math.round((b+m)*255) };
+        }
+
+        // ランダムにモードを切り替え（1〜3個をON）
+        function randomizeModes() {
+          // 全OFF
+          MODES.forEach(m => m.off());
+          // ランダムに1〜3個ON
+          const count = rand(1, 3);
+          const shuffled = [...MODES].sort(() => Math.random() - 0.5);
+          shuffled.slice(0, count).forEach(m => m.on());
+        }
+
+        // ランダムにプリセットを切り替え
+        function randomizePreset() {
+          const btns = getPresetBtns();
+          if (!btns.length) return;
+          const target = btns[rand(0, btns.length - 1)];
+          target.click();
+        }
+
+        // ランダムにオブジェクト数を変更
+        function randomizeCount() {
+          const n = rand(1, 20);
+          mm.setObjectCount?.(n);
+          const input = document.getElementById('objectCount');
+          if (input) { input.value = n; input.dispatchEvent(new Event('input', { bubbles: true })); }
+        }
+
+        // ランダムにパラメータを変更
+        function randomizeParams() {
+          mm.setSizeMultiplier?.(0.3 + Math.random() * 2.5);
+          mm.setSpeedMultiplier?.(0.2 + Math.random() * 2.0);
+          mm.setSpreadMultiplier?.(0.5 + Math.random() * 2.0);
+          mm.setSpacingMultiplier?.(rand(2, 12));
+          // 背景色も変える（白〜黒〜ダーク系）
+          const bg = Math.random() < 0.5 ? { r: 0, g: 0, b: 0 } : { r: rand(0, 30), g: rand(0, 30), b: rand(0, 30) };
+          mm.setBackgroundColor?.(bg);
+          // オブジェクトカラー
+          if (Math.random() < 0.6) {
+            const col = randColor();
+            mm.setDefaultObjectColor?.(col);
+          } else {
+            mm.setDefaultObjectColor?.({ r: 255, g: 255, b: 255 });
+          }
+        }
+
+        // シーン全体をランダムに変化させる1サイクル
+        function cycle() {
+          randomizePreset();
+          randomizeModes();
+          randomizeParams();
+          if (Math.random() < 0.4) randomizeCount();
+        }
+
+        // AUTO開始
+        function startAuto() {
+          isActive = true;
+          btn.classList.add('active');
+
+          // 既存のautoModeをOFF（旧モードと干渉しないよう）
+          mm.toggleAutoMode?.(false);
+
+          // 初回即実行
+          cycle();
+
+          // 4〜10秒ごとにサイクル
+          function scheduleNext() {
+            const delay = rand(4000, 10000);
+            const t = setTimeout(() => {
+              if (!isActive) return;
+              cycle();
+              scheduleNext();
+            }, delay);
+            timers.push(t);
+          }
+          scheduleNext();
+        }
+
+        // AUTO停止
+        function stopAuto() {
+          isActive = false;
+          timers.forEach(t => clearTimeout(t));
+          timers = [];
+          btn.classList.remove('active');
+          // 全モードOFF
+          MODES.forEach(m => m.off());
+        }
+
+        btn.addEventListener('click', () => isActive ? stopAuto() : startAuto());
+
+        // RESETボタンと連携
+        const resetBtn = document.getElementById('topResetBtn');
+        if (resetBtn) {
+          resetBtn.addEventListener('click', () => {
+            if (isActive) stopAuto();
+          }, { capture: true });
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', apply);
+      } else { apply(); }
+    })();
+    </script>
+
+</body>
 
 </html>
