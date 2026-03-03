@@ -1928,6 +1928,65 @@
     })();
     </script>
 
+    <script>
+    // ===== テキストフィット: 文字数に応じてフォントサイズを自動調整 =====
+    (function() {
+      function patchFitTextSize() {
+        const mm = window.mandalaMachine;
+        if (!mm || !mm.processingLayer) {
+          setTimeout(patchFitTextSize, 500);
+          return;
+        }
+        const pl = mm.processingLayer;
+
+        // fitTextSizeをオーバーライド
+        // 元: t.width * 0.85 で横幅のみチェック
+        // 新: 文字数に応じてベースサイズを下げ、横幅80%・縦幅70%の両方でクランプ
+        pl.fitTextSize = function(p, text, baseSize) {
+          const len = text.length;
+
+          // 文字数によるベースサイズの補正
+          // 1〜5文字: そのまま / 6〜10: 80% / 11〜20: 60% / 21〜: 40%
+          let scale = 1.0;
+          if      (len <= 5)  scale = 1.0;
+          else if (len <= 10) scale = 0.80;
+          else if (len <= 20) scale = 0.60;
+          else if (len <= 35) scale = 0.45;
+          else                scale = 0.30;
+
+          let size = baseSize * scale;
+          p.textSize(size);
+
+          // 横幅クランプ（キャンバス幅の78%以内）
+          const maxW = p.width * 0.78;
+          const textW = p.textWidth(text);
+          if (textW > maxW) {
+            size *= maxW / textW;
+          }
+
+          // 縦幅クランプ（キャンバス高さの60%以内）
+          const maxH = p.height * 0.60;
+          if (size > maxH) size = maxH;
+
+          // 最小サイズ保証（小さすぎて読めないのを防止）
+          size = Math.max(size, 8);
+
+          p.textSize(size);
+          return size;
+        };
+
+        console.log('[TextFit] fitTextSize patched');
+      }
+
+      // DOMContentLoaded後にパッチ
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => setTimeout(patchFitTextSize, 1000));
+      } else {
+        setTimeout(patchFitTextSize, 1000);
+      }
+    })();
+    </script>
+
 </body>
 
 </html>
