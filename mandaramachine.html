@@ -1511,10 +1511,23 @@
         }
 
         // シーン全体をランダムに変化させる1サイクル
+        // ワイヤーフレームモードをランダムに切り替え
+        function randomizeWireframe() {
+          const modes = ['solid', 'wire', 'mix'];
+          const picked = modes[rand(0, modes.length - 1)];
+          mm.setWireframeMode?.(picked);
+          // ボタン状態を更新
+          ['solid','wire','mix'].forEach(m => {
+            const btn = document.querySelector(`.wireframe-btn[data-mode="${m}"], #wireframe${m.charAt(0).toUpperCase()+m.slice(1)}Btn`);
+            if (btn) btn.classList.toggle('active', m === picked);
+          });
+        }
+
         function cycle() {
           randomizePreset();
           randomizeModes();
           randomizeParams();
+          randomizeWireframe();
           if (Math.random() < 0.4) randomizeCount();
         }
 
