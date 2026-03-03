@@ -1542,11 +1542,11 @@
           mm.setBackgroundColor?.(bg);
           // オブジェクトカラー: 背景と被らない色を必ず選ぶ
           if (isDark) {
-            // 黒背景 → 白 or 明るいカラー（黒は使わない）
-            mm.setDefaultObjectColor?.(Math.random() < 0.5 ? { r: 255, g: 255, b: 255 } : randBrightColor());
+            // 黒背景 → 必ず明るいカラー（白 or bright color、黒NG）
+            mm.setDefaultObjectColor?.(randBrightColor());
           } else {
-            // 白背景 → 黒 or 濃いカラー（白は使わない）
-            mm.setDefaultObjectColor?.(Math.random() < 0.5 ? { r: 0, g: 0, b: 0 } : randDarkColor());
+            // 白背景 → 必ず濃いカラー（黒 or dark color、白NG）
+            mm.setDefaultObjectColor?.(randDarkColor());
           }
         }
 
