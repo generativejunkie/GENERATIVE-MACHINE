@@ -379,6 +379,10 @@
                             <span class="icon symbol">◈</span>
                             <span data-i18n="raven">RAVEN</span>
                         </button>
+                        <button id="topCodeRainBtn" class="mode-btn" title="Code Rain Mode">
+                            <span class="icon symbol">⌨</span>
+                            <span>CODE</span>
+                        </button>
                         <button id="topQuantumBtn" class="mode-btn" title="Quantum Mode" data-i18n-title="quantum">
                             <span class="icon symbol">✦</span>
                             <span data-i18n="quantum">QUANTUM</span>
@@ -1652,6 +1656,181 @@
             if (isActive) stopAuto();
           }, { capture: true });
         }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', apply);
+      } else { apply(); }
+    })();
+    </script>
+
+
+    <!-- CODE RAIN MODE -->
+    <script>
+    (function setupCodeRain() {
+      function apply() {
+        const btn = document.getElementById('topCodeRainBtn');
+        if (!btn) return setTimeout(apply, 200);
+
+        let isActive = false;
+        let canvas = null;
+        let ctx = null;
+        let rafId = null;
+        let cols = [];
+        let frame = 0;
+        let patternPhase = 0; // 0=rain, 1=forming, 2=pattern, 3=dissolve
+
+        // 実際のminified JSコードから文字を拝借
+        const CODE_SRC = 'ger.stopCamera(),console.log("Camera stopped")getMosaicCanvas(){var t;return((t=this.mosaicProcessor)==null?void 0:t.getCanvas())??null}setupAutoBgControls(){const t=document.getElementById("autoStrobeCheckbox"),n=document.getElementById("autoColorAPicker");t&&t.addEventListener("change",()=>{this.app.setAutoColorStrobe(t.checked)})};setBlinkingMode(t){this.state.blinkingMode=t,t||this.resetBackgroundIfManual()}toggleBlinkingMode(){const t=!this.state.blinkingMode;return this.setBlinkingMode(t),t}setBlinkingSpeed(t){this.state.blinkingSpeed=t}handleBlinkingMode(){const t=Date.now(),n=500/this.state.blinkingSpeed}setupCanvasTextControl(){const t=document.getElementById("canvasText");t&&t.addEventListener("input",l=>{const c=l.target.value;this.app.setCanvasText(c)})}function randomize(){return Math.floor(Math.random()*256)}updateMeshesForInstance(t,n,r,s,a,o,l,c,u,h,d,f){const p=this.meshCache.get(t.id);if(!p)return;const m=Date.now()*.001*o}createSymmetricMesh(t,n,r){const s=[];for(let a=0;a<n;a++){const o=a/n*Math.PI*2}}toggleSpinMode(t){const n=t!==void 0?t:!this.state.spinMode;this.state.spinMode=n}setWireframeMode(t){this.state.wireframeMode=t}setBackgroundColor(t){const{r:n,g:r,b:s}=t;this.sceneManager.setBackgroundColor(t)}';
+
+        const CHARS = CODE_SRC.split('');
+        const FONT_SIZE = 11;
+        const COLS_COUNT = () => Math.floor(canvas.width / (FONT_SIZE * 0.65));
+
+        // マンダラパターン用の対称座標
+        function mandalaPoint(t, radius, sym, i) {
+          const angle = (i / sym) * Math.PI * 2 + t;
+          return {
+            x: canvas.width / 2 + Math.cos(angle) * radius,
+            y: canvas.height / 2 + Math.sin(angle) * radius
+          };
+        }
+
+        function initCols(count) {
+          cols = Array.from({ length: count }, (_, i) => ({
+            x: i * (FONT_SIZE * 0.65) + FONT_SIZE * 0.3,
+            y: canvas.height + Math.random() * canvas.height, // 画面外下から開始
+            speed: 1.5 + Math.random() * 3,
+            charIdx: Math.floor(Math.random() * CHARS.length),
+            brightness: 0.5 + Math.random() * 0.5,
+            trail: Math.floor(8 + Math.random() * 12),
+          }));
+        }
+
+        function startRain() {
+          const container = document.getElementById('canvasContainer');
+          canvas = document.createElement('canvas');
+          canvas.id = '__code_rain_canvas__';
+          canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:6;pointer-events:none;';
+          container.appendChild(canvas);
+
+          function resize() {
+            const rect = container.getBoundingClientRect();
+            canvas.width  = rect.width;
+            canvas.height = rect.height;
+            initCols(COLS_COUNT());
+          }
+          resize();
+          window.__codeRainResize = resize;
+          window.addEventListener('resize', resize);
+
+          ctx = canvas.getContext('2d');
+          patternPhase = 0;
+          frame = 0;
+          tick();
+        }
+
+        function tick() {
+          if (!isActive) return;
+          rafId = requestAnimationFrame(tick);
+          frame++;
+
+          const W = canvas.width;
+          const H = canvas.height;
+
+          // フェーズ管理: 600フレームごとにパターン形成フェーズへ
+          const cyclLen = 600;
+          const phasePos = frame % cyclLen;
+          if (phasePos < 400)       patternPhase = 0; // rain
+          else if (phasePos < 450)  patternPhase = 1; // forming
+          else if (phasePos < 550)  patternPhase = 2; // pattern hold
+          else                      patternPhase = 3; // dissolve
+
+          // 背景を半透明で塗りつぶし（トレイル効果）
+          ctx.fillStyle = 'rgba(0,0,0,0.08)';
+          ctx.fillRect(0, 0, W, H);
+
+          ctx.font = `${FONT_SIZE}px "Space Grotesk", monospace`;
+
+          if (patternPhase === 0 || patternPhase === 3) {
+            // ---- RAINフェーズ: 下から上へ流れる ----
+            cols.forEach(col => {
+              col.y -= col.speed;
+
+              // 画面上端を超えたらリセット（下から再登場）
+              if (col.y < -FONT_SIZE * col.trail) {
+                col.y = H + Math.random() * 200;
+                col.speed = 1.5 + Math.random() * 3;
+                col.charIdx = Math.floor(Math.random() * CHARS.length);
+              }
+
+              // トレイル描画
+              for (let t = 0; t < col.trail; t++) {
+                const cy = col.y + t * FONT_SIZE;
+                if (cy < 0 || cy > H) continue;
+                const alpha = (t / col.trail) * col.brightness;
+                const ch = CHARS[(col.charIdx + t) % CHARS.length];
+                // 先頭は明るい白、末尾は暗い緑
+                if (t === 0) {
+                  ctx.fillStyle = `rgba(220,255,220,${alpha})`;
+                } else if (t < 3) {
+                  ctx.fillStyle = `rgba(100,255,100,${alpha * 0.8})`;
+                } else {
+                  ctx.fillStyle = `rgba(0,180,60,${alpha * 0.5})`;
+                }
+                ctx.fillText(ch, col.x, cy);
+              }
+              col.charIdx = (col.charIdx + 1) % CHARS.length;
+            });
+
+          } else if (patternPhase === 1 || patternPhase === 2) {
+            // ---- PATTERNフェーズ: 文字がマンダラ状に集合 ----
+            const sym = 8;
+            const t = frame * 0.01;
+            const progress = patternPhase === 1 ? (phasePos - 400) / 50 : 1;
+
+            cols.forEach((col, i) => {
+              const ringIdx = i % 3;
+              const radius = 80 + ringIdx * 60;
+              const target = mandalaPoint(t, radius, cols.length / 3, i);
+
+              // 現在位置からtargetへ補間
+              col.x += (target.x - col.x) * 0.06 * progress;
+              col.y += (target.y - col.y) * 0.06 * progress;
+
+              const ch = CHARS[col.charIdx % CHARS.length];
+              const glow = 0.6 + Math.sin(frame * 0.05 + i) * 0.4;
+              ctx.fillStyle = `rgba(0,255,80,${glow * 0.9})`;
+              ctx.fillText(ch, col.x, col.y);
+              col.charIdx = (col.charIdx + 1) % CHARS.length;
+            });
+          }
+        }
+
+        function stopRain() {
+          isActive = false;
+          if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+          window.removeEventListener('resize', window.__codeRainResize);
+          document.getElementById('__code_rain_canvas__')?.remove();
+          canvas = null; ctx = null;
+        }
+
+        btn.addEventListener('click', () => {
+          if (isActive) {
+            isActive = false;
+            stopRain();
+            btn.classList.remove('active');
+          } else {
+            isActive = true;
+            btn.classList.add('active');
+            startRain();
+          }
+        });
+
+        // RESETボタン連携
+        document.getElementById('topResetBtn')?.addEventListener('click', () => {
+          if (isActive) { stopRain(); btn.classList.remove('active'); }
+        }, { capture: true });
       }
 
       if (document.readyState === 'loading') {
