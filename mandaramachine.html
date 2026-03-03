@@ -1555,45 +1555,65 @@
           scheduleNext();
 
           // エフェクトランダムサイクル（一定期間ON→別に切り替え）
-          const FX_SLOTS = [
+          // エフェクト独立ランダムループ
+          // glitch / noise / mosaic: 3〜8秒ごとに10%確率でON、2〜6秒後にOFF
+          // strobe: 約5分に1回、白/黒/赤ランダム、10秒後にOFF
+          const EFFECT_SLOTS = [
             { key: 'glitch', btnId: 'topGlitchBtn', apply: v => mm.setGlobalEffect?.('glitch', v) },
             { key: 'noise',  btnId: 'topNoiseBtn',  apply: v => mm.setGlobalEffect?.('noise',  v) },
             { key: 'mosaic', btnId: 'topMosaicBtn', apply: v => mm.setGlobalEffect?.('mosaic', v) },
-            { key: 'strobe', btnId: 'topBlinkBtn',  apply: v => { mm.setBlinkingMode?.(v); if (v) mm.setBlinkingSpeed?.(10); } },
           ];
+          const STROBE_COLORS = ['#ffffff', '#000000', '#ff0000'];
 
-          function clearAllFx() {
-            FX_SLOTS.forEach(fx => {
-              fx.apply(false);
-              document.getElementById(fx.btnId)?.classList.remove('active');
-            });
+          function setFxBtn(btnId, on) {
+            document.getElementById(btnId)?.classList.toggle('active', on);
           }
 
-          function applyFx(slot) {
-            slot.apply(true);
-            document.getElementById(slot.btnId)?.classList.add('active');
-          }
-
-          function scheduleFxCycle() {
-            if (!isActive) return;
-
-            // 無エフェクト期間: 3〜8秒
-            const pauseDur = rand(3000, 8000);
-            const t1 = setTimeout(() => {
+          // glitch/noise/mosaicの独立ループ
+          EFFECT_SLOTS.forEach(fx => {
+            function fxTick() {
               if (!isActive) return;
-
-              // ランダムに1〜2個のエフェクトをON
-              clearAllFx();
-              const shuffled = [...FX_SLOTS].sort(() => Math.random() - 0.5);
-              const count = Math.random() < 0.4 ? 2 : 1;
-              shuffled.slice(0, count).forEach(applyFx);
-
-              // ON期間: 2〜6秒
-              const onDur = fx.key === 'strobe' ? 10000 : rand(2000, 6000);
-              const t2 = setTimeout(() => {
+              const delay = rand(3000, 8000);
+              const t = setTimeout(() => {
                 if (!isActive) return;
-                clearAllFx();
-                scheduleFxCycle(); // 次のサイクルへ
+                if (Math.random() < 0.1) {
+                  fx.apply(true);
+                  setFxBtn(fx.btnId, true);
+                  const dur = rand(2000, 6000);
+                  const off = setTimeout(() => { fx.apply(false); setFxBtn(fx.btnId, false); }, dur);
+                  timers.push(off);
+                }
+                fxTick();
+              }, delay);
+              timers.push(t);
+            }
+            fxTick();
+          });
+
+          // strobeの独立ループ（約5分に1回）
+          function strobeTick() {
+            if (!isActive) return;
+            const delay = rand(270000, 330000); // 4.5〜5.5分
+            const t = setTimeout(() => {
+              if (!isActive) return;
+              // 白/黒/赤からランダムに2色選んでストロボ
+              const colors = [...STROBE_COLORS].sort(() => Math.random() - 0.5);
+              mm.setAutoColors?.(colors[0], colors[1], colors[2]);
+              mm.setAutoColorStrobe?.(true);
+              mm.setBlinkingMode?.(true);
+              mm.setBlinkingSpeed?.(10);
+              setFxBtn('topBlinkBtn', true);
+              const off = setTimeout(() => {
+                mm.setBlinkingMode?.(false);
+                mm.setAutoColorStrobe?.(false);
+                setFxBtn('topBlinkBtn', false);
+                strobeTick();
+              }, 10000);
+              timers.push(off);
+            }, delay);
+            timers.push(t);
+          }
+          strobeTick(); // 次のサイクルへ
               }, onDur);
               timers.push(t2);
             }, pauseDur);
