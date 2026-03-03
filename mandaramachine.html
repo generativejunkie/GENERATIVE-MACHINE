@@ -1576,7 +1576,7 @@
               shuffled.slice(0, count).forEach(applyFx);
 
               // ON期間: 2〜6秒
-              const onDur = rand(2000, 6000);
+              const onDur = fx.key === 'strobe' ? 10000 : rand(2000, 6000);
               const t2 = setTimeout(() => {
                 if (!isActive) return;
                 clearAllFx();
