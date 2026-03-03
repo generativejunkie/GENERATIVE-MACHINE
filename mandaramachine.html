@@ -1846,6 +1846,52 @@
           }
 
           scheduleFx();
+
+          // ---- ウォッチドッグ: 2秒ごとに監視 ----
+          // オブジェクト0個 or spread/sizeが極端 → 強制リセット
+          function watchdog() {
+            if (!isActive) return;
+
+            const instances = mm.getAllInstances?.() || [];
+            const state = mm.getState?.() || {};
+            const bg = state.backgroundColor || {r:0,g:0,b:0};
+            const isDark = bg.r < 128 && bg.g < 128 && bg.b < 128;
+
+            // オブジェクトが0個 → 最低3個追加
+            if (instances.length === 0) {
+              const n = rand(3, 8);
+              for (let i = 0; i < n; i++) mm.addRandomInstance?.();
+              // カラーも再設定
+              mm.setDefaultObjectColor?.(isDark ? randBrightColor() : randDarkColor());
+            }
+
+            // spread が大きすぎる → 画面内に戻す
+            const spread = state.spreadMultiplier ?? 1;
+            if (spread > 2.0) {
+              mm.setSpreadMultiplier?.(0.8 + Math.random() * 0.8);
+            }
+
+            // size が大きすぎる → 縮小
+            const size = state.sizeMultiplier ?? 1;
+            if (size > 2.5) {
+              mm.setSizeMultiplier?.(0.8 + Math.random() * 1.0);
+            }
+
+            // オブジェクトカラーと背景が近すぎる（どちらも暗い or 明るい）→ 修正
+            const objColor = state.defaultObjectColor || {r:128,g:128,b:128};
+            const objBright = (objColor.r + objColor.g + objColor.b) / 3;
+            const bgBright  = (bg.r + bg.g + bg.b) / 3;
+            const contrast  = Math.abs(objBright - bgBright);
+            if (contrast < 60) {
+              // コントラスト不足 → 強制修正
+              mm.setDefaultObjectColor?.(isDark ? randBrightColor() : randDarkColor());
+            }
+
+            const t = setTimeout(watchdog, 2000);
+            timers.push(t);
+          }
+
+          watchdog();
         }
 
         // AUTO停止
