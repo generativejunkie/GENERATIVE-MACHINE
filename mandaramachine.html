@@ -1521,7 +1521,7 @@
 
         // ランダムにオブジェクト数を変更
         function randomizeCount() {
-          const n = rand(1, 20);
+          const n = rand(3, 20); // 最低3個保証（0個による真っ黒を防止）
           // rAFで次フレームに分散
           requestAnimationFrame(() => {
             mm.setObjectCount?.(n);
@@ -1532,9 +1532,9 @@
 
         // ランダムにパラメータを変更
         function randomizeParams() {
-          mm.setSizeMultiplier?.(0.3 + Math.random() * 2.5);
+          mm.setSizeMultiplier?.(0.5 + Math.random() * 2.0);  // 最小0.5→見切れ防止
           mm.setSpeedMultiplier?.(0.2 + Math.random() * 2.0);
-          mm.setSpreadMultiplier?.(0.5 + Math.random() * 2.0);
+          mm.setSpreadMultiplier?.(0.3 + Math.random() * 1.5); // spread上限を抑えて画面内に
           mm.setSpacingMultiplier?.(rand(2, 12));
           // 背景は黒か白のみ
           const isDark = Math.random() < 0.5;
@@ -1556,6 +1556,12 @@
           const modes = ['solid', 'wire', 'mix'];
           const picked = modes[rand(0, modes.length - 1)];
           mm.setWireframeMode?.(picked);
+          // wire/mix + 黒背景の組み合わせ時は色を明るく再強制
+          if (picked === 'wire' || picked === 'mix') {
+            const bg = mm.getState?.()?.backgroundColor || {r:0,g:0,b:0};
+            const isDark = bg.r < 128 && bg.g < 128 && bg.b < 128;
+            if (isDark) mm.setDefaultObjectColor?.(randBrightColor());
+          }
           // ボタン状態を更新
           ['solid','wire','mix'].forEach(m => {
             const btn = document.querySelector(`.wireframe-btn[data-mode="${m}"], #wireframe${m.charAt(0).toUpperCase()+m.slice(1)}Btn`);
