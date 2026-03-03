@@ -1495,15 +1495,17 @@
           mm.setSpeedMultiplier?.(0.2 + Math.random() * 2.0);
           mm.setSpreadMultiplier?.(0.5 + Math.random() * 2.0);
           mm.setSpacingMultiplier?.(rand(2, 12));
-          // 背景色も変える（白〜黒〜ダーク系）
-          const bg = Math.random() < 0.5 ? { r: 0, g: 0, b: 0 } : { r: rand(0, 30), g: rand(0, 30), b: rand(0, 30) };
+          // 背景は黒か白のみ
+          const isDark = Math.random() < 0.5;
+          const bg = isDark ? { r: 0, g: 0, b: 0 } : { r: 255, g: 255, b: 255 };
           mm.setBackgroundColor?.(bg);
-          // オブジェクトカラー
-          if (Math.random() < 0.6) {
-            const col = randColor();
-            mm.setDefaultObjectColor?.(col);
+          // 黒背景なら白かカラー、白背景なら黒かカラー
+          if (isDark) {
+            // 暗背景 → 白 or カラー（黒は使わない）
+            mm.setDefaultObjectColor?.(Math.random() < 0.5 ? { r: 255, g: 255, b: 255 } : randColor());
           } else {
-            mm.setDefaultObjectColor?.({ r: 255, g: 255, b: 255 });
+            // 白背景 → 黒 or カラー
+            mm.setDefaultObjectColor?.(Math.random() < 0.5 ? { r: 0, g: 0, b: 0 } : randColor());
           }
         }
 
