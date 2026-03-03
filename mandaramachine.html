@@ -1541,47 +1541,53 @@
           }
           scheduleNext();
 
-          // 音連動エフェクトループ
-          function fxLoop() {
-            if (!isActive) return;
-            fxRafId = requestAnimationFrame(fxLoop);
+          // エフェクトランダムサイクル（一定期間ON→別に切り替え）
+          const FX_SLOTS = [
+            { key: 'glitch', btnId: 'topGlitchBtn', apply: v => mm.setGlobalEffect?.('glitch', v) },
+            { key: 'noise',  btnId: 'topNoiseBtn',  apply: v => mm.setGlobalEffect?.('noise',  v) },
+            { key: 'mosaic', btnId: 'topMosaicBtn', apply: v => mm.setGlobalEffect?.('mosaic', v) },
+            { key: 'strobe', btnId: 'topBlinkBtn',  apply: v => { mm.setBlinkingMode?.(v); if (v) mm.setBlinkingSpeed?.(10); } },
+          ];
 
-            // 周波数データ取得（マイクON時のみ有効）
-            const freqData = mm.getCurrentFrequencyData?.();
-            if (!freqData || freqData.length === 0) return;
-
-            // 低域(kick)・中域(snare)・高域(hi-hat)
-            const bass = freqData.slice(0, 8).reduce((s, v) => s + v, 0) / 8 / 255;
-            const mid  = freqData.slice(8, 32).reduce((s, v) => s + v, 0) / 24 / 255;
-            const high = freqData.slice(32, 80).reduce((s, v) => s + v, 0) / 48 / 255;
-
-            // ストロボ: 低域が強いとき（キック）MAX速度でON
-            if (bass > 0.6) {
-              mm.setBlinkingMode?.(true);
-              mm.setBlinkingSpeed?.(10); // MAX
-              document.getElementById('topBlinkBtn')?.classList.add('active');
-            } else if (bass < 0.3) {
-              mm.setBlinkingMode?.(false);
-              document.getElementById('topBlinkBtn')?.classList.remove('active');
-            }
-
-            // グリッチ: 高域ピーク時
-            const glitchOn = high > 0.65;
-            mm.setGlobalEffect?.('glitch', glitchOn);
-            document.getElementById('topGlitchBtn')?.classList.toggle('active', glitchOn);
-
-            // ノイズ: 中域が強いとき
-            const noiseOn = mid > 0.55;
-            mm.setGlobalEffect?.('noise', noiseOn);
-            document.getElementById('topNoiseBtn')?.classList.toggle('active', noiseOn);
-
-            // モザイク: 低域と中域が両方強い（ビート全体が激しい）
-            const overallEnergy = (bass + mid) / 2;
-            const mosaicOn = overallEnergy > 0.7;
-            mm.setGlobalEffect?.('mosaic', mosaicOn);
-            document.getElementById('topMosaicBtn')?.classList.toggle('active', mosaicOn);
+          function clearAllFx() {
+            FX_SLOTS.forEach(fx => {
+              fx.apply(false);
+              document.getElementById(fx.btnId)?.classList.remove('active');
+            });
           }
-          fxLoop();
+
+          function applyFx(slot) {
+            slot.apply(true);
+            document.getElementById(slot.btnId)?.classList.add('active');
+          }
+
+          function scheduleFxCycle() {
+            if (!isActive) return;
+
+            // 無エフェクト期間: 3〜8秒
+            const pauseDur = rand(3000, 8000);
+            const t1 = setTimeout(() => {
+              if (!isActive) return;
+
+              // ランダムに1〜2個のエフェクトをON
+              clearAllFx();
+              const shuffled = [...FX_SLOTS].sort(() => Math.random() - 0.5);
+              const count = Math.random() < 0.4 ? 2 : 1;
+              shuffled.slice(0, count).forEach(applyFx);
+
+              // ON期間: 2〜6秒
+              const onDur = rand(2000, 6000);
+              const t2 = setTimeout(() => {
+                if (!isActive) return;
+                clearAllFx();
+                scheduleFxCycle(); // 次のサイクルへ
+              }, onDur);
+              timers.push(t2);
+            }, pauseDur);
+            timers.push(t1);
+          }
+
+          scheduleFxCycle();
         }
 
         // AUTO停止
