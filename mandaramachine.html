@@ -196,6 +196,64 @@
         .cam-device-item:hover { background: #1a1a1a; color: #fff; }
         .cam-device-item.active { color: #0af; }
         .cam-device-icon { font-size: 14px; }
+
+        /* ===== 2行グリッドトップバー ===== */
+        .mode-control-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            padding: 0;
+            width: 100%;
+        }
+        .top-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 2px;
+            padding: 3px 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .top-row--modes {
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        /* 全ボタン統一サイズ */
+        .top-row .mode-btn {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 7px;
+            height: 26px;
+            min-width: 0;
+            white-space: nowrap;
+            font-size: 10px;
+            letter-spacing: 0.04em;
+        }
+        .top-row .mode-btn .icon {
+            font-size: 11px;
+            line-height: 1;
+        }
+        /* RESETだけ赤 */
+        .top-row--reset {
+            color: #ff4444 !important;
+            border-color: #ff4444 !important;
+        }
+        /* 区切り線 */
+        .top-row-divider {
+            width: 1px;
+            height: 18px;
+            background: rgba(255,255,255,0.15);
+            margin: 0 4px;
+            flex-shrink: 0;
+        }
+        /* dropdown-container はインラインで */
+        .top-row .dropdown-container {
+            position: relative;
+            display: inline-flex;
+        }
+
 </style>
   <script type="module" crossorigin src="/assets/index-Dwl_9uI6.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-_3glWkjg.css">
@@ -322,9 +380,9 @@
             <!-- 上部モードバー -->
             <div id="topBar">
                 <div class="mode-control-bar">
-                    <!-- Left Side: Features -->
-                    <!-- Mode Group 1: Core Mechanics -->
-                    <div class="mode-group">
+
+                    <!-- ROW 1: モードボタン -->
+                    <div class="top-row top-row--modes">
                         <button id="topAutoBtn" class="mode-btn" title="Auto Mode" data-i18n-title="auto">
                             <span class="icon symbol">⟳</span>
                             <span data-i18n="auto">AUTO</span>
@@ -362,16 +420,11 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Mode Group 2: Specialized States -->
-                    <div class="mode-group">
                         <button id="topGravityBtn" class="mode-btn" title="Zero Gravity" data-i18n-title="zeroGravity">
                             <span class="icon symbol">⇪</span>
                             <span data-i18n="gravity">ZERO GRAVITY</span>
                         </button>
-                        <button id="topBrainHackBtn" class="mode-btn" title="Brain Hack Mode"
-                            data-i18n-title="brainhack">
+                        <button id="topBrainHackBtn" class="mode-btn" title="Brain Hack Mode" data-i18n-title="brainhack">
                             <span class="icon symbol">⌬</span>
                             <span data-i18n="brainhack">BRAIN HACK</span>
                         </button>
@@ -397,30 +450,27 @@
                         </button>
                     </div>
 
-                    <div class="divider-vertical"></div>
-                        <div class="mode-group">
-                            <button id="topGlitchBtn" class="mode-btn" title="GLITCH">
-                                <span class="icon symbol">▓</span>
-                                <span>GLITCH</span>
-                            </button>
-                            <button id="topNoiseBtn" class="mode-btn" title="NOISE">
-                                <span class="icon symbol">░</span>
-                                <span>NOISE</span>
-                            </button>
-                            <button id="topMosaicBtn" class="mode-btn" title="MOSAIC">
-                                <span class="icon symbol">▦</span>
-                                <span>MOSAIC</span>
-                            </button>
-                        </div>
-                        <div class="mode-group">
-                            <button id="topResetBtn" class="mode-btn" title="RESET ALL" style="color:#ff4444;border-color:#ff4444;">
-                                <span class="icon symbol">⟳</span>
-                                <span>RESET</span>
-                            </button>
-                        </div>
+                    <!-- ROW 2: エフェクト＋ツール -->
+                    <div class="top-row top-row--tools">
+                        <button id="topGlitchBtn" class="mode-btn" title="GLITCH">
+                            <span class="icon symbol">▓</span>
+                            <span>GLITCH</span>
+                        </button>
+                        <button id="topNoiseBtn" class="mode-btn" title="NOISE">
+                            <span class="icon symbol">░</span>
+                            <span>NOISE</span>
+                        </button>
+                        <button id="topMosaicBtn" class="mode-btn" title="MOSAIC">
+                            <span class="icon symbol">▦</span>
+                            <span>MOSAIC</span>
+                        </button>
+                        <button id="topResetBtn" class="mode-btn top-row--reset" title="RESET ALL">
+                            <span class="icon symbol">⟳</span>
+                            <span>RESET</span>
+                        </button>
 
-                    <!-- Mode Group 3: View & Tools -->
-                    <div class="mode-group system-tools">
+                        <div class="top-row-divider"></div>
+
                         <button id="topSolidBtn" class="mode-btn active" title="Solid Mode" data-i18n-title="solid">
                             <span class="icon icon-solid"></span>
                             <span data-i18n="solid">SOLID</span>
@@ -434,7 +484,7 @@
                             <span data-i18n="mix">MIX</span>
                         </button>
 
-                        <div class="divider-vertical"></div>
+                        <div class="top-row-divider"></div>
 
                         <button id="topMicBtn" class="mode-btn" title="Mic Input">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -445,9 +495,8 @@
                                 <line x1="8" y1="23" x2="16" y2="23"></line>
                             </svg>
                         </button>
-
                         <span id="midiStatus"
-                            style="font-size: 14px; margin-right: 8px; opacity: 0.3; transition: opacity 0.3s;"
+                            style="font-size: 14px; opacity: 0.3; transition: opacity 0.3s; display:flex; align-items:center;"
                             title="MIDI Not Connected">⌬</span>
                         <button id="topDarkModeBtn" class="mode-btn" title="Dark Mode">
                             <svg class="moon-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -468,9 +517,8 @@
                                 <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                             </svg>
                         </button>
-                        
-                        
                     </div>
+
                 </div>
 
                 <!-- Expandable Seekbars (Overlay) -->
@@ -496,14 +544,12 @@
                         <input type="range" id="brainHackModeSeekbar" min="0" max="5" step="1" value="0">
                     </div>
                     <div class="seekbar-item" id="quantumSeekbar" style="display: none;">
-                        <label><span data-i18n="coherence">Coherence</span>: <span
-                                id="quantumCoherenceValue">0.5</span></label>
+                        <label><span data-i18n="coherence">Coherence</span>: <span id="quantumCoherenceValue">0.5</span></label>
                         <input type="range" id="quantumCoherenceSeekbar" min="0" max="1" step="0.01" value="0.5">
                     </div>
                     <div class="seekbar-item" id="activeModeHUD"
                         style="display: none; align-items: center; justify-content: center; width: auto; min-width: 200px; gap: 8px;">
                         <div id="hudContent" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
-                            <!-- Active modes will be injected here as stickers -->
                         </div>
                     </div>
                 </div>
