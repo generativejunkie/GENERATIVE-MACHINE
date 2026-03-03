@@ -1636,20 +1636,177 @@
           });
         }
 
-        // AUTO開始
+        // ============================================================
+        // AUTO VJ ENGINE — 10時間飽きさせないロジック
+        // ============================================================
         function startAuto() {
           isActive = true;
           btn.classList.add('active');
-
-          // 既存のautoModeをOFF（旧モードと干渉しないよう）
           mm.toggleAutoMode?.(false);
 
-          // 初回即実行
-          cycle();
+          // ---- 状態管理 ----
+          let sessionStart    = Date.now();
+          let cycleCount      = 0;
+          let lastModeHash    = '';
+          const recentHashes  = [];   // 直近10パターンを記憶
+          const MAX_HISTORY   = 10;
 
-          // 4〜10秒ごとにサイクル
+          // ---- フェーズ定義 ----
+          // CALM(穏やか) / FLOW(流れる) / BUILD(盛り上がり) / PEAK(クライマックス) / RESET(リセット)
+          const PHASES = ['CALM', 'FLOW', 'BUILD', 'PEAK', 'RESET'];
+
+          // フェーズ別パラメータ
+          const PHASE_CONFIG = {
+            CALM:  { minModes:1, maxModes:1, minDelay:8000,  maxDelay:14000, fxChance:0.05, countRange:[3,6],   speedRange:[0.2,0.8],  sizeRange:[0.6,1.2] },
+            FLOW:  { minModes:1, maxModes:2, minDelay:5000,  maxDelay:9000,  fxChance:0.10, countRange:[4,10],  speedRange:[0.5,1.5],  sizeRange:[0.5,1.8] },
+            BUILD: { minModes:2, maxModes:3, minDelay:3000,  maxDelay:7000,  fxChance:0.20, countRange:[6,15],  speedRange:[1.0,2.0],  sizeRange:[0.4,2.2] },
+            PEAK:  { minModes:2, maxModes:4, minDelay:2000,  maxDelay:5000,  fxChance:0.40, countRange:[10,20], speedRange:[1.5,2.5],  sizeRange:[0.5,2.8] },
+            RESET: { minModes:1, maxModes:1, minDelay:10000, maxDelay:16000, fxChance:0.02, countRange:[3,5],   speedRange:[0.2,0.6],  sizeRange:[0.5,1.0] },
+          };
+
+          // フェーズシーケンス（繰り返すパターン）
+          // 約6〜10分で1サイクル
+          const PHASE_SEQUENCE = [
+            { phase:'CALM',  duration: rand(90,150) * 1000  },  // 1.5〜2.5分
+            { phase:'FLOW',  duration: rand(120,180) * 1000 },  // 2〜3分
+            { phase:'BUILD', duration: rand(90,150) * 1000  },  // 1.5〜2.5分
+            { phase:'PEAK',  duration: rand(30,60) * 1000   },  // 30〜60秒
+            { phase:'RESET', duration: rand(30,60) * 1000   },  // 30〜60秒
+          ];
+
+          let phaseSeqIdx   = 0;
+          let currentPhase  = 'CALM';
+          let phaseTimer    = null;
+
+          // クライマックス（30〜60分に1回）
+          let climaxTimer   = null;
+          let climaxActive  = false;
+
+          // ---- フェーズ管理 ----
+          function advancePhase() {
+            phaseSeqIdx = (phaseSeqIdx + 1) % PHASE_SEQUENCE.length;
+            const next  = PHASE_SEQUENCE[phaseSeqIdx];
+            currentPhase = next.phase;
+            phaseTimer = setTimeout(advancePhase, next.duration);
+            timers.push(phaseTimer);
+          }
+
+          // 最初のフェーズをセット
+          const firstPhase = PHASE_SEQUENCE[0];
+          currentPhase = firstPhase.phase;
+          phaseTimer = setTimeout(advancePhase, firstPhase.duration);
+          timers.push(phaseTimer);
+
+          // ---- クライマックス（30〜60分ごと） ----
+          function scheduleClimax() {
+            const wait = rand(30 * 60000, 60 * 60000);
+            climaxTimer = setTimeout(() => {
+              if (!isActive) return;
+              triggerClimax();
+              scheduleClimax();
+            }, wait);
+            timers.push(climaxTimer);
+          }
+
+          function triggerClimax() {
+            climaxActive = true;
+            currentPhase = 'PEAK';
+            // 全モードOFF→ランダムに3〜4個一気にON
+            MODES.forEach(m => m.off());
+            const shuffled = [...MODES].sort(() => Math.random() - 0.5);
+            shuffled.slice(0, rand(3, 4)).forEach(m => m.on());
+            // エフェクト爆発
+            mm.setGlobalEffect?.('glitch', true);
+            mm.setGlobalEffect?.('noise',  true);
+            mm.setBlinkingMode?.(true);
+            mm.setBlinkingSpeed?.(10);
+            mm.setSpeedMultiplier?.(2.5);
+            mm.setSizeMultiplier?.(2.0);
+            // 20〜40秒後に収束
+            const t = setTimeout(() => {
+              if (!isActive) return;
+              climaxActive = false;
+              mm.setGlobalEffect?.('glitch', false);
+              mm.setGlobalEffect?.('noise',  false);
+              mm.setBlinkingMode?.(false);
+              currentPhase = 'RESET';
+            }, rand(20000, 40000));
+            timers.push(t);
+          }
+
+          scheduleClimax();
+
+          // ---- メインサイクル ----
+          function getPhaseConfig() {
+            return climaxActive ? PHASE_CONFIG.PEAK : (PHASE_CONFIG[currentPhase] || PHASE_CONFIG.FLOW);
+          }
+
+          function cycle() {
+            if (!isActive) return;
+            cycleCount++;
+            const cfg = getPhaseConfig();
+
+            // プリセット変更（rAFで分散）
+            requestAnimationFrame(() => {
+              randomizePreset();
+
+              requestAnimationFrame(() => {
+                // モード切り替え（直近と被らないよう）
+                MODES.forEach(m => m.off());
+                const count    = rand(cfg.minModes, cfg.maxModes);
+                const shuffled = [...MODES].sort(() => Math.random() - 0.5);
+                const chosen   = shuffled.slice(0, count);
+
+                // ハッシュで重複チェック
+                const hash = chosen.map((m,i) => MODES.indexOf(chosen[i])).sort().join(',');
+                if (recentHashes.includes(hash) && recentHashes.length >= 3) {
+                  // 被ったら別の1個だけON
+                  const fallback = shuffled.find(m => !chosen.includes(m)) || shuffled[0];
+                  fallback.on();
+                  recentHashes.push(MODES.indexOf(fallback).toString());
+                } else {
+                  chosen.forEach(m => m.on());
+                  recentHashes.push(hash);
+                }
+                if (recentHashes.length > MAX_HISTORY) recentHashes.shift();
+
+                requestAnimationFrame(() => {
+                  // パラメータ（フェーズに応じた範囲）
+                  const [sMin, sMax] = cfg.speedRange;
+                  const [szMin, szMax] = cfg.sizeRange;
+                  mm.setSpeedMultiplier?.(sMin + Math.random() * (sMax - sMin));
+                  mm.setSizeMultiplier?.(szMin + Math.random() * (szMax - szMin));
+                  mm.setSpreadMultiplier?.(0.3 + Math.random() * 1.5);
+                  mm.setSpacingMultiplier?.(rand(2, 12));
+
+                  // 背景・カラー
+                  const isDark = Math.random() < 0.5;
+                  mm.setBackgroundColor?.(isDark ? {r:0,g:0,b:0} : {r:255,g:255,b:255});
+                  mm.setDefaultObjectColor?.(isDark ? randBrightColor() : randDarkColor());
+
+                  // ワイヤーフレーム
+                  randomizeWireframe();
+
+                  // オブジェクト数（40%の確率で変更）
+                  if (Math.random() < 0.4) {
+                    const [cMin, cMax] = cfg.countRange;
+                    const n = rand(cMin, cMax);
+                    requestAnimationFrame(() => {
+                      mm.setObjectCount?.(n);
+                      const input = document.getElementById('objectCount');
+                      if (input) { input.value = n; input.dispatchEvent(new Event('input', {bubbles:true})); }
+                    });
+                  }
+                });
+              });
+            });
+          }
+
+          // ---- サイクルスケジューラー ----
           function scheduleNext() {
-            const delay = rand(4000, 10000);
+            if (!isActive) return;
+            const cfg   = getPhaseConfig();
+            const delay = rand(cfg.minDelay, cfg.maxDelay);
             const t = setTimeout(() => {
               if (!isActive) return;
               cycle();
@@ -1657,55 +1814,41 @@
             }, delay);
             timers.push(t);
           }
+
+          cycle();
           scheduleNext();
 
-          // エフェクトランダムサイクル（一定期間ON→別に切り替え）
+          // ---- エフェクトスケジューラー（フェーズ連動） ----
           const FX_SLOTS = [
-            { key: 'glitch', btnId: 'topGlitchBtn', apply: v => mm.setGlobalEffect?.('glitch', v) },
-            { key: 'noise',  btnId: 'topNoiseBtn',  apply: v => mm.setGlobalEffect?.('noise',  v) },
-            { key: 'mosaic', btnId: 'topMosaicBtn', apply: v => mm.setGlobalEffect?.('mosaic', v) },
-            { key: 'strobe', btnId: 'topBlinkBtn',  apply: v => { mm.setBlinkingMode?.(v); if (v) mm.setBlinkingSpeed?.(10); } },
+            { key:'glitch', apply: v => mm.setGlobalEffect?.('glitch', v) },
+            { key:'noise',  apply: v => mm.setGlobalEffect?.('noise',  v) },
+            { key:'mosaic', apply: v => mm.setGlobalEffect?.('mosaic', v) },
           ];
 
-          function clearAllFx() {
-            FX_SLOTS.forEach(fx => {
-              fx.apply(false);
-              document.getElementById(fx.btnId)?.classList.remove('active');
-            });
-          }
-
-          function applyFx(slot) {
-            slot.apply(true);
-            document.getElementById(slot.btnId)?.classList.add('active');
-          }
-
-          function scheduleFxCycle() {
-            if (!isActive) return;
-
-            // 無エフェクト期間: 3〜8秒
-            const pauseDur = rand(3000, 8000);
+          function scheduleFx() {
+            if (!isActive || climaxActive) return;
+            const cfg     = getPhaseConfig();
+            const pause   = rand(3000, 10000);
             const t1 = setTimeout(() => {
-              if (!isActive) return;
-
-              // ランダムに1〜2個のエフェクトをON
-              clearAllFx();
-              const shuffled = [...FX_SLOTS].sort(() => Math.random() - 0.5);
-              const count = Math.random() < 0.4 ? 2 : 1;
-              shuffled.slice(0, count).forEach(applyFx);
-
-              // ON期間: 2〜6秒
-              const onDur = fx.key === 'strobe' ? 10000 : rand(2000, 6000);
-              const t2 = setTimeout(() => {
-                if (!isActive) return;
-                clearAllFx();
-                scheduleFxCycle(); // 次のサイクルへ
-              }, onDur);
-              timers.push(t2);
-            }, pauseDur);
+              if (!isActive || climaxActive) return;
+              // フェーズに応じた確率でエフェクトON
+              if (Math.random() < cfg.fxChance * 3) {
+                const fx  = FX_SLOTS[rand(0, FX_SLOTS.length - 1)];
+                fx.apply(true);
+                const onDur = rand(1500, 5000);
+                const t2 = setTimeout(() => {
+                  fx.apply(false);
+                  scheduleFx();
+                }, onDur);
+                timers.push(t2);
+              } else {
+                scheduleFx();
+              }
+            }, pause);
             timers.push(t1);
           }
 
-          scheduleFxCycle();
+          scheduleFx();
         }
 
         // AUTO停止
@@ -1715,14 +1858,11 @@
           timers = [];
           if (fxRafId) { cancelAnimationFrame(fxRafId); fxRafId = null; }
           btn.classList.remove('active');
-          // 全モードOFF
           MODES.forEach(m => m.off());
-          // エフェクト全OFF
           mm.setGlobalEffect?.('glitch', false);
-          mm.setGlobalEffect?.('noise', false);
+          mm.setGlobalEffect?.('noise',  false);
           mm.setGlobalEffect?.('mosaic', false);
           mm.setBlinkingMode?.(false);
-          // ボタン状態も戻す
           ['topGlitchBtn','topNoiseBtn','topMosaicBtn','topBlinkBtn'].forEach(id => {
             document.getElementById(id)?.classList.remove('active');
           });
