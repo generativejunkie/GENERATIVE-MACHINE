@@ -122,8 +122,11 @@ export class SceneManager extends EventEmitter {
   private createRenderer(): THREE.WebGLRenderer {
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
-      alpha: true, // Allow transparency for CSS background
+      alpha: false, // No transparency - prevents white flash (alpha:true causes clearAlpha=0 → white)
     });
+
+    // Force black background to eliminate white flash
+    renderer.setClearColor(0x0a0a0a, 1);
 
     // Force 1:1 pixel ratio for exact Full HD control
     renderer.setPixelRatio(1);
@@ -1421,8 +1424,16 @@ export class SceneManager extends EventEmitter {
    * Start animation loop
    */
   public startAnimation(onUpdate: (renderer: THREE.WebGLRenderer) => void): void {
-    const animate = () => {
+    // 60fps cap: skip frame if last render was <14ms ago
+    let lastFrameTime = 0;
+    const FRAME_BUDGET = 1000 / 60; // ~16.67ms
+
+    const animate = (now: number = 0) => {
       this.animationFrameId = requestAnimationFrame(animate);
+
+      const elapsed = now - lastFrameTime;
+      if (elapsed < FRAME_BUDGET - 1) return; // skip frame, maintain 60fps cap
+      lastFrameTime = now - (elapsed % FRAME_BUDGET);
 
       // Call update callback
       onUpdate(this.renderer);
