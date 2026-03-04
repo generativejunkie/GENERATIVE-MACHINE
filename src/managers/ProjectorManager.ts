@@ -110,6 +110,9 @@ export class ProjectorManager {
             }
 
             ctx.clearRect(0, 0, composite.width, composite.height);
+        // Sync invert filter from main window
+        const isLightMode = document.body.classList.contains('light-mode');
+        ctx.filter = isLightMode ? 'invert(1)' : 'none';
 
             // Layer 1: Three.js 3D scene
             try {
