@@ -842,10 +842,9 @@
       function randomizePreset() {
         const items = document.querySelectorAll('.preset-item');
         if (!items.length) return;
+        // add-btnではなくitem本体をクリック（マテリアル切り替えのみ、シーンリセットなし）
         const item = items[rand(0, items.length - 1)];
-        // add-btn があればそちら、なければ直接クリック
-        const addBtn = item?.querySelector('.add-btn');
-        (addBtn || item)?.click();
+        item?.click();
       }
 
       // =============================================
@@ -908,15 +907,7 @@
           mm.setDefaultObjectColor?.({ r: rand(100,255), g: rand(100,255), b: rand(100,255) });
         }
 
-        // オブジェクト数 (40%で変更)
-        if (maybe(0.4)) {
-          const n = rand(5, 48);
-          const input = document.getElementById('objectCount');
-          if (input) {
-            input.value = n;
-            input.dispatchEvent(new Event('input', { bubbles: true }));
-          }
-        }
+        // オブジェクト数変更はパフォーマンス上削除
       }
 
       // =============================================
@@ -957,8 +948,8 @@
           state = randomState();
         }
 
-        // プリセット: 65%で変更
-        if (maybe(0.65)) randomizePreset();
+        // プリセット: 50%で変更（頻度を下げてパフォーマンス安定化）
+        if (maybe(0.50)) randomizePreset();
 
         applyState(state);
         randomizeParams();
