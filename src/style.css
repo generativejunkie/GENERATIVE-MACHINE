@@ -14,6 +14,7 @@
     /* Canvas Theming */
     --canvas-bg: #000000;
     --letterbox-bg: #000000;
+    --input-text: #ffffff;
 
     /* Left panel collapse transition */
     --left-panel-width: 260px;
@@ -181,7 +182,7 @@ body.light-mode .panel-side {
 
 /* --- Headers --- */
 .panel-header {
-    padding: 14px 16px;
+    padding: 8px 12px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     justify-content: space-between;
@@ -223,7 +224,7 @@ body.light-mode .panel-side {
 
 .count-input {
     background: var(--bg-color);
-    color: var(--accent-color);
+    color: #ffffff;
     border: 1px solid var(--border-color);
     border-radius: 2px;
     font-size: 10px;
@@ -337,10 +338,10 @@ body.light-mode .panel-side {
 
 input[type="text"] {
     width: 100%;
-    padding: 8px;
+    padding: 6px 8px;
     background: var(--bg-color);
     border: 1px solid var(--border-color);
-    color: var(--text-color);
+    color: #ffffff;
     font-family: var(--font-mono);
     font-size: 11px;
 }
@@ -416,8 +417,8 @@ input[type="text"] {
     justify-content: center;
     position: relative;
     z-index: 20;
-    min-height: 50px;
-    padding: 4px 0;
+    min-height: 36px;
+    padding: 2px 0;
 }
 
 .mode-control-bar {
@@ -462,7 +463,7 @@ input[type="text"] {
 }
 
 .mode-btn {
-    height: 30px;
+    height: 26px;
     padding: 0 8px;
     border: 1px solid transparent;
     background: transparent;
@@ -471,9 +472,9 @@ input[type="text"] {
     display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 10px;
-    font-weight: 500;
-    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 600;
+    border-radius: 3px;
     transition: all 0.2s;
     white-space: nowrap;
     flex-shrink: 0;
@@ -826,15 +827,15 @@ body.light-mode #p5-container canvas {
 
 /* --- Right Panel (Settings) --- */
 .menu-section {
-    padding: 16px;
+    padding: 10px 12px;
     border-bottom: 1px solid var(--border-color);
 }
 
 .menu-section h3 {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     color: var(--text-color);
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     letter-spacing: 0.5px;
 }
 
@@ -1763,4 +1764,12 @@ body.light-mode #generatingOverlay {
 
 .ui-hidden #topBar {
     transform: translateY(-100%);
+}
+
+/* All inputs: white text on dark bg */
+input, select, textarea {
+    color: #ffffff !important;
+}
+body.light-mode input, body.light-mode select, body.light-mode textarea {
+    color: #000000 !important;
 }
