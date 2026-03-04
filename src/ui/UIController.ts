@@ -1760,10 +1760,10 @@ export class UIController {
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
       // Pull back camera to show smaller objects (fit whole object in frame)
-      camera.position.set(3.5, 3.5, 4.5);
+      camera.position.set(5.5, 5.5, 7.0);
       camera.lookAt(0, 0, 0);
 
-      sharedRenderer.setClearColor(0xf0f0f0);
+      sharedRenderer.setClearColor(0x0a0a0a);
 
       // Add stronger lights
       const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
