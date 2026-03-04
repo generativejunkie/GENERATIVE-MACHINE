@@ -723,7 +723,7 @@
     </script>
 
 
-  <!-- AUTO MODE: 10-hour VJ Marathon Script -->
+  <!-- AUTO MODE: 10hr VJ Marathon + AI Learning v2 -->
   <script>
   (function() {
     function apply() {
@@ -736,55 +736,156 @@
 
       const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
       const maybe = (p) => Math.random() < p;
+      const pick = (arr) => arr[rand(0, arr.length - 1)];
 
-      // ---- ボタン操作ヘルパー ----
+      // =============================================
+      // AI LEARNING ENGINE
+      // 実際に使われたモード組み合わせを記憶し、
+      // 好まれるパターンを高頻度で再生する
+      // =============================================
+      const AI = {
+        history: [],        // 過去のサイクル記録
+        scores: {},         // パターンスコア
+        maxHistory: 200,    // 最大記憶数
+
+        // 現在の状態をハッシュ化
+        hash(state) {
+          return [
+            state.mandala ? 'M' : '-',
+            state.quantum ? 'Q' : '-',
+            state.orbit   ? 'O' : '-',
+            state.spin    ? 'S' : '-',
+            state.baryon  ? 'B' : '-',
+            state.strobe  ? 'T' : '-',
+            state.space   ? 'P' : '-',
+            state.render
+          ].join('');
+        },
+
+        // サイクル後に記録 (連続稼働時間をスコアとして蓄積)
+        record(state) {
+          const key = this.hash(state);
+          this.scores[key] = (this.scores[key] || 0) + 1;
+          this.history.push({ key, ts: Date.now() });
+          if (this.history.length > this.maxHistory) this.history.shift();
+
+          // mandalaMachine の neuralLearner にも同期
+          const nl = window.mandalaMachine?.neuralLearner;
+          if (nl && nl.patterns) {
+            nl.patterns[key] = (nl.patterns[key] || 0) + 1;
+          }
+        },
+
+        // 高スコアパターンを確率的に選択（ε-greedy: 30%はランダム探索）
+        suggest() {
+          if (Object.keys(this.scores).length === 0 || maybe(0.30)) return null;
+          // スコア上位3パターンからランダムに選ぶ
+          const sorted = Object.entries(this.scores)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5);
+          const [key] = pick(sorted);
+          return this.decodeKey(key);
+        },
+
+        decodeKey(key) {
+          return {
+            mandala: key[0] === 'M',
+            quantum: key[1] === 'Q',
+            orbit:   key[2] === 'O',
+            spin:    key[3] === 'S',
+            baryon:  key[4] === 'B',
+            strobe:  key[5] === 'T',
+            space:   key[6] === 'P',
+            render:  key[7]
+          };
+        },
+
+        // 統計サマリー（デバッグ用）
+        summary() {
+          return Object.entries(this.scores)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([k, v]) => k + ':' + v)
+            .join(', ');
+        }
+      };
+
+      // =============================================
+      // BUTTON CONTROL
+      // =============================================
+      function getBtnState(id) {
+        return document.getElementById(id)?.classList.contains('active') || false;
+      }
       function setBtn(id, active) {
         const el = document.getElementById(id);
         if (!el) return;
-        const isOn = el.classList.contains('active');
-        if (active !== isOn) el.click();
+        if (el.classList.contains('active') !== active) el.click();
       }
 
-      function clickBtn(id) {
-        document.getElementById(id)?.click();
+      // =============================================
+      // SPACE MODE (toggleSpaceMode API直接呼び出し)
+      // =============================================
+      function setSpaceMode(on) {
+        const mm = window.mandalaMachine;
+        if (!mm?.toggleSpaceMode) return;
+        // SPACEはトグルAPIがあるので現在状態を確認して制御
+        const current = mm._spaceModeActive || false;
+        if (on !== current) {
+          mm.toggleSpaceMode();
+          mm._spaceModeActive = on;
+        }
       }
 
-      // ---- プリセット選択 ----
+      // =============================================
+      // PRESET SELECTION
+      // =============================================
       function randomizePreset() {
         const items = document.querySelectorAll('.preset-item');
         if (!items.length) return;
         const item = items[rand(0, items.length - 1)];
-        item?.querySelector('.add-btn')?.click() || item?.click();
+        // add-btn があればそちら、なければ直接クリック
+        const addBtn = item?.querySelector('.add-btn');
+        (addBtn || item)?.click();
       }
 
-      // ---- モードランダム ----
-      function randomizeModes() {
-        // MANDALA: 50%
-        setBtn('topMandalaBtn', maybe(0.5));
+      // =============================================
+      // APPLY STATE
+      // =============================================
+      function applyState(state) {
+        setBtn('topMandalaBtn', state.mandala);
+        setBtn('topQuantumBtn', state.quantum);
+        setBtn('topOrbitBtn',   state.orbit);
+        setBtn('topSpinBtn',    state.spin);
+        setBtn('topBaryonBtn',  state.baryon);
+        setBtn('topBlinkBtn',   state.strobe);
+        setSpaceMode(state.space);
 
-        // QUANTUM: 30%
-        setBtn('topQuantumBtn', maybe(0.3));
-
-        // ORBIT: 25%
-        setBtn('topOrbitBtn', maybe(0.25));
-
-        // SPIN: 25%
-        setBtn('topSpinBtn', maybe(0.25));
-
-        // BARYON: 20%
-        setBtn('topBaryonBtn', maybe(0.2));
-
-        // STROBE: 15%
-        setBtn('topBlinkBtn', maybe(0.15));
-
-        // レンダーモード: SOLID / WIRE / MIX をランダムに
-        const renderMode = rand(0, 2);
-        if (renderMode === 0) setBtn('topSolidBtn', true);
-        else if (renderMode === 1) setBtn('topWireBtn', true);
-        else setBtn('topMixBtn', true);
+        // レンダーモード
+        if (state.render === 'W') setBtn('topWireBtn', true);
+        else if (state.render === 'X') setBtn('topMixBtn', true);
+        else setBtn('topSolidBtn', true);
       }
 
-      // ---- パラメータランダム ----
+      // =============================================
+      // GENERATE RANDOM STATE
+      // =============================================
+      function randomState() {
+        const renders = ['S', 'W', 'X'];
+        return {
+          mandala: maybe(0.55),
+          quantum: maybe(0.30),
+          orbit:   maybe(0.25),
+          spin:    maybe(0.25),
+          baryon:  maybe(0.20),
+          strobe:  maybe(0.12),
+          space:   maybe(0.20),
+          render:  pick(renders)
+        };
+      }
+
+      // =============================================
+      // PARAMS RANDOMIZE
+      // =============================================
       function randomizeParams() {
         const mm = window.mandalaMachine;
         if (!mm) return;
@@ -793,23 +894,22 @@
         mm.setSpreadMultiplier?.(0.5 + Math.random() * 2.0);
         mm.setSpacingMultiplier?.(rand(2, 14));
 
-        // 背景: 黒 or 暗い色のみ
-        const bg = maybe(0.7)
+        // 背景: 黒 or 極暗
+        const bg = maybe(0.75)
           ? { r: 0, g: 0, b: 0 }
-          : { r: rand(0, 25), g: rand(0, 25), b: rand(0, 25) };
+          : { r: rand(0, 20), g: rand(0, 20), b: rand(0, 20) };
         mm.setBackgroundColor?.(bg);
 
-        // オブジェクトカラー: 背景が黒なら白or明るい色
+        // オブジェクト色
         if (maybe(0.5)) {
           mm.setDefaultObjectColor?.({ r: 255, g: 255, b: 255 });
         } else {
-          const r = rand(80, 255), g = rand(80, 255), b = rand(80, 255);
-          mm.setDefaultObjectColor?.({ r, g, b });
+          mm.setDefaultObjectColor?.({ r: rand(100,255), g: rand(100,255), b: rand(100,255) });
         }
 
-        // オブジェクト数
+        // オブジェクト数 (40%で変更)
         if (maybe(0.4)) {
-          const n = rand(5, 40);
+          const n = rand(5, 48);
           const input = document.getElementById('objectCount');
           if (input) {
             input.value = n;
@@ -818,77 +918,73 @@
         }
       }
 
-      // ---- エフェクトランダム (音連動 or 純ランダム) ----
-      let fxPhase = { strobe: false, noise: false, mosaic: false, glitch: false };
-
-      function randomizeFx() {
-        const mm = window.mandalaMachine;
-
-        // ストロボ速度ランダム
-        if (maybe(0.15)) {
-          mm?.setBlinkingMode?.(true);
-          mm?.setBlinkingSpeed?.(rand(3, 10));
-          setBtn('topBlinkBtn', true);
-        } else {
-          mm?.setBlinkingMode?.(false);
-        }
-
-        // グリッチ
-        const noiseBtn = document.getElementById('sideNoiseBtn');
-        const mosaicBtn = document.getElementById('sideMosaicBtn');
-        if (maybe(0.12)) noiseBtn?.click();
-        if (maybe(0.10)) mosaicBtn?.click();
-      }
-
-      // ---- 音連動FXループ ----
+      // =============================================
+      // AUDIO-REACTIVE FX LOOP
+      // =============================================
+      let lastStrobeState = false;
       function startFxLoop() {
         if (fxRafId) cancelAnimationFrame(fxRafId);
-        let frameCount = 0;
-
+        let frame = 0;
         function loop() {
           if (!isActive) return;
           fxRafId = requestAnimationFrame(loop);
-          frameCount++;
-          if (frameCount % 6 !== 0) return; // 約10fps
-
+          if (++frame % 6 !== 0) return; // ~10fps
           const mm = window.mandalaMachine;
           const freq = mm?.getCurrentFrequencyData?.();
-          if (!freq || freq.length === 0) return;
-
-          const bass = freq.slice(0, 8).reduce((s,v) => s+v, 0) / 8 / 255;
-          const mid  = freq.slice(8, 32).reduce((s,v) => s+v, 0) / 24 / 255;
-          const high = freq.slice(32, 80).reduce((s,v) => s+v, 0) / 48 / 255;
-
-          // ストロボ: 低域 or ランダム
-          const strobeOn = bass > 0.5 || (maybe(0.005));
-          if (strobeOn !== fxPhase.strobe) {
-            fxPhase.strobe = strobeOn;
+          if (!freq || !freq.length) return;
+          const bass = freq.slice(0,8).reduce((s,v)=>s+v,0)/8/255;
+          const strobeOn = bass > 0.5 || maybe(0.004);
+          if (strobeOn !== lastStrobeState) {
+            lastStrobeState = strobeOn;
             mm?.setBlinkingMode?.(strobeOn);
-            if (strobeOn) mm?.setBlinkingSpeed?.(rand(5, 10));
+            if (strobeOn) mm?.setBlinkingSpeed?.(rand(5,10));
           }
         }
         loop();
       }
 
-      // ---- メインサイクル ----
+      // =============================================
+      // MAIN CYCLE
+      // =============================================
+      let cycleCount = 0;
       function cycle() {
-        if (maybe(0.7)) randomizePreset();
-        randomizeModes();
+        cycleCount++;
+
+        // AI提案を試みる（学習済みパターンを再生）
+        let state = AI.suggest();
+        if (!state) {
+          state = randomState();
+        }
+
+        // プリセット: 65%で変更
+        if (maybe(0.65)) randomizePreset();
+
+        applyState(state);
         randomizeParams();
-        if (maybe(0.3)) randomizeFx();
+
+        // 記録（AI学習）
+        AI.record(state);
+
+        // 100サイクルごとにコンソールに学習状況を出力
+        if (cycleCount % 20 === 0) {
+          console.log('[AUTO AI] Top patterns:', AI.summary());
+        }
       }
 
-      // ---- 開始 / 停止 ----
+      // =============================================
+      // START / STOP
+      // =============================================
       function startAuto() {
         isActive = true;
         btn.classList.add('active');
         window.mandalaMachine?.toggleAutoMode?.(false);
+
         cycle();
         startFxLoop();
 
         function scheduleNext() {
-          // 4秒〜15秒のランダム間隔（長時間耐久向け）
-          const delay = rand(4000, 15000);
+          // 4〜18秒ランダム間隔
+          const delay = rand(4000, 18000);
           const t = setTimeout(() => {
             if (!isActive) return;
             cycle();
@@ -897,6 +993,8 @@
           timers.push(t);
         }
         scheduleNext();
+
+        console.log('[AUTO] Started - AI Learning enabled');
       }
 
       function stopAuto() {
@@ -905,21 +1003,20 @@
         timers = [];
         if (fxRafId) { cancelAnimationFrame(fxRafId); fxRafId = null; }
         btn.classList.remove('active');
-        // モードリセット
+
+        // 全モードOFF
         ['topMandalaBtn','topQuantumBtn','topOrbitBtn','topSpinBtn','topBaryonBtn','topBlinkBtn'].forEach(id => {
           const el = document.getElementById(id);
           if (el?.classList.contains('active')) el.click();
         });
+        setSpaceMode(false);
         window.mandalaMachine?.setBlinkingMode?.(false);
+
+        console.log('[AUTO] Stopped after', cycleCount, 'cycles. AI patterns:', AI.summary());
       }
 
+      // クリックハンドラ上書き
       btn.addEventListener('click', () => isActive ? stopAuto() : startAuto(), { capture: true });
-
-      // RESETボタン連携
-      const resetBtn = document.getElementById('resetScene');
-      if (resetBtn) {
-        resetBtn.addEventListener('click', () => { if (isActive) stopAuto(); }, { capture: true });
-      }
     }
 
     if (document.readyState === 'loading') {
