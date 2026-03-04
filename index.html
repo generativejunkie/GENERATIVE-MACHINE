@@ -722,6 +722,211 @@
         })();
     </script>
 
+
+  <!-- AUTO MODE: 10-hour VJ Marathon Script -->
+  <script>
+  (function() {
+    function apply() {
+      const btn = document.getElementById('topAutoBtn');
+      if (!btn) return;
+
+      let isActive = false;
+      let timers = [];
+      let fxRafId = null;
+
+      const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+      const maybe = (p) => Math.random() < p;
+
+      // ---- ボタン操作ヘルパー ----
+      function setBtn(id, active) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const isOn = el.classList.contains('active');
+        if (active !== isOn) el.click();
+      }
+
+      function clickBtn(id) {
+        document.getElementById(id)?.click();
+      }
+
+      // ---- プリセット選択 ----
+      function randomizePreset() {
+        const items = document.querySelectorAll('.preset-item');
+        if (!items.length) return;
+        const item = items[rand(0, items.length - 1)];
+        item?.querySelector('.add-btn')?.click() || item?.click();
+      }
+
+      // ---- モードランダム ----
+      function randomizeModes() {
+        // MANDALA: 50%
+        setBtn('topMandalaBtn', maybe(0.5));
+
+        // QUANTUM: 30%
+        setBtn('topQuantumBtn', maybe(0.3));
+
+        // ORBIT: 25%
+        setBtn('topOrbitBtn', maybe(0.25));
+
+        // SPIN: 25%
+        setBtn('topSpinBtn', maybe(0.25));
+
+        // BARYON: 20%
+        setBtn('topBaryonBtn', maybe(0.2));
+
+        // STROBE: 15%
+        setBtn('topBlinkBtn', maybe(0.15));
+
+        // レンダーモード: SOLID / WIRE / MIX をランダムに
+        const renderMode = rand(0, 2);
+        if (renderMode === 0) setBtn('topSolidBtn', true);
+        else if (renderMode === 1) setBtn('topWireBtn', true);
+        else setBtn('topMixBtn', true);
+      }
+
+      // ---- パラメータランダム ----
+      function randomizeParams() {
+        const mm = window.mandalaMachine;
+        if (!mm) return;
+        mm.setSizeMultiplier?.(0.3 + Math.random() * 2.5);
+        mm.setSpeedMultiplier?.(0.2 + Math.random() * 2.0);
+        mm.setSpreadMultiplier?.(0.5 + Math.random() * 2.0);
+        mm.setSpacingMultiplier?.(rand(2, 14));
+
+        // 背景: 黒 or 暗い色のみ
+        const bg = maybe(0.7)
+          ? { r: 0, g: 0, b: 0 }
+          : { r: rand(0, 25), g: rand(0, 25), b: rand(0, 25) };
+        mm.setBackgroundColor?.(bg);
+
+        // オブジェクトカラー: 背景が黒なら白or明るい色
+        if (maybe(0.5)) {
+          mm.setDefaultObjectColor?.({ r: 255, g: 255, b: 255 });
+        } else {
+          const r = rand(80, 255), g = rand(80, 255), b = rand(80, 255);
+          mm.setDefaultObjectColor?.({ r, g, b });
+        }
+
+        // オブジェクト数
+        if (maybe(0.4)) {
+          const n = rand(5, 40);
+          const input = document.getElementById('objectCount');
+          if (input) {
+            input.value = n;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        }
+      }
+
+      // ---- エフェクトランダム (音連動 or 純ランダム) ----
+      let fxPhase = { strobe: false, noise: false, mosaic: false, glitch: false };
+
+      function randomizeFx() {
+        const mm = window.mandalaMachine;
+
+        // ストロボ速度ランダム
+        if (maybe(0.15)) {
+          mm?.setBlinkingMode?.(true);
+          mm?.setBlinkingSpeed?.(rand(3, 10));
+          setBtn('topBlinkBtn', true);
+        } else {
+          mm?.setBlinkingMode?.(false);
+        }
+
+        // グリッチ
+        const noiseBtn = document.getElementById('sideNoiseBtn');
+        const mosaicBtn = document.getElementById('sideMosaicBtn');
+        if (maybe(0.12)) noiseBtn?.click();
+        if (maybe(0.10)) mosaicBtn?.click();
+      }
+
+      // ---- 音連動FXループ ----
+      function startFxLoop() {
+        if (fxRafId) cancelAnimationFrame(fxRafId);
+        let frameCount = 0;
+
+        function loop() {
+          if (!isActive) return;
+          fxRafId = requestAnimationFrame(loop);
+          frameCount++;
+          if (frameCount % 6 !== 0) return; // 約10fps
+
+          const mm = window.mandalaMachine;
+          const freq = mm?.getCurrentFrequencyData?.();
+          if (!freq || freq.length === 0) return;
+
+          const bass = freq.slice(0, 8).reduce((s,v) => s+v, 0) / 8 / 255;
+          const mid  = freq.slice(8, 32).reduce((s,v) => s+v, 0) / 24 / 255;
+          const high = freq.slice(32, 80).reduce((s,v) => s+v, 0) / 48 / 255;
+
+          // ストロボ: 低域 or ランダム
+          const strobeOn = bass > 0.5 || (maybe(0.005));
+          if (strobeOn !== fxPhase.strobe) {
+            fxPhase.strobe = strobeOn;
+            mm?.setBlinkingMode?.(strobeOn);
+            if (strobeOn) mm?.setBlinkingSpeed?.(rand(5, 10));
+          }
+        }
+        loop();
+      }
+
+      // ---- メインサイクル ----
+      function cycle() {
+        if (maybe(0.7)) randomizePreset();
+        randomizeModes();
+        randomizeParams();
+        if (maybe(0.3)) randomizeFx();
+      }
+
+      // ---- 開始 / 停止 ----
+      function startAuto() {
+        isActive = true;
+        btn.classList.add('active');
+        window.mandalaMachine?.toggleAutoMode?.(false);
+        cycle();
+        startFxLoop();
+
+        function scheduleNext() {
+          // 4秒〜15秒のランダム間隔（長時間耐久向け）
+          const delay = rand(4000, 15000);
+          const t = setTimeout(() => {
+            if (!isActive) return;
+            cycle();
+            scheduleNext();
+          }, delay);
+          timers.push(t);
+        }
+        scheduleNext();
+      }
+
+      function stopAuto() {
+        isActive = false;
+        timers.forEach(t => clearTimeout(t));
+        timers = [];
+        if (fxRafId) { cancelAnimationFrame(fxRafId); fxRafId = null; }
+        btn.classList.remove('active');
+        // モードリセット
+        ['topMandalaBtn','topQuantumBtn','topOrbitBtn','topSpinBtn','topBaryonBtn','topBlinkBtn'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el?.classList.contains('active')) el.click();
+        });
+        window.mandalaMachine?.setBlinkingMode?.(false);
+      }
+
+      btn.addEventListener('click', () => isActive ? stopAuto() : startAuto(), { capture: true });
+
+      // RESETボタン連携
+      const resetBtn = document.getElementById('resetScene');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => { if (isActive) stopAuto(); }, { capture: true });
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', apply);
+    } else { apply(); }
+  })();
+  </script>
 </body>
 
 </html>
