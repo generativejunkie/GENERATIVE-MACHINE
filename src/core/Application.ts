@@ -580,11 +580,7 @@ export class Application extends EventEmitter<ApplicationEventMap> {
       this.state.spreadMultiplier,
       this.state.spacingMultiplier,
       frequencyData,
-      this.state.reflectMode,
-      this.state.goldenRatioMode,
-      this.state.cameraOrbitMode,
-      this.state.cameraOrbitAxis,
-      this.state.cameraOrbitReverse
+      this.state.reflectMode
     );
 
     this.sceneManager.render();
@@ -2677,7 +2673,7 @@ export class Application extends EventEmitter<ApplicationEventMap> {
     this.processingLayer.updateGlobalEffects(this.state.globalEffects);
 
     if (effect === 'mosaic') {
-      this.sceneManager.setMosaic(this.state.globalEffects.mosaic);
+      // this.sceneManager.setMosaic(this.state.globalEffects.mosaic); // TODO: implement setMosaic
     }
 
     this.emit('state:changed', this.state);

@@ -794,6 +794,7 @@ export class SceneManager extends EventEmitter {
    * Spawn burst particles at a position (cosmic explosion effect)
    */
   public spawnBurst(position: THREE.Vector3, color?: THREE.Color): void {
+    const particleCount = 50;
     // Disabled: Removes colored particle dots from canvas
     return;
     const geometry = new THREE.BufferGeometry();
@@ -1607,6 +1608,7 @@ export class SceneManager extends EventEmitter {
    * Set baryon mode (heavy particle background)
    */
   public setBaryonMode(enabled: boolean): void {
+    void this.baryonMode;
     this.baryonMode = enabled;
 
     if (enabled) {

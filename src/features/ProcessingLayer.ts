@@ -326,7 +326,7 @@ export class ProcessingLayer {
     private drawWarpText(p: p5, now: number, intensity: number): void {
         const txt = this.canvasText.toUpperCase();
         p.textStyle(p.BOLD);
-        const size = this.fitTextSize(p, txt, 120 + intensity * 30);
+        void this.fitTextSize(p, txt, 120 + intensity * 30);
         p.textAlign(p.CENTER, p.CENTER);
         p.noStroke();
 
@@ -366,7 +366,7 @@ export class ProcessingLayer {
 
     // ─── SCN: Laser Scan Reveal ──────────────────────────────────
     // Single precise line sweeps vertically. Text revealed above, dimmed below
-    private drawScanlineText(p: p5, now: number, intensity: number): void {
+    private drawScanlineText(p: p5, _now: number, intensity: number): void {
         const txt = this.canvasText.toUpperCase();
         p.textStyle(p.BOLD);
         const size = this.fitTextSize(p, txt, 120 + intensity * 30);
@@ -411,7 +411,7 @@ export class ProcessingLayer {
 
     // ─── HEX: Cascade Lock ───────────────────────────────────────
     // Characters rapidly cycle through hex values then "lock in" left-to-right
-    private drawHexText(p: p5, now: number, intensity: number): void {
+    private drawHexText(p: p5, _now: number, intensity: number): void {
         const txt = this.canvasText.toUpperCase();
         p.textStyle(p.BOLD);
         p.textFont('monospace');
