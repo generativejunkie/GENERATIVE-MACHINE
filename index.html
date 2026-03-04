@@ -858,6 +858,7 @@
         setBtn('topSpinBtn',    state.spin);
         setBtn('topBaryonBtn',  state.baryon);
         setBtn('topBlinkBtn',   state.strobe);
+        if (state.strobe) { window.mandalaMachine?.setBlinkingMode?.(true); window.mandalaMachine?.setBlinkingSpeed?.(10); }
         setSpaceMode(state.space);
 
         // レンダーモード
@@ -877,7 +878,7 @@
           orbit:   maybe(0.25),
           spin:    maybe(0.25),
           baryon:  maybe(0.20),
-          strobe:  maybe(0.12),
+          strobe:  maybe(0.04),
           space:   maybe(0.20),
           render:  pick(renders)
         };
@@ -937,7 +938,7 @@
           if (strobeOn !== lastStrobeState) {
             lastStrobeState = strobeOn;
             mm?.setBlinkingMode?.(strobeOn);
-            if (strobeOn) mm?.setBlinkingSpeed?.(rand(5,10));
+            if (strobeOn) mm?.setBlinkingSpeed?.(10);
           }
         }
         loop();
