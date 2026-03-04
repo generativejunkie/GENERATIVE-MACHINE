@@ -243,7 +243,7 @@ body.light-mode .panel-side {
 
 .preset-item {
     aspect-ratio: 1;
-    background: var(--bg-color);
+    background: #0a0a0a;
     cursor: pointer;
     position: relative;
     transition: background 0.1s;
@@ -273,6 +273,7 @@ body.light-mode .panel-side {
     height: 100% !important;
     display: block;
     object-fit: cover;
+    background: #0a0a0a !important;
 }
 
 /* Preset Item Buttons */
@@ -1772,4 +1773,13 @@ input, select, textarea {
 }
 body.light-mode input, body.light-mode select, body.light-mode textarea {
     color: #000000 !important;
+}
+
+
+/* Light mode preset grid */
+body.light-mode .preset-item {
+    background: #f0f0f0;
+}
+body.light-mode .preset-item canvas {
+    background: #f0f0f0 !important;
 }
