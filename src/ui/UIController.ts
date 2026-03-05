@@ -1563,13 +1563,10 @@ export class UIController {
   }
 
   private setupResetButton(): void {
-    const resetBtn = document.getElementById('resetScene');
-
-    if (resetBtn) {
-      resetBtn.addEventListener('click', () => {
-        this.app.clearAll();
-      });
-    }
+    // 'resetScene'(旧ID) と 'topResetBtn'(新topBar) 両対応
+    const doReset = () => { this.app.clearAll(); };
+    document.getElementById('resetScene')?.addEventListener('click', doReset);
+    document.getElementById('topResetBtn')?.addEventListener('click', doReset);
   }
 
 
