@@ -42,29 +42,48 @@
             font-weight: 700;
         }
     
-  /* V-OUT: canvasContainer fullscreen - full bleed */
-  #canvasContainer:fullscreen,
-  #canvasContainer:-webkit-full-screen {
-    width: 100vw !important;
-    height: 100vh !important;
-    background: #000 !important;
-    display: block !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-    overflow: hidden !important;
-    position: fixed !important;
-    top: 0 !important; left: 0 !important;
+  /* Expand button */
+  .expand-canvas-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 100;
+    width: 32px;
+    height: 32px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.4;
+    transition: opacity 0.2s;
   }
-  /* メインcanvas(1920x1080)を画面全体に引き伸ばす */
-  #canvasContainer:fullscreen canvas,
-  #canvasContainer:-webkit-full-screen canvas {
+  .expand-canvas-btn:hover { opacity: 1; }
+  #canvasWrapper { position: relative; }
+
+  /* Fullscreen: canvasWrapperを全画面に */
+  #canvasWrapper:fullscreen,
+  #canvasWrapper:-webkit-full-screen {
+    background: #000 !important;
     width: 100vw !important;
     height: 100vh !important;
-    object-fit: cover !important;
-    display: block !important;
-    position: absolute !important;
-    top: 0 !important; left: 0 !important;
+  }
+  #canvasWrapper:fullscreen .canvas-container,
+  #canvasWrapper:-webkit-full-screen .canvas-container {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  #canvasWrapper:fullscreen canvas,
+  #canvasWrapper:-webkit-full-screen canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  /* fullscreen時は展開ボタンをSVG切り替え */
+  #canvasWrapper:fullscreen .expand-canvas-btn,
+  #canvasWrapper:-webkit-full-screen .expand-canvas-btn {
+    opacity: 0.4;
   }
 </style>
 </head>
@@ -331,6 +350,12 @@
             <!-- キャンバス -->
             <div id="canvasWrapper">
                 <div class="canvas-container" id="canvasContainer"></div>
+                <!-- 展開ボタン: キャンバス右上に常時表示 -->
+                <button id="expandCanvasBtn" class="expand-canvas-btn" title="Fullscreen">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 6V1H6M10 1H15V6M15 10V15H10M6 15H1V10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
                 <div id="p5-container"
                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5;">
                 </div>
@@ -1045,31 +1070,52 @@
 <!-- V-OUT FULLSCREEN OVERRIDE -->
 <script>
 (function() {
-  function initVOut() {
-    var btn = document.getElementById('vOutBtn');
-    if (!btn) { setTimeout(initVOut, 500); return; }
-    var nb = btn.cloneNode(true);
-    btn.parentNode.replaceChild(nb, btn);
-    nb.addEventListener('click', function() {
-      var cc = document.getElementById('canvasContainer');
-      if (!cc) return;
+  function toggleFS(targetEl, btn) {
+    if (!document.fullscreenElement) {
+      targetEl.requestFullscreen({ navigationUI: 'hide' })
+        .then(function(){ if(btn) btn.classList.add('active'); })
+        .catch(function(e){ console.warn('FS failed', e); });
+    } else {
+      document.exitFullscreen()
+        .then(function(){ if(btn) btn.classList.remove('active'); });
+    }
+  }
+
+  function init() {
+    // 展開ボタン (canvasWrapper右上)
+    var expBtn = document.getElementById('expandCanvasBtn');
+    var cw = document.getElementById('canvasWrapper');
+    if (expBtn && cw) {
+      expBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleFS(cw, expBtn);
+      });
+    }
+
+    // V-OUTボタンも同じ動作に
+    var vBtn = document.getElementById('vOutBtn');
+    if (vBtn) {
+      var nb = vBtn.cloneNode(true);
+      vBtn.parentNode.replaceChild(nb, vBtn);
+      nb.addEventListener('click', function() { toggleFS(cw, nb); });
+    }
+
+    document.addEventListener('fullscreenchange', function() {
+      var eb = document.getElementById('expandCanvasBtn');
+      var vb = document.getElementById('vOutBtn');
       if (!document.fullscreenElement) {
-        // Three.js rendererの背景を黒に強制
-        var mm = window.mandalaMachine;
-        if (mm && mm.setBackgroundColor) mm.setBackgroundColor({r:0,g:0,b:0});
-        cc.requestFullscreen({ navigationUI: 'hide' })
-          .then(function(){ nb.classList.add('active'); })
-          .catch(function(e){ console.warn('FS failed', e); });
+        if(eb) eb.classList.remove('active');
+        if(vb) vb.classList.remove('active');
+        // SVGを展開アイコンに戻す
+        if(eb) eb.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6V1H6M10 1H15V6M15 10V15H10M6 15H1V10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><\/svg>';
       } else {
-        document.exitFullscreen().then(function(){ nb.classList.remove('active'); });
+        // SVGを縮小アイコンに
+        if(eb) eb.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1V6H1M15 6H10V1M10 15V10H15M1 10H6V15" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><\/svg>';
       }
     });
-    document.addEventListener('fullscreenchange', function(){
-      var b = document.getElementById('vOutBtn');
-      if (!document.fullscreenElement && b) b.classList.remove('active');
-    });
   }
-  setTimeout(initVOut, 1200);
+
+  setTimeout(init, 1200);
 })();
 </script>
 </body>
