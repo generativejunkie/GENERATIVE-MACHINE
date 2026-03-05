@@ -209,15 +209,18 @@
                     <!-- Left Side: Features -->
                     <!-- Mode Group 1: Core Mechanics -->
                     <div class="mode-group">
+                        <button id="topAutoBtn" class="mode-btn" title="Auto Mode" data-i18n-title="auto">
+                            <span data-i18n="auto">AUTO</span>
+                        </button>
+                        <button id="topResetBtn" class="mode-btn" title="Reset Scene" data-i18n-title="resetScene">
+                            <span data-i18n="resetScene">RESET</span>
+                        </button>
                         <button id="topAiBtn" class="mode-btn" title="Space Mode" data-i18n-title="space">
                             <span data-i18n="space">SPACE</span>
                         </button>
                         <button id="topMandalaBtn" class="mode-btn" title="Mandala Mode" aria-label="曼荼羅モードを切り替え"
                             aria-pressed="false" role="switch" data-i18n-title="mandala">
                             <span data-i18n="mandala">MANDALA</span>
-                        </button>
-                        <button id="topAutoBtn" class="mode-btn" title="Auto Mode" data-i18n-title="auto">
-                            <span data-i18n="auto">AUTO</span>
                         </button>
                         <div class="dropdown-container">
                             <button id="topBlinkBtn" class="mode-btn" title="Strobe" data-i18n-title="blinkingMode">
@@ -1116,6 +1119,132 @@
   }
 
   setTimeout(init, 1200);
+})();
+</script>
+
+<!-- AUTO MODE 10H ENDURANCE -->
+<script>
+(function() {
+  // RESETボタン連携
+  function initReset() {
+    var btn = document.getElementById('topResetBtn');
+    if (!btn) { setTimeout(initReset, 800); return; }
+    btn.addEventListener('click', function() {
+      var mm = window.mandalaMachine;
+      if (!mm) return;
+      try {
+        if (typeof mm.resetScene === 'function') mm.resetScene();
+        else if (typeof mm.reset === 'function') mm.reset();
+        else if (typeof mm.init === 'function') mm.init();
+        // フォールバック: ページリロード無しでオブジェクト数をリセット
+        var countInput = document.getElementById('objectCount') || document.getElementById('count');
+        if (countInput) { countInput.value = 12; countInput.dispatchEvent(new Event('input')); }
+        console.log('[RESET] scene reset triggered');
+      } catch(e) { console.warn('[RESET] error:', e); }
+    });
+    console.log('[RESET] button initialized');
+  }
+  setTimeout(initReset, 1500);
+
+  // AUTO MODE 10時間耐久システム
+  var AUTO_HEALTH = {
+    startTime: null,
+    errorCount: 0,
+    lastPresetChange: 0,
+    intervalId: null,
+    watchdogId: null,
+
+    start: function() {
+      this.startTime = Date.now();
+      this.errorCount = 0;
+      console.log('[AUTO-ENDURANCE] started');
+      this.watchdog();
+    },
+
+    stop: function() {
+      if (this.watchdogId) clearTimeout(this.watchdogId);
+      this.watchdogId = null;
+      console.log('[AUTO-ENDURANCE] stopped');
+    },
+
+    watchdog: function() {
+      var self = this;
+      self.watchdogId = setTimeout(function() {
+        try {
+          var mm = window.mandalaMachine;
+          if (!mm) { self.watchdog(); return; }
+
+          var elapsed = Date.now() - self.startTime;
+          var hours = (elapsed / 3600000).toFixed(2);
+
+          // FPSチェック
+          var fps = parseFloat(document.getElementById('fpsDisplay')?.textContent || '60');
+          if (fps < 10 && fps > 0) {
+            console.warn('[AUTO-ENDURANCE] Low FPS:', fps, '- reducing objects');
+            self.errorCount++;
+            // オブジェクト数を減らして回復
+            var countEl = document.getElementById('objectCount');
+            if (countEl) {
+              var cur = parseInt(countEl.value) || 12;
+              countEl.value = Math.max(4, cur - 4);
+              countEl.dispatchEvent(new Event('input'));
+            }
+          } else {
+            self.errorCount = Math.max(0, self.errorCount - 1);
+          }
+
+          // 3時間ごとにシーンをソフトリセット（メモリ解放）
+          if (elapsed > 0 && elapsed % (3 * 3600000) < 30000) {
+            console.log('[AUTO-ENDURANCE] 3h soft reset, elapsed:', hours + 'h');
+            try {
+              if (typeof mm.softReset === 'function') mm.softReset();
+              // Three.jsのGC促進
+              if (mm.renderer && mm.renderer.info) {
+                console.log('[AUTO-ENDURANCE] renderer info:', JSON.stringify(mm.renderer.info.memory));
+              }
+            } catch(e) {}
+          }
+
+          // エラーが5回以上続いたら強制ソフトリセット
+          if (self.errorCount >= 5) {
+            console.warn('[AUTO-ENDURANCE] force reset due to errors');
+            self.errorCount = 0;
+            try {
+              var rb = document.getElementById('topResetBtn');
+              if (rb) rb.click();
+            } catch(e) {}
+          }
+
+        } catch(e) {
+          console.warn('[AUTO-ENDURANCE] watchdog error:', e);
+        }
+        self.watchdog(); // 30秒ごとに繰り返し
+      }, 30000);
+    }
+  };
+
+  // AUTOモードON/OFFを監視
+  function watchAutoMode() {
+    var autoBtn = document.getElementById('topAutoBtn');
+    if (!autoBtn) { setTimeout(watchAutoMode, 1000); return; }
+
+    var observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(m) {
+        if (m.attributeName === 'class') {
+          var isActive = autoBtn.classList.contains('active');
+          if (isActive && !AUTO_HEALTH.watchdogId) {
+            AUTO_HEALTH.start();
+          } else if (!isActive && AUTO_HEALTH.watchdogId) {
+            AUTO_HEALTH.stop();
+          }
+        }
+      });
+    });
+    observer.observe(autoBtn, { attributes: true });
+    console.log('[AUTO-ENDURANCE] observer attached');
+  }
+  setTimeout(watchAutoMode, 2000);
+
 })();
 </script>
 </body>
