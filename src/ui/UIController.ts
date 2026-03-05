@@ -1007,7 +1007,6 @@ export class UIController {
         if (!document.fullscreenElement) vOutBtn.classList.remove('active');
       });
     }
-    }
 
     updateSeekbarVisibility();
   }
