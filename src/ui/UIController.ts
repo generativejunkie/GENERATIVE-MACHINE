@@ -986,9 +986,27 @@ export class UIController {
     // V-OUT Button
     const vOutBtn = document.getElementById('vOutBtn');
     if (vOutBtn) {
+      // V-OUT: キャンバスエリアのみ全画面表示（左パネルはそのまま操作可能）
+      const getCanvasContainer = () => document.getElementById('canvasContainer');
+
       vOutBtn.addEventListener('click', () => {
-        this.app.openProjectorWindow();
+        const cc = getCanvasContainer();
+        if (!cc) { this.app.openProjectorWindow(); return; }
+
+        if (!document.fullscreenElement) {
+          cc.requestFullscreen({ navigationUI: 'hide' })
+            .then(() => vOutBtn.classList.add('active'))
+            .catch(() => this.app.openProjectorWindow());
+        } else {
+          document.exitFullscreen()
+            .then(() => vOutBtn.classList.remove('active'));
+        }
       });
+
+      document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) vOutBtn.classList.remove('active');
+      });
+    }
     }
 
     updateSeekbarVisibility();
