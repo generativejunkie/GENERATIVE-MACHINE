@@ -272,6 +272,7 @@ export class UIController {
 
     // DJ Name and Effects
     this.setupCanvasTextControl();
+    this.setupTimetable();
 
     // Initialize slider visuals
     document.querySelectorAll('input[type="range"]').forEach(el => {
@@ -2758,6 +2759,199 @@ export class UIController {
         }
       });
     }
+  }
+
+  // ─── TIMETABLE ────────────────────────────────────────────
+
+  private ttEntries: Array<{ id: string; djName: string; startTime: string; endTime: string }> = [];
+  private ttOverride: 'auto' | 'force-on' | 'force-off' = 'auto';
+  private ttFadeOpacity = 0;
+  private ttFadeDir: 'in' | 'out' | null = null;
+  private ttFadeStart: number | null = null;
+  private ttLastActiveId: string | null = null;
+  private ttTickId: ReturnType<typeof setInterval> | null = null;
+
+  private parseTimeMin(t: string): number {
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m;
+  }
+
+  private isTTActive(entry: { startTime: string; endTime: string }): boolean {
+    const start = this.parseTimeMin(entry.startTime);
+    const end   = this.parseTimeMin(entry.endTime);
+    const now   = new Date().getHours() * 60 + new Date().getMinutes();
+    if (end > 1440) return now >= start || now < (end - 1440);
+    if (end <= start) return now >= start || now < end;
+    return now >= start && now < end;
+  }
+
+  private ttTick(): void {
+    if (this.ttOverride !== 'auto') return;
+    const active = this.ttEntries.find(e => this.isTTActive(e)) ?? null;
+
+    if (active?.id !== this.ttLastActiveId) {
+      if (active) {
+        this.ttFadeDir = 'in';
+        this.ttFadeStart = performance.now();
+        this.app.setCanvasText(active.djName);
+      } else if (this.ttLastActiveId !== null) {
+        this.ttFadeDir = 'out';
+        this.ttFadeStart = performance.now();
+      }
+      this.ttLastActiveId = active?.id ?? null;
+    }
+
+    if (this.ttFadeDir && this.ttFadeStart !== null) {
+      const progress = Math.min((performance.now() - this.ttFadeStart) / 3000, 1);
+      this.ttFadeOpacity = this.ttFadeDir === 'in' ? progress : 1 - progress;
+      if (progress >= 1) {
+        if (this.ttFadeOpacity === 0) this.app.toggleShowDJName(false);
+        this.ttFadeDir = null;
+        this.ttFadeStart = null;
+      }
+      this.app.toggleShowDJName(this.ttFadeOpacity > 0);
+    }
+
+    this.updateTTStatus();
+    this.renderTTEntries();
+  }
+
+  private updateTTStatus(): void {
+    const nowLabel  = document.getElementById('ttNowLabel');
+    const nextLabel = document.getElementById('ttNextLabel');
+    if (!nowLabel || !nextLabel) return;
+
+    const active = this.ttEntries.find(e => this.isTTActive(e));
+    const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
+    let next: typeof this.ttEntries[0] | null = null;
+    let minDiff = Infinity;
+    for (const e of this.ttEntries) {
+      let diff = this.parseTimeMin(e.startTime) - nowMin;
+      if (diff < 0) diff += 1440;
+      if (diff > 0 && diff < minDiff) { minDiff = diff; next = e; }
+    }
+
+    nowLabel.textContent  = active
+      ? '▶ ' + active.djName + '  ' + active.startTime + '–' + active.endTime
+      : '— NO ACTIVE DJ —';
+    nowLabel.style.color  = active ? 'var(--text-color)' : 'rgba(255,255,255,0.3)';
+    nextLabel.textContent = next
+      ? 'NEXT › ' + next.djName + '  ' + next.startTime
+      : '';
+  }
+
+  private renderTTEntries(): void {
+    const list = document.getElementById('ttEntryList');
+    if (!list) return;
+    list.innerHTML = '';
+    for (const e of this.ttEntries) {
+      const isActive = this.isTTActive(e);
+      const row = document.createElement('div');
+      row.className = 'tt-entry-row' + (isActive ? ' tt-active' : '');
+      row.innerHTML =
+        '<span class="tt-entry-name">' + e.djName + '</span>' +
+        '<span class="tt-entry-time">' + e.startTime + '</span>' +
+        '<span class="tt-entry-time">' + e.endTime   + '</span>' +
+        '<button class="tt-entry-del" data-id="' + e.id + '" title="Delete">×</button>';
+      (row.querySelector('.tt-entry-del') as HTMLButtonElement).addEventListener('click', () => {
+        this.ttEntries = this.ttEntries.filter(x => x.id !== e.id);
+        this.renderTTEntries();
+        this.updateTTStatus();
+      });
+      list.appendChild(row);
+    }
+  }
+
+  private setupTimetable(): void {
+    // Collapse toggle
+    document.getElementById('ttToggleBtn')?.addEventListener('click', (ev) => {
+      const btn = ev.currentTarget as HTMLButtonElement;
+      const sec = document.getElementById('timetableSection');
+      if (!sec) return;
+      const collapsed = sec.style.display === 'none';
+      sec.style.display = collapsed ? '' : 'none';
+      btn.textContent = collapsed ? '−' : '＋';
+    });
+
+    // Override buttons
+    const applyOverride = (mode: typeof this.ttOverride) => {
+      this.ttOverride = mode;
+      ['ttAutoBtn', 'ttForceOnBtn', 'ttForceOffBtn'].forEach(id =>
+        document.getElementById(id)?.classList.remove('active'));
+      const map: Record<string, string> = {
+        'auto': 'ttAutoBtn', 'force-on': 'ttForceOnBtn', 'force-off': 'ttForceOffBtn'
+      };
+      document.getElementById(map[mode])?.classList.add('active');
+      if (mode === 'force-on') {
+        const a = this.ttEntries.find(e => this.isTTActive(e));
+        if (a) { this.app.setCanvasText(a.djName); this.app.toggleShowDJName(true); }
+      }
+      if (mode === 'force-off') this.app.toggleShowDJName(false);
+    };
+    document.getElementById('ttAutoBtn')?.addEventListener('click',     () => applyOverride('auto'));
+    document.getElementById('ttForceOnBtn')?.addEventListener('click',  () => applyOverride('force-on'));
+    document.getElementById('ttForceOffBtn')?.addEventListener('click', () => applyOverride('force-off'));
+
+    // Add entry
+    document.getElementById('ttAddBtn')?.addEventListener('click', () => {
+      const name  = (document.getElementById('ttNewName')  as HTMLInputElement)?.value.trim();
+      const start = (document.getElementById('ttNewStart') as HTMLInputElement)?.value.trim();
+      const end   = (document.getElementById('ttNewEnd')   as HTMLInputElement)?.value.trim();
+      if (!name || !start || !end) return;
+      if (!/^\d{1,2}:\d{2}$/.test(start) || !/^\d{1,2}:\d{2}$/.test(end)) {
+        alert('時刻は HH:mm 形式で入力してください'); return;
+      }
+      this.ttEntries.push({ id: 'tt_' + Date.now(), djName: name, startTime: start, endTime: end });
+      (document.getElementById('ttNewName')  as HTMLInputElement).value = '';
+      (document.getElementById('ttNewStart') as HTMLInputElement).value = '';
+      (document.getElementById('ttNewEnd')   as HTMLInputElement).value = '';
+      this.renderTTEntries();
+      this.updateTTStatus();
+    });
+
+    // CSV import
+    const fileInput = document.getElementById('ttCsvFile') as HTMLInputElement;
+    document.getElementById('ttImportBtn')?.addEventListener('click', () => fileInput?.click());
+    fileInput?.addEventListener('change', () => {
+      const file = fileInput.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const text = (ev.target?.result as string) ?? '';
+        const newEntries: typeof this.ttEntries = [];
+        text.trim().split('\n').forEach((line, i) => {
+          const l = line.trim();
+          if (!l || l.startsWith('#')) return;
+          const cols = l.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+          if (cols.length < 3) return;
+          const [djName, startTime, endTime] = cols;
+          if (!/^\d{1,2}:\d{2}$/.test(startTime) || !/^\d{1,2}:\d{2}$/.test(endTime)) return;
+          newEntries.push({ id: 'tt_' + Date.now() + '_' + i, djName, startTime, endTime });
+        });
+        this.ttEntries = [...this.ttEntries, ...newEntries];
+        this.renderTTEntries();
+        this.updateTTStatus();
+        fileInput.value = '';
+      };
+      reader.readAsText(file);
+    });
+
+    // CSV export
+    document.getElementById('ttExportBtn')?.addEventListener('click', () => {
+      const csv = ['# DJ Name,Start Time,End Time',
+        ...this.ttEntries.map(e => e.djName + ',' + e.startTime + ',' + e.endTime)
+      ].join('\n');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+      a.download = 'timetable.csv';
+      a.click();
+    });
+
+    // Start polling every 10 seconds
+    this.renderTTEntries();
+    this.updateTTStatus();
+    if (this.ttTickId) clearInterval(this.ttTickId);
+    this.ttTickId = setInterval(() => this.ttTick(), 10_000);
   }
 }
 
