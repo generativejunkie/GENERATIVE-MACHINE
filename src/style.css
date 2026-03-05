@@ -18,6 +18,7 @@
 
     /* Left panel collapse transition */
     --left-panel-width: 260px;
+    --right-panel-width: 260px;
 }
 
 /* Light mode override (toggled via moon button) */
@@ -1782,4 +1783,41 @@ body.light-mode .preset-item {
 }
 body.light-mode .preset-item canvas {
     background: #f0f0f0 !important;
+}
+
+
+/* ── Right Panel Toggle ── */
+#rightPanelToggle {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 100;
+    width: 32px;
+    height: 32px;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.15s, color 0.15s, right 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    line-height: 1;
+}
+
+#rightPanelToggle:hover {
+    background: var(--hover-bg);
+    color: var(--text-color);
+}
+
+/* Shift toggle when panel is open */
+#rightPanelToggle.panel-open {
+    right: calc(var(--right-panel-width) + 12px);
+}
+
+/* Hide right panel when collapsed */
+#rightPanel.panel-collapsed {
+    display: none;
 }
