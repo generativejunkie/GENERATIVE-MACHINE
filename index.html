@@ -139,6 +139,37 @@
                 </div>
             </div>
 
+            <!-- ─── TIMETABLE ─────────────────────────────── -->
+            <div class="panel-header" style="margin-top: 20px;">
+                <h3>TIMETABLE</h3>
+                <button id="ttToggleBtn" class="mode-tag-btn" title="Collapse">−</button>
+            </div>
+
+            <div id="timetableSection" class="timetable-section">
+                <div class="tt-status">
+                    <span id="ttNowLabel" class="tt-now-label">— NO ACTIVE DJ —</span>
+                    <span id="ttNextLabel" class="tt-next-label"></span>
+                </div>
+                <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+                    <button id="ttAutoBtn"     class="mode-tag-btn active">AUTO</button>
+                    <button id="ttForceOnBtn"  class="mode-tag-btn">SHOW</button>
+                    <button id="ttForceOffBtn" class="mode-tag-btn">HIDE</button>
+                </div>
+                <div id="ttEntryList" class="tt-entry-list"></div>
+                <div class="tt-add-row">
+                    <input type="text" id="ttNewName"  class="tt-input-name" placeholder="DJ NAME">
+                    <input type="text" id="ttNewStart" class="tt-input-time" placeholder="22:00">
+                    <input type="text" id="ttNewEnd"   class="tt-input-time" placeholder="23:30">
+                    <button id="ttAddBtn" class="mode-tag-btn">＋</button>
+                </div>
+                <div class="tt-csv-row">
+                    <button id="ttImportBtn" class="mode-tag-btn">CSV IMPORT</button>
+                    <input  type="file" id="ttCsvFile" accept=".csv,.txt" style="display:none;">
+                    <button id="ttExportBtn" class="mode-tag-btn">EXPORT</button>
+                </div>
+            </div>
+            <!-- ─── /TIMETABLE ────────────────────────────── -->
+
 
 
             <div class="panel-header" style="margin-top: 20px;">
