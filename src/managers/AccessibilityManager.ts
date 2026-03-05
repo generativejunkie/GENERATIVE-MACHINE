@@ -10,8 +10,8 @@ export class AccessibilityManager extends EventEmitter {
     private highContrastEnabled: boolean = false;
     private announceEnabled: boolean = false;
     private simpleModeEnabled: boolean = false;
-    private currentLang: 'ja' | 'en' = 'ja';
-    private locale: Locale = ja;
+    private currentLang: 'ja' | 'en' = 'en';
+    private locale: Locale = en;
 
     constructor(app: Application) {
         super();
