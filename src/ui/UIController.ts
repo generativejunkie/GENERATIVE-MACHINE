@@ -201,6 +201,7 @@ export class UIController {
   private setupEventListeners(): void {
     // Top right buttons
     this.setupTopRightButtons();
+    this.setupPanelToggles();
 
     // Top bar mode buttons
     this.setupTopBarModeButtons();
@@ -753,6 +754,34 @@ export class UIController {
     if (topDarkModeBtn) {
       topDarkModeBtn.addEventListener('click', () => {
         this.toggleDarkMode();
+      });
+    }
+  }
+
+  private setupPanelToggles(): void {
+    const appRoot = document.getElementById('app-root');
+
+    // ── Left panel ──────────────────────────────────────────
+    const leftToggle = document.getElementById('leftPanelToggle');
+    const leftPanel  = document.getElementById('leftPanel');
+    if (leftToggle && leftPanel && appRoot) {
+      leftToggle.addEventListener('click', () => {
+        const collapsed = appRoot.classList.toggle('left-collapsed');
+        leftPanel.classList.toggle('panel-collapsed', collapsed);
+        leftToggle.textContent = collapsed ? '›' : '‹';
+        leftToggle.style.left  = collapsed ? '12px' : 'calc(var(--left-panel-width) + 12px)';
+      });
+    }
+
+    // ── Right panel ─────────────────────────────────────────
+    const rightToggle = document.getElementById('rightPanelToggle');
+    const rightPanel  = document.getElementById('rightPanel');
+    if (rightToggle && rightPanel && appRoot) {
+      rightToggle.addEventListener('click', () => {
+        const collapsed = appRoot.classList.toggle('right-collapsed');
+        rightPanel.classList.toggle('panel-collapsed', collapsed);
+        rightToggle.textContent = collapsed ? '‹' : '›';
+        rightToggle.style.right = collapsed ? '12px' : 'calc(260px + 12px)';
       });
     }
   }
