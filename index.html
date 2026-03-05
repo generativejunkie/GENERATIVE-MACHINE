@@ -41,7 +41,28 @@
         .reset-btn {
             font-weight: 700;
         }
-    </style>
+    
+  /* V-OUT: canvasContainer fullscreen */
+  #canvasContainer:fullscreen,
+  #canvasContainer:-webkit-full-screen {
+    width: 100vw !important;
+    height: 100vh !important;
+    background: #0a0a0a !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+  #canvasContainer:fullscreen canvas,
+  #canvasContainer:-webkit-full-screen canvas {
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    width: auto !important;
+    height: auto !important;
+  }
+</style>
 </head>
 
 <body tabindex="0">
@@ -1016,6 +1037,35 @@
     } else { apply(); }
   })();
   </script>
+
+<!-- V-OUT FULLSCREEN OVERRIDE -->
+<script>
+(function() {
+  function initVOut() {
+    var btn = document.getElementById('vOutBtn');
+    if (!btn) { setTimeout(initVOut, 500); return; }
+    // cloneで既存リスナーを除去
+    var nb = btn.cloneNode(true);
+    btn.parentNode.replaceChild(nb, btn);
+    nb.addEventListener('click', function() {
+      var cc = document.getElementById('canvasContainer');
+      if (!cc) return;
+      if (!document.fullscreenElement) {
+        cc.requestFullscreen({ navigationUI: 'hide' })
+          .then(function(){ nb.classList.add('active'); })
+          .catch(function(e){ console.warn('FS failed', e); });
+      } else {
+        document.exitFullscreen().then(function(){ nb.classList.remove('active'); });
+      }
+    });
+    document.addEventListener('fullscreenchange', function(){
+      var b = document.getElementById('vOutBtn');
+      if (!document.fullscreenElement && b) b.classList.remove('active');
+    });
+  }
+  setTimeout(initVOut, 1200);
+})();
+</script>
 </body>
 
 </html>
