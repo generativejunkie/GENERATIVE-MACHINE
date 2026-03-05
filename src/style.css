@@ -11,6 +11,18 @@
     --font-ui: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-mono: "SF Mono", "Monaco", "Inconsolata", "Fira Mono", "Droid Sans Mono", "Source Code Pro", monospace;
 
+
+/* Grid adjustment when right panel collapsed */
+#app-root.right-collapsed {
+    grid-template-columns: var(--left-panel-width) 1fr 0;
+}
+
+@media (max-width: 1024px) {
+    #app-root.right-collapsed {
+        grid-template-columns: 220px 1fr 0;
+    }
+}
+
     /* Canvas Theming */
     --canvas-bg: #000000;
     --letterbox-bg: #000000;
