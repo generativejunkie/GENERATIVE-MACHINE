@@ -1833,3 +1833,130 @@ body.light-mode .preset-item canvas {
 #rightPanel.panel-collapsed {
     display: none;
 }
+
+
+/* ─── TIMETABLE ──────────────────────────────────────────── */
+.timetable-section {
+  padding: 0 10px;
+  margin-bottom: 16px;
+}
+
+.tt-status {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  margin-bottom: 8px;
+  min-height: 36px;
+}
+
+.tt-now-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tt-next-label {
+  font-size: 9px;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.05em;
+}
+
+.tt-entry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 8px;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.tt-entry-row {
+  display: grid;
+  grid-template-columns: 1fr 44px 44px 22px;
+  gap: 3px;
+  align-items: center;
+  padding: 3px 4px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid transparent;
+  transition: border-color 0.2s;
+  font-size: 10px;
+}
+
+.tt-entry-row.tt-active {
+  border-color: var(--text-color);
+  background: rgba(255,255,255,0.08);
+}
+
+.tt-entry-name {
+  font-weight: 700;
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(255,255,255,0.7);
+}
+
+.tt-entry-row.tt-active .tt-entry-name {
+  color: var(--text-color);
+}
+
+.tt-entry-time {
+  font-size: 9px;
+  color: rgba(255,255,255,0.4);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.tt-entry-del {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.25);
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.tt-entry-del:hover { color: rgba(255,80,80,0.8); }
+
+.tt-add-row {
+  display: grid;
+  grid-template-columns: 1fr 52px 52px 28px;
+  gap: 3px;
+  margin-bottom: 6px;
+}
+
+.tt-input-name,
+.tt-input-time {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 3px;
+  color: var(--text-color);
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 5px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tt-input-name::placeholder,
+.tt-input-time::placeholder {
+  color: rgba(255,255,255,0.2);
+}
+
+.tt-csv-row {
+  display: flex;
+  gap: 4px;
+}
+/* ─── /TIMETABLE ─────────────────────────────────────────── */
