@@ -28,8 +28,8 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       input: {
-        mandara: path.resolve(__dirname, 'mandara.html'),
         index: path.resolve(__dirname, 'index.html'),
+        mandara: path.resolve(__dirname, 'mandara.html'),
       }
     }
   }
