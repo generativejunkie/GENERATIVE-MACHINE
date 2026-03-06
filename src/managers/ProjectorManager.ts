@@ -150,7 +150,7 @@ export class ProjectorManager {
 
         this.mandalaStream = compositeStream;
 
-        const features = 'width=800,height=600,menubar=no,toolbar=no,location=no,status=no,directories=no,popup=yes';
+        const features = 'width=1280,height=720,resizable=yes,scrollbars=no,menubar=no,toolbar=no,location=no,status=no';
         this.projectorWindow = window.open('', 'MandalaProjector', features);
 
         if (!this.projectorWindow) {
