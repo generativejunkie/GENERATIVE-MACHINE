@@ -25,6 +25,12 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true
+    sourcemap: true,
+    rollupOptions: {
+      input: {
+        mandara: path.resolve(__dirname, 'mandara.html'),
+        index: path.resolve(__dirname, 'index.html'),
+      }
+    }
   }
 });
