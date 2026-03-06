@@ -193,9 +193,6 @@ export class ProjectorManager {
         overlay.addEventListener('click', enterFS);
         doc.body.appendChild(overlay);
 
-        doc.body.requestFullscreen().then(() => {
-            overlay.style.display = 'none';
-        }).catch(() => {});
 
         doc.body.addEventListener('dblclick', () => {
             if (!doc.fullscreenElement) {
