@@ -179,7 +179,7 @@ export class ProjectorManager {
         video.autoplay = true;
         (video as any).muted = true;
         video.playsInline = true;
-        video.style.cssText = 'width:100vw;height:100vh;object-fit:contain;';
+        video.style.cssText = 'width:100vw;height:100vh;object-fit:fill;';
         video.srcObject = stream;
         this.currentVideoElement = video;
         doc.body.appendChild(video);
