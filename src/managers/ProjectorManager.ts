@@ -178,36 +178,9 @@ export class ProjectorManager {
         this.currentVideoElement = video;
         doc.body.appendChild(video);
 
-        const overlay = doc.createElement('div');
-        overlay.innerText = 'Click to Fullscreen';
-        overlay.style.cssText = 'position:absolute;top:0;left:0;width:100vw;height:100vh;display:flex;justify-content:center;align-items:center;color:rgba(255,255,255,0.5);font-family:sans-serif;font-size:24px;cursor:pointer;z-index:1000;background:rgba(0,0,0,0.5);';
-
-        const enterFS = () => {
-            if (!doc.fullscreenElement) {
-                doc.body.requestFullscreen()
-                    .then(() => { overlay.style.display = 'none'; })
-                    .catch(err => console.warn('Fullscreen denied:', err));
-            }
-        };
-
-        overlay.addEventListener('click', enterFS);
-        doc.body.appendChild(overlay);
-
-
-        doc.body.addEventListener('dblclick', () => {
-            if (!doc.fullscreenElement) {
-                doc.body.requestFullscreen().then(() => { overlay.style.display = 'none'; });
-            } else {
-                doc.exitFullscreen();
-            }
-        });
-
+        // Esc to close popup
         doc.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') win.close();
-        });
-
-        doc.addEventListener('fullscreenchange', () => {
-            if (doc.fullscreenElement) overlay.style.display = 'none';
         });
 
         console.log('📽️ Projector window ready — composite stream (Three.js + p5.js text) active');
