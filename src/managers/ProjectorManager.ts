@@ -110,21 +110,21 @@ export class ProjectorManager {
             }
 
             ctx.clearRect(0, 0, composite.width, composite.height);
-        // Sync invert filter from main window
-        const isLightMode = document.body.classList.contains('light-mode');
-        ctx.filter = isLightMode ? 'invert(1)' : 'none';
+            // Sync invert filter from main window
+            const isLightMode = document.body.classList.contains('light-mode');
+            ctx.filter = isLightMode ? 'invert(1)' : 'none';
 
             // Layer 1: Three.js 3D scene
             try {
                 ctx.drawImage(threeCanvas, 0, 0, composite.width, composite.height);
-            } catch (_) {}
+            } catch (_) { }
 
             // Layer 2: p5.js text overlay — re-query each frame to handle late initialization
             const p5c = document.querySelector('#p5-container canvas') as HTMLCanvasElement | null;
             if (p5c) {
                 try {
                     ctx.drawImage(p5c, 0, 0, composite.width, composite.height);
-                } catch (_) {}
+                } catch (_) { }
             }
 
             this.compositeAnimFrame = requestAnimationFrame(renderFrame);
@@ -178,12 +178,63 @@ export class ProjectorManager {
         this.currentVideoElement = video;
         doc.body.appendChild(video);
 
-        // Esc to close popup
+        // ── 右下に常設のフルスクリーンボタン ──────────────────────────
+        const fsBtn = doc.createElement('button');
+        fsBtn.innerHTML = '⛶ FULLSCREEN';
+        fsBtn.style.cssText = [
+            'position:fixed',
+            'bottom:20px',
+            'right:20px',
+            'z-index:9999',
+            'background:rgba(0,0,0,0.6)',
+            'color:rgba(255,255,255,0.85)',
+            'border:1px solid rgba(255,255,255,0.3)',
+            'border-radius:6px',
+            'padding:8px 16px',
+            'font-family:sans-serif',
+            'font-size:13px',
+            'letter-spacing:0.08em',
+            'cursor:pointer',
+            'transition:opacity 0.3s',
+            'opacity:0.7',
+        ].join(';');
+
+        const toggleFS = () => {
+            if (!doc.fullscreenElement) {
+                doc.body.requestFullscreen({ navigationUI: 'hide' })
+                    .catch(err => console.warn('Fullscreen denied:', err));
+            } else {
+                doc.exitFullscreen();
+            }
+        };
+
+        fsBtn.addEventListener('click', toggleFS);
+        fsBtn.addEventListener('mouseenter', () => { fsBtn.style.opacity = '1'; doc.body.style.cursor = 'auto'; });
+        fsBtn.addEventListener('mouseleave', () => { fsBtn.style.opacity = '0.7'; doc.body.style.cursor = 'none'; });
+
+        doc.body.appendChild(fsBtn);
+
+        // フルスクリーン状態でボタンラベル更新
+        doc.addEventListener('fullscreenchange', () => {
+            if (doc.fullscreenElement) {
+                fsBtn.innerHTML = '✕ EXIT FULLSCREEN';
+            } else {
+                fsBtn.innerHTML = '⛶ FULLSCREEN';
+            }
+        });
+
+        // ダブルクリックでもフルスクリーントグル
+        doc.body.addEventListener('dblclick', (e) => {
+            if (e.target !== fsBtn) toggleFS();
+        });
+
+        // Esc: フルスクリーン中はブラウザが処理、非フルスクリーン時はウィンドウを閉じる
         doc.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') win.close();
+            if (e.key === 'Escape' && !doc.fullscreenElement) win.close();
         });
 
         console.log('📽️ Projector window ready — composite stream (Three.js + p5.js text) active');
+        console.log('📽️ Hint: Click "FULLSCREEN" button or double-click to go fullscreen. Move window to another monitor first.');
     }
 
     private startWindowCheck(): void {
