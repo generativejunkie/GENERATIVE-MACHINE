@@ -150,8 +150,17 @@ export class ProjectorManager {
 
         this.mandalaStream = compositeStream;
 
-        const features = 'width=1280,height=720,resizable=yes,scrollbars=no,menubar=no,toolbar=no,location=no,status=no';
+        // left/top を指定することで最大化を防ぐ（960x540で中央付近に配置）
+        const w = 960, h = 540;
+        const left = Math.round((window.screen.width - w) / 2);
+        const top = Math.round((window.screen.height - h) / 4);
+        const features = `width=${w},height=${h},left=${left},top=${top},resizable=yes,scrollbars=no,menubar=no,toolbar=no,location=no,status=no`;
         this.projectorWindow = window.open('', 'MandalaProjector', features);
+        // ブラウザが最大化した場合に備えてリサイズ
+        if (this.projectorWindow) {
+            try { this.projectorWindow.resizeTo(w, h); } catch (_) { }
+            try { this.projectorWindow.moveTo(left, top); } catch (_) { }
+        }
 
         if (!this.projectorWindow) {
             alert('Pop-up blocked! Please allow pop-ups for this site.');
