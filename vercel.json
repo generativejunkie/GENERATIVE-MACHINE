@@ -28,6 +28,10 @@
     {
       "source": "/info/:slug",
       "destination": "/info/:slug.html"
+    },
+    {
+      "source": "/mandaramachine",
+      "destination": "/mandaramachine.html"
     }
   ],
   "redirects": [
