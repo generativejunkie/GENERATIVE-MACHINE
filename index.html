@@ -41,51 +41,60 @@
         .reset-btn {
             font-weight: 700;
         }
-    
-  /* Expand button */
-  .expand-canvas-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 100;
-    width: 32px;
-    height: 32px;
-    background: rgba(0,0,0,0.5);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0.4;
-    transition: opacity 0.2s;
-  }
-  .expand-canvas-btn:hover { opacity: 1; }
-  #canvasWrapper { position: relative; }
 
-  /* Fullscreen: canvasWrapperを全画面に */
-  #canvasWrapper:fullscreen,
-  #canvasWrapper:-webkit-full-screen {
-    background: #000 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-  }
-  #canvasWrapper:fullscreen .canvas-container,
-  #canvasWrapper:-webkit-full-screen .canvas-container {
-    width: 100% !important;
-    height: 100% !important;
-  }
-  #canvasWrapper:fullscreen canvas,
-  #canvasWrapper:-webkit-full-screen canvas {
-    width: 100% !important;
-    height: 100% !important;
-  }
-  /* fullscreen時は展開ボタンをSVG切り替え */
-  #canvasWrapper:fullscreen .expand-canvas-btn,
-  #canvasWrapper:-webkit-full-screen .expand-canvas-btn {
-    opacity: 0.4;
-  }
-</style>
+        /* Expand button */
+        .expand-canvas-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 100;
+            width: 32px;
+            height: 32px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.4;
+            transition: opacity 0.2s;
+        }
+
+        .expand-canvas-btn:hover {
+            opacity: 1;
+        }
+
+        #canvasWrapper {
+            position: relative;
+        }
+
+        /* Fullscreen: canvasWrapperを全画面に */
+        #canvasWrapper:fullscreen,
+        #canvasWrapper:-webkit-full-screen {
+            background: #000 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+        }
+
+        #canvasWrapper:fullscreen .canvas-container,
+        #canvasWrapper:-webkit-full-screen .canvas-container {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        #canvasWrapper:fullscreen canvas,
+        #canvasWrapper:-webkit-full-screen canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* fullscreen時は展開ボタンをSVG切り替え */
+        #canvasWrapper:fullscreen .expand-canvas-btn,
+        #canvasWrapper:-webkit-full-screen .expand-canvas-btn {
+            opacity: 0.4;
+        }
+    </style>
 </head>
 
 <body tabindex="0">
@@ -149,20 +158,20 @@
                     <span id="ttNextLabel" class="tt-next-label"></span>
                 </div>
                 <div style="display: flex; gap: 4px; margin-bottom: 8px;">
-                    <button id="ttAutoBtn"     class="mode-tag-btn active">AUTO</button>
-                    <button id="ttForceOnBtn"  class="mode-tag-btn">SHOW</button>
+                    <button id="ttAutoBtn" class="mode-tag-btn active">AUTO</button>
+                    <button id="ttForceOnBtn" class="mode-tag-btn">SHOW</button>
                     <button id="ttForceOffBtn" class="mode-tag-btn">HIDE</button>
                 </div>
                 <div id="ttEntryList" class="tt-entry-list"></div>
                 <div class="tt-add-row">
-                    <input type="text" id="ttNewName"  class="tt-input-name" placeholder="DJ NAME">
+                    <input type="text" id="ttNewName" class="tt-input-name" placeholder="DJ NAME">
                     <input type="text" id="ttNewStart" class="tt-input-time" placeholder="22:00">
-                    <input type="text" id="ttNewEnd"   class="tt-input-time" placeholder="23:30">
+                    <input type="text" id="ttNewEnd" class="tt-input-time" placeholder="23:30">
                     <button id="ttAddBtn" class="mode-tag-btn">＋</button>
                 </div>
                 <div class="tt-csv-row">
                     <button id="ttImportBtn" class="mode-tag-btn">CSV IMPORT</button>
-                    <input  type="file" id="ttCsvFile" accept=".csv,.txt" style="display:none;">
+                    <input type="file" id="ttCsvFile" accept=".csv,.txt" style="display:none;">
                     <button id="ttExportBtn" class="mode-tag-btn">EXPORT</button>
                 </div>
             </div>
@@ -384,9 +393,10 @@
                 <div class="canvas-container" id="canvasContainer"></div>
                 <!-- 展開ボタン: キャンバス右上に常時表示 -->
                 <button id="expandCanvasBtn" class="expand-canvas-btn" title="Fullscreen">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1 6V1H6M10 1H15V6M15 10V15H10M6 15H1V10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 6V1H6M10 1H15V6M15 10V15H10M6 15H1V10" stroke="white" stroke-width="1.5"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
                 </button>
                 <div id="p5-container"
                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5;">
@@ -806,477 +816,428 @@
     </script>
 
 
-  <!-- AUTO MODE: 10hr VJ Marathon + AI Learning v2 -->
-  <script>
-  (function() {
-    function apply() {
-      const btn = document.getElementById('topAutoBtn');
-      if (!btn) return;
+    <!-- AUTO MODE: 10hr VJ Marathon + AI Learning v2 -->
+    <script>
+        (function () {
+            function apply() {
+                const btn = document.getElementById('topAutoBtn');
+                if (!btn) return;
 
-      let isActive = false;
-      let timers = [];
-      let fxRafId = null;
+                let isActive = false;
+                let timers = [];
+                let fxRafId = null;
 
-      const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
-      const maybe = (p) => Math.random() < p;
-      const pick = (arr) => arr[rand(0, arr.length - 1)];
+                const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+                const maybe = (p) => Math.random() < p;
+                const pick = (arr) => arr[rand(0, arr.length - 1)];
 
-      // =============================================
-      // AI LEARNING ENGINE
-      // 実際に使われたモード組み合わせを記憶し、
-      // 好まれるパターンを高頻度で再生する
-      // =============================================
-      const AI = {
-        history: [],        // 過去のサイクル記録
-        scores: {},         // パターンスコア
-        maxHistory: 200,    // 最大記憶数
+                // =============================================
+                // AI LEARNING ENGINE
+                // 実際に使われたモード組み合わせを記憶し、
+                // 好まれるパターンを高頻度で再生する
+                // =============================================
+                const AI = {
+                    history: [],        // 過去のサイクル記録
+                    scores: {},         // パターンスコア
+                    maxHistory: 200,    // 最大記憶数
 
-        // 現在の状態をハッシュ化
-        hash(state) {
-          return [
-            state.mandala ? 'M' : '-',
-            state.quantum ? 'Q' : '-',
-            state.orbit   ? 'O' : '-',
-            state.spin    ? 'S' : '-',
-            state.baryon  ? 'B' : '-',
-            state.strobe  ? 'T' : '-',
-            state.space   ? 'P' : '-',
-            state.render
-          ].join('');
-        },
+                    // 現在の状態をハッシュ化
+                    hash(state) {
+                        return [
+                            state.mandala ? 'M' : '-',
+                            state.quantum ? 'Q' : '-',
+                            state.orbit ? 'O' : '-',
+                            state.spin ? 'S' : '-',
+                            state.baryon ? 'B' : '-',
+                            state.strobe ? 'T' : '-',
+                            state.space ? 'P' : '-',
+                            state.render
+                        ].join('');
+                    },
 
-        // サイクル後に記録 (連続稼働時間をスコアとして蓄積)
-        record(state) {
-          const key = this.hash(state);
-          this.scores[key] = (this.scores[key] || 0) + 1;
-          this.history.push({ key, ts: Date.now() });
-          if (this.history.length > this.maxHistory) this.history.shift();
+                    // サイクル後に記録 (連続稼働時間をスコアとして蓄積)
+                    record(state) {
+                        const key = this.hash(state);
+                        this.scores[key] = (this.scores[key] || 0) + 1;
+                        this.history.push({ key, ts: Date.now() });
+                        if (this.history.length > this.maxHistory) this.history.shift();
 
-          // mandalaMachine の neuralLearner にも同期
-          const nl = window.mandalaMachine?.neuralLearner;
-          if (nl && nl.patterns) {
-            nl.patterns[key] = (nl.patterns[key] || 0) + 1;
-          }
-        },
+                        // mandalaMachine の neuralLearner にも同期
+                        const nl = window.mandalaMachine?.neuralLearner;
+                        if (nl && nl.patterns) {
+                            nl.patterns[key] = (nl.patterns[key] || 0) + 1;
+                        }
+                    },
 
-        // 高スコアパターンを確率的に選択（ε-greedy: 30%はランダム探索）
-        suggest() {
-          if (Object.keys(this.scores).length === 0 || maybe(0.30)) return null;
-          // スコア上位3パターンからランダムに選ぶ
-          const sorted = Object.entries(this.scores)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 5);
-          const [key] = pick(sorted);
-          return this.decodeKey(key);
-        },
+                    // 高スコアパターンを確率的に選択（ε-greedy: 30%はランダム探索）
+                    suggest() {
+                        if (Object.keys(this.scores).length === 0 || maybe(0.30)) return null;
+                        // スコア上位3パターンからランダムに選ぶ
+                        const sorted = Object.entries(this.scores)
+                            .sort((a, b) => b[1] - a[1])
+                            .slice(0, 5);
+                        const [key] = pick(sorted);
+                        return this.decodeKey(key);
+                    },
 
-        decodeKey(key) {
-          return {
-            mandala: key[0] === 'M',
-            quantum: key[1] === 'Q',
-            orbit:   key[2] === 'O',
-            spin:    key[3] === 'S',
-            baryon:  key[4] === 'B',
-            strobe:  key[5] === 'T',
-            space:   key[6] === 'P',
-            render:  key[7]
-          };
-        },
+                    decodeKey(key) {
+                        return {
+                            mandala: key[0] === 'M',
+                            quantum: key[1] === 'Q',
+                            orbit: key[2] === 'O',
+                            spin: key[3] === 'S',
+                            baryon: key[4] === 'B',
+                            strobe: key[5] === 'T',
+                            space: key[6] === 'P',
+                            render: key[7]
+                        };
+                    },
 
-        // 統計サマリー（デバッグ用）
-        summary() {
-          return Object.entries(this.scores)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 5)
-            .map(([k, v]) => k + ':' + v)
-            .join(', ');
-        }
-      };
+                    // 統計サマリー（デバッグ用）
+                    summary() {
+                        return Object.entries(this.scores)
+                            .sort((a, b) => b[1] - a[1])
+                            .slice(0, 5)
+                            .map(([k, v]) => k + ':' + v)
+                            .join(', ');
+                    }
+                };
 
-      // =============================================
-      // BUTTON CONTROL
-      // =============================================
-      function getBtnState(id) {
-        return document.getElementById(id)?.classList.contains('active') || false;
-      }
-      function setBtn(id, active) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        if (el.classList.contains('active') !== active) el.click();
-      }
+                // =============================================
+                // BUTTON CONTROL
+                // =============================================
+                function getBtnState(id) {
+                    return document.getElementById(id)?.classList.contains('active') || false;
+                }
+                function setBtn(id, active) {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    if (el.classList.contains('active') !== active) el.click();
+                }
 
-      // =============================================
-      // SPACE MODE (toggleSpaceMode API直接呼び出し)
-      // =============================================
-      function setSpaceMode(on) {
-        const mm = window.mandalaMachine;
-        if (!mm?.toggleSpaceMode) return;
-        // SPACEはトグルAPIがあるので現在状態を確認して制御
-        const current = mm._spaceModeActive || false;
-        if (on !== current) {
-          mm.toggleSpaceMode();
-          mm._spaceModeActive = on;
-        }
-      }
+                // =============================================
+                // SPACE MODE (toggleSpaceMode API直接呼び出し)
+                // =============================================
+                function setSpaceMode(on) {
+                    const mm = window.mandalaMachine;
+                    if (!mm?.toggleSpaceMode) return;
+                    // SPACEはトグルAPIがあるので現在状態を確認して制御
+                    const current = mm._spaceModeActive || false;
+                    if (on !== current) {
+                        mm.toggleSpaceMode();
+                        mm._spaceModeActive = on;
+                    }
+                }
 
-      // =============================================
-      // PRESET SELECTION
-      // =============================================
-      function randomizePreset() {
-        const items = document.querySelectorAll('.preset-item');
-        if (!items.length) return;
-        // add-btnではなくitem本体をクリック（マテリアル切り替えのみ、シーンリセットなし）
-        const item = items[rand(0, items.length - 1)];
-        item?.click();
-      }
+                // =============================================
+                // PRESET SELECTION
+                // =============================================
+                function randomizePreset() {
+                    const items = document.querySelectorAll('.preset-item');
+                    if (!items.length) return;
+                    // add-btnではなくitem本体をクリック（マテリアル切り替えのみ、シーンリセットなし）
+                    const item = items[rand(0, items.length - 1)];
+                    item?.click();
+                }
 
-      // =============================================
-      // APPLY STATE
-      // =============================================
-      function applyState(state) {
-        setBtn('topMandalaBtn', state.mandala);
-        setBtn('topQuantumBtn', state.quantum);
-        setBtn('topOrbitBtn',   state.orbit);
-        setBtn('topSpinBtn',    state.spin);
-        setBtn('topBaryonBtn',  state.baryon);
-        setBtn('topBlinkBtn',   state.strobe);
-        if (state.strobe) { window.mandalaMachine?.setBlinkingMode?.(true); window.mandalaMachine?.setBlinkingSpeed?.(10); }
-        setSpaceMode(state.space);
+                // =============================================
+                // APPLY STATE
+                // =============================================
+                function applyState(state) {
+                    setBtn('topMandalaBtn', state.mandala);
+                    setBtn('topQuantumBtn', state.quantum);
+                    setBtn('topOrbitBtn', state.orbit);
+                    setBtn('topSpinBtn', state.spin);
+                    setBtn('topBaryonBtn', state.baryon);
+                    setBtn('topBlinkBtn', state.strobe);
+                    if (state.strobe) { window.mandalaMachine?.setBlinkingMode?.(true); window.mandalaMachine?.setBlinkingSpeed?.(10); }
+                    setSpaceMode(state.space);
 
-        // レンダーモード
-        if (state.render === 'W') setBtn('topWireBtn', true);
-        else if (state.render === 'X') setBtn('topMixBtn', true);
-        else setBtn('topSolidBtn', true);
-      }
+                    // レンダーモード
+                    if (state.render === 'W') setBtn('topWireBtn', true);
+                    else if (state.render === 'X') setBtn('topMixBtn', true);
+                    else setBtn('topSolidBtn', true);
+                }
 
-      // =============================================
-      // GENERATE RANDOM STATE
-      // =============================================
-      function randomState() {
-        const renders = ['S', 'W', 'X'];
-        return {
-          mandala: maybe(0.55),
-          quantum: maybe(0.30),
-          orbit:   maybe(0.25),
-          spin:    maybe(0.25),
-          baryon:  maybe(0.20),
-          strobe:  maybe(0.04),
-          space:   maybe(0.20),
-          render:  pick(renders)
-        };
-      }
+                // =============================================
+                // GENERATE RANDOM STATE
+                // =============================================
+                function randomState() {
+                    const renders = ['S', 'W', 'X'];
+                    return {
+                        mandala: maybe(0.55),
+                        quantum: maybe(0.30),
+                        orbit: maybe(0.25),
+                        spin: maybe(0.25),
+                        baryon: maybe(0.20),
+                        strobe: maybe(0.04),
+                        space: maybe(0.20),
+                        render: pick(renders)
+                    };
+                }
 
-      // =============================================
-      // PARAMS RANDOMIZE
-      // =============================================
-      function randomizeParams() {
-        const mm = window.mandalaMachine;
-        if (!mm) return;
-        mm.setSizeMultiplier?.(0.3 + Math.random() * 2.5);
-        mm.setSpeedMultiplier?.(0.2 + Math.random() * 2.0);
-        mm.setSpreadMultiplier?.(0.5 + Math.random() * 2.0);
-        mm.setSpacingMultiplier?.(rand(2, 14));
+                // =============================================
+                // PARAMS RANDOMIZE
+                // =============================================
+                function randomizeParams() {
+                    const mm = window.mandalaMachine;
+                    if (!mm) return;
+                    mm.setSizeMultiplier?.(0.3 + Math.random() * 2.5);
+                    mm.setSpeedMultiplier?.(0.2 + Math.random() * 2.0);
+                    mm.setSpreadMultiplier?.(0.5 + Math.random() * 2.0);
+                    mm.setSpacingMultiplier?.(rand(2, 14));
 
-        // 背景: 黒 or 極暗
-        const bg = maybe(0.75)
-          ? { r: 0, g: 0, b: 0 }
-          : { r: rand(0, 20), g: rand(0, 20), b: rand(0, 20) };
-        mm.setBackgroundColor?.(bg);
+                    // 背景: 黒 or 極暗
+                    const bg = maybe(0.75)
+                        ? { r: 0, g: 0, b: 0 }
+                        : { r: rand(0, 20), g: rand(0, 20), b: rand(0, 20) };
+                    mm.setBackgroundColor?.(bg);
 
-        // オブジェクト色
-        if (maybe(0.5)) {
-          mm.setDefaultObjectColor?.({ r: 255, g: 255, b: 255 });
-        } else {
-          mm.setDefaultObjectColor?.({ r: rand(100,255), g: rand(100,255), b: rand(100,255) });
-        }
+                    // オブジェクト色
+                    if (maybe(0.5)) {
+                        mm.setDefaultObjectColor?.({ r: 255, g: 255, b: 255 });
+                    } else {
+                        mm.setDefaultObjectColor?.({ r: rand(100, 255), g: rand(100, 255), b: rand(100, 255) });
+                    }
 
-        // オブジェクト数変更はパフォーマンス上削除
-      }
+                    // オブジェクト数変更はパフォーマンス上削除
+                }
 
-      // =============================================
-      // AUDIO-REACTIVE FX LOOP
-      // =============================================
-      let lastStrobeState = false;
-      function startFxLoop() {
-        if (fxRafId) cancelAnimationFrame(fxRafId);
-        let frame = 0;
-        function loop() {
-          if (!isActive) return;
-          fxRafId = requestAnimationFrame(loop);
-          if (++frame % 6 !== 0) return; // ~10fps
-          const mm = window.mandalaMachine;
-          const freq = mm?.getCurrentFrequencyData?.();
-          if (!freq || !freq.length) return;
-          const bass = freq.slice(0,8).reduce((s,v)=>s+v,0)/8/255;
-          const strobeOn = bass > 0.5 || maybe(0.004);
-          if (strobeOn !== lastStrobeState) {
-            lastStrobeState = strobeOn;
-            mm?.setBlinkingMode?.(strobeOn);
-            if (strobeOn) mm?.setBlinkingSpeed?.(10);
-          }
-        }
-        loop();
-      }
+                // =============================================
+                // AUDIO-REACTIVE FX LOOP
+                // =============================================
+                let lastStrobeState = false;
+                function startFxLoop() {
+                    if (fxRafId) cancelAnimationFrame(fxRafId);
+                    let frame = 0;
+                    function loop() {
+                        if (!isActive) return;
+                        fxRafId = requestAnimationFrame(loop);
+                        if (++frame % 6 !== 0) return; // ~10fps
+                        const mm = window.mandalaMachine;
+                        const freq = mm?.getCurrentFrequencyData?.();
+                        if (!freq || !freq.length) return;
+                        const bass = freq.slice(0, 8).reduce((s, v) => s + v, 0) / 8 / 255;
+                        const strobeOn = bass > 0.5 || maybe(0.004);
+                        if (strobeOn !== lastStrobeState) {
+                            lastStrobeState = strobeOn;
+                            mm?.setBlinkingMode?.(strobeOn);
+                            if (strobeOn) mm?.setBlinkingSpeed?.(10);
+                        }
+                    }
+                    loop();
+                }
 
-      // =============================================
-      // MAIN CYCLE
-      // =============================================
-      let cycleCount = 0;
-      function cycle() {
-        cycleCount++;
+                // =============================================
+                // MAIN CYCLE
+                // =============================================
+                let cycleCount = 0;
+                function cycle() {
+                    cycleCount++;
 
-        // AI提案を試みる（学習済みパターンを再生）
-        let state = AI.suggest();
-        if (!state) {
-          state = randomState();
-        }
+                    // AI提案を試みる（学習済みパターンを再生）
+                    let state = AI.suggest();
+                    if (!state) {
+                        state = randomState();
+                    }
 
-        // プリセット: 50%で変更（頻度を下げてパフォーマンス安定化）
-        if (maybe(0.50)) randomizePreset();
+                    // プリセット: 50%で変更（頻度を下げてパフォーマンス安定化）
+                    if (maybe(0.50)) randomizePreset();
 
-        applyState(state);
-        randomizeParams();
+                    applyState(state);
+                    randomizeParams();
 
-        // 記録（AI学習）
-        AI.record(state);
+                    // 記録（AI学習）
+                    AI.record(state);
 
-        // 100サイクルごとにコンソールに学習状況を出力
-        if (cycleCount % 20 === 0) {
-          console.log('[AUTO AI] Top patterns:', AI.summary());
-        }
-      }
+                    // 100サイクルごとにコンソールに学習状況を出力
+                    if (cycleCount % 20 === 0) {
+                        console.log('[AUTO AI] Top patterns:', AI.summary());
+                    }
+                }
 
-      // =============================================
-      // START / STOP
-      // =============================================
-      function startAuto() {
-        isActive = true;
-        btn.classList.add('active');
-        window.mandalaMachine?.toggleAutoMode?.(false);
+                // =============================================
+                // START / STOP
+                // =============================================
+                function startAuto() {
+                    isActive = true;
+                    btn.classList.add('active');
+                    window.mandalaMachine?.toggleAutoMode?.(false);
 
-        cycle();
-        startFxLoop();
+                    cycle();
+                    startFxLoop();
 
-        function scheduleNext() {
-          // 4〜18秒ランダム間隔
-          const delay = rand(4000, 18000);
-          const t = setTimeout(() => {
-            if (!isActive) return;
-            cycle();
-            scheduleNext();
-          }, delay);
-          timers.push(t);
-        }
-        scheduleNext();
+                    function scheduleNext() {
+                        // 4〜18秒ランダム間隔
+                        const delay = rand(4000, 18000);
+                        const t = setTimeout(() => {
+                            if (!isActive) return;
+                            cycle();
+                            scheduleNext();
+                        }, delay);
+                        timers.push(t);
+                    }
+                    scheduleNext();
 
-        console.log('[AUTO] Started - AI Learning enabled');
-      }
+                    console.log('[AUTO] Started - AI Learning enabled');
+                }
 
-      function stopAuto() {
-        isActive = false;
-        timers.forEach(t => clearTimeout(t));
-        timers = [];
-        if (fxRafId) { cancelAnimationFrame(fxRafId); fxRafId = null; }
-        btn.classList.remove('active');
+                function stopAuto() {
+                    isActive = false;
+                    timers.forEach(t => clearTimeout(t));
+                    timers = [];
+                    if (fxRafId) { cancelAnimationFrame(fxRafId); fxRafId = null; }
+                    btn.classList.remove('active');
 
-        // 全モードOFF
-        ['topMandalaBtn','topQuantumBtn','topOrbitBtn','topSpinBtn','topBaryonBtn','topBlinkBtn'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el?.classList.contains('active')) el.click();
-        });
-        setSpaceMode(false);
-        window.mandalaMachine?.setBlinkingMode?.(false);
+                    // 全モードOFF
+                    ['topMandalaBtn', 'topQuantumBtn', 'topOrbitBtn', 'topSpinBtn', 'topBaryonBtn', 'topBlinkBtn'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el?.classList.contains('active')) el.click();
+                    });
+                    setSpaceMode(false);
+                    window.mandalaMachine?.setBlinkingMode?.(false);
 
-        console.log('[AUTO] Stopped after', cycleCount, 'cycles. AI patterns:', AI.summary());
-      }
+                    console.log('[AUTO] Stopped after', cycleCount, 'cycles. AI patterns:', AI.summary());
+                }
 
-      // クリックハンドラ上書き
-      btn.addEventListener('click', () => isActive ? stopAuto() : startAuto(), { capture: true });
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', apply);
-    } else { apply(); }
-  })();
-  </script>
-
-<!-- V-OUT FULLSCREEN OVERRIDE -->
-<script>
-(function() {
-  function toggleFS(targetEl, btn) {
-    if (!document.fullscreenElement) {
-      targetEl.requestFullscreen({ navigationUI: 'hide' })
-        .then(function(){ if(btn) btn.classList.add('active'); })
-        .catch(function(e){ console.warn('FS failed', e); });
-    } else {
-      document.exitFullscreen()
-        .then(function(){ if(btn) btn.classList.remove('active'); });
-    }
-  }
-
-  function init() {
-    // 展開ボタン (canvasWrapper右上)
-    var expBtn = document.getElementById('expandCanvasBtn');
-    var cw = document.getElementById('canvasWrapper');
-    if (expBtn && cw) {
-      expBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        toggleFS(cw, expBtn);
-      });
-    }
-
-    // V-OUTボタンも同じ動作に
-    var vBtn = document.getElementById('vOutBtn');
-    if (vBtn) {
-      var nb = vBtn.cloneNode(true);
-      vBtn.parentNode.replaceChild(nb, vBtn);
-      nb.addEventListener('click', function() { toggleFS(cw, nb); });
-    }
-
-    document.addEventListener('fullscreenchange', function() {
-      var eb = document.getElementById('expandCanvasBtn');
-      var vb = document.getElementById('vOutBtn');
-      if (!document.fullscreenElement) {
-        if(eb) eb.classList.remove('active');
-        if(vb) vb.classList.remove('active');
-        // SVGを展開アイコンに戻す
-        if(eb) eb.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6V1H6M10 1H15V6M15 10V15H10M6 15H1V10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><\/svg>';
-      } else {
-        // SVGを縮小アイコンに
-        if(eb) eb.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1V6H1M15 6H10V1M10 15V10H15M1 10H6V15" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><\/svg>';
-      }
-    });
-  }
-
-  setTimeout(init, 1200);
-})();
-</script>
-
-<!-- AUTO MODE 10H ENDURANCE -->
-<script>
-(function() {
-  // RESETボタン連携
-  function initReset() {
-    var btn = document.getElementById('topResetBtn');
-    if (!btn) { setTimeout(initReset, 800); return; }
-    btn.addEventListener('click', function() {
-      var mm = window.mandalaMachine;
-      if (!mm) return;
-      try {
-        if (typeof mm.resetScene === 'function') mm.resetScene();
-        else if (typeof mm.reset === 'function') mm.reset();
-        else if (typeof mm.init === 'function') mm.init();
-        // フォールバック: ページリロード無しでオブジェクト数をリセット
-        var countInput = document.getElementById('objectCount') || document.getElementById('count');
-        if (countInput) { countInput.value = 12; countInput.dispatchEvent(new Event('input')); }
-        console.log('[RESET] scene reset triggered');
-      } catch(e) { console.warn('[RESET] error:', e); }
-    });
-    console.log('[RESET] button initialized');
-  }
-  setTimeout(initReset, 1500);
-
-  // AUTO MODE 10時間耐久システム
-  var AUTO_HEALTH = {
-    startTime: null,
-    errorCount: 0,
-    lastPresetChange: 0,
-    intervalId: null,
-    watchdogId: null,
-
-    start: function() {
-      this.startTime = Date.now();
-      this.errorCount = 0;
-      console.log('[AUTO-ENDURANCE] started');
-      this.watchdog();
-    },
-
-    stop: function() {
-      if (this.watchdogId) clearTimeout(this.watchdogId);
-      this.watchdogId = null;
-      console.log('[AUTO-ENDURANCE] stopped');
-    },
-
-    watchdog: function() {
-      var self = this;
-      self.watchdogId = setTimeout(function() {
-        try {
-          var mm = window.mandalaMachine;
-          if (!mm) { self.watchdog(); return; }
-
-          var elapsed = Date.now() - self.startTime;
-          var hours = (elapsed / 3600000).toFixed(2);
-
-          // FPSチェック
-          var fps = parseFloat(document.getElementById('fpsDisplay')?.textContent || '60');
-          if (fps < 10 && fps > 0) {
-            console.warn('[AUTO-ENDURANCE] Low FPS:', fps, '- reducing objects');
-            self.errorCount++;
-            // オブジェクト数を減らして回復
-            var countEl = document.getElementById('objectCount');
-            if (countEl) {
-              var cur = parseInt(countEl.value) || 12;
-              countEl.value = Math.max(4, cur - 4);
-              countEl.dispatchEvent(new Event('input'));
+                // クリックハンドラ上書き
+                btn.addEventListener('click', () => isActive ? stopAuto() : startAuto(), { capture: true });
             }
-          } else {
-            self.errorCount = Math.max(0, self.errorCount - 1);
-          }
 
-          // 3時間ごとにシーンをソフトリセット（メモリ解放）
-          if (elapsed > 0 && elapsed % (3 * 3600000) < 30000) {
-            console.log('[AUTO-ENDURANCE] 3h soft reset, elapsed:', hours + 'h');
-            try {
-              if (typeof mm.softReset === 'function') mm.softReset();
-              // Three.jsのGC促進
-              if (mm.renderer && mm.renderer.info) {
-                console.log('[AUTO-ENDURANCE] renderer info:', JSON.stringify(mm.renderer.info.memory));
-              }
-            } catch(e) {}
-          }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', apply);
+            } else { apply(); }
+        })();
+    </script>
 
-          // エラーが5回以上続いたら強制ソフトリセット
-          if (self.errorCount >= 5) {
-            console.warn('[AUTO-ENDURANCE] force reset due to errors');
-            self.errorCount = 0;
-            try {
-              var rb = document.getElementById('topResetBtn');
-              if (rb) rb.click();
-            } catch(e) {}
-          }
 
-        } catch(e) {
-          console.warn('[AUTO-ENDURANCE] watchdog error:', e);
-        }
-        self.watchdog(); // 30秒ごとに繰り返し
-      }, 30000);
-    }
-  };
 
-  // AUTOモードON/OFFを監視
-  function watchAutoMode() {
-    var autoBtn = document.getElementById('topAutoBtn');
-    if (!autoBtn) { setTimeout(watchAutoMode, 1000); return; }
 
-    var observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(m) {
-        if (m.attributeName === 'class') {
-          var isActive = autoBtn.classList.contains('active');
-          if (isActive && !AUTO_HEALTH.watchdogId) {
-            AUTO_HEALTH.start();
-          } else if (!isActive && AUTO_HEALTH.watchdogId) {
-            AUTO_HEALTH.stop();
-          }
-        }
-      });
-    });
-    observer.observe(autoBtn, { attributes: true });
-    console.log('[AUTO-ENDURANCE] observer attached');
-  }
-  setTimeout(watchAutoMode, 2000);
+    <!-- AUTO MODE 10H ENDURANCE -->
+    <script>
+        (function () {
+            // RESETボタン連携
+            function initReset() {
+                var btn = document.getElementById('topResetBtn');
+                if (!btn) { setTimeout(initReset, 800); return; }
+                btn.addEventListener('click', function () {
+                    var mm = window.mandalaMachine;
+                    if (!mm) return;
+                    try {
+                        if (typeof mm.resetScene === 'function') mm.resetScene();
+                        else if (typeof mm.reset === 'function') mm.reset();
+                        else if (typeof mm.init === 'function') mm.init();
+                        // フォールバック: ページリロード無しでオブジェクト数をリセット
+                        var countInput = document.getElementById('objectCount') || document.getElementById('count');
+                        if (countInput) { countInput.value = 12; countInput.dispatchEvent(new Event('input')); }
+                        console.log('[RESET] scene reset triggered');
+                    } catch (e) { console.warn('[RESET] error:', e); }
+                });
+                console.log('[RESET] button initialized');
+            }
+            setTimeout(initReset, 1500);
 
-})();
-</script>
+            // AUTO MODE 10時間耐久システム
+            var AUTO_HEALTH = {
+                startTime: null,
+                errorCount: 0,
+                lastPresetChange: 0,
+                intervalId: null,
+                watchdogId: null,
+
+                start: function () {
+                    this.startTime = Date.now();
+                    this.errorCount = 0;
+                    console.log('[AUTO-ENDURANCE] started');
+                    this.watchdog();
+                },
+
+                stop: function () {
+                    if (this.watchdogId) clearTimeout(this.watchdogId);
+                    this.watchdogId = null;
+                    console.log('[AUTO-ENDURANCE] stopped');
+                },
+
+                watchdog: function () {
+                    var self = this;
+                    self.watchdogId = setTimeout(function () {
+                        try {
+                            var mm = window.mandalaMachine;
+                            if (!mm) { self.watchdog(); return; }
+
+                            var elapsed = Date.now() - self.startTime;
+                            var hours = (elapsed / 3600000).toFixed(2);
+
+                            // FPSチェック
+                            var fps = parseFloat(document.getElementById('fpsDisplay')?.textContent || '60');
+                            if (fps < 10 && fps > 0) {
+                                console.warn('[AUTO-ENDURANCE] Low FPS:', fps, '- reducing objects');
+                                self.errorCount++;
+                                // オブジェクト数を減らして回復
+                                var countEl = document.getElementById('objectCount');
+                                if (countEl) {
+                                    var cur = parseInt(countEl.value) || 12;
+                                    countEl.value = Math.max(4, cur - 4);
+                                    countEl.dispatchEvent(new Event('input'));
+                                }
+                            } else {
+                                self.errorCount = Math.max(0, self.errorCount - 1);
+                            }
+
+                            // 3時間ごとにシーンをソフトリセット（メモリ解放）
+                            if (elapsed > 0 && elapsed % (3 * 3600000) < 30000) {
+                                console.log('[AUTO-ENDURANCE] 3h soft reset, elapsed:', hours + 'h');
+                                try {
+                                    if (typeof mm.softReset === 'function') mm.softReset();
+                                    // Three.jsのGC促進
+                                    if (mm.renderer && mm.renderer.info) {
+                                        console.log('[AUTO-ENDURANCE] renderer info:', JSON.stringify(mm.renderer.info.memory));
+                                    }
+                                } catch (e) { }
+                            }
+
+                            // エラーが5回以上続いたら強制ソフトリセット
+                            if (self.errorCount >= 5) {
+                                console.warn('[AUTO-ENDURANCE] force reset due to errors');
+                                self.errorCount = 0;
+                                try {
+                                    var rb = document.getElementById('topResetBtn');
+                                    if (rb) rb.click();
+                                } catch (e) { }
+                            }
+
+                        } catch (e) {
+                            console.warn('[AUTO-ENDURANCE] watchdog error:', e);
+                        }
+                        self.watchdog(); // 30秒ごとに繰り返し
+                    }, 30000);
+                }
+            };
+
+            // AUTOモードON/OFFを監視
+            function watchAutoMode() {
+                var autoBtn = document.getElementById('topAutoBtn');
+                if (!autoBtn) { setTimeout(watchAutoMode, 1000); return; }
+
+                var observer = new MutationObserver(function (mutations) {
+                    mutations.forEach(function (m) {
+                        if (m.attributeName === 'class') {
+                            var isActive = autoBtn.classList.contains('active');
+                            if (isActive && !AUTO_HEALTH.watchdogId) {
+                                AUTO_HEALTH.start();
+                            } else if (!isActive && AUTO_HEALTH.watchdogId) {
+                                AUTO_HEALTH.stop();
+                            }
+                        }
+                    });
+                });
+                observer.observe(autoBtn, { attributes: true });
+                console.log('[AUTO-ENDURANCE] observer attached');
+            }
+            setTimeout(watchAutoMode, 2000);
+
+        })();
+    </script>
 </body>
 
 </html>
