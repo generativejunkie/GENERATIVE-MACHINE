@@ -220,11 +220,12 @@ export class ProjectorManager {
 
         doc.body.appendChild(fsBtn);
 
-        // フルスクリーン状態でボタンラベル更新
+        // フルスクリーン状態でボタンを非表示
         doc.addEventListener('fullscreenchange', () => {
             if (doc.fullscreenElement) {
-                fsBtn.innerHTML = '✕ EXIT FULLSCREEN';
+                fsBtn.style.display = 'none';
             } else {
+                fsBtn.style.display = 'block';
                 fsBtn.innerHTML = '⛶ FULLSCREEN';
             }
         });
