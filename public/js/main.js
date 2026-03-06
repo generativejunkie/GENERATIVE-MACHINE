@@ -23,7 +23,6 @@ import { broadcastEvent, initSync } from './utils/sync.js';
 import { initGitChildPilotSync } from './modules/git-child-pilot-sync.js';
 import { initVisionWatcher } from './modules/vision-watcher.js'; // GJ-X-008
 import { initResonanceMachine } from './modules/resonance-machine.js';
-import { initResonanceMachine } from './modules/resonance-machine.js';
 import { AccessibilitySettings } from './modules/accessibility-controller.js';
 import { QuantumResilience } from './modules/quantum-resilience.js';
 
@@ -72,7 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initAIAgentHandshake();
     initGitChildPilotSync(); // GJ-X-013: Git Child Pilot Visual Sync
     // initVisionWatcher(); // GJ-X-008: Gesture UI - Disabled (requires camera access)
-    initResonanceMachine();
     initResonanceMachine();
     initVoidNavTrigger();
 
