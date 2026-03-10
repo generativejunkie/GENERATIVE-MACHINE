@@ -43,19 +43,11 @@ export const imageMachineSketch = (p) => {
 
     // Available transition effects (GOD SPEED - removed heavy particle/noise effects)
     const transitionEffects = [
-        'blocks',
-        'slide',
-        'pixelate',
-        'stripe',
-        'grid',
-        'wipe',
-        'curtain',
-        'rgb-split',
-        'scan',
-        'glitch',  // Simple glitch
-        'shatter', // Optimised fragments
-        'chromatic' // Lightweight color offset
-        // Removed: 'noise', 'particles', 'kaleidoscope', 'ripple' for performance
+        'blocks', 'slide', 'pixelate', 'stripe', 'grid', 'wipe', 'curtain',
+        'rgb-split', 'scan', 'glitch', 'shatter', 'chromatic',
+        'spiral', 'zoom', 'reveal', 'fade', 'matrix', 'noise', 'mosaic',
+        'kaleidoscope', 'wave', 'ripple', 'particles',
+        'ascii', 'thermal', 'posterize', 'mirror', 'scanner', 'static', 'liquid', 'binary'
     ];
 
     // Terminal State
@@ -411,6 +403,7 @@ export const imageMachineSketch = (p) => {
         p.loadImage(filePath,
             (img) => {
                 img.filePath = filePath;
+                img.loadPixels(); // Ensure pixels are available for effects
                 allImages[filePath] = img;
                 imageLoadAttempts = 0;
                 callback({ success: true, img: img });
@@ -477,68 +470,38 @@ export const imageMachineSketch = (p) => {
 
     function runTransition(content, progress, isDecay) {
         if (!content) return;
-
         switch (transitionType) {
-            case 'blocks':
-                drawBlocks(content, progress, isDecay);
-                break;
-            case 'slide':
-                drawSlide(content, progress, isDecay);
-                break;
-            case 'pixelate':
-                drawPixelate(content, progress, isDecay);
-                break;
-            case 'spiral':
-                drawSpiral(content, progress, isDecay);
-                break;
-            case 'zoom':
-                drawZoom(content, progress, isDecay);
-                break;
-            case 'rgb-split':
-                drawRGBSplit(content, progress, isDecay);
-                break;
-            case 'scan':
-                drawScan(content, progress, isDecay);
-                break;
-            case 'reveal':
-                drawReveal(content, progress, isDecay);
-                break;
-            case 'stripe':
-                drawStripe(content, progress, isDecay);
-                break;
-            case 'fade':
-                drawFade(content, progress, isDecay);
-                break;
-            case 'grid':
-                drawGrid(content, progress, isDecay);
-                break;
-            case 'wipe':
-                drawWipe(content, progress, isDecay);
-                break;
-            case 'dissolve':
-                drawDissolve(content, progress, isDecay);
-                break;
-            case 'curtain':
-                drawCurtain(content, progress, isDecay);
-                break;
-            case 'matrix':
-                drawMatrix(content, progress, isDecay);
-                break;
-            case 'noise':
-                drawNoise(content, progress, isDecay);
-                break;
-            case 'mosaic':
-                drawMosaic(content, progress, isDecay);
-                break;
-            case 'kaleidoscope':
-                drawKaleidoscope(content, progress, isDecay);
-                break;
-            case 'shatter':
-                drawShatter(content, progress, isDecay);
-                break;
-            case 'chromatic':
-                drawChromatic(content, progress, isDecay);
-                break;
+            case 'blocks': drawBlocks(content, progress, isDecay); break;
+            case 'slide': drawSlide(content, progress, isDecay); break;
+            case 'pixelate': drawPixelate(content, progress, isDecay); break;
+            case 'spiral': drawSpiral(content, progress, isDecay); break;
+            case 'zoom': drawZoom(content, progress, isDecay); break;
+            case 'rgb-split': drawRGBSplit(content, progress, isDecay); break;
+            case 'scan': drawScan(content, progress, isDecay); break;
+            case 'reveal': drawReveal(content, progress, isDecay); break;
+            case 'stripe': drawStripe(content, progress, isDecay); break;
+            case 'fade': drawFade(content, progress, isDecay); break;
+            case 'grid': drawGrid(content, progress, isDecay); break;
+            case 'wipe': drawWipe(content, progress, isDecay); break;
+            case 'dissolve': drawDissolve(content, progress, isDecay); break;
+            case 'curtain': drawCurtain(content, progress, isDecay); break;
+            case 'matrix': drawMatrix(content, progress, isDecay); break;
+            case 'noise': drawNoise(content, progress, isDecay); break;
+            case 'mosaic': drawMosaic(content, progress, isDecay); break;
+            case 'kaleidoscope': drawKaleidoscope(content, progress, isDecay); break;
+            case 'shatter': drawShatter(content, progress, isDecay); break;
+            case 'chromatic': drawChromatic(content, progress, isDecay); break;
+            case 'wave': drawWave(content, progress, isDecay); break;
+            case 'ripple': drawRipple(content, progress, isDecay); break;
+            case 'particles': drawParticles(content, progress, isDecay); break;
+            case 'ascii': drawAscii(content, progress, isDecay); break;
+            case 'thermal': drawThermal(content, progress, isDecay); break;
+            case 'posterize': drawPosterize(content, progress, isDecay); break;
+            case 'mirror': drawMirror(content, progress, isDecay); break;
+            case 'scanner': drawScanner(content, progress, isDecay); break;
+            case 'static': drawStatic(content, progress, isDecay); break;
+            case 'liquid': drawLiquid(content, progress, isDecay); break;
+            case 'binary': drawBinary(content, progress, isDecay); break;
         }
     }
 
@@ -1417,6 +1380,142 @@ export const imageMachineSketch = (p) => {
             p.noStroke();
             const size = isTouch() ? 3 : 2;
             p.ellipse(x + dx, y + dy, size, size);
+        }
+    }
+
+    function drawAscii(content, progress, isDecay) {
+        p.background(0);
+        const chars = "@%#*+=-:. ";
+        const gridSize = isTouch() ? 12 : 8;
+        const fade = isDecay ? (1 - progress) : progress;
+        p.textFont('Courier New, monospace');
+        p.textSize(gridSize);
+        p.textAlign(p.CENTER, p.CENTER);
+        for (let y = 0; y < p.height; y += gridSize) {
+            for (let x = 0; x < p.width; x += gridSize) {
+                let r, g, b;
+                if (useColorMode) {
+                    const colors = Array.isArray(content) ? content : colorPatterns[0];
+                    const c = p.color(colors[p.floor(p.random(colors.length))]);
+                    r = p.red(c); g = p.green(c); b = p.blue(c);
+                } else if (content && content.pixels) {
+                    const imgX = p.constrain(p.floor(x), 0, content.width - 1);
+                    const imgY = p.constrain(p.floor(y), 0, content.height - 1);
+                    const idx = (imgX + imgY * content.width) * 4;
+                    r = content.pixels[idx]; g = content.pixels[idx + 1]; b = content.pixels[idx + 2];
+                } else { continue; }
+                const brightness = (r + g + b) / 3;
+                const charIdx = p.floor(p.map(brightness, 0, 255, 0, chars.length - 1));
+                p.fill(r, g, b, fade * 255);
+                p.text(chars[charIdx], x + gridSize / 2, y + gridSize / 2);
+            }
+        }
+    }
+
+    function drawThermal(content, progress, isDecay) {
+        p.background(0);
+        const fade = isDecay ? (1 - progress) : progress;
+        const step = isTouch() ? 6 : 4;
+        for (let y = 0; y < p.height; y += step) {
+            for (let x = 0; x < p.width; x += step) {
+                let r, g, b;
+                if (content && content.pixels) {
+                    const imgX = p.constrain(p.floor(x), 0, content.width - 1);
+                    const imgY = p.constrain(p.floor(y), 0, content.height - 1);
+                    const idx = (imgX + imgY * content.width) * 4;
+                    r = content.pixels[idx]; g = content.pixels[idx + 1]; b = content.pixels[idx + 2];
+                } else { continue; }
+                const brightness = (r + g + b) / 3;
+                if (brightness < 64) p.fill(0, 0, p.map(brightness, 0, 64, 50, 255), fade * 255);
+                else if (brightness < 128) p.fill(p.map(brightness, 64, 128, 0, 255), 0, 255, fade * 255);
+                else if (brightness < 192) p.fill(255, p.map(brightness, 128, 192, 0, 100), 0, fade * 255);
+                else p.fill(255, 255, p.map(brightness, 192, 255, 0, 255), fade * 255);
+                p.noStroke();
+                p.rect(x, y, step, step);
+            }
+        }
+    }
+
+    function drawPosterize(content, progress, isDecay) {
+        p.background(255);
+        if (!content || useColorMode) return;
+        const levels = isDecay ? p.map(progress, 0, 1, 8, 2) : p.map(progress, 0, 1, 2, 8);
+        p.image(content, 0, 0, p.width, p.height);
+        p.filter(p.POSTERIZE, Math.floor(levels));
+    }
+
+    function drawMirror(content, progress, isDecay) {
+        p.background(0);
+        if (!content) return;
+        const fade = isDecay ? (1 - progress) : progress;
+        const w = p.width / 2;
+        p.push();
+        p.tint(255, fade * 255);
+        p.image(content, 0, 0, w, p.height, 0, 0, content.width / 2, content.height);
+        p.translate(p.width, 0);
+        p.scale(-1, 1);
+        p.image(content, 0, 0, w, p.height, 0, 0, content.width / 2, content.height);
+        p.pop();
+    }
+
+    function drawScanner(content, progress, isDecay) {
+        p.background(0);
+        if (!content) return;
+        const scanY = (p.frameCount * 8) % p.height;
+        const fade = isDecay ? (1 - progress) : progress;
+        p.tint(255, fade * 255);
+        p.image(content, 0, 0, p.width, p.height);
+        p.stroke(0, 255, 100, fade * 255);
+        p.strokeWeight(2);
+        p.line(0, scanY, p.width, scanY);
+        if (p.random() > 0.8) {
+            p.copy(content, 0, Math.floor(scanY), content.width, 20, p.random(-30, 30), Math.floor(scanY), p.width, 20);
+        }
+    }
+
+    function drawStatic(content, progress, isDecay) {
+        p.background(0);
+        const fade = isDecay ? (1 - progress) : progress;
+        if (content && !useColorMode) {
+            p.tint(255, fade * 255);
+            p.image(content, 0, 0, p.width, p.height);
+        }
+        for (let i = 0; i < 500; i++) {
+            p.stroke(p.random(255), p.random(200) * fade);
+            p.point(p.random(p.width), p.random(p.height));
+        }
+    }
+
+    function drawLiquid(content, progress, isDecay) {
+        p.background(255);
+        if (!content) return;
+        const amount = isDecay ? progress * 60 : (1 - progress) * 60;
+        for (let i = 0; i < p.height; i += 10) {
+            const xOffset = p.sin(i * 0.01 + p.frameCount * 0.1) * amount;
+            p.copy(content, 0, Math.floor(i), content.width, 10, Math.floor(xOffset), Math.floor(i), p.width, 10);
+        }
+    }
+
+    function drawBinary(content, progress, isDecay) {
+        p.background(0);
+        const gridSize = isTouch() ? 24 : 16;
+        const fade = isDecay ? (1 - progress) : progress;
+        p.textFont('Courier New, monospace');
+        p.textSize(gridSize * 0.8);
+        p.textAlign(p.CENTER, p.CENTER);
+        for (let y = 0; y < p.height; y += gridSize) {
+            for (let x = 0; x < p.width; x += gridSize) {
+                let r, g, b;
+                if (content && content.pixels) {
+                    const imgX = p.constrain(p.floor(x), 0, content.width - 1);
+                    const imgY = p.constrain(p.floor(y), 0, content.height - 1);
+                    const idx = (imgX + imgY * content.width) * 4;
+                    r = content.pixels[idx]; g = content.pixels[idx + 1]; b = content.pixels[idx + 2];
+                } else { continue; }
+                const brightness = (r + g + b) / 3;
+                p.fill(0, 255, 100, fade * 255);
+                p.text(brightness > 127 ? "1" : "0", x + gridSize / 2, y + gridSize / 2);
+            }
         }
     }
 
