@@ -3,7 +3,7 @@
  * High-contrast, high-resonance visual state for Nebula projector.
  */
 import { broadcastEvent } from '../utils/sync.js';
-import { BrainHackMandala } from './BrainHackMandala.js';
+// import { BrainHackMandala } from './BrainHackMandala.js';
 
 export class GJMode {
     constructor() {
@@ -81,6 +81,7 @@ export class GJMode {
         // Nebula Pulse Loop
         this.pulse();
 
+        /*
         // --- BRAIN HACK INJECTION ---
         if (!this.brainHack) {
             this.brainHack = new BrainHackMandala('brain-hack-canvas');
@@ -93,6 +94,7 @@ export class GJMode {
         document.getElementById('brain-hack-canvas').style.zIndex = '9998';
         document.getElementById('brain-hack-canvas').style.top = '0';
         document.getElementById('brain-hack-canvas').style.left = '0';
+        */
     }
 
     showWaitingScreen() {
@@ -127,10 +129,12 @@ export class GJMode {
         document.body.classList.remove('gj-mode-active');
         this.hideWaitingScreen();
 
+        /*
         if (this.brainHack) {
             this.brainHack.stop();
             document.getElementById('brain-hack-canvas').style.display = 'none';
         }
+        */
     }
 
     pulse() {
