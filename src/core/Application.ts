@@ -1,0 +1,2731 @@
+/**
+ * Main Application orchestrator
+ * Ties together all managers and handles core application logic
+ * @module core/Application
+ */
+
+import * as THREE from 'three';
+import { AudioManager } from '@managers/AudioManager';
+import { MixerManager } from '@managers/MixerManager';
+import { MidiManager } from '@managers/MidiManager';
+import { InstanceManager } from '@managers/InstanceManager';
+import { SceneManager } from '@managers/SceneManager';
+import { AccessibilityManager } from '@managers/AccessibilityManager';
+import { EventEmitter } from '@utils/EventEmitter';
+import { MATERIALS } from '@materials/geometries';
+
+// Managers
+import { QuantumManager } from '@managers/QuantumManager';
+import { ProjectorManager } from '@managers/ProjectorManager';
+// AI Features
+import { NeuralPatternLearner } from '@features/NeuralPatternLearner';
+import { ProcessingLayer } from '@features/ProcessingLayer';
+import { BrainHackMandala } from '@features/BrainHackMandala';
+
+// Reserved for future use
+// import { MULTIPLIER_DEFAULTS } from '@constants/config';
+import type { ObjectInstance, ApplicationState, ApplicationEventMap, FrequencyBands, RGBColor } from '@types';
+
+export class Application extends EventEmitter<ApplicationEventMap> {
+  // Managers
+  private audioManager: AudioManager;
+  private mixerManager: MixerManager;
+  private instanceManager: InstanceManager;
+  private sceneManager: SceneManager;
+  private midiManager: MidiManager;
+  private quantumManager: QuantumManager;
+  private projectorManager: ProjectorManager;
+
+
+
+  // AI Features
+  private neuralLearner: NeuralPatternLearner;
+  private processingLayer: ProcessingLayer;
+  private brainHack: BrainHackMandala;
+
+
+  // State
+  private state: ApplicationState;
+  private targetParams: Partial<ApplicationState> = {};
+  private smoothingSpeed: number = 0.2;
+  private lastChaosTime: number = 0;
+  private animationId: number | null = null;
+  private autoGenerateTimer: NodeJS.Timeout | null = null;
+  private autoModeSwitchTimer: NodeJS.Timeout | null = null;
+  private lastSpawnTime: { low: number; mid: number; high: number } = {
+    low: 0,
+    mid: 0,
+    high: 0
+  };
+  private snapshotInterval: NodeJS.Timeout | null = null;
+  private defaultObjectColor: { r: number; g: number; b: number } | null = { r: 51, g: 51, b: 51 };
+  private defaultWireframeMode: 'solid' | 'wireframe' | 'mixed' = 'solid';
+  private excludedMaterialIndices: Set<number> = new Set(); // Materials excluded from auto-generate
+
+  // VJ Pro Controls
+  private visualControls = {
+    masterIntensity: 100,
+    brightness: 100,
+    contrast: 100,
+    saturation: 100
+  };
+  private performanceStats = {
+    fps: 60,
+    frameTime: 0,
+    lastFrameTime: performance.now()
+  };
+  private mediaRecorder: MediaRecorder | null = null;
+  private recordedChunks: Blob[] = [];
+
+  // New AUTO / Antigravity extended state
+  private autoModeCycleTimer: number = Date.now();
+  private gravityCycleTimer: number = Date.now();
+  private lastMandalaUpdate: number = 0;
+  private lastBPM: number = 120;
+  private cosmicPhase: 'cosmic' | 'mechanical' = 'cosmic';
+  private beatCounter: number = 0;
+
+  // Baryon mode original colors
+  private preBaryonColors: Map<number, RGBColor | null> = new Map();
+
+  constructor(canvasContainerId: string) {
+    super();
+
+    // Initialize managers
+    this.audioManager = new AudioManager();
+    this.mixerManager = new MixerManager();
+    this.midiManager = new MidiManager();
+    this.instanceManager = new InstanceManager();
+    this.sceneManager = new SceneManager(canvasContainerId);
+    this.quantumManager = new QuantumManager();
+    this.projectorManager = new ProjectorManager();
+    new AccessibilityManager(this);
+
+    // Initialize AI features
+    this.neuralLearner = new NeuralPatternLearner();
+    this.processingLayer = new ProcessingLayer('p5-container');
+    this.brainHack = new BrainHackMandala(
+      this.sceneManager.getRenderer(),
+      (this.sceneManager as any).scene // Need scene reference
+    );
+
+    // Setup listener for BPM update
+    this.on('audio:bpm', (bpm) => {
+      this.processingLayer.updateBPM(bpm);
+    });
+
+    // Setup listener for MIDI events
+    this.midiManager.on('midi:cc', (data) => {
+      this.processingLayer.updateMidi('cc', data);
+    });
+
+    this.midiManager.on('error', (err) => {
+      console.error("MIDI Error:", err);
+    });
+
+
+    // Initialize state
+    // Initial State: Manual Mode (All OFF)
+    this.state = {
+      isPlaying: true, // Audio playing
+      spaceMode: false,   // Space Mode OFF
+      autoMode: false,    // AUTO Mode OFF
+      mandalaMode: false, // Mandala Mode OFF
+      symmetryEnabled: false, // New Flag: Decoupled visual symmetry
+      symmetryCount: 1,
+      sizeMultiplier: 1.0,
+      speedMultiplier: 1.0,
+      spreadMultiplier: 1.0,
+      spacingMultiplier: 8.0, // Reduced for centralized initial layout (was 10.0)
+      aiSpeedMultiplier: 5.0,
+      baseRotation: 0,
+      autoGenerateMode: false,
+      autoGenerateSpeedMultiplier: 4,
+      autoGenerateDistance: 100, // Increased for wider auto-spawn range
+      frequencySpawnMode: false,
+      goldenRatioMode: false,
+      antigravityMode: false,
+      reflectMode: false,
+      brainHackMode: false,
+      brainHackModeIndex: 0,
+      quantumMode: false,
+      quantumCoherence: 0.5,
+      quantumEntangled: false,
+      wireframeMode: 'solid',
+      dispersionPattern: 'outward',
+      autoCyclePatterns: true,
+      autoColorStrobe: false,
+      autoColorA: '#ffffff',
+      autoColorB: '#000000',
+      autoColorC: '#000000', // Default third to black
+      blinkingMode: false,
+      blinkingSpeed: 5,
+      glitchMode: false,
+      hassanMode: false,
+      coreMandalaMode: false,
+      videoReactivityMode: false,
+      neuralLinkMode: false,
+      cameraOrbitMode: false,
+      cameraOrbitAxis: 'horizontal',
+      cameraOrbitReverse: false,
+      orbitMode: false,
+      baryonMode: false,
+      spinMode: false,
+      djName: '',
+      showDJName: false,
+      djNameEffect: 'none',
+      globalEffects: {
+        noise: false,
+        mosaic: false,
+        dataStream: false,
+        glitch: false,
+        hassan: false
+      }
+    };
+
+    // Initialize ProcessingLayer with initial DJ Name
+    this.processingLayer.updateCanvasText(this.state.djName);
+
+    this.setupEventListeners();
+    this.startSnapshotRecording();
+  }
+
+  /**
+   * Setup event listeners between managers
+   */
+  private setupEventListeners(): void {
+    // Audio events
+    this.audioManager.on('audio:playing', (isPlaying: boolean) => {
+      this.state.isPlaying = isPlaying;
+      this.emit('state:changed', this.state);
+    });
+
+    this.audioManager.on('audio:bpm-detected', (bpm: number) => {
+      this.emit('audio:bpm', bpm);
+
+      // Update auto-generation timing if active
+      if (this.state.autoGenerateMode) {
+        this.updateAutoGeneration();
+      }
+    });
+
+    this.audioManager.on('audio:beat', (data: { time: number; bpm: number }) => {
+      this.handleBeat(data);
+    });
+
+    // Instance events
+    this.instanceManager.on('instance:added', (instance: ObjectInstance) => {
+      this.emit('instance:added', instance);
+
+      // AI Learning: Track added instances
+      this.neuralLearner.learn({
+        type: 'add',
+        instance,
+        timestamp: Date.now()
+      });
+    });
+
+    this.instanceManager.on('instance:removed', (id: number) => {
+      this.emit('instance:removed', id);
+
+      // AI Learning: Track removed instances
+      const instances = this.instanceManager.getAllInstances();
+      const removedInstance = instances.find(i => i.id === id);
+      if (removedInstance) {
+        this.neuralLearner.learn({
+          type: 'remove',
+          instance: removedInstance,
+          timestamp: Date.now()
+        });
+      }
+    });
+
+    // Scene events - Drag and drop position updates
+    this.sceneManager.on('object:dragend', (data: any) => {
+      const { instanceId, position } = data;
+      if (instanceId !== undefined && position) {
+        console.log(`📍 Persisting drag position for instance ${instanceId}:`, position);
+        this.instanceManager.updateInstance(instanceId, { position });
+      }
+    });
+  }
+
+  /**
+   * Handle BrainHack Mode
+   */
+  public toggleBrainHackMode(enabled?: boolean): void {
+    const nextValue = enabled !== undefined ? enabled : !this.state.brainHackMode;
+    this.state.brainHackMode = nextValue;
+    this.brainHack.setVisible(nextValue);
+    this.emit('state:changed', this.state);
+
+    console.log(`🧠 BrainHack Mode: ${nextValue ? 'ON' : 'OFF'}`);
+  }
+
+  public setBrainHackModeIndex(index: number): void {
+    this.state.brainHackModeIndex = index;
+    this.brainHack.setMode(index);
+    this.emit('state:changed', this.state);
+  }
+
+  public setBrainHackColors(colorA: string, colorB: string, colorC: string): void {
+    this.brainHack.setColors(colorA, colorB, colorC);
+  }
+
+  /**
+   * Handle beat detection
+   */
+  private handleBeat(data: { time: number; bpm: number }): void {
+    const bands = this.getCurrentFrequencyBands();
+
+    // 1. Frequency-Based Dispersion
+    // User Request: "Patterns for divergence and auto-cycling"
+    this.beatCounter++;
+
+    // Cycle pattern every 32 beats if enabled
+    if (this.state.autoCyclePatterns && this.beatCounter % 32 === 0) {
+      const patterns: Array<'outward' | 'inward' | 'spiral' | 'vortex' | 'random' | 'expandX' | 'expandY'> =
+        ['outward', 'inward', 'spiral', 'vortex', 'random', 'expandX', 'expandY'];
+      const nextIndex = (patterns.indexOf(this.state.dispersionPattern) + 1) % patterns.length;
+      this.setDispersionPattern(patterns[nextIndex]);
+    }
+
+    if (bands.low > 60) {
+      // Bass: Strong Disperse
+      // @ts-ignore
+      if (this.sceneManager.disperseObjects) {
+        this.sceneManager.disperseObjects(bands.low / 255 * 12.0, this.state.dispersionPattern);
+      }
+    } else if (bands.mid > 170) {
+      // Mids: Vibrate (Shake)
+      // @ts-ignore
+      if (this.sceneManager.vibrateObjects) this.sceneManager.vibrateObjects(bands.mid / 255 * 3.0);
+    } else if (bands.high > 160) {
+      // Highs: Fast Vibrate
+      // @ts-ignore
+      if (this.sceneManager.vibrateObjects) this.sceneManager.vibrateObjects(bands.high / 255 * 1.5);
+    }
+
+
+
+    // 2. Space Mode: Aggressive Randomization
+    if (this.state.spaceMode) {
+      if (Math.random() < 0.3) this.toggleMandalaMode(); // 30% chance
+      if (Math.random() < 0.4) {
+        const symmetries = [2, 3, 4, 5, 6, 8, 12, 16];
+        this.setSymmetryCount(symmetries[Math.floor(Math.random() * symmetries.length)]);
+      }
+      if (Math.random() < 0.2) this.setBaseRotation(Math.random() * 360);
+      if (Math.random() < 0.25) {
+        this.setSizeMultiplier(0.5 + Math.random() * 2);
+        this.setSpacingMultiplier(5 + Math.random() * 15);
+      }
+      if (Math.random() < 0.15) {
+        this.state.sizeMultiplier *= -1;
+        this.emit('state:changed', this.state);
+      }
+    }
+
+    // 3. AUTO/Space Mode: BPM-Synced Material Switching
+    // User Request: "Randomly switch objects based on BPM"
+    if (this.state.autoMode || this.state.spaceMode) {
+      // Beat pulse: spawn new
+      const spawnChance = 0.3 + (bands.high / 255) * 0.5;
+      if (Math.random() < spawnChance) {
+        this.handleAutoMode(true);
+      }
+
+      // Beat pulse: Switch existing materials (Dynamic VJ feel)
+      // User Request: "More frequent random changes"
+      if (Math.random() < 0.8) { // 80% chance on beat to trigger switch
+        const instances = this.instanceManager.getAllInstances();
+        const switchCount = Math.floor(instances.length * 0.5); // Switch 50% of objects
+
+        for (let i = 0; i < switchCount; i++) {
+          const randomIdx = Math.floor(Math.random() * instances.length);
+          const target = instances[randomIdx];
+          if (target && !target.pinned) {
+            const newMat = Math.floor(Math.random() * MATERIALS.length);
+            this.instanceManager.updateInstance(target.id, { materialIndex: newMat });
+          }
+        }
+      }
+    }
+
+    // 4. Mandala Mode: Random Heartbeat/ECG Pattern (Dynamic & Organic)
+    // Addresses user request for "Reflect & Random" while maintaining "Heartbeat" pulse
+    if (this.state.mandalaMode) {
+      // Allow rapid pulses but cap to prevent visual noise
+      if (Date.now() - this.lastChaosTime > 150) {
+        this.lastChaosTime = Date.now();
+
+        const intensity = Math.max(0.4, bands.low / 255);
+
+        // 1. Randomize Pulse Magnitude (Avoid repetitive motion)
+        const targetSpacing = 5.0 + (intensity * (10 + Math.random() * 30)); // Varies 15-45
+        const targetSpread = 0.5 + (intensity * (0.5 + Math.random() * 2.5)); // Varies 1-3
+        const targetSize = 1.0 + intensity * (0.5 + Math.random() * 1.5);
+
+        // Apply Systole (Expansion)
+        this.setSpacingMultiplier(targetSpacing);
+        this.setSpreadMultiplier(targetSpread);
+        this.setSizeMultiplier(targetSize);
+
+        // Random Rotation Twist
+        if (Math.random() < 0.3) {
+          this.setBaseRotation(this.state.baseRotation + (Math.random() - 0.5) * 90);
+        }
+
+        // 2. Return to Diastole (Baseline)
+        // Sharp decay for ECG feel
+        setTimeout(() => {
+          this.setSpacingMultiplier(2.0); // Baseline reduced for centering (was 5.0)
+          this.setSpreadMultiplier(0.4);  // Baseline reduced (was 0.5)
+          this.setSizeMultiplier(1.0);    // Baseline
+        }, 100); // Faster return (was 120)
+
+        // 3. Randomize Symmetry (If Reflect is Active)
+        // User want "Mandala Reflect -> Random"
+        if (this.state.symmetryEnabled && Math.random() < 0.25) {
+          const symmetries = [4, 6, 8, 12, 16];
+          const newSym = symmetries[Math.floor(Math.random() * symmetries.length)];
+          this.setSymmetryCount(newSym);
+        }
+      }
+    }
+
+    this.emit('audio:beat', data);
+  }
+
+
+  public setDispersionPattern(pattern: 'outward' | 'inward' | 'spiral' | 'vortex' | 'random' | 'expandX' | 'expandY'): void {
+    this.state.dispersionPattern = pattern;
+    this.emit('state:changed', this.state);
+    console.log(`🌀 Dispersion Pattern set to: ${pattern}`);
+  }
+
+  public setAutoCyclePatterns(enabled: boolean): void {
+    this.state.autoCyclePatterns = enabled;
+    this.emit('state:changed', this.state);
+    console.log(`🔄 Auto Cycle Patterns: ${enabled}`);
+  }
+
+  public setAutoColorStrobe(enabled: boolean): void {
+    this.state.autoColorStrobe = enabled;
+    this.emit('state:changed', this.state);
+    console.log(`⚡ AUTO Strobe: ${enabled}`);
+  }
+
+  public setAutoColors(colorA: string, colorB: string, colorC: string = '#000000'): void {
+    this.state.autoColorA = colorA;
+    this.state.autoColorB = colorB;
+    this.state.autoColorC = colorC;
+    this.emit('state:changed', this.state);
+    console.log(`🎨 AUTO Colors: ${colorA} / ${colorB} / ${colorC}`);
+  }
+
+  /**
+   * Start the application
+   */
+  public start(): void {
+    if (!this.animationId) {
+      this.animate();
+    }
+  }
+
+  /**
+   * Stop the application
+   */
+  public stop(): void {
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
+    }
+
+    this.stopAutoGeneration();
+  }
+
+  /**
+   * Main animation loop
+   */
+  private animate = (): void => {
+    this.animationId = requestAnimationFrame(this.animate);
+
+    // Detect BPM continuously when audio is playing
+    if (this.state.isPlaying) {
+      this.updateSmoothing();
+      this.audioManager.detectBPM();
+
+      // 🎵 Global Audio-Reactive Dispersion (All Modes)
+      // Matches Sound Machine behavior - objects disperse with audio input
+      this.handleGlobalDispersion();
+
+      // 🎨 Update Processing Layer (p5.js)
+      const bands = this.getCurrentFrequencyBands();
+      this.processingLayer.update(bands.low / 255);
+    }
+
+    // Handle frequency-based spawning
+    if (this.state.frequencySpawnMode && this.state.isPlaying) {
+      this.handleFrequencySpawning();
+    }
+
+    // Mandala Mode: Auto-change symmetry (independent of other modes)
+    if (this.state.mandalaMode && this.state.isPlaying) {
+      this.handleMandalaMode();
+    }
+
+    // AUTO Mode: Slow parameter cycles and feature switching
+    if (this.state.autoMode && this.state.isPlaying && !this.state.blinkingMode) {
+      this.handleSlowAutoFeatures();
+    }
+
+    // Global Blinking Mode
+    if (this.state.blinkingMode && this.state.isPlaying) {
+      this.handleBlinkingMode();
+    }
+
+    // Space Mode: Auto-control parameters based on audio
+    if (this.state.spaceMode && this.state.isPlaying) {
+      this.handleAIControl();
+      if (!this.state.mandalaMode) this.state.mandalaMode = true;
+    }
+
+    // New: Glitch and Hassan Modes
+    if (this.state.glitchMode && this.state.isPlaying) {
+      this.handleGlitchMode();
+    }
+    if (this.state.hassanMode && this.state.isPlaying) {
+      this.handleHassanMode();
+    }
+
+    // AUTO Mode: Auto-spawn objects logic
+    if (this.state.autoMode && this.state.isPlaying) {
+      this.handleAutoMode();
+    }
+
+    // ORBIT Mode: 360° camera rotation
+    if (this.state.orbitMode && this.state.isPlaying) {
+      const bands = this.getCurrentFrequencyBands();
+      const intensity = (bands.low + bands.mid + bands.high) / (255 * 3);
+      this.sceneManager.updateOrbit(intensity);
+    }
+
+    // SPIN Mode: Rotate mandala in place (shape preserved)
+    if (this.state.spinMode && this.state.isPlaying) {
+      const bands = this.getCurrentFrequencyBands();
+      const audioBoost = (bands.low + bands.mid) / (255 * 2);
+      // Base spin speed + audio-reactive acceleration
+      const spinSpeed = 0.3 + audioBoost * 1.5;
+      this.state.baseRotation = (this.state.baseRotation + spinSpeed) % 360;
+      this.sceneManager.setSmoothBaseRotation(this.state.baseRotation);
+    }
+
+    // BARYON Mode: Audio-reactive particle background + object dispersion
+    if (this.state.baryonMode && this.state.isPlaying) {
+      const bands = this.getCurrentFrequencyBands();
+      this.sceneManager.updateBaryonParticles(bands);
+
+      // Disperse 3D objects with bass
+      const bass = bands.low / 255;
+      if (bass > 0.15) {
+        this.sceneManager.disperseObjects(bass * 1.5, 'outward');
+      }
+    }
+
+    // Antigravity Mode: Meditative object cycling
+    if (this.state.antigravityMode) {
+      this.handleGravityMode();
+    }
+
+    // Update BrainHack shader
+    if (this.state.brainHackMode) {
+      const bands = this.getCurrentFrequencyBands();
+      const kick = bands.low / 255;
+
+      // Calculate beat progress (0.0 to 1.0)
+      const beatInterval = this.audioManager.getBeatInterval();
+      const timeSinceBeat = Date.now() - (this.audioManager as any).lastBeatTime;
+      const beatProgress = Math.min(1.0, timeSinceBeat / beatInterval);
+
+      this.brainHack.update(beatProgress, kick, this.state.brainHackModeIndex);
+    }
+
+    // Update Quantum simulation
+    if (this.state.quantumMode) {
+      this.quantumManager.update(
+        this.performanceStats.frameTime,
+        this.state.quantumCoherence,
+        this.state.quantumEntangled
+      );
+
+      // Use quantum factors to subtly modulate object parameters
+      const quantumFactor = this.quantumManager.getQuantumFactor(0);
+      this.state.sizeMultiplier *= (0.95 + quantumFactor * 0.1);
+    }
+
+    // Get all instances and update scene
+    const instances = this.instanceManager.getAllInstances();
+    // Use mixer frequency data if mixer is enabled, otherwise use regular audio manager
+    // Unified source check
+    const frequencyData = this.getCurrentFrequencyData();
+
+    this.sceneManager.updateScene(
+      instances,
+      this.state.mandalaMode,
+      this.state.symmetryEnabled,
+      this.state.symmetryCount,
+      this.state.sizeMultiplier,
+      this.state.speedMultiplier,
+      this.state.spreadMultiplier,
+      this.state.spacingMultiplier,
+      frequencyData,
+      this.state.reflectMode
+    );
+
+    this.sceneManager.render();
+
+    // Update performance statistics
+    this.updatePerformanceStats();
+  };
+
+
+
+
+  /**
+   * Handle frequency-based automatic spawning
+   */
+  private handleFrequencySpawning(): void {
+    const bands = this.getCurrentFrequencyBands();
+    const now = Date.now();
+    const cooldown = 150; // milliseconds
+
+    // Respect max objects setting (default 20)
+    const maxObjects = this.instanceManager.getMaxObjects();
+    if (this.instanceManager.getAllInstances().length >= maxObjects) {
+      return;
+    }
+
+    // Low frequency (bass) - spawn material 0
+    if (bands.low > 180 && now - this.lastSpawnTime.low > cooldown) {
+      this.addRandomInstance();
+      this.lastSpawnTime.low = now;
+    }
+
+    // Mid frequency - spawn material 1
+    if (bands.mid > 180 && now - this.lastSpawnTime.mid > cooldown) {
+      this.addRandomInstance();
+      this.lastSpawnTime.mid = now;
+    }
+
+    // High frequency - spawn material 2
+    if (bands.high > 180 && now - this.lastSpawnTime.high > cooldown) {
+      this.addRandomInstance();
+      this.lastSpawnTime.high = now;
+    }
+  }
+
+  /**
+   * AI Mode: Auto-control parameters based on audio analysis
+   */
+  private handleAIControl(): void {
+    const now = Date.now();
+
+    // Limit AI control update frequency based on AI speed
+    // Base update interval: 200ms, adjusted by AI speed
+    const updateInterval = 200 / (this.state.aiSpeedMultiplier / 5); // Default 5x = 200ms
+    if (this.lastAIControlUpdate && now - this.lastAIControlUpdate < updateInterval) {
+      return; // Skip this frame
+    }
+    this.lastAIControlUpdate = now;
+
+    const bands = this.getCurrentFrequencyBands();
+    const bpm = this.audioManager.getEstimatedBPM();
+
+    // Normalize frequency bands (0-1)
+    const lowNorm = bands.low / 255;
+    const midNorm = bands.mid / 255;
+    const highNorm = bands.high / 255;
+
+    // Calculate overall energy
+    const energy = (lowNorm + midNorm + highNorm) / 3;
+
+    // Calculate smooth factor based on AI speed
+    const baseFactor = 0.01; // Very slow base transition
+    const smoothFactor = baseFactor * (this.state.aiSpeedMultiplier / 5);
+
+    // AI Control Logic
+
+    // 1. SIZE: Based on low frequencies (bass)
+    // More bass = larger objects
+    const targetSize = 0.5 + (lowNorm * 1.5); // Range: 0.5 - 2.0
+    this.state.sizeMultiplier = this.smoothTransition(
+      this.state.sizeMultiplier,
+      targetSize,
+      smoothFactor * 2
+    );
+
+    // 2. SPEED: Based on BPM and high frequencies
+    // Higher BPM + more highs = faster rotation
+    const bpmFactor = Math.max(0, Math.min(1, (bpm - 60) / 120)); // Normalize BPM (60-180)
+    const targetSpeed = -3 + ((bpmFactor + highNorm) / 2) * 6; // Range: -3 to 3
+    this.state.speedMultiplier = this.smoothTransition(
+      this.state.speedMultiplier,
+      targetSpeed,
+      smoothFactor
+    );
+
+    // 3. SPREAD: Based on mid frequencies and energy
+    // More mids + energy = wider spread
+    const targetSpread = 0.5 + ((midNorm + energy) / 2) * 2.5; // Range: 0.5 - 3.0
+    this.state.spreadMultiplier = this.smoothTransition(
+      this.state.spreadMultiplier,
+      targetSpread,
+      smoothFactor * 1.5
+    );
+
+    // 4. SPACING: Based on overall energy
+    // More energy = objects further from center
+    const targetSpacing = 0.5 + (energy * 19.5); // Range: 0.5 - 20
+    this.state.spacingMultiplier = this.smoothTransition(
+      this.state.spacingMultiplier,
+      targetSpacing,
+      smoothFactor * 2
+    );
+
+    // Space mode only adjusts parameters
+  }
+
+  /**
+   * Mandala Mode: Audio-reactive divergence with Reflect
+   */
+  private handleMandalaMode(): void {
+    // 1. Force Reflect Mode
+    if (!this.state.reflectMode) {
+      this.setReflectMode(true);
+    }
+    this.sceneManager.setAntigravityMode(false);
+
+    // 2. Disable standard Auto-Spawn to use Voice-Trigger
+    if (this.state.autoMode) {
+      this.state.autoMode = false;
+    }
+
+    const bands = this.getCurrentFrequencyBands();
+
+    // Calculate Volume / Energy
+    const normalizedVolume = (bands.low + bands.mid + bands.high) / (255 * 3);
+
+    // 3. Audio Reactive Divergence (Speed)
+    // DISABLED to match Auto Mode and reduce chaos
+    /*
+    const divergence = (normalizedVolume - 0.2) * 2.0;
+    if (divergence > 0.05) {
+      this.state.speedMultiplier = 1.0 + (divergence * 3.0);
+    }
+    */
+
+    // Define now variable
+    const now = Date.now();
+
+
+    // Trigger randomization occasionally (e.g. every 3 seconds or on strong beats)
+    if (now - this.lastMandalaUpdate > 3000 || (normalizedVolume > 0.6 && now - this.lastMandalaUpdate > 1000)) {
+      this.lastMandalaUpdate = now;
+
+      // Randomize Symmetry (4, 6, 8, 10, 12, 16)
+      const symmetries = [4, 6, 8, 10, 12, 16];
+      const randomSym = symmetries[Math.floor(Math.random() * symmetries.length)];
+      if (this.state.symmetryCount !== randomSym) {
+        this.setSymmetryCount(randomSym);
+      }
+
+      // Randomize Parameters
+      // Size: 0.5 - 2.5
+      const newSize = 0.5 + Math.random() * 2.0;
+      this.setSizeMultiplier(this.state.reflectMode ? -newSize : newSize);
+
+      // Spacing (Distance): 1.0 - 15.0 (Reduced range for centering)
+      const newSpacing = 1.0 + Math.random() * 14.0;
+      this.setSpacingMultiplier(newSpacing);
+
+      // Random Speed Direction
+      const speedDir = Math.random() < 0.5 ? 1 : -1;
+      this.state.speedMultiplier = (1.0 + Math.random()) * speedDir;
+
+      // Random Rotation
+      this.setBaseRotation(Math.random() * 360);
+
+      // Random Refresh: Add new objects
+      if (Math.random() < 0.3) {
+        this.addRandomInstance();
+      }
+
+      console.log(`🌸 Mandala Shift: Sym=${randomSym}, Size=${newSize.toFixed(1)}, Dist=${newSpacing.toFixed(1)}`);
+    }
+
+    // Ensure we have objects to show
+    if (this.instanceManager.getAllInstances().length < 5) {
+      this.addRandomInstance();
+    }
+
+    // Random Object Switching (Replace existing or add new)
+    if (Math.random() < 0.05) { // 5% chance per frame (approx 3 times/sec at 60fps)
+      // Add new object if under limit
+      if (this.instanceManager.getAllInstances().length < this.instanceManager.getMaxObjects()) {
+        this.addRandomInstance();
+      } else {
+        // Cycle: Remove oldest, add new
+        this.instanceManager.removeOldestInstance();
+        this.addRandomInstance();
+      }
+    }
+
+    // 4. Voice Triggered Spawning - SIMPLIFIED
+    // Just ensure we have activity
+    if (normalizedVolume > 0.4 && now - this.lastSpawnTime.mid > 200) {
+      // Burst spawn
+      if (this.instanceManager.getAllInstances().length < this.instanceManager.getMaxObjects()) {
+        this.addRandomInstance();
+        this.lastSpawnTime.mid = now;
+      }
+    }
+
+    // Update history
+    this.updateFrequencyHistory(bands);
+
+    // Detect BPM change
+    const currentBPM = this.audioManager.getEstimatedBPM();
+    if (Math.abs(currentBPM - this.lastBPM) > 10) {
+      this.onSongChange(currentBPM);
+      this.lastBPM = currentBPM;
+    }
+
+    // Apply Real-time sync
+    this.applyFrequencySync(bands);
+
+    // Apply global divergence logic (Requested by User: "Sound machine divergence logic for ALL modes")
+    // Apply global divergence logic (Requested by User: "Sound machine divergence logic for ALL modes")
+    const bass = bands.low / 255;
+    if (bass > 0.1) {
+      // Divergence speed based on bass
+      // User Request: "Match Sound Machine dispersion"
+      // Increased for visible effect
+      const divergenceSpeed = bass * 2.0;
+      this.sceneManager.disperseObjects(divergenceSpeed);
+    }
+
+    // Gravity Mode Logic
+    if (this.state.antigravityMode) {
+      this.handleGravityMode();
+    }
+
+    // Emit change for UI
+    this.emit('state:changed', this.state);
+  }
+
+  // Track last AI control update time
+  private lastAIControlUpdate: number = 0;
+
+  // Cosmic rhythm system
+  private handleAutoMode(force: boolean = false): void {
+    const now = Date.now();
+
+    // AUTO Mode: Auto-generate based on energy and AI speed
+    const baseInterval = 10000; // Slower for meditative feel
+    const speedFactor = this.state.aiSpeedMultiplier / 5;
+    const objectSpawnInterval = baseInterval / speedFactor;
+
+    const maxObjects = this.instanceManager.getMaxObjects();
+
+    if ((force || (!this.lastAIObjectSpawn || now - this.lastAIObjectSpawn > objectSpawnInterval)) && this.instanceManager.getAllInstances().length < maxObjects) {
+      let materialIndex = Math.floor(Math.random() * MATERIALS.length);
+      this.addInstance(materialIndex);
+      this.lastAIObjectSpawn = now;
+      console.log(`🤖 Auto-spawn material #${materialIndex}`);
+    }
+  }
+
+  /**
+   * Handle global background blinking logic
+   */
+  private handleBlinkingMode(): void {
+    const now = Date.now();
+    // speed 1 (500ms) to 10 (50ms)
+    const interval = 500 / this.state.blinkingSpeed;
+
+    // Support 3-color cycle if autoColorC is different from others
+    const { autoColorA, autoColorB, autoColorC } = this.state;
+    const colors = [autoColorA, autoColorB];
+    if (autoColorC !== autoColorB && autoColorC !== autoColorA) {
+      colors.push(autoColorC);
+    }
+
+    const phase = Math.floor(now / interval) % colors.length;
+    this.setBackgroundColor(this.hexToRgb(colors[phase]));
+  }
+
+  /**
+   * New functionality: Slowly cycle RGB colors and features in AUTO mode
+   */
+  private handleSlowAutoFeatures(): void {
+    const now = Date.now();
+
+    // 1. Background Color Management
+    if (this.state.autoColorStrobe) {
+      // Strobe logic: Fast flash between A and B
+      const strobe = Math.floor(now / 100) % 2 === 0;
+      const colorHex = strobe ? this.state.autoColorA : this.state.autoColorB;
+      this.setBackgroundColor(this.hexToRgb(colorHex));
+    } else {
+      // Gradual shift logic using custom colors
+      const mix = Math.sin(now / 3000) * 0.5 + 0.5; // 3s cycle
+      const colorA = this.hexToRgb(this.state.autoColorA);
+      const colorB = this.hexToRgb(this.state.autoColorB);
+
+      const mixedColor = {
+        r: Math.round(colorA.r * mix + colorB.r * (1 - mix)),
+        g: Math.round(colorA.g * mix + colorB.g * (1 - mix)),
+        b: Math.round(colorA.b * mix + colorB.b * (1 - mix))
+      };
+      this.setBackgroundColor(mixedColor);
+    }
+
+    // Also modulate size or rotation slowly
+    const pulse = Math.sin(now / 5000) * 0.5 + 1.5; // slow 5s wave
+    this.state.sizeMultiplier = pulse;
+
+    // 2. Slow Feature Switching (every 20 seconds)
+    // Now cycles through ALL modes
+    if (now - this.autoModeCycleTimer > 20000) {
+      this.autoModeCycleTimer = now;
+
+      // Feature list (excluding AUTO itself)
+      const features = [
+        () => {
+          this.setMandalaMode(true);
+          this.setSpaceMode(false);
+          this.toggleAntigravityMode(false);
+          this.setFrequencySpawn(false);
+        },
+        () => {
+          this.setMandalaMode(false);
+          this.setSpaceMode(true);
+          this.toggleAntigravityMode(false);
+          this.setFrequencySpawn(true);
+        },
+        () => {
+          this.setMandalaMode(true);
+          this.toggleAntigravityMode(true);
+          this.setFrequencySpawn(false);
+        },
+        () => {
+          this.setMandalaMode(false);
+          this.setSpaceMode(true);
+          this.setFrequencySpawn(false);
+        },
+        () => {
+          this.toggleGoldenRatioMode(true);
+          this.setReflectMode(true);
+        },
+        () => {
+          this.setFrequencySpawn(true);
+          this.setSpaceMode(true);
+        },
+        () => { // Reset to clean state (Manual look)
+          this.setMandalaMode(false);
+          this.setSpaceMode(false);
+          this.toggleAntigravityMode(false);
+          this.toggleGoldenRatioMode(false);
+          this.setFrequencySpawn(false);
+          this.setReflectMode(false);
+        }
+      ];
+
+      const randomFeature = features[Math.floor(Math.random() * features.length)];
+      console.log(`⟳ AUTO Mode: Triggering random feature shift`);
+      randomFeature();
+    }
+  }
+
+  private resetBackgroundIfManual(): void {
+    if (!this.state.autoMode && !this.state.blinkingMode) {
+      this.setBackgroundColor({ r: 255, g: 255, b: 255 });
+    }
+  }
+
+  /**
+   * Toggle global blinking mode
+   */
+  public setBlinkingMode(enabled: boolean): void {
+    this.state.blinkingMode = enabled;
+    if (!enabled) {
+      this.resetBackgroundIfManual();
+    }
+    console.log(`💡 Blinking Mode: ${enabled ? 'ON' : 'OFF'}`);
+  }
+
+  /**
+   * Toggle global blinking mode
+   */
+  public toggleBlinkingMode(): boolean {
+    const newState = !this.state.blinkingMode;
+    this.setBlinkingMode(newState);
+    return newState;
+  }
+
+  /**
+   * Set blinking speed (1-10)
+   */
+  public setBlinkingSpeed(speed: number): void {
+    this.state.blinkingSpeed = speed;
+  }
+
+  /**
+   * Helper to convert Hex to RGB
+   */
+  private hexToRgb(hex: string): { r: number; g: number; b: number } {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : { r: 255, g: 255, b: 255 };
+  }
+
+
+  // Track last AI object spawn time
+  private lastAIObjectSpawn: number = 0;
+
+  // Intelligent pattern recognition
+  private frequencyHistory: { low: number[]; mid: number[]; high: number[] } = {
+    low: [],
+    mid: [],
+    high: []
+  };
+
+  private genreCharacteristics: {
+    avgBass: number;
+    avgMid: number;
+    avgHigh: number;
+    bpmRange: number;
+  } = {
+      avgBass: 0,
+      avgMid: 0,
+      avgHigh: 0,
+      bpmRange: 0
+    };
+
+  /**
+   * Smooth transition helper for AI control
+   */
+  private smoothTransition(current: number, target: number, factor: number): number {
+    return current + (target - current) * factor;
+  }
+
+  /**
+   * 🎵 Global Audio-Reactive Dispersion
+   * Applies radial dispersion based on bass and vibration based on mids.
+   * Works with microphone input - matches Sound Machine behavior.
+   */
+  private handleGlobalDispersion(): void {
+    const bands = this.getCurrentFrequencyBands();
+    const bass = bands.low / 255;
+    const mid = bands.mid / 255;
+
+    // Bass -> Radial Dispersion (発散)
+    // Objects explode outward from center when bass hits
+    if (bass > 0.15) {
+      const dispersionForce = bass * 2.0; // Strong dispersion force
+      this.sceneManager.disperseObjects(dispersionForce);
+    }
+
+    // Mid -> Vibration (振動)
+    // Objects shake/vibrate on mid frequencies
+    if (mid > 0.25) {
+      this.sceneManager.vibrateObjects(mid * 2.0);
+    }
+  }
+
+  /**
+   * Add a random instance (excluding blacklisted materials)
+   */
+  public addRandomInstance(): void {
+    // Get available materials (not excluded)
+    const availableIndices: number[] = [];
+    for (let i = 0; i < MATERIALS.length; i++) {
+      if (!this.excludedMaterialIndices.has(i)) {
+        availableIndices.push(i);
+      }
+    }
+
+    // If all materials are excluded, use all materials
+    if (availableIndices.length === 0) {
+      console.warn('⚠️ All materials excluded from auto-generate. Using all materials.');
+      availableIndices.push(...Array.from({ length: MATERIALS.length }, (_, i) => i));
+    }
+
+    // Pick random from available
+    const randomIndex = Math.floor(Math.random() * availableIndices.length);
+    const materialIndex = availableIndices[randomIndex];
+
+    // Use auto-generate distance if in auto-generate mode, and always use default color
+    const options = this.state.autoGenerateMode
+      ? {
+        customSpacing: this.state.autoGenerateDistance,
+        color: this.defaultObjectColor,
+        wireframe: this.defaultWireframeMode,
+        useGoldenRatio: this.state.goldenRatioMode
+      }
+      : {
+        color: this.defaultObjectColor,
+        wireframe: this.defaultWireframeMode,
+        useGoldenRatio: this.state.goldenRatioMode
+      };
+    this.instanceManager.addInstance(materialIndex, options);
+  }
+
+  /**
+   * Toggle material exclusion from auto-generate
+   */
+  public toggleMaterialExclusion(materialIndex: number): boolean {
+    if (this.excludedMaterialIndices.has(materialIndex)) {
+      this.excludedMaterialIndices.delete(materialIndex);
+      console.log(`✅ Material #${materialIndex} enabled for auto-generate`);
+      return false; // Not excluded
+    } else {
+      this.excludedMaterialIndices.add(materialIndex);
+      console.log(`❌ Material #${materialIndex} excluded from auto-generate`);
+      return true; // Excluded
+    }
+  }
+
+  /**
+   * Check if material is excluded from auto-generate
+   */
+  public isMaterialExcluded(materialIndex: number): boolean {
+    return this.excludedMaterialIndices.has(materialIndex);
+  }
+
+  /**
+   * Get all excluded material indices
+   */
+  public getExcludedMaterials(): number[] {
+    return Array.from(this.excludedMaterialIndices);
+  }
+
+  /**
+   * Add instance by material index
+   */
+  public addInstance(materialIndex: number, options?: Partial<ObjectInstance>): ObjectInstance {
+    const instanceOptions = {
+      ...options,
+      color: options?.color || this.defaultObjectColor,
+      wireframe: options?.wireframe !== undefined ? options.wireframe : this.defaultWireframeMode
+    };
+    return this.instanceManager.addInstance(materialIndex, instanceOptions);
+  }
+
+  /**
+   * Remove instance by ID
+   */
+  public removeInstance(instanceId: number): boolean {
+    return this.instanceManager.removeInstance(instanceId);
+  }
+
+  /**
+   * Duplicate instance
+   */
+  public duplicateInstance(instanceId: number): ObjectInstance | null {
+    const duplicated = this.instanceManager.duplicateInstance(instanceId);
+
+    if (duplicated) {
+      // AI Learning: Track duplication as a preference signal
+      this.neuralLearner.learn({
+        type: 'duplicate',
+        instance: duplicated,
+        timestamp: Date.now()
+      });
+    }
+
+    return duplicated;
+  }
+
+  /**
+   * Clear all instances
+   */
+  public clearAll(): void {
+    this.instanceManager.clearAll();
+  }
+
+  /**
+   * Toggle pin status of an instance
+   */
+  public togglePin(instanceId: number): boolean {
+    const result = this.instanceManager.togglePin(instanceId);
+
+    if (result) {
+      // AI Learning: Track pinning as a strong preference signal
+      const instances = this.instanceManager.getAllInstances();
+      const pinnedInstance = instances.find(i => i.id === instanceId);
+      if (pinnedInstance) {
+        this.neuralLearner.learn({
+          type: 'pin',
+          instance: pinnedInstance,
+          timestamp: Date.now()
+        });
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Start microphone input
+   */
+  public async startMicrophone(deviceId?: string): Promise<string | null> {
+    return this.audioManager.startMicrophone(deviceId);
+  }
+
+  public async getAvailableInputDevices(): Promise<MediaDeviceInfo[]> {
+    return this.audioManager.getAvailableInputDevices();
+  }
+
+  /**
+   * Stop microphone input
+   */
+  public stopMicrophone(): void {
+    this.audioManager.stopMicrophone();
+  }
+
+  /**
+   * Set microphone input gain
+   */
+  public setMicrophoneGain(gain: number): void {
+    this.audioManager.setInputGain(gain);
+  }
+
+  /**
+   * Update camera background in the scene
+   */
+  public updateCameraBackground(canvas: HTMLCanvasElement | null): void {
+    this.sceneManager.setCameraBackground(canvas);
+  }
+
+  /**
+   * Get microphone input gain
+   */
+  public getMicrophoneGain(): number {
+    return this.audioManager.getInputGain();
+  }
+
+  /**
+   * Load audio file
+   */
+  public async loadAudioFile(file: File): Promise<void> {
+    return await this.audioManager.loadAudioFile(file);
+  }
+
+  /**
+   * Stop all audio
+   */
+  public stopAudio(): void {
+    this.audioManager.stopAll();
+  }
+
+  /**
+   * Toggle play/pause audio
+   */
+  public async togglePlayPause(): Promise<void> {
+    await this.audioManager.togglePlayPause();
+  }
+
+  /**
+   * Get current BPM
+   */
+  public getBPM(): number {
+    return this.audioManager.getEstimatedBPM();
+  }
+
+  // ========== Mixer Methods ==========
+
+  /**
+   * Enable mixer mode
+   */
+  public enableMixer(): void {
+    this.audioManager.stopAll();
+  }
+
+  /**
+   * Disable mixer mode
+   */
+  public disableMixer(): void {
+    this.mixerManager.stopTrackA();
+    this.mixerManager.stopTrackB();
+  }
+
+  /**
+   * Load audio file to mixer Track A
+   */
+  public async loadMixerTrackA(file: File): Promise<void> {
+    this.enableMixer();
+    await this.mixerManager.loadTrackA(file);
+  }
+
+  /**
+   * Load audio file to mixer Track B
+   */
+  public async loadMixerTrackB(file: File): Promise<void> {
+    this.enableMixer();
+    await this.mixerManager.loadTrackB(file);
+  }
+
+  /**
+   * Toggle play/pause for mixer Track A
+   */
+  public toggleMixerTrackA(): void {
+    this.mixerManager.toggleTrackA();
+  }
+
+  /**
+   * Toggle play/pause for mixer Track B
+   */
+  public toggleMixerTrackB(): void {
+    this.mixerManager.toggleTrackB();
+  }
+
+  /**
+   * Set crossfader position (-1 to 1)
+   */
+  public setCrossfader(position: number): void {
+    this.mixerManager.setCrossfader(position);
+  }
+
+  /**
+   * Get mixer manager for direct access
+   */
+  public getMixerManager(): MixerManager {
+    return this.mixerManager;
+  }
+
+  public getMidiManager(): MidiManager {
+    return this.midiManager;
+  }
+
+  public toggleMandalaMode(force?: boolean): void {
+    if (force !== undefined) {
+      this.state.mandalaMode = force;
+    } else {
+      this.state.mandalaMode = !this.state.mandalaMode;
+    }
+
+    // Auto-enable symmetry visuals when entering Mandala Mode for better UX?
+    // User requested "Decouple". So NO.
+    // "Top and Right Panel are independent."
+    // So ONLY toggle the chaos mode here.
+
+    this.emit('state:changed', this.state);
+  }
+
+  /**
+   * Set symmetry enabled (Visual Mirroring)
+   */
+  public setSymmetryEnabled(enabled: boolean): void {
+    this.state.symmetryEnabled = enabled;
+    this.emit('state:changed', this.state);
+  }
+
+
+
+  /**
+   * Toggle symmetry enabled
+   */
+  public toggleSymmetryEnabled(): void {
+    this.setSymmetryEnabled(!this.state.symmetryEnabled);
+  }
+
+  /**
+   * Set target parameter for smoothing
+   */
+  private setTargetParameter(key: keyof ApplicationState, value: number): void {
+    if (isNaN(value)) return;
+
+    // Only smooth numeric values
+    if (typeof this.state[key] === 'number') {
+      (this.targetParams as any)[key] = value;
+    } else {
+      // For booleans etc, set directly
+      (this.state as any)[key] = value;
+      this.emit('state:changed', this.state);
+    }
+  }
+
+  /**
+   * Update smoothed parameters logic
+   */
+  private updateSmoothing(): void {
+    let changed = false;
+    const keys = Object.keys(this.targetParams) as (keyof ApplicationState)[];
+
+    keys.forEach(key => {
+      const target = (this.targetParams as any)[key];
+      const current = (this.state as any)[key];
+
+      // Safety: Ignore NaNs
+      if (typeof target === 'number' && isNaN(target)) {
+        delete (this.targetParams as any)[key];
+        return;
+      }
+      if (typeof current === 'number' && isNaN(current)) {
+        // Reset corrupted state to 1.0 or 0.0 depending on likely param logic
+        (this.state as any)[key] = 1.0;
+        return;
+      }
+
+      if (typeof target === 'number' && typeof current === 'number') {
+        // Linear interpolation (LERP)
+        const diff = target - current;
+        if (Math.abs(diff) > 0.001) {
+          (this.state as any)[key] = current + diff * this.smoothingSpeed;
+          changed = true;
+        } else {
+          // Snap to target if very close
+          (this.state as any)[key] = target;
+          delete (this.targetParams as any)[key];
+          changed = true;
+        }
+      }
+    });
+
+    if (changed) {
+      this.emit('state:changed', this.state);
+    }
+  }
+
+  /**
+   * Analyze audio and randomize parameters (One-Shot)
+   */
+  private randomizeParametersByAudio(): void {
+    // Correctly get bands from active source (Mic or Mixer)
+    const bands = this.getCurrentFrequencyBands();
+
+    // 1. Randomize Instances (5-30) - Increased Range
+    const currentInstances = this.instanceManager.getAllInstances().filter(i => !i.mediaData);
+    const targetCount = 5 + Math.floor(Math.random() * 26); // 5 to 30
+
+    console.log(`🎲 RANDOMIZE: Instances ${currentInstances.length} -> ${targetCount}`);
+
+    if (currentInstances.length < targetCount) {
+      const toAdd = targetCount - currentInstances.length;
+      for (let i = 0; i < toAdd; i++) {
+        this.instanceManager.addInstance(Math.floor(Math.random() * 10), { // Random Mat
+          scale: 1.0
+        });
+      }
+    } else if (currentInstances.length > targetCount) {
+      const toRemove = currentInstances.length - targetCount;
+      for (let i = 0; i < toRemove; i++) {
+        if (currentInstances[i]) {
+          this.instanceManager.removeInstance(currentInstances[i].id);
+        }
+      }
+    }
+
+    // Force Material Shuffle for ALL instances (Boredom Killer)
+    const allInstances = this.instanceManager.getAllInstances();
+    allInstances.forEach(inst => {
+      // 30% chance to switch texture
+      if (Math.random() < 0.3) {
+        this.instanceManager.updateInstance(inst.id, {
+          materialIndex: Math.floor(Math.random() * 10) // Assuming 10 mats
+        });
+      }
+    });
+
+    // 2. Randomize Symmetry (4-16)
+    const targetSym = 4 + Math.floor(Math.random() * 13); // 4 to 16
+    this.setSymmetryCount(targetSym);
+
+    // 3. Randomize Parameters with Smoothing (Target)
+    // Size: Adjusted Range (0.2 - 3.0)
+    this.setTargetParameter('sizeMultiplier', 0.2 + Math.random() * 2.8);
+
+    // Spacing (Distance): Clamped Range (2.0 - 15.0) -> Keep on screen
+    const midBoost = (bands.mid / 255) * 5.0;
+    this.setTargetParameter('spacingMultiplier', 2.0 + Math.random() * 13.0 + midBoost);
+
+    // Spread (Scale): Adjusted Range (0.2 - 3.0)
+    this.setTargetParameter('spreadMultiplier', 0.2 + Math.random() * 2.8);
+
+    // Rotation: Random position
+    this.setTargetParameter('baseRotation', Math.random() * 360);
+
+    // 4. Reflect (Mirror) Random
+    this.setReflectMode(Math.random() < 0.5);
+
+    console.log(`🌸 Mandala Random: ${targetCount} objs, ${targetSym} sym`);
+  }
+
+  /**
+   * Handle Gravity Mode: Cosmic object switching with effects
+   */
+  private handleGravityMode(): void {
+    const now = Date.now();
+
+    // Update cosmic visual effects every frame
+    this.sceneManager.updateCosmicEffects();
+
+    // Cosmic cycle every 8 seconds
+    const cycleInterval = 8000;
+    if (now - this.gravityCycleTimer > cycleInterval) {
+      this.gravityCycleTimer = now;
+
+      const instances = this.instanceManager.getAllInstances();
+      const currentCount = instances.length;
+
+      // Dynamic population (3-8 objects)
+      const targetCount = 3 + Math.floor(Math.random() * 6);
+
+      if (currentCount > targetCount) {
+        // Fade out the oldest with cosmic effect
+        const oldest = instances.find(inst => !inst.mediaData && !inst.pinned);
+        if (oldest) {
+          this.sceneManager.fadeOutInstance(oldest.id, 800);
+          // Delay actual removal — the fade-out handler in SceneManager will clean up
+          setTimeout(() => {
+            this.instanceManager.removeInstance(oldest.id);
+          }, 850);
+        }
+      } else if (currentCount < targetCount) {
+        // Add new with burst entrance
+        this.addRandomInstance();
+        // Spawn burst at a random position near center for entrance effect
+        const burstPos = new THREE.Vector3(
+          (Math.random() - 0.5) * 2,
+          (Math.random() - 0.5) * 2,
+          (Math.random() - 0.5) * 2
+        );
+        this.sceneManager.spawnBurst(burstPos);
+      } else {
+        // Switch: fade out one, add another
+        const oldest = instances.find(inst => !inst.mediaData && !inst.pinned);
+        if (oldest) {
+          this.sceneManager.fadeOutInstance(oldest.id, 800);
+          setTimeout(() => {
+            this.instanceManager.removeInstance(oldest.id);
+            this.addRandomInstance();
+          }, 850);
+        }
+      }
+
+      console.log(`🌌 Zero Gravity Cycle: ${currentCount} → ${targetCount} objects`);
+    }
+  }
+
+  /**
+   * Set mandala mode
+   */
+  public setMandalaMode(enabled: boolean): void {
+    if (enabled) {
+      this.state.spaceMode = false;
+      this.state.symmetryEnabled = true;
+
+      // Trigger initial pattern immediately
+      this.randomizeMandalaPattern();
+    } else {
+      this.state.symmetryEnabled = false;
+    }
+
+    this.state.mandalaMode = enabled;
+    this.resetBackgroundIfManual();
+    // Auto-enable object spawning if currently off, so user sees something
+    if (enabled && !this.state.autoMode) {
+      this.state.autoMode = true;
+    }
+
+    this.emit('state:changed', this.state);
+  }
+
+  /**
+   * Randomize Mandala Pattern (Kaleidoscope effect)
+   */
+  private randomizeMandalaPattern(): void {
+    // 1. Force Reflect Mode
+    this.setReflectMode(true);
+
+    // 2. Random Symmetry (4, 6, 8, 10, 12)
+    const symmetries = [4, 6, 8, 10, 12];
+    const randomSym = symmetries[Math.floor(Math.random() * symmetries.length)];
+    this.setSymmetryCount(randomSym);
+
+    // 3. Randomize Parameters
+    // Size: 0.5 - 2.0 (Needs to be negative for Reflect Mode to visualize correctly)
+    const rawSize = 0.5 + Math.random() * 1.5;
+    this.state.sizeMultiplier = -rawSize;
+
+    // Spread (Scale): 0.2 - 2.0
+    this.state.spreadMultiplier = 0.2 + Math.random() * 1.8;
+
+    // Spacing (Distance): 5.0 - 25.0
+    this.state.spacingMultiplier = 5.0 + Math.random() * 20.0;
+
+    // Speed: Randomize
+    this.state.speedMultiplier = (Math.random() * 4) - 2; // -2 to 2
+
+    // Rotation: Random
+    this.state.baseRotation = Math.random() * 360;
+
+    // 4. Random Objects (4 - 20)
+    const currentInstances = this.instanceManager.getAllInstances();
+    const targetCount = 4 + Math.floor(Math.random() * 17); // 4 to 20
+
+    // Adjust count
+    if (currentInstances.length > targetCount) {
+      // Remove excess
+      const toRemove = currentInstances.slice(targetCount).map(i => i.id);
+      toRemove.forEach(id => this.instanceManager.removeInstance(id));
+    } else {
+      // Add needed
+      const needed = targetCount - currentInstances.length;
+      for (let i = 0; i < needed; i++) {
+        const materialIndex = Math.floor(Math.random() * MATERIALS.length);
+        this.addInstance(materialIndex);
+      }
+    }
+
+    this.emit('state:changed', this.state); // Update UI
+    console.log(`🌸 MANDALA PATTERN: Sym=${randomSym}, Count=${targetCount}`);
+  }
+
+  /**
+   * Set symmetry count
+   */
+  public setSymmetryCount(count: number): void {
+    this.state.symmetryCount = Math.max(2, Math.min(16, count));
+    this.state.symmetryEnabled = true;
+    this.emit('state:changed', this.state);
+  }
+
+  /**
+   * Set size multiplier
+   */
+  public setSizeMultiplier(multiplier: number): void {
+    let val = Math.max(0.1, Math.min(5, Math.abs(multiplier)));
+    if (this.state.reflectMode) {
+      val = -val;
+    }
+    this.state.sizeMultiplier = val;
+    this.emit('state:changed', this.state);
+  }
+
+  /**
+   * Set speed multiplier
+   */
+  public setSpeedMultiplier(multiplier: number): void {
+    this.state.speedMultiplier = Math.max(-3, Math.min(3, multiplier));
+    this.emit('state:changed', this.state);
+  }
+
+  /**
+   * Set spread multiplier
+   */
+  public setSpreadMultiplier(multiplier: number): void {
+    this.state.spreadMultiplier = Math.max(0.1, Math.min(5, multiplier));
+    this.emit('state:changed', this.state);
+  }
+
+  /**
+   * Set spacing multiplier
+   */
+  public setSpacingMultiplier(multiplier: number): void {
+    this.state.spacingMultiplier = Math.max(0.1, Math.min(20, multiplier));
+    this.instanceManager.setSpacingMultiplier(this.state.spacingMultiplier);
+    this.emit('state:changed', this.state);
+  }
+
+  /**
+   * Set base rotation (in degrees)
+   */
+  public setBaseRotation(degrees: number): void {
+    this.state.baseRotation = degrees % 360;
+    this.sceneManager.setBaseRotation(this.state.baseRotation);
+    this.emit('state:changed', this.state);
+  }
+
+  /**
+   * Toggle auto-generation mode
+   */
+  public toggleAutoGeneration(): void {
+    this.state.autoGenerateMode = !this.state.autoGenerateMode;
+
+    if (this.state.autoGenerateMode) {
+      this.startAutoGeneration();
+    } else {
+      this.stopAutoGeneration();
+    }
+
+    this.emit('state:changed', this.state);
+  }
+
+  /**
+   * Set auto-generation mode
+   */
+  public setAutoGeneration(enabled: boolean): void {
+    this.state.autoGenerateMode = enabled;
+
+    if (enabled) {
+      // Only start auto-gen timer if NOT in Mandala mode (Mandala manages its own count)
+      if (!this.state.mandalaMode) {
+        this.startAutoGeneration();
+      }
+    } else {
+      this.stopAutoGeneration();
+    }
+
+    this.emit('state:changed', this.state);
+  }
+
+  /**
+   * Set auto-generation speed multiplier
+   */
+  public setAutoGenerationSpeed(multiplier: number): void {
+    this.state.autoGenerateSpeedMultiplier = Math.max(-4, Math.min(8, multiplier));
+
+    if (this.state.autoGenerateMode) {
+      this.updateAutoGeneration();
+    }
+
+    this.emit('state:changed', this.state);
+  }
+
+  /**
+   * Set auto-generation distance
+   */
+  public setAutoGenerationDistance(distance: number): void {
+    this.state.autoGenerateDistance = Math.max(5, Math.min(40, distance));
+    this.emit('state:changed', this.state);
+  }
+
+  /**
+   * Start auto-generation
+   */
+  private startAutoGeneration(): void {
+    this.stopAutoGeneration();
+
+    const beatInterval = this.audioManager.getBeatInterval();
+
+    // Handle negative multipliers: negative = slower (longer interval)
+    // Positive multipliers: higher = faster (shorter interval)
+    let interval: number;
+    if (this.state.autoGenerateSpeedMultiplier > 0) {
+      interval = beatInterval / this.state.autoGenerateSpeedMultiplier;
+    } else if (this.state.autoGenerateSpeedMultiplier < 0) {
+      // Negative values multiply the interval (slower generation)
+      interval = beatInterval * Math.abs(this.state.autoGenerateSpeedMultiplier);
+    } else {
+      // Zero or invalid: use base beat interval
+      interval = beatInterval;
+    }
+
+    // Object generation timer
+    this.autoGenerateTimer = setInterval(() => {
+      this.addRandomInstance();
+    }, interval);
+
+    // Mode switching timer - changes every 4-8 beats based on BPM
+    const modeChangeBeats = 4 + Math.floor(Math.random() * 5); // 4-8 beats
+    const modeChangeInterval = beatInterval * modeChangeBeats;
+
+    this.autoModeSwitchTimer = setInterval(() => {
+      // Randomly toggle antigravity mode (50% chance)
+      this.toggleAntigravityMode(Math.random() < 0.5);
+
+      // Randomly select wireframe mode (33% each: solid, wireframe, mixed)
+      const wireframeModes: ('solid' | 'wireframe' | 'mixed')[] = ['solid', 'wireframe', 'mixed'];
+      const randomWireframeMode = wireframeModes[Math.floor(Math.random() * 3)];
+      this.setWireframeMode(randomWireframeMode);
+    }, modeChangeInterval);
+  }
+
+  /**
+   * Stop auto-generation
+   */
+  private stopAutoGeneration(): void {
+    if (this.autoGenerateTimer) {
+      clearInterval(this.autoGenerateTimer);
+      this.autoGenerateTimer = null;
+    }
+    if (this.autoModeSwitchTimer) {
+      clearInterval(this.autoModeSwitchTimer);
+      this.autoModeSwitchTimer = null;
+    }
+  }
+
+  /**
+   * Update auto-generation timing based on BPM
+   */
+  private updateAutoGeneration(): void {
+    if (this.state.autoGenerateMode) {
+      this.startAutoGeneration();
+    }
+  }
+
+  /**
+   * Toggle frequency spawn mode
+   */
+  public toggleFrequencySpawn(): void {
+    this.state.frequencySpawnMode = !this.state.frequencySpawnMode;
+    this.emit('state:changed', this.state);
+  }
+
+  /**
+   * Set frequency spawn mode
+   */
+  public setFrequencySpawn(enabled: boolean): void {
+    this.state.frequencySpawnMode = enabled;
+    this.emit('state:changed', this.state);
+  }
+
+
+
+  /**
+   * Set Space mode
+   */
+  public setSpaceMode(enabled: boolean): void {
+    this.state.spaceMode = enabled;
+    this.resetBackgroundIfManual();
+    this.emit('state:changed', this.state);
+  }
+
+  /**
+   * Toggle AUTO mode
+   */
+  public toggleAutoMode(): void {
+    this.state.autoMode = !this.state.autoMode;
+    if (!this.state.autoMode) {
+      this.setBackgroundColor({ r: 255, g: 255, b: 255 });
+    }
+    this.emit('state:changed', this.state);
+  }
+
+  /**
+   * Set AUTO mode
+   */
+  public setAutoMode(enabled: boolean): void {
+    this.state.autoMode = enabled;
+    if (!enabled) {
+      this.setBackgroundColor({ r: 255, g: 255, b: 255 });
+    }
+    this.emit('state:changed', this.state);
+  }
+
+  /**
+   * Set AI speed multiplier
+   */
+  public setAISpeed(multiplier: number): void {
+    this.state.aiSpeedMultiplier = Math.max(1, Math.min(10, multiplier));
+    this.emit('state:changed', this.state);
+  }
+
+  /**
+   * Set max objects
+   */
+  public setMaxObjects(max: number): void {
+    this.instanceManager.setMaxObjects(max);
+  }
+
+  /**
+   * Set canvas text
+   */
+  public setCanvasText(text: string): void {
+    this.state.djName = text;
+    this.state.showDJName = true; // Auto-show when text is set/sent
+    this.processingLayer.updateCanvasText(text);
+    this.processingLayer.setShowDJName(true);
+    this.emit('state:changed', this.state);
+
+    // Sync UI buttons if they exist
+    const onBtn = document.getElementById('djNameOnBtn');
+    const offBtn = document.getElementById('djNameOffBtn');
+    if (onBtn && offBtn) {
+      onBtn.classList.add('active');
+      offBtn.classList.remove('active');
+    }
+  }
+
+  public toggleShowDJName(enabled?: boolean): void {
+    const nextValue = enabled !== undefined ? enabled : !this.state.showDJName;
+    this.state.showDJName = nextValue;
+    this.processingLayer.setShowDJName(nextValue);
+    this.emit('state:changed', this.state);
+  }
+
+  /**
+   * Get max objects
+   */
+  public getMaxObjects(): number {
+    return this.instanceManager.getMaxObjects();
+  }
+
+  /**
+   * Set reflect mode (mirror reflection)
+   */
+  public setReflectMode(enabled: boolean): void {
+    this.state.reflectMode = enabled;
+    // Apply reflection by making size multiplier negative
+    if (enabled && this.state.sizeMultiplier > 0) {
+      this.state.sizeMultiplier *= -1;
+    } else if (!enabled && this.state.sizeMultiplier < 0) {
+      this.state.sizeMultiplier *= -1;
+    }
+    this.emit('state:changed', this.state);
+  }
+
+  public toggleReflectMode(): void {
+    this.setReflectMode(!this.state.reflectMode);
+  }
+
+  // ========== Quantum Methods ==========
+
+  public toggleQuantumMode(enabled?: boolean): void {
+    const nextValue = enabled !== undefined ? enabled : !this.state.quantumMode;
+    this.state.quantumMode = nextValue;
+    if (!nextValue) {
+      this.quantumManager.reset();
+    }
+    this.emit('state:changed', this.state);
+    console.log(`🌌 Quantum Mode: ${nextValue ? 'ON' : 'OFF'}`);
+  }
+
+  public setQuantumCoherence(val: number): void {
+    this.state.quantumCoherence = val;
+    this.quantumManager.setCoherence(val);
+    this.emit('state:changed', this.state);
+  }
+
+  public toggleQuantumEntanglement(enabled?: boolean): void {
+    const nextValue = enabled !== undefined ? enabled : !this.state.quantumEntangled;
+    this.state.quantumEntangled = nextValue;
+    this.quantumManager.setEntangled(nextValue);
+    this.emit('state:changed', this.state);
+  }
+
+  public quantumMeasure(): void {
+    this.quantumManager.measure();
+  }
+
+  // ========== Projector Methods ==========
+
+  public openProjectorWindow(): void {
+    this.projectorManager.openWindow();
+  }
+
+
+
+  /**
+   * Update frequency history for intelligent analysis
+   */
+  private updateFrequencyHistory(bands: FrequencyBands): void {
+    const maxHistory = 100;
+
+    this.frequencyHistory.low.push(bands.low);
+    this.frequencyHistory.mid.push(bands.mid);
+    this.frequencyHistory.high.push(bands.high);
+
+    if (this.frequencyHistory.low.length > maxHistory) {
+      this.frequencyHistory.low.shift();
+      this.frequencyHistory.mid.shift();
+      this.frequencyHistory.high.shift();
+    }
+
+    // Update genre characteristics
+    if (this.frequencyHistory.low.length >= 50) {
+      this.genreCharacteristics.avgBass = this.getAverageFrequency(this.frequencyHistory.low);
+      this.genreCharacteristics.avgMid = this.getAverageFrequency(this.frequencyHistory.mid);
+      this.genreCharacteristics.avgHigh = this.getAverageFrequency(this.frequencyHistory.high);
+    }
+  }
+
+  /**
+   * Handle song change - detect genre and adapt parameters
+   */
+  private onSongChange(newBPM: number): void {
+    console.log(`🎵 Song change detected: BPM ${this.lastBPM} → ${newBPM}`);
+
+    // Detect genre based on frequency characteristics
+    const genre = this.detectGenre();
+    console.log(`🎭 Detected genre: ${genre}`);
+
+    // Change symmetry based on genre and bass energy
+    const avgBass = this.genreCharacteristics.avgBass;
+    const symmetries = [4, 6, 8, 12];
+
+    // Intelligent selection based on genre and bass energy
+    let symmetryIndex = 0;
+    if (genre === 'electronic' || genre === 'techno') {
+      symmetryIndex = 3; // Electronic → 12 (complex patterns)
+    } else if (genre === 'rock' || genre === 'metal') {
+      symmetryIndex = 2; // Rock → 8 (strong patterns)
+    } else if (avgBass > 150) {
+      symmetryIndex = 2; // Heavy bass → 8
+    } else if (avgBass > 100) {
+      symmetryIndex = 1; // Medium → 6
+    } else {
+      symmetryIndex = 0; // Light → 4
+    }
+
+    this.setSymmetryCount(symmetries[symmetryIndex]);
+
+    // Toggle cosmic/mechanical phase based on genre
+    if (genre === 'electronic' || genre === 'techno') {
+      this.cosmicPhase = 'mechanical'; // Electronic → mechanical precision
+    } else if (genre === 'ambient' || genre === 'classical') {
+      this.cosmicPhase = 'cosmic'; // Ambient → cosmic flow
+    } else {
+      // Toggle for other genres
+      this.cosmicPhase = this.cosmicPhase === 'cosmic' ? 'mechanical' : 'cosmic';
+    }
+
+    console.log(`🌌 Phase: ${this.cosmicPhase}, Symmetry: ${symmetries[symmetryIndex]}`);
+  }
+
+  /**
+   * Detect music genre based on frequency patterns
+   */
+  private detectGenre(): string {
+    const { avgBass, avgMid, avgHigh } = this.genreCharacteristics;
+    const currentBPM = this.audioManager.getEstimatedBPM();
+
+    // Genre detection logic based on frequency balance and BPM
+    const bassRatio = avgBass / (avgMid + avgHigh + 1);
+    const highRatio = avgHigh / (avgBass + avgMid + 1);
+
+    if (currentBPM > 140 && bassRatio > 1.5) {
+      return 'techno'; // Fast BPM + heavy bass
+    } else if (currentBPM > 120 && highRatio > 1.2) {
+      return 'electronic'; // Fast BPM + bright highs
+    } else if (bassRatio > 1.8) {
+      return 'dubstep'; // Very heavy bass
+    } else if (currentBPM > 140 && avgMid > 150) {
+      return 'drum_and_bass'; // Fast + strong mids
+    } else if (currentBPM < 90 && highRatio < 0.8) {
+      return 'ambient'; // Slow + low highs
+    } else if (avgMid > avgBass && avgMid > avgHigh) {
+      return 'rock'; // Mid-focused
+    } else if (currentBPM < 100 && avgHigh > avgBass) {
+      return 'classical'; // Slow + high focus
+    } else if (bassRatio > 1.2) {
+      return 'hip_hop'; // Bass-heavy
+    }
+
+    return 'general'; // Default
+  }
+
+
+
+  /**
+   * Apply real-time frequency synchronization (every frame)
+   */
+  private applyFrequencySync(bands: FrequencyBands): void {
+    // Low frequency (Bass) -> Symmetry changes (threshold-based)
+    // Disabled in Mandala Mode to keep kaleidoscope shape steady
+    if (!this.state.mandalaMode && bands.low > 200 && this.state.symmetryCount < 12) {
+      const symmetries = [4, 6, 8, 10, 12];
+      const currentIndex = symmetries.indexOf(this.state.symmetryCount);
+      if (currentIndex >= 0 && currentIndex < symmetries.length - 1) {
+        // Gradually increase symmetry on bass hits
+        const now = Date.now();
+        if (!this.lastMandalaUpdate || now - this.lastMandalaUpdate > 2000) {
+          this.setSymmetryCount(symmetries[currentIndex + 1]);
+        }
+      }
+    }
+
+    // High frequency → Reflect mode toggle (threshold-based)
+    if (bands.high > 180) {
+      if (!this.state.reflectMode) {
+        this.setReflectMode(true);
+      }
+    } else if (bands.high < 100) {
+      if (this.state.reflectMode && !this.state.mandalaMode) {
+        this.setReflectMode(false);
+      }
+    }
+  }
+
+  /**
+   * Get average frequency from history
+   */
+  private getAverageFrequency(history: number[]): number {
+    if (history.length === 0) return 0;
+    const sum = history.reduce((a, b) => a + b, 0);
+    return sum / history.length;
+  }
+
+  /**
+   * Get all instances
+   */
+  public getAllInstances(): ObjectInstance[] {
+    return this.instanceManager.getAllInstances();
+  }
+
+  /**
+   * Get current frequency bands from active source for UI
+   */
+  public getCurrentFrequencyBands(): FrequencyBands {
+    // Prioritize Microphone/Line-In if active
+    // This fixes the issue where indicators don't react if useMixer flag is stale
+    if (this.audioManager.getCurrentSource() === 'microphone') {
+      return this.audioManager.getFrequencyBands();
+    }
+    // Fallback to Mixer (File)
+    return this.mixerManager.getFrequencyBands();
+  }
+
+  /**
+   * Get current frequency data from active source
+   */
+  public getCurrentFrequencyData(): Uint8Array {
+    if (this.audioManager.getCurrentSource() === 'microphone') {
+      return this.audioManager.getFrequencyData();
+    }
+    // Fallback to Mixer (File)
+    return this.mixerManager.getFrequencyData();
+  }
+
+  /**
+   * Get current state
+   */
+  public getState(): ApplicationState {
+    return { ...this.state };
+  }
+
+  /**
+   * Capture screenshot
+   */
+  public captureScreenshot(): string {
+    return this.sceneManager.captureScreenshot();
+  }
+
+  /**
+   * Set default object color
+   */
+  public setDefaultObjectColor(color: { r: number; g: number; b: number } | null): void {
+    this.defaultObjectColor = color;
+  }
+
+  /**
+   * Remove oldest instance (non-media)
+   */
+  public removeOldestInstance(): void {
+    const instances = this.instanceManager.getAllInstances();
+    const oldest = instances.find(inst => !inst.mediaData);
+    if (oldest) {
+      this.instanceManager.removeInstance(oldest.id);
+    }
+  }
+
+
+
+  /**
+   * Set wireframe mode for all objects
+   */
+  public setWireframeMode(mode: 'solid' | 'wireframe' | 'mixed'): void {
+    this.defaultWireframeMode = mode;
+    this.state.wireframeMode = mode;
+
+    // Update all existing instances
+    const instances = this.instanceManager.getAllInstances();
+    instances.forEach(instance => {
+      instance.wireframe = mode;
+    });
+
+    // Clear mesh cache to force rebuild with new wireframe setting
+    this.sceneManager.clearMeshCache();
+
+    // Emit state change for UI synchronization
+    this.emit('state:changed', this.state);
+  }
+
+  /**
+   * Set background color
+   */
+  public setBackgroundColor(color: { r: number; g: number; b: number }): void {
+    this.sceneManager.setBackgroundColor(color);
+  }
+
+  /**
+   * Toggle golden ratio mode for object placement
+   */
+  public toggleGoldenRatioMode(enabled: boolean): void {
+    this.state.goldenRatioMode = enabled;
+    console.log(`🌀 Golden Ratio Mode: ${enabled ? 'ON' : 'OFF'}`);
+  }
+
+  /**
+   * Toggle Space mode
+   */
+  public toggleSpaceMode(force?: boolean): void {
+    const newState = force !== undefined ? force : !this.state.spaceMode;
+
+    // Trigger audio randomization when enabling
+    if (newState) {
+      if (!this.state.spaceMode) this.randomizeParametersByAudio();
+      this.state.mandalaMode = false;
+    }
+
+    this.state.spaceMode = newState;
+    this.emit('state:changed', this.state);
+    console.log(`🌌 Space Mode: ${this.state.spaceMode ? 'ON' : 'OFF'}`);
+  }
+
+  /**
+   * Toggle antigravity mode
+   */
+  public toggleAntigravityMode(force?: boolean): void {
+    const newState = force !== undefined ? force : !this.state.antigravityMode;
+
+    // Trigger audio randomization when enabling
+    // Trigger audio randomization when enabling
+    if (newState && !this.state.antigravityMode) {
+      this.randomizeParametersByAudio();
+
+      // User Request: "Gravity Mode becomes Mandala" -> Fix by disabling Mandala/Symmetry
+      // Gravity Mode should be independent "Space/Star" mode
+      this.setMandalaMode(false);
+      this.setReflectMode(false);
+      this.state.symmetryEnabled = false;
+    }
+
+    this.state.antigravityMode = newState;
+    this.resetBackgroundIfManual();
+    this.sceneManager.setAntigravityMode(newState);
+    this.emit('state:changed', this.state);
+    console.log(`🚀 Antigravity Mode: ${this.state.antigravityMode ? 'ON' : 'OFF'}`);
+  }
+
+  /**
+   * Toggle 360° orbit mode
+   */
+  public toggleOrbitMode(force?: boolean): void {
+    const newState = force !== undefined ? force : !this.state.orbitMode;
+    this.state.orbitMode = newState;
+    this.sceneManager.setOrbitMode(newState);
+    this.emit('state:changed', this.state);
+    console.log(`◎ Orbit Mode: ${newState ? 'ON' : 'OFF'}`);
+  }
+
+  /**
+   * Toggle spin mode (rotate mandala in place)
+   */
+  public toggleSpinMode(force?: boolean): void {
+    const newState = force !== undefined ? force : !this.state.spinMode;
+    this.state.spinMode = newState;
+    this.emit('state:changed', this.state);
+    console.log(`⟳ Spin Mode: ${newState ? 'ON' : 'OFF'}`);
+  }
+
+  /**
+   * Toggle baryon mode (heavy particle objects scattered across canvas)
+   */
+  public toggleBaryonMode(force?: boolean): void {
+    const newState = force !== undefined ? force : !this.state.baryonMode;
+    this.state.baryonMode = newState;
+    this.sceneManager.setBaryonMode(newState);
+
+    if (newState) {
+      // Disable mandala/symmetry — baryon is free-form scatter
+      this.setMandalaMode(false);
+      this.setReflectMode(false);
+      this.state.symmetryEnabled = false;
+
+      // Black background
+      this.sceneManager.setBackgroundColor({ r: 0, g: 0, b: 0 });
+
+      // White objects
+      this.defaultObjectColor = { r: 255, g: 255, b: 255 };
+
+      // Wide spread for full-canvas scatter
+      this.state.spreadMultiplier = 3.0;
+      this.state.spacingMultiplier = 15.0;
+
+      // Auto-enable orbit for XYZ rotation
+      this.toggleOrbitMode(true);
+
+      // Spawn scattered objects to fill the space
+      const currentCount = this.instanceManager.getAllInstances().length;
+      const targetCount = 30; // Good number for scattered display
+      for (let i = currentCount; i < targetCount; i++) {
+        this.addRandomInstance();
+      }
+
+      // Save original colors and set all existing objects to white
+      this.preBaryonColors.clear();
+      this.instanceManager.getAllInstances().forEach(inst => {
+        this.preBaryonColors.set(inst.id, inst.color ? { ...inst.color } : null);
+        inst.color = { r: 255, g: 255, b: 255 };
+      });
+      this.sceneManager.clearMeshCache();
+    } else {
+      // Restore defaults
+      this.defaultObjectColor = { r: 51, g: 51, b: 51 };
+      this.state.spreadMultiplier = 1.0;
+      this.state.spacingMultiplier = 8.0;
+
+      // Restore white background
+      this.sceneManager.setBackgroundColor({ r: 255, g: 255, b: 255 });
+
+      // Restore object colors to their original state (or dark default if not saved)
+      this.instanceManager.getAllInstances().forEach(inst => {
+        if (this.preBaryonColors.has(inst.id)) {
+          inst.color = this.preBaryonColors.get(inst.id) || null;
+        } else {
+          inst.color = { r: 51, g: 51, b: 51 };
+        }
+      });
+      this.preBaryonColors.clear();
+      this.sceneManager.clearMeshCache();
+
+      // Turn off orbit if it was auto-enabled
+      this.toggleOrbitMode(false);
+    }
+
+    this.emit('state:changed', this.state);
+    console.log(`⊛ Baryon Mode: ${newState ? 'ON' : 'OFF'}`);
+  }
+
+  /**
+   * Set VJ mode (black background, white objects for dark venues)
+   */
+  public setVJMode(enabled: boolean): void {
+    if (enabled) {
+      // VJ Mode ON: Black background, white objects
+      this.sceneManager.setBackgroundColor({ r: 0, g: 0, b: 0 });
+      this.setDefaultObjectColor({ r: 255, g: 255, b: 255 });
+
+      // Update all existing instances to white
+      const instances = this.instanceManager.getAllInstances();
+      instances.forEach(instance => {
+        instance.color = { r: 255, g: 255, b: 255 };
+      });
+
+      // Clear mesh cache to force rebuild with new colors
+      this.sceneManager.clearMeshCache();
+
+      console.log('🎪 VJ Mode: ON (Black background, White objects)');
+    } else {
+      // VJ Mode OFF: Reset to default (light background, black objects)
+      this.sceneManager.setBackgroundColor({ r: 245, g: 245, b: 245 });
+      this.setDefaultObjectColor(null); // null = use material's default color
+
+      // Update all existing instances to default colors
+      const instances = this.instanceManager.getAllInstances();
+      instances.forEach(instance => {
+        instance.color = null;
+      });
+
+      // Clear mesh cache to force rebuild with new colors
+      this.sceneManager.clearMeshCache();
+
+      console.log('🎪 VJ Mode: OFF (Default colors)');
+    }
+  }
+
+  // ========== VJ Pro Controls ==========
+
+  /**
+   * Set master intensity (overall brightness multiplier)
+   */
+  public setMasterIntensity(value: number): void {
+    this.visualControls.masterIntensity = Math.max(0, Math.min(200, value));
+    this.applyVisualFilters();
+  }
+
+  /**
+   * Set brightness adjustment
+   */
+  public setBrightness(value: number): void {
+    this.visualControls.brightness = Math.max(50, Math.min(150, value));
+    this.applyVisualFilters();
+  }
+
+  /**
+   * Set contrast adjustment
+   */
+  public setContrast(value: number): void {
+    this.visualControls.contrast = Math.max(50, Math.min(150, value));
+    this.applyVisualFilters();
+  }
+
+  /**
+   * Set saturation adjustment
+   */
+  public setSaturation(value: number): void {
+    this.visualControls.saturation = Math.max(0, Math.min(200, value));
+    this.applyVisualFilters();
+  }
+
+  /**
+   * Apply visual filters to canvas
+   */
+  private applyVisualFilters(): void {
+    const canvas = this.sceneManager.getRenderer()?.domElement;
+    if (!canvas) return;
+
+    const { masterIntensity, brightness, contrast, saturation } = this.visualControls;
+
+    // Combine all filters
+    const filters = [
+      `brightness(${(brightness * masterIntensity) / 10000})`,
+      `contrast(${contrast}%)`,
+      `saturate(${saturation}%)`
+    ];
+
+    canvas.style.filter = filters.join(' ');
+  }
+
+  /**
+   * Update performance statistics
+   */
+  public updatePerformanceStats(): void {
+    const now = performance.now();
+    const deltaTime = now - this.performanceStats.lastFrameTime;
+
+    if (deltaTime > 0) {
+      this.performanceStats.fps = Math.round(1000 / deltaTime);
+      this.performanceStats.frameTime = deltaTime;
+    }
+
+    this.performanceStats.lastFrameTime = now;
+  }
+
+  /**
+   * Get performance statistics
+   */
+  public getPerformanceStats() {
+    return {
+      fps: this.performanceStats.fps,
+      frameTime: this.performanceStats.frameTime,
+      objectCount: this.instanceManager.getAllInstances().length
+    };
+  }
+
+  /**
+   * Calculate application score based on various metrics
+   */
+  public getApplicationScore() {
+    const instances = this.instanceManager.getAllInstances();
+    const objectCount = instances.length;
+    const maxObjects = this.instanceManager.getMaxObjects();
+    const bpm = this.audioManager.getEstimatedBPM();
+
+    // 1. PERFORMANCE SCORE (0-100)
+    // Based on FPS and frame time
+    let performanceScore = 0;
+    const fps = this.performanceStats.fps;
+    if (fps >= 60) {
+      performanceScore = 100;
+    } else if (fps >= 50) {
+      performanceScore = 80 + ((fps - 50) / 10) * 20;
+    } else if (fps >= 30) {
+      performanceScore = 50 + ((fps - 30) / 20) * 30;
+    } else {
+      performanceScore = (fps / 30) * 50;
+    }
+
+    // 2. COMPLEXITY SCORE (0-100)
+    // Based on object count, mandala mode, symmetry, and effects
+    let complexityScore = 0;
+
+    // Object count contribution (40 points max)
+    const objectRatio = Math.min(objectCount / 50, 1); // Cap at 50 objects for scoring
+    complexityScore += objectRatio * 40;
+
+    // Mandala mode contribution (20 points)
+    if (this.state.mandalaMode) {
+      complexityScore += 10;
+      // Symmetry bonus (10 points max)
+      const symmetryRatio = Math.min(this.state.symmetryCount / 12, 1);
+      complexityScore += symmetryRatio * 10;
+    }
+
+    // Effects contribution (40 points)
+    let effectsCount = 0;
+    if (this.state.spaceMode) effectsCount += 2; // AI mode is complex
+    if (this.state.autoGenerateMode) effectsCount += 1;
+    if (this.state.frequencySpawnMode) effectsCount += 1.5; // Audio-reactive
+    if (this.state.goldenRatioMode) effectsCount += 1;
+    if (this.state.antigravityMode) effectsCount += 1;
+
+    complexityScore += Math.min(effectsCount / 6.5, 1) * 40;
+
+    // 3. AUDIO SYNC SCORE (0-100)
+    // Based on BPM detection and audio reactivity
+    let audioScore = 0;
+
+    // BPM detection (50 points)
+    if (bpm > 60 && bpm < 180) {
+      audioScore += 50; // Valid BPM detected
+    } else if (bpm >= 60) {
+      audioScore += 25; // BPM detected but out of typical range
+    }
+
+    // Audio playing (20 points)
+    if (this.state.isPlaying) {
+      audioScore += 20;
+    }
+
+    // Audio-reactive features (30 points)
+    if (this.state.frequencySpawnMode) {
+      audioScore += 15;
+    }
+    if (this.state.spaceMode && this.state.isPlaying) {
+      audioScore += 15; // AI responds to audio
+    }
+
+    // 4. CREATIVITY SCORE (0-100)
+    // Based on unique features and combinations
+    let creativityScore = 0;
+
+    // Golden ratio usage (20 points)
+    if (this.state.goldenRatioMode) {
+      creativityScore += 20;
+    }
+
+    // AI mode usage (30 points)
+    if (this.state.spaceMode) {
+      creativityScore += 30;
+    }
+
+    // Mandala + effects combination (25 points)
+    if (this.state.mandalaMode && (this.state.goldenRatioMode || this.state.antigravityMode)) {
+      creativityScore += 25;
+    }
+
+    // Max objects limit pushing boundaries (25 points)
+    if (maxObjects >= 100) {
+      creativityScore += 25;
+    } else if (maxObjects >= 50) {
+      creativityScore += 15;
+    }
+
+    // TOTAL SCORE (average of all categories)
+    const totalScore = Math.round(
+      (performanceScore + complexityScore + audioScore + creativityScore) / 4
+    );
+
+    return {
+      total: totalScore,
+      performance: Math.round(performanceScore),
+      complexity: Math.round(complexityScore),
+      audioSync: Math.round(audioScore),
+      creativity: Math.round(creativityScore),
+      details: {
+        fps: this.performanceStats.fps,
+        objectCount,
+        maxObjects,
+        bpm,
+        mandalaMode: this.state.mandalaMode,
+        symmetryCount: this.state.symmetryCount,
+        aiMode: this.state.spaceMode,
+        autoGenerateMode: this.state.autoGenerateMode,
+        frequencySpawnMode: this.state.frequencySpawnMode,
+        goldenRatioMode: this.state.goldenRatioMode,
+        antigravityMode: this.state.antigravityMode,
+        isPlaying: this.state.isPlaying
+      }
+    };
+  }
+
+  /**
+   * Start recording canvas output
+   */
+  public startRecording(): boolean {
+    const canvas = this.sceneManager.getRenderer()?.domElement;
+    if (!canvas) return false;
+
+    try {
+      const stream = canvas.captureStream(60); // 60 FPS
+      this.mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'video/webm;codecs=vp9',
+        videoBitsPerSecond: 8000000 // 8 Mbps
+      });
+
+      this.recordedChunks = [];
+
+      this.mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          this.recordedChunks.push(event.data);
+        }
+      };
+
+      this.mediaRecorder.onstop = () => {
+        const blob = new Blob(this.recordedChunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `mandala-vj-${Date.now()}.webm`;
+        a.click();
+        URL.revokeObjectURL(url);
+        console.log('🎥 Recording saved');
+      };
+
+      this.mediaRecorder.start();
+      console.log('🎥 Recording started');
+      return true;
+    } catch (error) {
+      console.error('❌ Recording failed:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Stop recording
+   */
+  public stopRecording(): void {
+    if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+      this.mediaRecorder.stop();
+      this.mediaRecorder = null;
+    }
+  }
+
+  /**
+   * Check if currently recording
+   */
+  public isRecording(): boolean {
+    return this.mediaRecorder !== null && this.mediaRecorder.state === 'recording';
+  }
+
+  // ========== AI Features ==========
+
+  /**
+   * Get AI-suggested next material based on learning
+   */
+  public getAISuggestedMaterial(): number {
+    const currentInstances = this.instanceManager.getAllInstances();
+    return this.neuralLearner.predictNext(currentInstances);
+  }
+
+  /**
+   * Get AI learning statistics
+   */
+  public getAIStatistics() {
+    return this.neuralLearner.getStatistics();
+  }
+
+  /**
+   * Get user profile from AI learner
+   */
+  public getAIUserProfile() {
+    return this.neuralLearner.getUserProfile();
+  }
+
+  /**
+   * Reset AI learning data
+   */
+  public resetAILearning(): void {
+    this.neuralLearner.reset();
+  }
+
+
+
+  // ========== Private Helper Methods ==========
+
+  /**
+   * Start automatic snapshot recording (disabled - AI features removed)
+   */
+  private startSnapshotRecording(): void {
+    // Disabled - TimeTravelEngine removed
+  }
+
+
+
+  /**
+   * Dispose resources
+   */
+  public dispose(): void {
+    this.stop();
+
+    if (this.snapshotInterval) {
+      clearInterval(this.snapshotInterval);
+      this.snapshotInterval = null;
+    }
+
+    this.audioManager.dispose();
+    this.instanceManager.dispose();
+    this.sceneManager.dispose();
+    this.removeAllListeners();
+  }
+  public getSceneManager(): SceneManager {
+    return this.sceneManager;
+  }
+
+  // ========== New Effect Control Methods ==========
+
+  public setGlobalEffect(effect: keyof ApplicationState['globalEffects'], enabled: boolean): void {
+    this.state.globalEffects[effect] = enabled;
+    this.processingLayer.updateGlobalEffects(this.state.globalEffects);
+    this.emit('state:changed', this.state);
+  }
+
+  public toggleGlobalEffect(effect: keyof ApplicationState['globalEffects']): void {
+    this.state.globalEffects[effect] = !this.state.globalEffects[effect];
+    this.processingLayer.updateGlobalEffects(this.state.globalEffects);
+
+    if (effect === 'mosaic') {
+      // this.sceneManager.setMosaic(this.state.globalEffects.mosaic); // TODO: implement setMosaic
+    }
+
+    this.emit('state:changed', this.state);
+  }
+
+  public setDJNameEffect(effect: ApplicationState['djNameEffect']): void {
+    this.state.djNameEffect = effect;
+    this.processingLayer.updateDJNameEffect(effect);
+    this.emit('state:changed', this.state);
+  }
+
+  public setGlitchMode(enabled: boolean): void {
+    this.state.glitchMode = enabled;
+    this.setGlobalEffect('glitch', enabled);
+  }
+
+  public setHassanMode(enabled: boolean): void {
+    this.state.hassanMode = enabled;
+    this.setGlobalEffect('hassan', enabled);
+  }
+
+  private handleGlitchMode(): void {
+    if (!this.state.glitchMode || !this.state.isPlaying) return;
+    const bands = this.getCurrentFrequencyBands();
+    const intensity = bands.low / 255;
+
+    // Trigger intense glitch bursts on strong beats
+    if (intensity > 0.85) {
+      this.processingLayer.updateGlobalEffects({ glitch: true });
+    } else if (intensity < 0.4) {
+      if (Math.random() > 0.95) {
+        this.processingLayer.updateGlobalEffects({ glitch: false });
+      }
+    }
+  }
+
+  private handleHassanMode(): void {
+    if (!this.state.hassanMode || !this.state.isPlaying) return;
+    const bands = this.getCurrentFrequencyBands();
+    const intensity = bands.low / 255;
+
+    if (intensity > 0.8) {
+      const originalSpacing = this.state.spacingMultiplier;
+      const originalSpread = this.state.spreadMultiplier;
+
+      this.state.spacingMultiplier = originalSpacing * (1 + intensity * 0.5);
+      this.state.spreadMultiplier = originalSpread * (1 + intensity * 0.3);
+
+      setTimeout(() => {
+        this.state.spacingMultiplier = originalSpacing;
+        this.state.spreadMultiplier = originalSpread;
+      }, 100);
+    }
+  }
+}

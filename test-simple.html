@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Test - Mandala Machine</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: monospace;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        #canvasContainer {
+            width: 800px;
+            height: 600px;
+            background: #000;
+            border: 2px solid #0f0;
+            margin: 20px 0;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #0f0;
+            background: #2a2a2a;
+        }
+        .error {
+            border-left-color: #f00;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #0f0;
+            border: none;
+            color: #000;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Mandala Machine - Simple Test</h1>
+
+    <div id="status"></div>
+
+    <div>
+        <button onclick="testAddObject()">Add Object</button>
+        <button onclick="testToggleMandala()">Toggle Mandala</button>
+        <button onclick="testClear()">Clear All</button>
+    </div>
+
+    <div id="canvasContainer"></div>
+
+    <div id="info">
+        <h3>Console Output:</h3>
+        <div id="console"></div>
+    </div>
+
+    <script type="module">
+        const statusDiv = document.getElementById('status');
+        const consoleDiv = document.getElementById('console');
+
+        function log(message, isError = false) {
+            const div = document.createElement('div');
+            div.className = isError ? 'status error' : 'status';
+            div.textContent = `${isError ? '❌' : '✅'} ${message}`;
+            statusDiv.appendChild(div);
+            consoleDiv.innerHTML += `${message}<br>`;
+            console.log(message);
+        }
+
+        // Console hijack
+        const originalLog = console.log;
+        const originalError = console.error;
+        console.log = (...args) => {
+            originalLog.apply(console, args);
+            consoleDiv.innerHTML += args.join(' ') + '<br>';
+        };
+        console.error = (...args) => {
+            originalError.apply(console, args);
+            consoleDiv.innerHTML += '<span style="color: red;">' + args.join(' ') + '</span><br>';
+        };
+
+        let app = null;
+
+        try {
+            log('Step 1: Importing Application...');
+            const { Application } = await import('/src/core/Application.ts');
+            log('✓ Application imported');
+
+            log('Step 2: Creating Application instance...');
+            app = new Application('canvasContainer');
+            log('✓ Application created');
+
+            log('Step 3: Starting Application...');
+            app.start();
+            log('✓ Application started');
+
+            log('Step 4: Adding test object...');
+            const instance = app.addInstance(0);
+            log(`✓ Object added: #${instance.id}`);
+
+            // Expose to window
+            window.app = app;
+
+            log('🎉 ALL TESTS PASSED!');
+
+        } catch (error) {
+            log(`FATAL ERROR: ${error.message}`, true);
+            console.error('Full error:', error);
+        }
+
+        // Global test functions
+        window.testAddObject = () => {
+            if (!app) {
+                alert('App not initialized!');
+                return;
+            }
+            const material = Math.floor(Math.random() * 23);
+            app.addInstance(material);
+            log(`Added material #${material}`);
+        };
+
+        window.testToggleMandala = () => {
+            if (!app) return;
+            app.toggleMandalaMode();
+            log('Toggled Mandala mode');
+        };
+
+        window.testClear = () => {
+            if (!app) return;
+            app.clearAll();
+            log('Cleared all objects');
+        };
+    </script>
+</body>
+</html>
