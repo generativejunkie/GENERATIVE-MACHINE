@@ -40,6 +40,9 @@ export const CONFIG = {
         ['#74B9FF', '#A29BFE', '#FD79A8', '#FDCB6E', '#00CEC9'],
         ['#00B894', '#00CEC9', '#0984E3', '#6C5CE7', '#FD79A8'],
         ['#E17055', '#FDCB6E', '#00B894', '#74B9FF', '#A29BFE'],
-        ['#2D3436', '#636E72', '#B2BEC3', '#DFE6E9', '#FFFFFF']
+        ['#2D3436', '#636E72', '#B2BEC3', '#DFE6E9', '#FFFFFF'],
+        ['#FF0055', '#00FFCC', '#3300FF', '#FFFF00', '#FF00FF'], // Cyberpunk
+        ['#2C3E50', '#E74C3C', '#ECF0F1', '#3498DB', '#2980B9'], // Nordic Sea
+        ['#FF5F6D', '#FFC371', '#BDC3C7', '#2C3E50', '#4CA1AF']  // Sunset Glow
     ]
 };

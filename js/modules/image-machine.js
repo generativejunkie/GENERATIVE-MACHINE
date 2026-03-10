@@ -1175,13 +1175,32 @@ export const imageMachineSketch = (p) => {
         if (useColorMode) {
             // Color pattern mosaic
             const colors = Array.isArray(content) ? content : colorPatterns[0];
+            const mosaicType = p.floor(p.random(4)); // 0: Rect, 1: Circle, 2: Diamond, 3: Triangle
+
             for (let y = 0; y < p.height; y += mosaicSize) {
                 for (let x = 0; x < p.width; x += mosaicSize) {
                     const colorIndex = p.floor(p.random(colors.length));
                     p.fill(colors[colorIndex]);
                     p.noStroke();
-                    // Draw circle mosaic
-                    p.ellipse(x + mosaicSize / 2, y + mosaicSize / 2, mosaicSize, mosaicSize);
+
+                    if (mosaicType === 1) {
+                        p.ellipse(x + mosaicSize / 2, y + mosaicSize / 2, mosaicSize, mosaicSize);
+                    } else if (mosaicType === 2) {
+                        p.push();
+                        p.translate(x + mosaicSize / 2, y + mosaicSize / 2);
+                        p.rotate(p.QUARTER_PI);
+                        p.rectMode(p.CENTER);
+                        p.rect(0, 0, mosaicSize * 0.7, mosaicSize * 0.7);
+                        p.pop();
+                    } else if (mosaicType === 3) {
+                        p.triangle(
+                            x, y + mosaicSize,
+                            x + mosaicSize / 2, y,
+                            x + mosaicSize, y + mosaicSize
+                        );
+                    } else {
+                        p.rect(x, y, mosaicSize, mosaicSize);
+                    }
                 }
             }
         } else if (content) {
@@ -1192,6 +1211,7 @@ export const imageMachineSketch = (p) => {
             const scaledH = content.height * scale;
             const offsetX = (p.width - scaledW) / 2;
             const offsetY = (p.height - scaledH) / 2;
+            const mosaicType = p.floor(p.random(4));
 
             for (let y = 0; y < p.height; y += mosaicSize) {
                 for (let x = 0; x < p.width; x += mosaicSize) {
@@ -1199,12 +1219,32 @@ export const imageMachineSketch = (p) => {
                     const imgX = p.floor((x - offsetX) / scale);
                     const imgY = p.floor((y - offsetY) / scale);
 
-                    if (imgX >= 0 && imgX < content.width && imgY >= 0 && imgY < content.height) {
-                        const c = content.get(imgX, imgY);
-                        p.fill(c);
+                    if (content.pixels && imgX >= 0 && imgX < content.width && imgY >= 0 && imgY < content.height) {
+                        const index = (imgX + imgY * content.width) * 4;
+                        const r = content.pixels[index];
+                        const g = content.pixels[index + 1];
+                        const b = content.pixels[index + 2];
+                        p.fill(r, g, b);
                         p.noStroke();
-                        // Draw circle mosaic
-                        p.ellipse(x + mosaicSize / 2, y + mosaicSize / 2, mosaicSize, mosaicSize);
+
+                        if (mosaicType === 1) {
+                            p.ellipse(x + mosaicSize / 2, y + mosaicSize / 2, mosaicSize, mosaicSize);
+                        } else if (mosaicType === 2) {
+                            p.push();
+                            p.translate(x + mosaicSize / 2, y + mosaicSize / 2);
+                            p.rotate(p.QUARTER_PI);
+                            p.rectMode(p.CENTER);
+                            p.rect(0, 0, mosaicSize * 0.7, mosaicSize * 0.7);
+                            p.pop();
+                        } else if (mosaicType === 3) {
+                            p.triangle(
+                                x, y + mosaicSize,
+                                x + mosaicSize / 2, y,
+                                x + mosaicSize, y + mosaicSize
+                            );
+                        } else {
+                            p.rect(x, y, mosaicSize, mosaicSize);
+                        }
                     }
                 }
             }
@@ -1406,7 +1446,7 @@ export const imageMachineSketch = (p) => {
                 } else { continue; }
                 const brightness = (r + g + b) / 3;
                 const charIdx = p.floor(p.map(brightness, 0, 255, 0, chars.length - 1));
-                p.fill(r, g, b, fade * 255);
+                p.fill(255, (brightness / 255) * fade * 255); // Changed to White with brightness alpha
                 p.text(chars[charIdx], x + gridSize / 2, y + gridSize / 2);
             }
         }
@@ -1465,7 +1505,7 @@ export const imageMachineSketch = (p) => {
         const fade = isDecay ? (1 - progress) : progress;
         p.tint(255, fade * 255);
         p.image(content, 0, 0, p.width, p.height);
-        p.stroke(0, 255, 100, fade * 255);
+        p.stroke(255, fade * 255); // Changed from Green to White
         p.strokeWeight(2);
         p.line(0, scanY, p.width, scanY);
         if (p.random() > 0.8) {
@@ -1513,7 +1553,7 @@ export const imageMachineSketch = (p) => {
                     r = content.pixels[idx]; g = content.pixels[idx + 1]; b = content.pixels[idx + 2];
                 } else { continue; }
                 const brightness = (r + g + b) / 3;
-                p.fill(0, 255, 100, fade * 255);
+                p.fill(255, fade * 255); // Changed from Green to White
                 p.text(brightness > 127 ? "1" : "0", x + gridSize / 2, y + gridSize / 2);
             }
         }
