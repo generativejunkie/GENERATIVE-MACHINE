@@ -65,6 +65,7 @@ export const imageMachineSketch = (p) => {
     let autoMode = false;
     let lastAutoSwitchTime = 0;
     let autoSwitchInterval = 8000; // 8 seconds default
+    let typedBuffer = ''; // Buffer for secret codes (void, high, ai)
 
     p.setup = () => {
         try {
@@ -1672,6 +1673,22 @@ export const imageMachineSketch = (p) => {
             }
         }
 
+        // Collect characters for secret codes
+        if (p.key.length === 1 && !waitingForInput) {
+            typedBuffer += p.key.toLowerCase();
+            if (typedBuffer.length > 10) typedBuffer = typedBuffer.substring(1);
+
+            if (typedBuffer.endsWith('void') || typedBuffer.endsWith('ai')) {
+                console.log("SECRET TRIGGERED: VOID");
+                p.triggerSecret('void');
+                typedBuffer = '';
+            } else if (typedBuffer.endsWith('high')) {
+                console.log("SECRET TRIGGERED: HIGH");
+                p.triggerSecret('high');
+                typedBuffer = '';
+            }
+        }
+
         // Handle spacebar for image switching
         if (p.key === ' ' || p.keyCode === 32) {
             handleInteraction();
@@ -1697,9 +1714,8 @@ export const imageMachineSketch = (p) => {
                 charIndex = 0;
             }
         } else if (currentInputType === 'capsule') {
-            // Capsule choice - handle redirect
-            userInput = key;
             const result = handleCapsuleChoice(key);
+            userInput = key;
 
             if (result === 'mix') {
                 // MIX capsule chosen - continue to VOID mode
@@ -1711,16 +1727,11 @@ export const imageMachineSketch = (p) => {
                     dialogueIndex++;
                     charIndex = 0;
                 } else {
-                    //Already at end, transition out of terminal
-
-                    // FORCE SHOW PHOTO332 for MIX choice
-
-                    // Trigger MIX Noise transition -> leading to MIX Mode
+                    // Already at end, transition out of terminal
                     animationState = 'mix_noise';
                     animationFrame = 0;
                 }
             }
-            // For WHITE/BLACK, redirect happens in handleCapsuleChoice
         }
 
         currentInputType = null;
