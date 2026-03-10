@@ -29,7 +29,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         index: path.resolve(__dirname, 'index.html'),
-        mandara: path.resolve(__dirname, 'mandara.html'),
+
       }
     }
   }

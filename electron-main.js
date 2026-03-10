@@ -44,7 +44,7 @@ function createProjectorWindow() {
     };
 
     projectorWindow = new BrowserWindow(windowOptions);
-    projectorWindow.loadFile('mandaramachine.html', { query: { "projector": "true" } });
+    projectorWindow.loadFile('index.html', { query: { "projector": "true" } });
     projectorWindow.on('closed', () => { projectorWindow = null; });
 }
 
@@ -68,7 +68,7 @@ function createWindow() {
         }
     });
 
-    mainWindow.loadFile('mandaramachine.html');
+    mainWindow.loadFile('index.html');
     mainWindow.maximize();
 
     mainWindow.on('closed', function () {
