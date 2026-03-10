@@ -4,8 +4,10 @@
   "description": "The anomaly born from the code. An interactive ecosystem where human intuition overrides machine logic. Orchestrated by ILLEND (The Singularity).",
   "main": "index.js",
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "start": "node bridge-server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "electron": "electron electron-main.js"
   },
   "repository": {
@@ -34,6 +36,7 @@
     "socket.io": "^4.8.3"
   },
   "devDependencies": {
-    "electron": "^40.8.0"
+    "electron": "^40.8.0",
+    "vite": "^5.0.10"
   }
 }
