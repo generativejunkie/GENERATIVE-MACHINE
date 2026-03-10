@@ -64,7 +64,7 @@ export const typingObserver = new IntersectionObserver((entries) => {
             typeText(entry.target, text, 50, loop);
         }
     });
-}, { threshold: 0.5 });
+}, { threshold: 0.1 });
 
 export function initHero() {
     const descEl = document.getElementById('description-text');
@@ -74,8 +74,12 @@ export function initHero() {
     const manifestoEl = document.getElementById('manifesto-text');
     const footerEl = document.getElementById('footer-text');
 
-    // Wait for fonts to load for accurate height calculation
-    document.fonts.ready.then(() => {
+    // Wait for fonts to load for accurate height calculation with fallback
+    const startInit = () => {
+        if (window._heroInitialized) return;
+        window._heroInitialized = true;
+        console.log('[HERO] Initializing typing animations...');
+
         if (descEl) {
             descEl.dataset.text = 'Exploring algorithmic beauty and the emotional resonance of machine intelligence.\nPrompt engineering as an art form.';
             descEl.dataset.loop = 'true';
@@ -163,5 +167,11 @@ export function initHero() {
                 });
             }, 250);
         });
-    });
+    };
+
+    // Try to init after fonts are ready, but fallback to 1s timeout
+    if (document.fonts) {
+        document.fonts.ready.then(startInit);
+    }
+    setTimeout(startInit, 1500);
 }

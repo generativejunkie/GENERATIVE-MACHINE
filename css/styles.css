@@ -2,10 +2,8 @@
 :root {
     --color-bg-primary: #ffffff;
     --color-bg-secondary: #f8f8f8;
-    /* Slightly more subtle gray */
     --color-bg-tertiary: #f2f2f2;
     --color-text-primary: #111111;
-    /* Softer black */
     --color-text-secondary: #555555;
     --color-text-tertiary: #888888;
     --color-accent: #000000;

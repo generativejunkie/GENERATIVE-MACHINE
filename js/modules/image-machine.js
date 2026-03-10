@@ -1856,7 +1856,7 @@ export const imageMachineSketch = (p) => {
     }
 
     function drawSuperHigh() {
-        p.background(0);
+        p.background(255);
 
         // Rapid image switching
         if (p.frameCount % 15 === 0) {

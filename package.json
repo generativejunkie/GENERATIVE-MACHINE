@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node bridge-server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "electron": "electron electron-main.js"
   },
   "repository": {
     "type": "git",
@@ -31,5 +32,8 @@
     "dotenv": "^16.4.7",
     "express": "^5.2.1",
     "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
+    "electron": "^40.8.0"
   }
 }
