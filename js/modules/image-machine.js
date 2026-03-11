@@ -1746,11 +1746,9 @@ export const imageMachineSketch = (p) => {
     let scrollOffset = 0;
 
     function drawTerminal() {
-        // Because the site is GLOBALLY INVERTED, we must draw:
-        // Background: WHITE (255) -> appears BLACK
-        // Text: BLACK (0) -> appears WHITE
-        p.background(255);
-        p.fill(0);
+        // TERMINAL RENDERING: Black background, white text
+        p.background(0);
+        p.fill(255);
 
         p.noStroke();
         p.textFont('Courier New, monospace');
@@ -1940,8 +1938,37 @@ export const imageMachineSketch = (p) => {
             animationState = 'pre_terminal_noise';
             animationFrame = 0;
 
-            // GOD SPEED: Invert colors to create BLACK terminal world
-            document.documentElement.style.filter = 'invert(1)';
+            // BLACK & WHITE MOSAIC WORLD with Darkening Filter
+            // Removing old invert(1) and substituting full black-screen + UI takeover filter
+            let mosaicLayer = document.getElementById('void-mosaic-layer');
+            if (!mosaicLayer) {
+                mosaicLayer = document.createElement('div');
+                mosaicLayer.id = 'void-mosaic-layer';
+                mosaicLayer.style.position = 'fixed';
+                mosaicLayer.style.top = '0';
+                mosaicLayer.style.left = '0';
+                mosaicLayer.style.width = '100vw';
+                mosaicLayer.style.height = '100vh';
+                mosaicLayer.style.pointerEvents = 'none';
+                mosaicLayer.style.zIndex = '900'; // Under the prompt, over the canvas
+
+                // Black and white checkerboard mosaic pattern
+                mosaicLayer.style.backgroundImage = `
+                    linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000),
+                    linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000)
+                `;
+                mosaicLayer.style.backgroundSize = '16px 16px';
+                mosaicLayer.style.backgroundPosition = '0 0, 8px 8px';
+                mosaicLayer.style.opacity = '0.85'; // Deep darkening
+
+                // Dim the layer beneath to true black/white
+                mosaicLayer.style.backdropFilter = 'grayscale(1) brightness(0.3) blur(2px)';
+                mosaicLayer.style.setProperty('-webkit-backdrop-filter', 'grayscale(1) brightness(0.3) blur(2px)');
+
+                document.body.appendChild(mosaicLayer);
+            }
+            mosaicLayer.style.display = 'block';
+
             document.body.style.backgroundColor = '#000000'; // Force backdrop color
 
             // Show backdoor link
@@ -1986,6 +2013,8 @@ export const imageMachineSketch = (p) => {
             document.documentElement.style.filter = 'none';
             document.documentElement.style.backgroundColor = '';
             document.body.style.backgroundColor = '';
+            const mosaicLayer = document.getElementById('void-mosaic-layer');
+            if (mosaicLayer) mosaicLayer.style.display = 'none';
 
             // Restore original background colors
             document.documentElement.style.removeProperty('--color-bg-secondary');

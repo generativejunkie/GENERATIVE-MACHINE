@@ -2392,8 +2392,36 @@ export class UIController {
   }
 
   private triggerVoidMode(): void {
-    // 1. Visual Inversion
-    document.documentElement.style.filter = 'invert(1) hue-rotate(180deg)';
+    // 1. Black & White Mosaic Overlay and Darken
+    const overlayId = 'void-mosaic-overlay';
+    let overlay = document.getElementById(overlayId);
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = overlayId;
+      overlay.style.position = 'fixed';
+      overlay.style.top = '0';
+      overlay.style.left = '0';
+      overlay.style.width = '100vw';
+      overlay.style.height = '100vh';
+      overlay.style.pointerEvents = 'none';
+      overlay.style.zIndex = '1000'; // Just below UI/Dialogues mostly
+
+      // Black and white checkerboard mosaic pattern
+      overlay.style.backgroundImage = `
+        linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000),
+        linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000)
+      `;
+      overlay.style.backgroundSize = '16px 16px';
+      overlay.style.backgroundPosition = '0 0, 8px 8px';
+      overlay.style.opacity = '0.85'; // High opacity to darken the screen heavily
+
+      // Backdrop filter to make everything underneath black and white
+      overlay.style.backdropFilter = 'grayscale(1) brightness(0.3) blur(2px)';
+      overlay.style.setProperty('-webkit-backdrop-filter', 'grayscale(1) brightness(0.3) blur(2px)');
+
+      document.body.appendChild(overlay);
+    }
+    overlay.style.display = 'block';
 
     // 2. Show Dialogue
     const container = document.getElementById('voidDialogueContainer');
@@ -2470,7 +2498,8 @@ export class UIController {
 
     setTimeout(() => {
       document.getElementById('voidDialogueContainer')?.classList.add('hidden');
-      document.documentElement.style.filter = '';
+      const overlay = document.getElementById('void-mosaic-overlay');
+      if (overlay) overlay.style.display = 'none';
     }, 5000);
   }
 

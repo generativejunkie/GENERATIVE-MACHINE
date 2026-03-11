@@ -79,9 +79,9 @@ document.addEventListener('DOMContentLoaded', () => {
         'trigger-secret': (detail) => {
             console.log("[SYNC] Trigger Secret:", detail.code);
             if (detail.code === 'void' || detail.code === 'ai') {
-                document.documentElement.style.filter = 'invert(1)';
+                // Handled in image-machine
             } else if (detail.code === 'exit') {
-                document.documentElement.style.filter = 'none';
+                // Handled in image-machine
             }
         },
         'sync-pulse': () => {
@@ -192,16 +192,22 @@ document.addEventListener('DOMContentLoaded', () => {
  * Explicit entry point for VOID mode (Limited Time Event)
  */
 function initVoidNavTrigger() {
-    const trigger = document.getElementById('nav-void-trigger');
-    if (trigger) {
-        trigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            console.log("NAV RITUAL: VOID TRIGGERED");
-            if (window.imageMachine && window.imageMachine.triggerSecret) {
-                window.imageMachine.triggerSecret('void');
-            }
-        });
-    }
+    const triggers = [
+        document.getElementById('nav-void-trigger'),
+        document.getElementById('voidModeBtn') // Added new VOID button support
+    ];
+
+    triggers.forEach(trigger => {
+        if (trigger) {
+            trigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log("RITUAL: VOID TRIGGERED VIA BUTTON");
+                if (window.imageMachine && window.imageMachine.triggerSecret) {
+                    window.imageMachine.triggerSecret('void');
+                }
+            });
+        }
+    });
 }
 
 /**
