@@ -184,32 +184,12 @@ export const imageMachineSketch = (p) => {
 
             switch (animationState) {
                 case 'pre_terminal_noise':
-                    drawPreTerminalNoise();
+                    drawPreTerminalNoise(currentContent);
                     animationFrame++;
-                    // 60fps * 5s = 300 frames
-                    if (animationFrame > 300) {
+                    // 60fps * 1s = 60 frames (shorten noise before terminal)
+                    if (animationFrame > 60) {
                         animationFrame = 0;
                         animationState = 'terminal';
-
-                        // Invert and grayscale the entire site for Terminal Mode
-                        document.documentElement.style.filter = 'invert(1) grayscale(1)';
-
-                        // FORCE PURITY: Set all backgrounds to PURE WHITE so they invert to PURE BLACK
-                        const r = document.documentElement.style;
-                        r.setProperty('--color-bg-primary', '#ffffff');
-                        r.setProperty('--color-bg-secondary', '#ffffff');
-                        r.setProperty('--color-bg-tertiary', '#ffffff');
-                        r.setProperty('--color-text-primary', '#000000');
-                        r.setProperty('--color-text-secondary', '#000000');
-                        r.setProperty('--color-text-tertiary', '#000000');
-
-                        // Force header to pure white (remove transparency for solid black invert)
-                        const header = document.querySelector('.site-header');
-                        if (header) header.style.background = '#ffffff';
-
-                        // To get BLACK background with invert(1), we must set the actual background to WHITE
-                        document.documentElement.style.backgroundColor = '#ffffff';
-                        document.body.style.backgroundColor = '#ffffff';
                     }
                     break;
                 case 'terminal':
@@ -1746,8 +1726,33 @@ export const imageMachineSketch = (p) => {
     let scrollOffset = 0;
 
     function drawTerminal() {
-        // TERMINAL RENDERING: Black background, white text
-        p.background(0);
+        // Draw image, darken, and mosaic
+        if (currentImageKey) {
+            const currentContent = useColorMode ? getColorPattern(currentImageKey) : allImages[currentImageKey];
+            if (currentContent && !useColorMode) {
+                drawImageFullscreen(currentContent);
+            }
+        }
+
+        // Darken the image
+        p.fill(0, 200);
+        p.noStroke();
+        p.rect(0, 0, p.width, p.height);
+
+        // B&W mosaic overlay
+        const blockSize = isTouch() ? 10 : 20;
+        for (let x = 0; x < p.width; x += blockSize) {
+            for (let y = 0; y < p.height; y += blockSize) {
+                if ((Math.floor(x / blockSize) + Math.floor(y / blockSize)) % 2 === 0) {
+                    p.fill(0, 100);
+                } else {
+                    p.fill(255, 20);
+                }
+                p.rect(x, y, blockSize, blockSize);
+            }
+        }
+
+        // Terminal text
         p.fill(255);
 
         p.noStroke();
@@ -1929,47 +1934,9 @@ export const imageMachineSketch = (p) => {
         }
         if (code === 'void' || code === 'ai') {
             console.log("AI TERMINAL ACTIVATED");
-
-            // Play music (Fallback to ambient-loop if desktop-ritual is not available)
-            // For now using ambient-loop.mp3 for all to avoid 404
             playAmbientMusic('ambient-loop.mp3');
-
-            // Start with noise (Mosaic Feedback)
             animationState = 'pre_terminal_noise';
             animationFrame = 0;
-
-            // BLACK & WHITE MOSAIC WORLD with Darkening Filter
-            // Removing old invert(1) and substituting full black-screen + UI takeover filter
-            let mosaicLayer = document.getElementById('void-mosaic-layer');
-            if (!mosaicLayer) {
-                mosaicLayer = document.createElement('div');
-                mosaicLayer.id = 'void-mosaic-layer';
-                mosaicLayer.style.position = 'fixed';
-                mosaicLayer.style.top = '0';
-                mosaicLayer.style.left = '0';
-                mosaicLayer.style.width = '100vw';
-                mosaicLayer.style.height = '100vh';
-                mosaicLayer.style.pointerEvents = 'none';
-                mosaicLayer.style.zIndex = '900'; // Under the prompt, over the canvas
-
-                // Black and white checkerboard mosaic pattern
-                mosaicLayer.style.backgroundImage = `
-                    linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000),
-                    linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000)
-                `;
-                mosaicLayer.style.backgroundSize = '16px 16px';
-                mosaicLayer.style.backgroundPosition = '0 0, 8px 8px';
-                mosaicLayer.style.opacity = '0.85'; // Deep darkening
-
-                // Dim the layer beneath to true black/white
-                mosaicLayer.style.backdropFilter = 'grayscale(1) brightness(0.3) blur(2px)';
-                mosaicLayer.style.setProperty('-webkit-backdrop-filter', 'grayscale(1) brightness(0.3) blur(2px)');
-
-                document.body.appendChild(mosaicLayer);
-            }
-            mosaicLayer.style.display = 'block';
-
-            document.body.style.backgroundColor = '#000000'; // Force backdrop color
 
             // Show backdoor link
             const backdoorLink = document.getElementById('void-backdoor-link');
@@ -2013,8 +1980,6 @@ export const imageMachineSketch = (p) => {
             document.documentElement.style.filter = 'none';
             document.documentElement.style.backgroundColor = '';
             document.body.style.backgroundColor = '';
-            const mosaicLayer = document.getElementById('void-mosaic-layer');
-            if (mosaicLayer) mosaicLayer.style.display = 'none';
 
             // Restore original background colors
             document.documentElement.style.removeProperty('--color-bg-secondary');
@@ -2022,14 +1987,20 @@ export const imageMachineSketch = (p) => {
         }
     };
 
-    function drawPreTerminalNoise() {
-        const blockSize = 10; // Smaller mosaic blocks
+    function drawPreTerminalNoise(content) {
+        if (content && !useColorMode) {
+            drawImageFullscreen(content);
+        }
+
+        // Random glitchy mosaic
+        const blockSize = 15;
         p.noStroke();
         for (let x = 0; x < p.width; x += blockSize) {
             for (let y = 0; y < p.height; y += blockSize) {
-                // Randomly Black or White
-                p.fill(p.random() > 0.5 ? 255 : 0);
-                p.rect(x, y, blockSize, blockSize);
+                if (p.random() > 0.4) {
+                    p.fill(p.random() > 0.5 ? 0 : 255, p.random(100, 200));
+                    p.rect(x, y, blockSize * p.random(0.5, 2), blockSize);
+                }
             }
         }
     }
