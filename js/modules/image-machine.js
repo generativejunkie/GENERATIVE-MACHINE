@@ -186,8 +186,8 @@ export const imageMachineSketch = (p) => {
                 case 'pre_terminal_noise':
                     drawPreTerminalNoise(currentContent);
                     animationFrame++;
-                    // 60fps * 1s = 60 frames (shorten noise before terminal)
-                    if (animationFrame > 60) {
+                    // 60fps * 3s = 180 frames (mosaic before terminal)
+                    if (animationFrame > 180) {
                         animationFrame = 0;
                         animationState = 'terminal';
                     }
@@ -1752,174 +1752,16 @@ export const imageMachineSketch = (p) => {
             }
         }
 
-        // Terminal text
-        p.fill(255);
-
-        p.noStroke();
-        p.textFont('Courier New, monospace');
-
-        // MOBILE READABILITY: Larger font size for better visibility
-        const baseSize = p.width < 400 ? 16 : 14; // Increased from 12 to 16 for mobile
-        p.textSize(baseSize);
-        p.textAlign(p.LEFT, p.TOP);
-        p.textLeading(baseSize * 1.8); // Increased line spacing
-
-        const margin = p.width < 400 ? 20 : 25; // More margin on mobile
-        let x = margin;
-        let y = margin - scrollOffset; // Apply scroll offset
-        const maxW = p.width - (margin * 2);
-
-        // Precise Line Height Tracker with better mobile support
-        const getLineHeight = (str) => {
-            const charWidth = baseSize * 0.5; // Tighter estimate for better wrapping
-            const charsPerLine = Math.floor(maxW / charWidth);
-
-            const paragraphs = str.split('\n');
-            let totalLines = 0;
-
-            paragraphs.forEach(pText => {
-                let visualLength = 0;
-                for (let i = 0; i < pText.length; i++) {
-                    const code = pText.charCodeAt(i);
-                    // More accurate Japanese character width
-                    visualLength += (code > 255 || code === 0x3000) ? 2.0 : 1;
-                }
-                const linesInParagraph = Math.ceil(visualLength / (charsPerLine - 1)) || 1;
-                totalLines += linesInParagraph;
-            });
-
-            return (totalLines * (baseSize * 1.8)); // Increased line spacing
-        };
-
-        const paragraphSpacing = baseSize * 2.0; // Clear, consistent gap between blocks
-
-        const drawWrappedText = (str) => {
-            if (y + 100 > 0 && y < p.height) {
-                p.text(str, x, y, maxW);
-            }
-            y += getLineHeight(str) + paragraphSpacing;
-        };
-
-        // Draw historic log
-        terminalLog.forEach(line => {
-            drawWrappedText(line);
-        });
-
-        // Current typing line logic
-        if (dialogueIndex < AI_DIALOGUE.length) {
-            const currentLineObj = AI_DIALOGUE[dialogueIndex];
-            const speaker = currentLineObj.speaker;
-            const fullText = currentLineObj.text;
-            const currentText = fullText.substring(0, charIndex);
-
-            const labelStr = `[${speaker}] ${currentText}`;
-            let currentBlockHeight = getLineHeight(labelStr);
-
-            // AGGRESSIVE SCROLLING: Keep the typing line visible at all times
-            let bottomThreshold = p.height - (margin * 2);
-            let targetY = y + currentBlockHeight;
-
-            if (targetY > bottomThreshold) {
-                // If the text is overflowing, move the scroll offset to "chase" the bottom
-                let gap = targetY - bottomThreshold;
-                scrollOffset += Math.max(1, gap * 0.15); // Faster chasing
-            }
-
-            // Draw with Cursor
-            const cursorChar = (p.frameCount % 40 < 20) ? '_' : ' ';
-            drawWrappedText(`[${speaker}] ${currentText}${cursorChar}`);
-
-            // Typing logic
-            if (p.millis() - lastTypeTime > typeInterval) {
-                charIndex++;
-                lastTypeTime = p.millis();
-
-                if (charIndex > fullText.length) {
-                    terminalLog.push(`[${speaker}] ${fullText}`);
-
-                    // Check if this line requires input
-                    const currentDialogue = AI_DIALOGUE[dialogueIndex];
-                    if (currentDialogue.waitForInput) {
-                        waitingForInput = true;
-                        currentInputType = currentDialogue.inputType; // 'yn' or 'capsule'
-
-                        // Show appropriate keyboard for mobile
-                        if (isTouch()) {
-                            showInputKeyboard(currentInputType);
-                        }
-                        // Desktop users will use keyboard Y/N or 1/2/3
-                    } else {
-                        // No input required, continue to next line
-                        dialogueIndex++;
-                        charIndex = 0;
-                        lastTypeTime = p.millis() + 1000; // Pause between messages
-                    }
-                } else {
-                    // Input was required, already handled elsewhere
-                }
-            }
-        } else {
-            // Dialogue finished
-            drawWrappedText("SYSTEM: GATE OPENING...");
-            if (y > p.height - (margin * 2)) {
-                scrollOffset += 2;
-            }
-
-            // Initialize lastTypeTime if not set
-            if (lastTypeTime === 0 || p.millis() - lastTypeTime < 0) {
-                lastTypeTime = p.millis();
-            }
-
-            if (p.millis() - lastTypeTime > 3000) {
-                console.log("CRITICAL: EXITING TERMINAL -> REBUILD (Mobile Optimized)");
-
-                // 1. Force state reset
-                animationFrame = 0;
-                terminalLog = []; // Immediate cleanup
-
-                // VOID MODE: Show photo332.webp after terminal
-                const voidImageKey = 'photos/photo332.webp';
-                if (allImages[voidImageKey]) {
-                    currentImageKey = voidImageKey;
-                    useColorMode = false;
-                } else {
-                    // Fallback: try to load it
-                    loadImageDynamically(voidImageKey, (result) => {
-                        if (result.success) {
-                            currentImageKey = result.img.filePath;
-                            useColorMode = false;
-                        } else {
-                            // Final fallback to color mode
-                            useColorMode = true;
-                            currentImageKey = 'color-' + Math.floor(Math.random() * colorPatterns.length);
-                        }
-                    });
-                }
-
-                // IMPORTANT: explicit clear to prevent logic locking
-                nextImageKey = null;
-
-                animationState = 'rebuild';
-
-                // 3. Forced UI Sync
-                const container = document.getElementById('imageCanvas-container');
-                if (container) {
-                    p.resizeCanvas(container.offsetWidth, container.offsetHeight);
-                }
-
-                // 4. Final state cleanup
-                dialogueIndex = 0;
-                charIndex = 0;
-                scrollOffset = 0;
-                lastTypeTime = 0;
-
-                // 5. Wake up engine
-                p.background(255); // Flash white to reset pixels
-                p.loop();
-            }
-        }
+        // (No text or dialogue logic rendered)
     }
 
+    p.toggleVoid = () => {
+        if (animationState === 'terminal' || animationState === 'pre_terminal_noise') {
+            p.triggerSecret('exit');
+        } else {
+            p.triggerSecret('void');
+        }
+    };
 
     p.nextImage = (fromSync = false) => {
         console.log("[IMAGE] Remote Switch Triggered");

@@ -201,8 +201,10 @@ function initVoidNavTrigger() {
         if (trigger) {
             trigger.addEventListener('click', (e) => {
                 e.preventDefault();
-                console.log("RITUAL: VOID TRIGGERED VIA BUTTON");
-                if (window.imageMachine && window.imageMachine.triggerSecret) {
+                console.log("RITUAL: VOID TOGGLED VIA BUTTON");
+                if (window.imageMachine && window.imageMachine.toggleVoid) {
+                    window.imageMachine.toggleVoid();
+                } else if (window.imageMachine && window.imageMachine.triggerSecret) {
                     window.imageMachine.triggerSecret('void');
                 }
             });
