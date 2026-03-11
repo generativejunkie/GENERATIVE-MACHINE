@@ -763,19 +763,19 @@ export class UIController {
 
     // ── Left panel ──────────────────────────────────────────
     const leftToggle = document.getElementById('leftPanelToggle');
-    const leftPanel  = document.getElementById('leftPanel');
+    const leftPanel = document.getElementById('leftPanel');
     if (leftToggle && leftPanel && appRoot) {
       leftToggle.addEventListener('click', () => {
         const collapsed = appRoot.classList.toggle('left-collapsed');
         leftPanel.classList.toggle('panel-collapsed', collapsed);
         leftToggle.textContent = collapsed ? '›' : '‹';
-        leftToggle.style.left  = collapsed ? '12px' : 'calc(var(--left-panel-width) + 12px)';
+        leftToggle.style.left = collapsed ? '12px' : 'calc(var(--left-panel-width) + 12px)';
       });
     }
 
     // ── Right panel ─────────────────────────────────────────
     const rightToggle = document.getElementById('rightPanelToggle');
-    const rightPanel  = document.getElementById('rightPanel');
+    const rightPanel = document.getElementById('rightPanel');
     if (rightToggle && rightPanel && appRoot) {
       rightToggle.addEventListener('click', () => {
         const collapsed = appRoot.classList.toggle('right-collapsed');
@@ -2380,6 +2380,15 @@ export class UIController {
         this.triggerVoidMode();
       }
     });
+
+    // Add listener for explicit UI button
+    const voidBtn = document.getElementById('voidModeBtn');
+    if (voidBtn) {
+      voidBtn.addEventListener('click', () => {
+        console.log('💀 VOID RITUAL DETECTED (via Button)');
+        this.triggerVoidMode();
+      });
+    }
   }
 
   private triggerVoidMode(): void {
@@ -2418,7 +2427,11 @@ export class UIController {
     for (const line of dialogue) {
       const p = document.createElement('div');
       p.className = 'void-line';
-      p.innerHTML = `<span class="speaker">[${line.speaker}]</span> ${line.text}`;
+      const speakerSpan = document.createElement('span');
+      speakerSpan.className = 'speaker';
+      speakerSpan.textContent = `[${line.speaker}]`;
+      p.appendChild(speakerSpan);
+      p.appendChild(document.createTextNode(` ${line.text}`));
       output.appendChild(p);
       if (output) output.scrollTop = output.scrollHeight;
 
@@ -2791,8 +2804,8 @@ export class UIController {
 
   private isTTActive(entry: { startTime: string; endTime: string }): boolean {
     const start = this.parseTimeMin(entry.startTime);
-    const end   = this.parseTimeMin(entry.endTime);
-    const now   = new Date().getHours() * 60 + new Date().getMinutes();
+    const end = this.parseTimeMin(entry.endTime);
+    const now = new Date().getHours() * 60 + new Date().getMinutes();
     if (end > 1440) return now >= start || now < (end - 1440);
     if (end <= start) return now >= start || now < end;
     return now >= start && now < end;
@@ -2830,7 +2843,7 @@ export class UIController {
   }
 
   private updateTTStatus(): void {
-    const nowLabel  = document.getElementById('ttNowLabel');
+    const nowLabel = document.getElementById('ttNowLabel');
     const nextLabel = document.getElementById('ttNextLabel');
     if (!nowLabel || !nextLabel) return;
 
@@ -2844,10 +2857,10 @@ export class UIController {
       if (diff > 0 && diff < minDiff) { minDiff = diff; next = e; }
     }
 
-    nowLabel.textContent  = active
+    nowLabel.textContent = active
       ? '▶ ' + active.djName + '  ' + active.startTime + '–' + active.endTime
       : '— NO ACTIVE DJ —';
-    nowLabel.style.color  = active ? 'var(--text-color)' : 'rgba(255,255,255,0.3)';
+    nowLabel.style.color = active ? 'var(--text-color)' : 'rgba(255,255,255,0.3)';
     nextLabel.textContent = next
       ? 'NEXT › ' + next.djName + '  ' + next.startTime
       : '';
@@ -2864,7 +2877,7 @@ export class UIController {
       row.innerHTML =
         '<span class="tt-entry-name">' + e.djName + '</span>' +
         '<span class="tt-entry-time">' + e.startTime + '</span>' +
-        '<span class="tt-entry-time">' + e.endTime   + '</span>' +
+        '<span class="tt-entry-time">' + e.endTime + '</span>' +
         '<button class="tt-entry-del" data-id="' + e.id + '" title="Delete">×</button>';
       (row.querySelector('.tt-entry-del') as HTMLButtonElement).addEventListener('click', () => {
         this.ttEntries = this.ttEntries.filter(x => x.id !== e.id);
@@ -2901,23 +2914,23 @@ export class UIController {
       }
       if (mode === 'force-off') this.app.toggleShowDJName(false);
     };
-    document.getElementById('ttAutoBtn')?.addEventListener('click',     () => applyOverride('auto'));
-    document.getElementById('ttForceOnBtn')?.addEventListener('click',  () => applyOverride('force-on'));
+    document.getElementById('ttAutoBtn')?.addEventListener('click', () => applyOverride('auto'));
+    document.getElementById('ttForceOnBtn')?.addEventListener('click', () => applyOverride('force-on'));
     document.getElementById('ttForceOffBtn')?.addEventListener('click', () => applyOverride('force-off'));
 
     // Add entry
     document.getElementById('ttAddBtn')?.addEventListener('click', () => {
-      const name  = (document.getElementById('ttNewName')  as HTMLInputElement)?.value.trim();
+      const name = (document.getElementById('ttNewName') as HTMLInputElement)?.value.trim();
       const start = (document.getElementById('ttNewStart') as HTMLInputElement)?.value.trim();
-      const end   = (document.getElementById('ttNewEnd')   as HTMLInputElement)?.value.trim();
+      const end = (document.getElementById('ttNewEnd') as HTMLInputElement)?.value.trim();
       if (!name || !start || !end) return;
       if (!/^\d{1,2}:\d{2}$/.test(start) || !/^\d{1,2}:\d{2}$/.test(end)) {
         alert('時刻は HH:mm 形式で入力してください'); return;
       }
       this.ttEntries.push({ id: 'tt_' + Date.now(), djName: name, startTime: start, endTime: end });
-      (document.getElementById('ttNewName')  as HTMLInputElement).value = '';
+      (document.getElementById('ttNewName') as HTMLInputElement).value = '';
       (document.getElementById('ttNewStart') as HTMLInputElement).value = '';
-      (document.getElementById('ttNewEnd')   as HTMLInputElement).value = '';
+      (document.getElementById('ttNewEnd') as HTMLInputElement).value = '';
       this.renderTTEntries();
       this.updateTTStatus();
     });

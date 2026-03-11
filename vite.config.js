@@ -23,6 +23,9 @@ export default defineConfig({
     host: '0.0.0.0', // ネットワークからアクセス可能にする
     open: true
   },
+  optimizeDeps: {
+    entries: ['index.html', 'singularity.html', 'future_2050.html']
+  },
   build: {
     outDir: 'dist',
     sourcemap: true,
