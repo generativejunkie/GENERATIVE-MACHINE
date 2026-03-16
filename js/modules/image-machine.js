@@ -1,8 +1,7 @@
 // ==================== IMAGE MACHINE ====================
 import { CONFIG } from '../config/config.js';
-import { getDialogue } from '../data/dialogue.js';
+
 import { playAmbientMusic, stopAmbientMusic } from './sound-machine.js';
-import { initVoidKeyboard, showInputKeyboard, setDialogueInputCallback, handleCapsuleChoice } from './void-input.js';
 import { broadcastEvent, initSync } from '../utils/sync.js';
 import { getImageAlt } from '../data/image-descriptions.js';
 import { AccessibilitySettings } from './accessibility-controller.js';
@@ -50,22 +49,12 @@ export const imageMachineSketch = (p) => {
         'ascii', 'thermal', 'posterize', 'mirror', 'scanner', 'static', 'liquid', 'binary'
     ];
 
-    // Terminal State
-    const AI_DIALOGUE = getDialogue(); // Get dialogue based on browser language
-    let terminalLog = [];
-    let dialogueIndex = 0;
-    let charIndex = 0;
-    let lastTypeTime = 0;
-    const typeInterval = 40; // ms per char (fast hacker typing)
-    let waitingForInput = false; // Track if waiting for user input
-    let currentInputType = null; // 'yn' or 'capsule'
-    let userInput = ''; // Store user's input choice
     let energySaver = false; // LOW POWER MODE
     let oledSaver = false; // OLED SAVER (True black)
     let autoMode = false;
     let lastAutoSwitchTime = 0;
     let autoSwitchInterval = 8000; // 8 seconds default
-    let typedBuffer = ''; // Buffer for secret codes (void, high, ai)
+    let typedBuffer = ''; // Buffer for secret codes (e.g. 'high')
 
     p.setup = () => {
         try {
@@ -140,12 +129,6 @@ export const imageMachineSketch = (p) => {
             console.log("IMAGE MACHINE: AUTO MODE =", autoMode);
         };
 
-        // Initialize VOID dialogue input system
-        initVoidKeyboard();
-        setDialogueInputCallback((key) => {
-            handleDialogueInputKey(key);
-        });
-
         // [AI] CROSS-TAB MIRRORING SYNC
         initSync({
             'trigger-secret': (detail) => {
@@ -182,19 +165,11 @@ export const imageMachineSketch = (p) => {
                 return;
             }
 
+            // OPAQUE BACKGROUND CLEAR (Prevent CSS checkerboard bleeding)
+            p.background(255);
+
             switch (animationState) {
-                case 'pre_terminal_noise':
-                    drawPreTerminalNoise(currentContent);
-                    animationFrame++;
-                    // 60fps * 3s = 180 frames (mosaic before terminal)
-                    if (animationFrame > 180) {
-                        animationFrame = 0;
-                        animationState = 'terminal';
-                    }
-                    break;
-                case 'terminal':
-                    drawTerminal();
-                    break;
+
                 case 'decay':
                     runTransition(currentContent, animationFrame / transitionDuration, true);
                     animationFrame++;
@@ -293,48 +268,7 @@ export const imageMachineSketch = (p) => {
                     }
                     break;
 
-                case 'mix_noise':
-                    drawPreTerminalNoise();
-                    animationFrame++;
-                    // Short noise burst (e.g. 60 frames = ~1-2 sec)
-                    if (animationFrame > 60) {
-                        animationFrame = 0;
 
-                        // Function to trigger the actual MIX mode logic
-                        const startMixDisplay = () => {
-                            // Keep the inverted visual style from VOID mode
-                            // No need for RETURN button - user can 2-tap title to exit
-
-                            // Resize canvas for fullscreen experience
-                            const container = document.getElementById('imageCanvas-container');
-                            if (container) {
-                                p.resizeCanvas(container.offsetWidth, container.offsetHeight);
-                            }
-
-                            // Start with a random image from the collection
-                            const keys = Object.keys(allImages);
-                            if (keys.length > 0) {
-                                currentImageKey = keys[p.floor(p.random(keys.length))];
-                                useColorMode = false;
-                            }
-
-                            // [VOID MODE] Enable auto-switching immediately
-                            autoMode = true;
-                            lastAutoSwitchTime = p.millis();
-                            autoSwitchInterval = 5000; // Start with 5 seconds, then randomize
-
-                            // Hide the CLICK/TAP prompt in VOID mode
-                            const prompt = document.getElementById('imagePrompt');
-                            if (prompt) prompt.classList.add('hidden');
-
-                            console.log('[VOID] Auto-switch mode activated - 2-tap title to exit');
-
-                            animationState = 'display';
-                        };
-
-                        startMixDisplay();
-                    }
-                    break;
 
                 case 'superhigh':
                     drawSuperHigh();
@@ -1546,11 +1480,16 @@ export const imageMachineSketch = (p) => {
         const canvasRatio = p.width / p.height;
         const imageRatio = img.width / img.height;
 
+        // Opaque darkening by tinting the image itself (No transparent rect overlays!)
+
+
         if (canvasRatio > imageRatio) {
             p.image(img, p.width / 2, p.height / 2, p.width, p.width / imageRatio);
         } else {
             p.image(img, p.width / 2, p.height / 2, p.height * imageRatio, p.height);
         }
+
+
     }
 
     const handleInteraction = () => {
@@ -1640,29 +1579,12 @@ export const imageMachineSketch = (p) => {
     };
 
     p.keyPressed = () => {
-        // Handle VOID dialogue input
-        if (waitingForInput && currentInputType) {
-            const key = p.key.toLowerCase();
-
-            if (currentInputType === 'yn' && (key === 'y' || key === 'n')) {
-                handleDialogueInputKey(key);
-                return false;
-            } else if (currentInputType === 'capsule' && (key === '1' || key === '2' || key === '3')) {
-                handleDialogueInputKey(key);
-                return false;
-            }
-        }
-
         // Collect characters for secret codes
-        if (p.key.length === 1 && !waitingForInput) {
+        if (p.key.length === 1) {
             typedBuffer += p.key.toLowerCase();
             if (typedBuffer.length > 10) typedBuffer = typedBuffer.substring(1);
 
-            if (typedBuffer.endsWith('void') || typedBuffer.endsWith('ai')) {
-                console.log("SECRET TRIGGERED: VOID");
-                p.triggerSecret('void');
-                typedBuffer = '';
-            } else if (typedBuffer.endsWith('high')) {
+            if (typedBuffer.endsWith('high')) {
                 console.log("SECRET TRIGGERED: HIGH");
                 p.triggerSecret('high');
                 typedBuffer = '';
@@ -1676,46 +1598,7 @@ export const imageMachineSketch = (p) => {
         }
     };
 
-    // Handle dialogue input from keyboard or touch
-    function handleDialogueInputKey(key) {
-        if (!waitingForInput || !currentInputType) return;
 
-        console.log(`Input received: ${key}`);
-
-        if (currentInputType === 'yn') {
-            // Y/N input - just acknowledge and continue
-            userInput = key;
-            waitingForInput = false;
-            showInputKeyboard(null); // Hide keyboard
-
-            // Continue to next dialogue line
-            if (dialogueIndex < AI_DIALOGUE.length - 1) {
-                dialogueIndex++;
-                charIndex = 0;
-            }
-        } else if (currentInputType === 'capsule') {
-            const result = handleCapsuleChoice(key);
-            userInput = key;
-
-            if (result === 'mix') {
-                // MIX capsule chosen - continue to VOID mode
-                waitingForInput = false;
-                showInputKeyboard(null);
-
-                // Continue dialogue/transition to VOID
-                if (dialogueIndex < AI_DIALOGUE.length - 1) {
-                    dialogueIndex++;
-                    charIndex = 0;
-                } else {
-                    // Already at end, transition out of terminal
-                    animationState = 'mix_noise';
-                    animationFrame = 0;
-                }
-            }
-        }
-
-        currentInputType = null;
-    }
 
     p.windowResized = () => {
         const container = document.getElementById('imageCanvas-container');
@@ -1725,43 +1608,7 @@ export const imageMachineSketch = (p) => {
     // Scroll state
     let scrollOffset = 0;
 
-    function drawTerminal() {
-        // Draw image, darken, and mosaic
-        if (currentImageKey) {
-            const currentContent = useColorMode ? getColorPattern(currentImageKey) : allImages[currentImageKey];
-            if (currentContent && !useColorMode) {
-                drawImageFullscreen(currentContent);
-            }
-        }
 
-        // Darken the image
-        p.fill(0, 200);
-        p.noStroke();
-        p.rect(0, 0, p.width, p.height);
-
-        // B&W mosaic overlay
-        const blockSize = isTouch() ? 10 : 20;
-        for (let x = 0; x < p.width; x += blockSize) {
-            for (let y = 0; y < p.height; y += blockSize) {
-                if ((Math.floor(x / blockSize) + Math.floor(y / blockSize)) % 2 === 0) {
-                    p.fill(0, 100);
-                } else {
-                    p.fill(255, 20);
-                }
-                p.rect(x, y, blockSize, blockSize);
-            }
-        }
-
-        // (No text or dialogue logic rendered)
-    }
-
-    p.toggleVoid = () => {
-        if (animationState === 'terminal' || animationState === 'pre_terminal_noise') {
-            p.triggerSecret('exit');
-        } else {
-            p.triggerSecret('void');
-        }
-    };
 
     p.nextImage = (fromSync = false) => {
         console.log("[IMAGE] Remote Switch Triggered");
@@ -1774,45 +1621,23 @@ export const imageMachineSketch = (p) => {
         if (!fromSync) {
             broadcastEvent('trigger-secret', { code });
         }
-        if (code === 'void' || code === 'ai') {
-            console.log("AI TERMINAL ACTIVATED");
-            playAmbientMusic('ambient-loop.mp3');
-            animationState = 'pre_terminal_noise';
-            animationFrame = 0;
-
-            // Show backdoor link
-            const backdoorLink = document.getElementById('void-backdoor-link');
-            if (backdoorLink) backdoorLink.classList.remove('hidden');
-
-            terminalLog = [];
-            dialogueIndex = 0;
-            charIndex = 0;
-
-            // IMPORTANT: explicit clear to prevent logic locking
-            nextImageKey = null;
-        } else if (code === 'high') {
+        if (code === 'high') {
             console.log("SUPER HIGH MODE ACTIVATED");
             animationState = 'superhigh';
             document.body.classList.add('superhigh-active');
             playAmbientMusic('ambient-loop.mp3');
         } else if (code === 'exit') {
-            console.log("EXITING TERMINAL");
+            console.log("EXITING SYSTEM MODES");
             stopAmbientMusic(); // Stop background music
 
             animationState = 'rebuild';
             document.body.classList.remove('superhigh-active');
 
-            // Hide backdoor link
-            const backdoorLink = document.getElementById('void-backdoor-link');
-            if (backdoorLink) backdoorLink.classList.add('hidden');
-
             // Restore Image
-            // We need to pick a valid key to rebuild TO
             let keys = Object.keys(allImages);
             if (keys.length > 0) {
                 currentImageKey = keys[0];
             } else {
-                // Determine based on config if image or color
                 const initialIndex = CONFIG.IMAGE_MACHINE.INITIAL_IMAGE_INDEX;
                 const fName = `${CONFIG.IMAGE_MACHINE.PATH_PREFIX}${(initialIndex + 1).toString().padStart(3, '0')}${CONFIG.IMAGE_MACHINE.FILE_EXTENSION}`;
                 currentImageKey = fName;
@@ -1822,30 +1647,10 @@ export const imageMachineSketch = (p) => {
             document.documentElement.style.filter = 'none';
             document.documentElement.style.backgroundColor = '';
             document.body.style.backgroundColor = '';
-
-            // Restore original background colors
-            document.documentElement.style.removeProperty('--color-bg-secondary');
-            document.documentElement.style.removeProperty('--color-bg-tertiary');
         }
     };
 
-    function drawPreTerminalNoise(content) {
-        if (content && !useColorMode) {
-            drawImageFullscreen(content);
-        }
 
-        // Random glitchy mosaic
-        const blockSize = 15;
-        p.noStroke();
-        for (let x = 0; x < p.width; x += blockSize) {
-            for (let y = 0; y < p.height; y += blockSize) {
-                if (p.random() > 0.4) {
-                    p.fill(p.random() > 0.5 ? 0 : 255, p.random(100, 200));
-                    p.rect(x, y, blockSize * p.random(0.5, 2), blockSize);
-                }
-            }
-        }
-    }
 
     function drawSuperHigh() {
         p.background(255);

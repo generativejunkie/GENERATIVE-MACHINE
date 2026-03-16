@@ -587,7 +587,6 @@ app.get('/api/signatures', (req, res) => {
 let activeProjects = [
     { id: 'img01', name: 'IMAGE_MACHINE', status: 'ACTIVE', description: 'Generative Visual Synthesis', resonance: 98 },
     { id: 'snd01', name: 'SOUND_MACHINE', status: 'ACTIVE', description: 'Audio Reactive Matrix', resonance: 85 },
-    { id: 'void01', name: 'VOID_GATEWAY', status: 'STANDBY', description: 'Deep System Access', resonance: 100 },
     { id: 'gst01', name: 'GHOST_LAYER', status: 'PENDING', description: 'Hidden Protocol Layer', resonance: 0 }
 ];
 
@@ -685,9 +684,7 @@ app.post('/api/projects/action', (req, res) => {
             project.status = project.status === 'ACTIVE' ? 'STANDBY' : 'ACTIVE';
         }
 
-        if (project.name === 'GHOST_LAYER' && project.status === 'ACTIVE') {
-            io.emit('command-relay', { type: 'trigger-secret', detail: { code: 'ai' } });
-        }
+
     }
 
     io.emit('project-update', activeProjects);

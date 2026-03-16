@@ -482,80 +482,7 @@ h3 {
     opacity: 0;
 }
 
-/* ==================== VOID Touch Keyboard ==================== */
-.void-keyboard {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 100;
-    transition: opacity 0.3s ease;
-    filter: invert(1);
-    /* Counter the global invert in terminal mode */
-}
 
-.void-keyboard.hidden {
-    display: none;
-}
-
-.void-keyboard-section {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-}
-
-.void-keyboard-section.hidden {
-    display: none;
-}
-
-.void-key {
-    font-family: 'Courier New', monospace;
-    font-size: 20px;
-    font-weight: bold;
-    color: #ffffff !important;
-    background: rgba(0, 0, 0, 0.8);
-    border: 2px solid #ffffff !important;
-    padding: 15px 25px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-transform: uppercase;
-    min-width: 60px;
-    outline: none;
-    opacity: 1 !important;
-    /* Ensure all buttons have same opacity and white color */
-}
-
-.void-key:hover,
-.void-key:focus,
-.void-key:active {
-    background: rgba(0, 0, 0, 0.8) !important;
-    color: #ffffff !important;
-    box-shadow: none !important;
-    transform: none !important;
-    /* Remove interaction effects */
-}
-
-.void-key:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* Mobile adjustments */
-@media (max-width: 768px) {
-    .void-key {
-        font-size: 18px;
-        padding: 12px 20px;
-        min-width: 50px;
-    }
-
-    .void-keyboard {
-        bottom: 10px;
-    }
-
-    .void-keyboard-section {
-        gap: 10px;
-    }
-}
 
 
 
@@ -2034,123 +1961,7 @@ select {
     opacity: 0.6;
 }
 
-/* ==================== MIX Mode (VOID Secret) ==================== */
-body.mix-mode {
-    overflow: hidden;
-    background-color: #000;
-}
 
-/* Hide everything by default */
-body.mix-mode>header,
-body.mix-mode>footer,
-body.mix-mode>main>section,
-body.mix-mode .skip-link {
-    display: none !important;
-}
-
-/* Show only Image Machine section wrapper (but hide its normal contents) */
-body.mix-mode>main,
-body.mix-mode>main>section#image-machine {
-    display: block !important;
-    position: static !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    height: auto !important;
-    overflow: visible !important;
-}
-
-/* Hide inner UI elements of Image Machine */
-body.mix-mode #image-machine .section-header,
-body.mix-mode #image-machine .machine-controls,
-body.mix-mode #imagePrompt,
-body.mix-mode .void-keyboard {
-    display: none !important;
-}
-
-/* Position the canvas wrapper strictly */
-body.mix-mode #image-machine .machine-canvas-wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 9999;
-    background: #000;
-    margin: 0;
-    border: none;
-    border-radius: 0;
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    /* Let clicks pass to canvas/buttons if needed, but wrapper is mainly bg */
-}
-
-/* Container holds the canvas */
-body.mix-mode #imageCanvas-container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: auto;
-}
-
-/* Force Landscape on Portrait Mobile */
-@media (max-width: 768px) and (orientation: portrait) {
-
-    /* 
-       To force landscape:
-       1. Rotate the CONTAINER, not just the canvas
-       2. Swap Width and Height units (100vw <-> 100vh)
-       3. Center it absolute-ly
-    */
-    body.mix-mode #imageCanvas-container {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        width: 100vh !important;
-        /* Width becomes formatted height of screen */
-        height: 100vw !important;
-        /* Height becomes formatted width of screen */
-        transform: translate(-50%, -50%) rotate(90deg);
-        transform-origin: center center;
-    }
-
-    body.mix-mode #imageCanvas-container canvas {
-        width: 100% !important;
-        height: 100% !important;
-        transform: none !important;
-        /* No double rotation */
-        object-fit: cover;
-    }
-}
-
-/* Return to Matrix Button */
-.return-matrix-btn {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 10000;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    font-family: 'Courier New', monospace;
-    font-size: 10px;
-    letter-spacing: 1px;
-    padding: 8px 12px;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(2px);
-}
-
-.return-matrix-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.8);
-    border-color: rgba(255, 255, 255, 0.5);
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-}
 
 /* INP Optimization: Prevent zoom delay on tap target */
 #image-machine-title {
@@ -2459,53 +2270,9 @@ body.superhigh-active .section-title {
     }
 }
 
-.return-matrix-btn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 9999;
-    padding: 10px 20px;
-    background: #000;
-    color: #fff;
-    border: 1px solid #fff;
-    font-family: var(--font-family-mono);
-    cursor: pointer;
-    transition: all 0.2s;
-}
 
-.return-matrix-btn:hover {
-    background: #fff;
-    color: #000;
-}
 
-/* ==================== VOID MODE LIMITED ==================== */
-#nav-void-trigger {
-    position: relative;
-}
 
-#nav-void-trigger span {
-    display: inline-block;
-    animation: void-pulse 1.5s infinite ease-in-out;
-}
-
-@keyframes void-pulse {
-
-    0%,
-    100% {
-        opacity: 0.7;
-        transform: scale(1);
-    }
-
-    50% {
-        opacity: 1;
-        transform: scale(1.1);
-    }
-}
-
-#nav-void-trigger:hover {
-    color: #ff00ff !important;
-    text-shadow: 0 0 8px rgba(255, 0, 255, 0.4);
-}
 
 /* ==================== Gesture UI (Vision Watcher) ==================== */
 .gesture-indicator {

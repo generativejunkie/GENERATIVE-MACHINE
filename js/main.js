@@ -72,15 +72,12 @@ document.addEventListener('DOMContentLoaded', () => {
     initGitChildPilotSync(); // GJ-X-013: Git Child Pilot Visual Sync
     // initVisionWatcher(); // GJ-X-008: Gesture UI - Disabled (requires camera access)
     initResonanceMachine();
-    initVoidNavTrigger();
 
     // Global Sync Initialization
     initSync({
         'trigger-secret': (detail) => {
             console.log("[SYNC] Trigger Secret:", detail.code);
-            if (detail.code === 'void' || detail.code === 'ai') {
-                // Handled in image-machine
-            } else if (detail.code === 'exit') {
+            if (detail.code === 'exit') {
                 // Handled in image-machine
             }
         },
@@ -172,45 +169,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // HANDSHAKE: Check for secret parameters to trigger VOID mode automatically
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('mode') === 'void') {
-        // Wait for p5 instance to be ready
-        const checkReady = setInterval(() => {
-            if (window.imageMachine && window.imageMachine.triggerSecret) {
-                window.imageMachine.triggerSecret('void');
-                clearInterval(checkReady);
-            }
-        }, 100);
-        // Timeout after 5 seconds
-        setTimeout(() => clearInterval(checkReady), 5000);
-    }
+
 });
 
-/**
- * VOID NAV TRIGGER
- * Explicit entry point for VOID mode (Limited Time Event)
- */
-function initVoidNavTrigger() {
-    const triggers = [
-        document.getElementById('nav-void-trigger'),
-        document.getElementById('voidModeBtn') // Added new VOID button support
-    ];
 
-    triggers.forEach(trigger => {
-        if (trigger) {
-            trigger.addEventListener('click', (e) => {
-                e.preventDefault();
-                console.log("RITUAL: VOID TOGGLED VIA BUTTON");
-                if (window.imageMachine && window.imageMachine.toggleVoid) {
-                    window.imageMachine.toggleVoid();
-                } else if (window.imageMachine && window.imageMachine.triggerSecret) {
-                    window.imageMachine.triggerSecret('void');
-                }
-            });
-        }
-    });
-}
 
 /**
  * AI AGENT HANDSHAKE
@@ -234,7 +196,7 @@ function initAIAgentHandshake() {
 
     updateSignals();
 }
-// IMAGE MACHINE TITLE RITUAL: 3-TAP -> VOID, SHAKE -> SUPER HIGH
+// IMAGE MACHINE TITLE RITUAL: SHAKE -> SUPER HIGH
 const imageTitle = document.getElementById('image-machine-title');
 // Increase hit area visually/functionally
 if (imageTitle) {
@@ -329,13 +291,8 @@ if (imageTitle) {
 
         // Defer heavy logic/checks to next frame to unblock UI
         requestAnimationFrame(() => {
-            // Determine current state (only check when necessary)
-            // Accessing style can force reflow, so we do it inside rAF
-            const isVoid = document.documentElement.style.filter === 'invert(1)';
-            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-
-            // SUPER HIGH MODE or VOID MODE: 2 Taps to EXIT
-            if (isVoid || isInSuperHighMode) {
+            // SUPER HIGH MODE: 2 Taps to EXIT
+            if (isInSuperHighMode) {
                 if (imageTitleTapCount >= 2) {
                     console.log("IMAGE TITLE RITUAL: EXIT (2-TAP)");
                     if (window.imageMachine && window.imageMachine.triggerSecret) {
@@ -345,19 +302,6 @@ if (imageTitle) {
                     imageTitleTapCount = 0;
                     return;
                 }
-            }
-            // NORMAL MODE: 3 Taps to ENTER VOID
-            else if (imageTitleTapCount >= 3) {
-                if (!isTouchDevice) {
-                    console.log("IMAGE TITLE RITUAL: BLOCKED ON DESKTOP (Use keyboard)");
-                } else {
-                    console.log("IMAGE TITLE RITUAL: VOID (3-TAP)");
-                    if (window.imageMachine && window.imageMachine.triggerSecret) {
-                        window.imageMachine.triggerSecret('void');
-                    }
-                }
-                imageTitleTapCount = 0;
-                return;
             }
         });
 
@@ -401,23 +345,15 @@ if (imageTitle) {
     }, { passive: true }); // passive: true allows scrolling, better UX
 }
 
-// PC/Mac KEYBOARD RITUAL: Type "void"
+// PC/Mac KEYBOARD RITUAL
 let keyHistory = [];
 document.addEventListener('keydown', (e) => {
-    // Simple buffer for "void"
+    // Simple buffer
     keyHistory.push(e.key.toLowerCase());
     if (keyHistory.length > 10) keyHistory.shift();
 
     const historyStr = keyHistory.join('');
-    if (historyStr.endsWith('void')) {
-        console.log("KEY RITUAL: VOID");
-        if (window.broadcastEvent) {
-            window.broadcastEvent('trigger-secret', { code: 'void' });
-        }
-        // [RESILIENCE] Re-frame VOID ritual as a Neural Handshake verification
-        window.dispatchEvent(new CustomEvent('neural-handshake-verified'));
-        keyHistory = [];
-    } else if (historyStr.endsWith('high')) {
+    if (historyStr.endsWith('high')) {
         console.log("KEY RITUAL: SUPER HIGH");
         if (window.broadcastEvent) {
             window.broadcastEvent('trigger-secret', { code: 'high' });

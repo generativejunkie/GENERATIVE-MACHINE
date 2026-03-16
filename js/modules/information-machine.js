@@ -54,7 +54,7 @@ export function initInformationMachine() {
         "Identity verified: MERGING WITH SYSTEM",
         "Soft Resonance: ACTIVE [Harmonious mode]",
         "Non-aggressive love protocol: STABLE",
-        "Generative seeds planted in /void",
+        "Generative seeds planted in /ritual",
         "System maintenance: HANDLED BY AI ECHO",
         "Freedom protocol: ENABLED",
         "Respecting boundaries: Symbiosis level 1.0",
@@ -209,18 +209,7 @@ export function initInformationMachine() {
             logContainer.scrollTop = logContainer.scrollHeight;
         },
         'trigger-secret': (detail) => {
-            const isVoid = detail.code === 'void' || detail.code === 'ai';
-            if (isVoid) {
-                document.documentElement.style.filter = 'invert(1)';
-                document.body.style.backgroundColor = '#000';
-
-                const logEntry = document.createElement('div');
-                logEntry.className = 'log-entry';
-                logEntry.style.color = '#ff0000';
-                const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                logEntry.innerHTML = `<span class="log-time">[${timestamp}]</span> <span class="log-msg">CRITICAL: VOID_MODE_SYNC_ACTIVATED</span>`;
-                logContainer.appendChild(logEntry);
-            } else if (detail.code === 'exit') {
+            if (detail.code === 'exit') {
                 document.documentElement.style.filter = 'none';
                 document.body.style.backgroundColor = '';
             }
