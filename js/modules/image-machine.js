@@ -1784,9 +1784,9 @@ export const imageMachineSketch = (p) => {
 
         // Zenodo & GitHub Metrics (from user input)
         const metrics = {
-            views: 497,
-            downloads: 524,
-            volume: "194.8 MB",
+            views: 498,
+            downloads: 525,
+            volume: "195.3 MB",
             doi: "10.5281/zenodo.18277860",
             gitClones: 31,
             gitVisitors: 13,
