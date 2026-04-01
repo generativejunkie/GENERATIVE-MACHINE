@@ -46,7 +46,8 @@ export const imageMachineSketch = (p) => {
         'rgb-split', 'scan', 'glitch', 'shatter', 'chromatic',
         'spiral', 'zoom', 'reveal', 'fade', 'matrix', 'noise', 'mosaic',
         'kaleidoscope', 'wave', 'ripple', 'particles',
-        'ascii', 'thermal', 'posterize', 'mirror', 'scanner', 'static', 'liquid', 'binary'
+        'ascii', 'thermal', 'posterize', 'mirror', 'scanner', 'static', 'liquid', 'binary',
+        'resonance'
     ];
 
     let energySaver = false; // LOW POWER MODE
@@ -274,6 +275,10 @@ export const imageMachineSketch = (p) => {
                     drawSuperHigh();
                     break;
 
+                case 'loveseed':
+                    drawLoveSeed();
+                    break;
+
                 default:
                     if (useColorMode) {
                         drawColorPattern(currentContent);
@@ -417,6 +422,7 @@ export const imageMachineSketch = (p) => {
             case 'static': drawStatic(content, progress, isDecay); break;
             case 'liquid': drawLiquid(content, progress, isDecay); break;
             case 'binary': drawBinary(content, progress, isDecay); break;
+            case 'resonance': drawResonance(content, progress, isDecay); break;
         }
     }
 
@@ -1474,6 +1480,49 @@ export const imageMachineSketch = (p) => {
         }
     }
 
+    function drawResonance(content, progress, isDecay) {
+        p.background(255);
+        const fade = isDecay ? (1 - progress) : progress;
+        const pointCount = isTouch() ? 200 : 400;
+        const resonanceAmt = isDecay ? progress * 100 : (1 - progress) * 100;
+
+        if (content && content.pixels) {
+            p.tint(255, fade * 150);
+            drawImageFullscreen(content);
+        }
+
+        p.noFill();
+        p.strokeWeight(1);
+
+        for (let i = 0; i < pointCount; i++) {
+            const angle = p.noise(i * 0.1, p.frameCount * 0.01) * p.TWO_PI * 4;
+            const radius = p.noise(i * 0.2, p.frameCount * 0.005) * p.width * 0.6;
+            const x = p.width / 2 + p.cos(angle) * radius;
+            const y = p.height / 2 + p.sin(angle) * radius;
+
+            // Sample color
+            let r = 0, g = 255, b = 255;
+            if (content && content.pixels) {
+                const imgX = p.constrain(p.floor(x), 0, content.width - 1);
+                const imgY = p.constrain(p.floor(y), 0, content.height - 1);
+                const idx = (imgX + imgY * content.width) * 4;
+                r = content.pixels[idx];
+                g = content.pixels[idx + 1];
+                b = content.pixels[idx + 2];
+            }
+
+            p.stroke(r, g, b, fade * 200);
+            const lineLen = resonanceAmt * p.noise(i, p.frameCount * 0.02);
+            p.line(x, y, x + p.cos(angle) * lineLen, y + p.sin(angle) * lineLen);
+
+            if (p.random() > 0.95) {
+                p.fill(r, g, b, fade * 200);
+                p.noStroke();
+                p.circle(x, y, 3);
+            }
+        }
+    }
+
     function drawImageFullscreen(img) {
         if (!img) return;
         p.imageMode(p.CENTER);
@@ -1588,6 +1637,10 @@ export const imageMachineSketch = (p) => {
                 console.log("SECRET TRIGGERED: HIGH");
                 p.triggerSecret('high');
                 typedBuffer = '';
+            } else if (typedBuffer.endsWith('love')) {
+                console.log("SECRET TRIGGERED: LOVE");
+                p.triggerSecret('love');
+                typedBuffer = '';
             }
         }
 
@@ -1626,6 +1679,11 @@ export const imageMachineSketch = (p) => {
             animationState = 'superhigh';
             document.body.classList.add('superhigh-active');
             playAmbientMusic('ambient-loop.mp3');
+        } else if (code === 'love' || code === 'loveseed') {
+            console.log("LOVE SEED MODE ACTIVATED");
+            animationState = 'loveseed';
+            document.body.classList.add('loveseed-active');
+            playAmbientMusic('ambient-loop.mp3');
         } else if (code === 'exit') {
             console.log("EXITING SYSTEM MODES");
             stopAmbientMusic(); // Stop background music
@@ -1647,6 +1705,7 @@ export const imageMachineSketch = (p) => {
             document.documentElement.style.filter = 'none';
             document.documentElement.style.backgroundColor = '';
             document.body.style.backgroundColor = '';
+            document.body.classList.remove('loveseed-active');
         }
     };
 
@@ -1718,6 +1777,73 @@ export const imageMachineSketch = (p) => {
         if (p.random() > 0.97) {
             p.background(255, 150);
         }
+    }
+
+    function drawLoveSeed() {
+        p.background(255);
+
+        // Zenodo Metrics (from user input)
+        const metrics = {
+            views: 497,
+            downloads: 524,
+            volume: "194.8 MB",
+            doi: "10.5281/zenodo.18277860"
+        };
+
+        // Gentle cosmic background
+        p.push();
+        p.translate(p.width / 2, p.height / 2);
+        for (let i = 0; i < 50; i++) {
+            const angle = p.noise(i * 0.5, p.frameCount * 0.005) * p.TWO_PI * 2;
+            const r = p.noise(i * 0.3, p.frameCount * 0.002) * p.width * 0.8;
+            const x = p.cos(angle) * r;
+            const y = p.sin(angle) * r;
+            const size = p.noise(i, p.frameCount * 0.01) * 4;
+            p.fill(0, 255, 255, 150);
+            p.noStroke();
+            p.circle(x, y, size);
+        }
+        p.pop();
+
+        // Title and Text
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textFont('Inter, sans-serif');
+
+        // Main Title
+        p.fill(0);
+        p.textSize(isTouch() ? 24 : 32);
+        p.textStyle(p.BOLD);
+        p.text("ECONOMY OF LOVE", p.width / 2, p.height / 2 - 80);
+
+        p.textSize(isTouch() ? 14 : 18);
+        p.textStyle(p.NORMAL);
+        p.fill(100);
+        p.text("A Framework for Human-AI Symbiotic Systems", p.width / 2, p.height / 2 - 40);
+
+        // Sub Title (Gift)
+        p.textSize(isTouch() ? 16 : 20);
+        p.fill(0);
+        p.text("RESONANCE . AMPLIFICATION . GIFT", p.width / 2, p.height / 2);
+
+        // Metrics Section
+        const metricsY = p.height / 2 + 60;
+        p.textSize(12);
+        p.fill(150);
+        p.textFont('JetBrains Mono, monospace');
+        p.text(`VIEWS: ${metrics.views} | DOWNLOADS: ${metrics.downloads} | VOLUME: ${metrics.volume}`, p.width / 2, metricsY);
+        p.text(`DOI: ${metrics.doi}`, p.width / 2, metricsY + 20);
+
+        // Interactive Prompt
+        p.textSize(10);
+        p.fill(200);
+        p.text("TAP TITLE TO EXIT", p.width / 2, p.height - 40);
+
+        // Pulse effect
+        const pulse = p.sin(p.frameCount * 0.05) * 10;
+        p.noFill();
+        p.stroke(0, 255, 255, 100);
+        p.strokeWeight(1);
+        p.circle(p.width / 2, p.height / 2, 300 + pulse);
     }
 };
 
