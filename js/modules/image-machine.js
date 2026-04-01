@@ -1788,8 +1788,8 @@ export const imageMachineSketch = (p) => {
             downloads: 525,
             volume: "195.3 MB",
             doi: "10.5281/zenodo.18277860",
-            gitClones: 31,
-            gitVisitors: 13,
+            gitClones: 538,
+            gitVisitors: 15,
             gitUnique: 26
         };
 
