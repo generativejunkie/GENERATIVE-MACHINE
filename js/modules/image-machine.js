@@ -1782,12 +1782,15 @@ export const imageMachineSketch = (p) => {
     function drawLoveSeed() {
         p.background(255);
 
-        // Zenodo Metrics (from user input)
+        // Zenodo & GitHub Metrics (from user input)
         const metrics = {
             views: 497,
             downloads: 524,
             volume: "194.8 MB",
-            doi: "10.5281/zenodo.18277860"
+            doi: "10.5281/zenodo.18277860",
+            gitClones: 31,
+            gitVisitors: 13,
+            gitUnique: 26
         };
 
         // Gentle cosmic background
@@ -1830,8 +1833,9 @@ export const imageMachineSketch = (p) => {
         p.textSize(12);
         p.fill(150);
         p.textFont('JetBrains Mono, monospace');
-        p.text(`VIEWS: ${metrics.views} | DOWNLOADS: ${metrics.downloads} | VOLUME: ${metrics.volume}`, p.width / 2, metricsY);
-        p.text(`DOI: ${metrics.doi}`, p.width / 2, metricsY + 20);
+        p.text(`ZENODO: ${metrics.views} VIEWS | ${metrics.downloads} DOWNLOADS`, p.width / 2, metricsY);
+        p.text(`GITHUB: ${metrics.gitClones} CLONES | ${metrics.gitVisitors} VISITORS`, p.width / 2, metricsY + 20);
+        p.text(`DOI: ${metrics.doi}`, p.width / 2, metricsY + 40);
 
         // Interactive Prompt
         p.textSize(10);
